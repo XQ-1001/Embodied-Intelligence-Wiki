@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>擎仓机器人 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> <span class="breadcrumb-sep">›</span> <span>擎仓机器人</span></div>
+  <div class="wiki-header"><h1>擎仓机器人</h1><div class="subtitle">北京擎仓机器人科技 · 2025年创立 · 北京/江西 · 智能仓储物流机器人 · 极早期</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#team">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#finance">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#a1">2.1 团队与场景匹配度</a></li>
+        <li class="toc-lvl4"><a href="#a2">2.2 技术路线适配性</a></li>
+        <li class="toc-lvl4"><a href="#a3">2.3 资本结构影响</a></li>
+        <li class="toc-lvl4"><a href="#a4">2.4 路径调整</a></li>
+        <li class="toc-lvl4"><a href="#a5">2.5 竞争定位</a></li>
+        <li class="toc-lvl4"><a href="#a6">2.6 其他观察</a></li>
+        <li class="toc-lvl2"><a href="#refs">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">擎仓机器人</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">北京擎仓机器人科技有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">关联实体</div><div class="ib-value">北京擎仓科技有限公司<br>江西擎仓智能装备有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">成立</div><div class="ib-value">2025年10月(北京主体)<br>2026年2月(江西主体)</div></div>
+        <div class="ib-row"><div class="ib-label">注册地</div><div class="ib-value">北京经开区/海淀<br>江西萍乡</div></div>
+        <div class="ib-row"><div class="ib-label">法定代表人</div><div class="ib-value">苏广泉(北京)<br>肖勇(江西)</div></div>
+        <div class="ib-section">投资方(tracker)</div>
+        <div class="ib-row"><div class="ib-label">投资方</div><div class="ib-value">隐山资本、纵腾集团、钟鼎资本</div></div>
+        <div class="ib-section">标签</div>
+        <div class="ib-row"><div class="ib-label">领域</div><div class="ib-value"><span class="tag">仓储物流</span><span class="tag">智能装备</span><span class="tag tag-info">工业机器人</span></div></div>
+      </aside>
+
+      <p class="article-intro"><b>擎仓机器人</b>（北京擎仓机器人科技有限公司）是一家成立于2025年10月的智能仓储物流机器人公司，由苏广泉创立，总部位于北京经济技术开发区。公司聚焦仓储物流场景的智能化装备，设有北京擎仓科技、江西擎仓智能装备等关联实体。根据tracker记录，投资方包括隐山资本、纵腾集团和钟鼎资本——均为物流供应链领域的头部产业和财务投资机构。公司目前处于极早期阶段，尚无公开的产品发布或融资公告。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper"><table class="wikitable infotable">
+        <tr><th>项目</th><th>内容</th></tr>
+        <tr><td>公司全称</td><td>北京擎仓机器人科技有限公司</td></tr>
+        <tr><td>成立时间</td><td>2025年10月30日</td></tr>
+        <tr><td>法定代表人</td><td>苏广泉</td></tr>
+        <tr><td>注册资本</td><td>50万元人民币</td></tr>
+        <tr><td>注册地址</td><td>北京市北京经济技术开发区经海三路109号院62号楼3层302室</td></tr>
+        <tr><td>关联实体</td><td>北京擎仓科技有限公司（2026年2月，北京海淀，苏广泉担任法人）；江西擎仓智能装备有限公司（2026年2月，江西萍乡，肖勇担任法人，注册资本1000万元）</td></tr>
+        <tr><td>经营范围</td><td>智能机器人研发/销售、工业机器人制造/销售、服务消费机器人、伺服控制机构、软件开发、货物进出口等；江西主体聚焦智能仓储装备、智能物料搬运装备</td></tr>
+        <tr><td>上市状态</td><td>未上市</td></tr>
+      </table></div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>时间</th><th>事件</th></tr>
+        <tr><td>2025年10月30日</td><td>北京擎仓机器人科技有限公司成立（北京经开区，注册资本50万元）</td></tr>
+        <tr><td>2026年2月</td><td>北京擎仓科技有限公司成立（北京海淀）；江西擎仓智能装备有限公司成立（江西萍乡，注册资本1000万元）</td></tr>
+      </table></div>
+
+      <h3 id="team">1.2 创始人及核心团队</h3>
+      <p>公司法定代表人为<b>苏广泉</b>，同时担任北京擎仓机器人和北京擎仓科技两家公司的法人代表。江西擎仓智能装备的法定代表人为<b>肖勇</b>。目前公开渠道尚未有创始团队履历的详细信息披露。</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+        <tr><td>法定代表人(北京)</td><td>苏广泉</td><td>公开信息有限，同时担任北京两家擎仓实体法人代表</td></tr>
+        <tr><td>法定代表人(江西)</td><td>肖勇</td><td>公开信息有限</td></tr>
+      </table></div>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <p>公司目前<b>未公开披露正式融资轮次及金额</b>。根据tracker记录，投资方包括三家物流供应链领域头部机构：</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>投资方</th><th>背景</th></tr>
+        <tr><td>隐山资本（Hidden Hill Capital）</td><td>普洛斯（GLP）旗下私募股权投资平台，专注物流供应链科技</td></tr>
+        <tr><td>纵腾集团</td><td>跨境电商物流基础设施龙头，覆盖海外仓、专线物流等</td></tr>
+        <tr><td>钟鼎资本</td><td>专注供应链+的头部VC，物流领域投资包括满帮、货拉拉、纵腾集团等</td></tr>
+      </table></div>
+      <div class="callout"><div class="callout-title">提示</div>上述三家投资方在物流供应链生态中关系密切——隐山资本管理合伙人东方浩曾任钟鼎资本创始合伙人，隐山也曾投资纵腾集团。三家联合投资擎仓机器人，表明其可能定位为仓储物流场景的具身智能解决方案。具体融资条款建议关注工商变更记录。</div>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <p>公司处于极早期阶段，技术路线尚未公开披露。从经营范围（智能机器人、工业机器人、伺服控制机构、智能仓储装备、物料搬运装备）和投资方画像推断，公司可能聚焦于<b>仓储物流场景的自动化与智能化</b>，涉及AGV/AMR搬运机器人、智能仓储系统、伺服控制等方向。</p>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <p>公司尚未公开发布任何产品。根据注册经营范围，产品方向可能涵盖：智能仓储装备、智能物料搬运装备、工业机器人、自动导引车（AGV）等。</p>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <p>从投资方生态推断，公司潜在应用场景包括：大型物流枢纽仓储自动化、跨境电商海外仓智能搬运、工业制造产线物料配送等。</p>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <p>公司成立不到一年，尚无公开的商业化数据。江西主体注册资本1000万元，规模大于北京主体，可能作为未来生产基地。</p>
+
+      <h3 id="finance">1.8 财务数据</h3>
+      <p>公司处于极早期，无公开财务数据。</p>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>公司注册地分布北京（研发/总部）和江西萍乡（智能装备制造），利用北京的研发人才优势和江西的制造成本优势。</li>
+        <li>三家投资方均为物流供应链领域顶尖机构，暗示公司可能获得丰富的产业场景资源——纵腾集团的海外仓网络、隐山资本的物流地产网络、钟鼎资本的物流科技生态。</li>
+        <li>公司名称"擎仓"暗示"擎举仓储"，与其仓储物流定位一致。</li>
+        <li>北京擎仓机器人与北京擎仓科技为同一法人代表（苏广泉），可能分别负责硬件制造和技术研发。</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="a1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>由于创始团队履历尚未公开，难以进行深入评估。但从公司选择仓储物流赛道来看，这是一个资本密集、场景明确、技术路径相对清晰的领域。如果团队具有物流自动化、工业机器人或供应链相关经验，将高度适配该场景；若团队来自其他领域，则需关注其技术迁移能力和行业know-how的积累速度。</p>
+      </div>
+
+      <div class="analysis-block" id="a2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>仓储物流是具身智能落地确定性最高的场景之一——环境结构化、任务标准化、ROI可量化。AGV/AMR技术已较为成熟，当前竞争焦点正从"能跑"向"能操作"（如拣选、码垛）升级。公司若在伺服控制、机械臂操作等方向发力，将切中行业痛点。但面临极智嘉、海柔创新等成熟玩家的竞争，差异化定位至关重要。</p>
+      </div>
+
+      <div class="analysis-block" id="a3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>隐山资本（普洛斯生态）+纵腾集团（跨境物流）+钟鼎资本（供应链VC）的组合堪称仓储物流赛道的"梦之队"。普洛斯的物流地产网络提供场景入口，纵腾的海外仓提供跨境应用场景，钟鼎的portfolio生态提供协同机会。这种产业资本深度绑定的结构可能带来确定性的早期订单，但也可能限制公司服务第三方客户的独立性。</p>
+      </div>
+
+      <div class="analysis-block" id="a4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>公司成立时间极短（不足7个月），尚处于产品定义和团队搭建阶段，尚未经历明显的战略转向。北京+江西的双城布局在早期即确立，显示创始团队对"研发+制造"分离模式有预先规划。</p>
+      </div>
+
+      <div class="analysis-block" id="a5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>在仓储物流机器人赛道，擎仓面临一个关键抉择：是做通用型仓储自动化平台（如极智嘉），还是聚焦特定场景的专用装备（如料箱机器人、装卸机器人）。从投资方阵容看，纵腾集团的跨境物流场景可能引导公司向海外仓自动化方向倾斜，这是一个相对蓝海且具有跨境壁垒的细分市场。</p>
+      </div>
+
+      <div class="analysis-block" id="a6">
+        <h4>2.6 其他重要观察</h4>
+        <p>擎仓机器人是本次wiki覆盖中信息量最少的企业之一，这与其成立时间短、未进行公开市场传播直接相关。然而，投资方阵容的高质量暗示该项目并非普通创业。值得持续关注的关键节点包括：首轮融资的正式公告、首批产品发布、以及与纵腾集团/普洛斯体系的首个落地项目。江西萍乡1000万元注册资本的生产基地能否顺利投产也是验证其执行力的重要指标。</p>
+      </div>
+
+      <h2 id="refs">3 参考资料</h2>
+      <div class="references"><ol>
+        <li><a href="https://www.tianxiaqiye.com/jqrqy/208965.html">北京擎仓机器人科技有限公司 — 天下企业（工商信息）</a></li>
+        <li><a href="https://gongshang.mingluji.com/beijing/name/%e5%8c%97%e4%ba%ac%e6%93%8e%e4%bb%93%e7%a7%91%e6%8a%80%e6%9c%89%e9%99%90%e5%85%ac%e5%8f%b8">北京擎仓科技有限公司 — 名录集（工商信息）</a></li>
+        <li><a href="https://www.fy35.com/company/32078440.html">江西擎仓智能装备有限公司 — 飞阳商务网（工商信息）</a></li>
+        <li><a href="https://gcp.natec.cn/hidden_hill.html">隐山资本（Hidden Hill Capital）简介</a></li>
+        <li><a href="http://chinawuliu.com.cn/zixun/202003/31/497327.shtml">仓擎智能：立志成为传统工业车辆智能化和无人化的AI赋能者 — 中国物流与采购网（行业背景参考）</a></li>
+      </ol></div>
+    </article>
+  </div>
+  <div class="page-footer">本页面最后更新于2026年5月4日 · 内容基于公开工商信息及tracker记录整理 · 具身智能Wiki</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

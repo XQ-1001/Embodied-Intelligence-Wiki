@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>九光智能 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style></head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> › <span>九光智能</span></div>
+  <div class="wiki-header"><h1>九光智能</h1><div class="subtitle">九光智能（北京）技术有限公司 / 深圳九光控股 · 2023年成立 · 全栈自研人形机器人 · 3轮融资超1亿美元</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#founders">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financials">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#misc">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl3"><a href="#a1">2.1 团队与场景匹配度</a></li>
+        <li class="toc-lvl3"><a href="#a2">2.2 技术与场景适配性</a></li>
+        <li class="toc-lvl3"><a href="#a3">2.3 资本结构对战略的影响</a></li>
+        <li class="toc-lvl3"><a href="#a4">2.4 试错与路径调整</a></li>
+        <li class="toc-lvl3"><a href="#a5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl3"><a href="#a6">2.6 其他观察</a></li>
+        <li class="toc-lvl2"><a href="#refs">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">九光智能</div>
+        <div class="ib-row"><div class="ib-label">公司全称</div><div class="ib-value">九光智能（北京）技术有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">控股实体</div><div class="ib-value">深圳九光控股有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2023年9月（北京）<br>2024年4月（深圳控股）</div></div>
+        <div class="ib-row"><div class="ib-label">创始人</div><div class="ib-value">徐志根</div></div>
+        <div class="ib-row"><div class="ib-label">总部</div><div class="ib-value">香港、深圳、武汉</div></div>
+        <div class="ib-section">融资</div>
+        <div class="ib-row"><div class="ib-label">融资轮次</div><div class="ib-value">3轮（天使轮起）</div></div>
+        <div class="ib-row"><div class="ib-label">融资总额</div><div class="ib-value">超1亿美元</div></div>
+        <div class="ib-row"><div class="ib-label">天使轮投资方</div><div class="ib-value">华业天成资本、基石资本</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">武汉投资</div><div class="ib-value">11亿元（产业园）</div></div>
+        <div class="ib-row"><div class="ib-label">量产计划</div><div class="ib-value">2026年Q1，年产3000-5000台</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">赛道</div><div class="ib-value"><span class="tag tag-info">人形机器人</span><span class="tag">具身智能</span><span class="tag">全栈自研</span></div></div>
+        <div class="ib-row"><div class="ib-label">阶段</div><div class="ib-value">量产前夕</div></div>
+        <div class="ib-section">官网</div>
+        <div class="ib-row"><div class="ib-label">官网</div><div class="ib-value">未公开</div></div>
+      </aside>
+
+      <p class="article-intro"><strong>九光智能</strong>（九光智能（北京）技术有限公司，控股实体为深圳九光控股有限公司）是一家成立于2023年的中国人形机器人企业，由华中科技大学少年班校友徐志根创立，在香港、深圳、武汉三地设立总部基地。公司定位为全栈自研的"生产力工具"型具身智能人形机器人企业，自称"武汉第一家以生产力工具机器人作为唯一目标的企业"。已完成三轮融资总额超1亿美元，天使轮投资方为华业天成资本和基石资本。公司计划2026年Q1在武汉实现首批量产，年产3000-5000台，并已于2025年11月启动上市辅导。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper"><table class="wikitable infotable">
+        <tr><th>项目</th><th>内容</th></tr>
+        <tr><td>公司全称</td><td>九光智能（北京）技术有限公司</td></tr>
+        <tr><td>控股实体</td><td>深圳九光控股有限公司（2024年4月成立）</td></tr>
+        <tr><td>英文名称</td><td>Nine Light Intelligence（推测）</td></tr>
+        <tr><td>成立日期</td><td>2023年9月（北京公司）</td></tr>
+        <tr><td>注册地址</td><td>北京（运营实体）；深圳（控股）；武汉（产业基地）</td></tr>
+        <tr><td>创始人/法定代表人</td><td>徐志根</td></tr>
+        <tr><td>公司类型</td><td>有限责任公司</td></tr>
+        <tr><td>经营状态</td><td>存续</td></tr>
+        <tr><td>上市情况</td><td>未上市（2025年11月启动上市辅导）</td></tr>
+        <tr><td>官网</td><td>未公开</td></tr>
+      </table></div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>时间</th><th>事件</th></tr>
+        <tr><td>2023年9月</td><td>九光智能（北京）技术有限公司注册成立</td></tr>
+        <tr><td>2024年4月</td><td>深圳九光控股有限公司成立，作为控股实体</td></tr>
+        <tr><td>2024年11月</td><td>披露天使轮融资，投资方为华业天成资本、基石资本</td></tr>
+        <tr><td>2025年3月</td><td>与武汉东西湖区签约落户，计划投资11亿元建智能机器人产业园</td></tr>
+        <tr><td>2025年11月</td><td>产业园全面开工；启动上市辅导；宣布成立具身智能机器人应用技术研究院</td></tr>
+        <tr><td>2026年Q1（计划）</td><td>首批第三代具身智能机器人在武汉正式下线</td></tr>
+      </table></div>
+
+      <h3 id="founders">1.2 创始人及核心团队</h3>
+      <p>公司由<strong>徐志根</strong>创立。徐志根本硕毕业于华中科技大学少年班（14岁入读），自称武汉为"第二故乡"，这一背景也解释了公司选择武汉作为产业基地的决策。徐志根在2025年11月中国青年企业家协会武汉恳谈会上首次披露量产计划，并表达了扎根武汉、打造全球具身智能机器人产业集群的愿景。公司前硬件合伙人<strong>何俊培</strong>已加入理想汽车，领导内部代号"Nexus"的人形机器人团队。目前公司团队整体规模未公开披露，但在武汉产业园投产在即的背景下，预计处于快速扩张阶段。</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+        <tr><td>创始人</td><td>徐志根</td><td>华中科技大学少年班本硕毕业，14岁入读；具身智能连续创业者；在多家高校和研究机构建立合作关系</td></tr>
+        <tr><td>前硬件合伙人</td><td>何俊培</td><td>已加入理想汽车，领导Nexus人形机器人团队（约30人规模）</td></tr>
+      </table></div>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>轮次</th><th>时间</th><th>金额</th><th>估值</th><th>投资方</th></tr>
+        <tr><td>天使轮</td><td>2024年11月（披露）</td><td>未单独披露</td><td>未披露</td><td>华业天成资本、基石资本</td></tr>
+        <tr><td>后续轮次</td><td>2024-2025年</td><td>未单独披露</td><td>未披露</td><td>未公开</td></tr>
+        <tr><td colspan="3"><strong>累计融资</strong></td><td colspan="2"><strong>超1亿美元（约6.91亿元人民币）</strong></td></tr>
+      </table></div>
+      <p>公司已完成三轮融资，累计融资额超1亿美元。天使轮由华业天成资本和基石资本联合投资。后续两轮投资方未公开披露。公司于2025年11月启动上市辅导，表明可能瞄准科创板或港交所上市。</p>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <p>九光智能采用<strong>全栈自研</strong>技术路线，覆盖"核心部件→关节→整机→AI体系"全链路。公司宣称其全尺寸人形机器人的显性性能指标已达业界领先水平。在训练模式上采用"通用基础+专业训练"策略——先让机器人具备成年人基本能力，再根据具体岗位需求进行定向训练。公司在深圳清华大学研究院成立智能机器人系统研发中心，并与香港大学、华中科技大学、哈佛大学医学院等建立合作关系。2025年11月成立"具身智能机器人应用技术研究院"。专利方面已申请通用仿人形机器人外观设计、三自由度髋部系统、大负载腿部系统、踝部和足底系统、腰身系统等多项专利。</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>维度</th><th>方向</th><th>说明</th></tr>
+        <tr><td>AI技术路线</td><td>全栈AI体系</td><td>从基础硬件→软件平台→AI体系全栈打通</td></tr>
+        <tr><td>硬件方向</td><td>全尺寸人形机器人</td><td>核心部件、关节、整机全自研</td></tr>
+        <tr><td>自研程度</td><td>全栈自研</td><td>部件到AI体系全部自研</td></tr>
+        <tr><td>训练模式</td><td>通用基础+专业训练</td><td>基础能力先行，岗位定向培训</td></tr>
+        <tr><td>研发合作</td><td>深圳清华大学研究院+多高校</td><td>HKU、HUST、哈佛医学院等</td></tr>
+      </table></div>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <p>公司已研发至<strong>第三代人形机器人</strong>，定位为"AI打工人"——具备成年男性基本能力的生产力工具（肩能扛、手能提，可学习、可训练）。产品为全尺寸人形具身智能机器人，全栈自研。公司已申请多项核心专利，包括通用仿人形机器人外观设计、三自由度髋部系统、大负载腿部系统等。计划2026年Q1在武汉首批下线，年产量3000-5000台。</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>代际</th><th>类型</th><th>定位</th><th>状态</th></tr>
+        <tr><td>第三代</td><td>全尺寸人形具身智能机器人</td><td>生产力工具（"AI打工人"）</td><td>研发完成，2026年Q1量产</td></tr>
+      </table></div>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <p>九光智能的应用场景聚焦三大方向：工业高危作业（核辐射、有毒有害环境中的替代人工操作）、高校与科研机构平台（作为研究平台开放给学术界）、以及特种场景（如核废料取样等）。公司已与核能领域企业和研究院进行多轮洽谈，预计首批产品将投入核辐射高危作业场景。</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>场景类别</th><th>具体场景</th><th>进展</th></tr>
+        <tr><td>工业高危作业</td><td>核辐射环境、有毒有害环境、核废料取样</td><td>已与核能企业多轮洽谈</td></tr>
+        <tr><td>科研平台</td><td>高校和科研机构研究平台</td><td>生态开放计划中</td></tr>
+        <tr><td>特种场景</td><td>危险环境替代人工</td><td>产品研发中</td></tr>
+      </table></div>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <p>公司目前处于量产前夜：武汉东西湖区智能机器人产业园已全面开工，计划投资11亿元；首批机器人预计2026年Q1下线，年产量规划3000-5000台。公司计划打通"核心部件→整机制造→垂直场景应用"全生态链，平台将开放给高校和科研机构。训练基地也在同步布局中。</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>指标</th><th>数据</th></tr>
+        <tr><td>计划年产量</td><td>3000-5000台</td></tr>
+        <tr><td>首批下线时间</td><td>2026年Q1</td></tr>
+        <tr><td>武汉产业园投资</td><td>11亿元</td></tr>
+        <tr><td>产业园状态</td><td>已全面开工</td></tr>
+      </table></div>
+
+      <h3 id="financials">1.8 财务数据</h3>
+      <p>公司为非上市企业，未公开披露财务数据。累计融资超1亿美元。计划在武汉5年内投资至少11亿元建设总部基地与产业园。2025年11月启动上市辅导，预计后续将有更多财务信息随IPO进程披露。</p>
+
+      <h3 id="misc">1.9 其他信息</h3>
+      <ul>
+        <li>公司自称"武汉第一家以生产力工具机器人作为唯一目标的企业"，定位清晰</li>
+        <li>创始人徐志根14岁入读华中科技大学少年班，学术背景深厚</li>
+        <li>前硬件合伙人何俊培被挖至理想汽车领导Nexus人形机器人团队，显示行业人才竞争激烈</li>
+        <li>公司通过深圳九光控股作为顶层实体，利于资本运作和上市架构</li>
+        <li>与哈佛大学医学院的合作意向较为罕见，可能涉及医疗机器人场景</li>
+        <li>公司已申请多项机器人核心部件专利，覆盖髋部、腿部、踝部、腰身等关键系统</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="a1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>徐志根的华中科技大学少年班背景为团队注入了扎实的工科基础，华科在机械工程、自动化领域有深厚积累。公司选择核辐射高危作业作为首发场景，而非消费或一般工业场景，体现出务实的差异化策略——高危特种场景对机器人性能要求明确、付费意愿强、容错率低但进入壁垒高。这一场景选择与技术团队的工科硬核背景有较好的匹配：全栈自研的硬件能力（关节、髋部、腿部等核心部件专利布局）正是高危场景所依赖的可靠性和定制化基础。前硬件合伙人何俊培的出走（加入理想汽车）也暗示团队在硬件/运动控制方面有被行业认可的人才储备。</p>
+      </div>
+
+      <div class="analysis-block" id="a2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>九光智能选择全栈自研路线（核心部件→关节→整机→AI体系），这在特种高危场景中具有明显优势：核辐射等环境需要定制化硬件（如抗辐射材料、密封设计、远程操控能力），依赖外部供应商的全栈控制能确保系统可靠性。但全栈自研也意味着研发投入大、周期长。公司宣称的"通用基础+专业训练"训练模式——先具备成年人基本能力，再按岗位定向培训——与高危场景的适配性较好，因为高危场景任务相对标准化（开门、取样、搬运），不需要消费级场景的高度泛化能力。然而，目前未见公司披露具体AI模型架构（如VLA、世界模型等），技术透明度的不足可能影响外界对其AI能力的评估。</p>
+      </div>
+
+      <div class="analysis-block" id="a3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>天使轮投资方华业天成资本和基石资本均为专业VC/PE机构，而非产业资本。纯财务投资者结构意味着公司在场景选择上保持较高独立性，但也缺乏产业资本带来的场景资源绑定。后续两轮融资方未公开，可能包括国资背景（考虑到武汉产业园的11亿元投资规模和地方政府支持）。公司在武汉东西湖区的产业园获得了明显的地方政府资源支持，包括土地、政策和可能的产业基金配套，形成了"VC+地方政府"的双轮资本结构。上市辅导的启动表明公司有明确的资本市场退出路径规划。</p>
+      </div>
+
+      <div class="analysis-block" id="a4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>公司成立时间较短（2023年9月至今不到3年），尚未观察到明显的战略调整或场景切换。从成立到量产规划（2026年Q1）约两年半时间，在硬件驱动的机器人赛道中属于较快节奏。值得注意的是前硬件合伙人何俊培的离职——核心硬件负责人在公司量产前夜离开，可能反映团队内部在技术路线或商业化节奏上存在分歧，也可能纯粹是人才被高薪挖角。公司从北京注册起步，后通过深圳控股公司、武汉产业基地形成三地布局，这一定位调整反映了公司对产业资源（武汉制造基础）和资本资源（深圳金融环境）的务实整合。</p>
+      </div>
+
+      <div class="analysis-block" id="a5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>九光智能在人形机器人赛道中选择了独特的"生产力工具"定位——不追求通用智能或消费级体验，而是聚焦于"真正能打工"的实用型机器人。在场景方面，公司优先选择核辐射等高危工业场景而非更热门的家庭服务或一般工厂场景，这是一种务实的"切口策略"：先做深一个高壁垒场景建立壁垒，再横向扩展。全栈自研路线虽然投入较大，但在特种场景中能形成系统性壁垒。与宇树科技的全品类路线、银河通用的通用大脑路线相比，九光更接近一个"垂直场景的全栈玩家"。</p>
+      </div>
+
+      <div class="analysis-block" id="a6">
+        <h4>2.6 其他重要观察</h4>
+        <p>九光智能的进展速度值得关注：从成立到规划年产3000-5000台的产业园建设仅用了约两年时间，节奏明显快于行业平均水平。11亿元的武汉产业园投资规模对于一个成立不到三年的创业公司而言较为激进，可能存在地方政府深度参与。公司启动上市辅导的时间点（2025年11月）在量产之前，表明公司寄望通过资本市场获取更大规模的资金支持。此外，与哈佛大学医学院的合作意向暗示公司可能在医疗机器人领域有长远布局。人才流失（何俊培加入理想汽车）也反映出具身智能赛道的人才争夺战日益激烈。</p>
+      </div>
+
+      <h2 id="refs">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://news.hubeidaily.net/mobile/c_4729307.html">"打工机器人"将在汉投产，九光项目落地跑出加速度（湖北日报）</a></li>
+          <li><a href="https://www.wuhan.gov.cn/sy/whyw/202511/t20251102_2670893.shtml">"AI打工人"明年在汉量产（武汉市人民政府）</a></li>
+          <li><a href="https://www.dxh.gov.cn/XWZX/MTBD/202511/t20251102_2670891.shtml">"AI打工人"明年在汉量产 替代人从事危险工作（东西湖区）</a></li>
+          <li><a href="https://stock.stockstar.com/RB2024110500032758.shtml">九光控股公布天使轮融资，投资方为华业天成资本、基石资本等（证券之星）</a></li>
+          <li><a href="https://news.hubeidaily.net/pc/c_4729481.html">"打工机器人"将在汉投产（湖北日报PC版）</a></li>
+          <li><a href="https://cjrb.cjn.cn/html/2025-11/02/content_151731_2777999.htm">"AI打工人"明年在汉量产（长江日报）</a></li>
+          <li><a href="https://whwb.cjn.cn/html/2025-11/03/content_152969_2779705.htm">"AI打工人"明年在汉量产（武汉晚报）</a></li>
+          <li><a href="https://www.patentguru.com/cn/company/4070124">九光智能（北京）技术有限公司 - 专利信息（PatentGuru）</a></li>
+          <li><a href="https://www.d1ev.com/newsflash/290249">理想汽车秘密研发人形机器人，双轮版年中或亮相（第一电动）</a></li>
+          <li><a href="https://m.ithome.com/html/926328.htm">消息称理想年内发布首款双轮机器人（IT之家）</a></li>
+          <li><a href="https://zwxww.net/show-42-236618-1.html">年产5000台！武汉将迎来量产"AI打工人"（时事观察）</a></li>
+          <li><a href="https://m.sohu.com/a/950065692_121372103/">"打工机器人"将在汉投产（搜狐）</a></li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">本页面最后更新于2026年5月4日 · 具身智能Wiki · Tier 3实体 · 信息来源截至2026年5月</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

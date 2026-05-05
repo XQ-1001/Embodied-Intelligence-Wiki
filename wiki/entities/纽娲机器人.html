@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>纽娲机器人 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> <span class="breadcrumb-sep">›</span> <span>纽娲机器人</span></div>
+  <div class="wiki-header"><h1>纽娲机器人</h1><div class="subtitle">NeoWa Robotics · 2026年成立 · 种子轮 · 具身智能末端配送</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#founders">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#financing">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financial">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#analysis-1">2.1 团队背景与场景匹配度</a></li>
+        <li class="toc-lvl4"><a href="#analysis-2">2.2 技术路线与场景适配性</a></li>
+        <li class="toc-lvl4"><a href="#analysis-3">2.3 资本结构对战略的影响</a></li>
+        <li class="toc-lvl4"><a href="#analysis-4">2.4 试错过程与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#analysis-5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#analysis-6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#references">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">纽娲机器人</div>
+        <div class="ib-row"><div class="ib-label">英文名称</div><div class="ib-value">NeoWa Robotics</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2026年2月</div></div>
+        <div class="ib-row"><div class="ib-label">总部</div><div class="ib-value">中国·上海（长宁区）</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">赛道</div><div class="ib-value">具身智能·末端配送</div></div>
+        <div class="ib-row"><div class="ib-label">融资阶段</div><div class="ib-value">种子轮（千万级人民币）</div></div>
+        <div class="ib-row"><div class="ib-label">创始人</div><div class="ib-value">杨睿刚（IEEE Fellow）</div></div>
+        <div class="ib-row"><div class="ib-label">核心技术</div><div class="ib-value">VLMM视觉-语言移动模型</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">标签</div><div class="ib-value"><span class="tag tag-info">具身智能</span><span class="tag">末端配送</span><span class="tag">种子轮</span><span class="tag tag-warn">极早期</span></div></div>
+      </aside>
+
+      <p class="article-intro">纽娲机器人（NeoWa Robotics）是一家成立于2026年2月的具身智能初创公司，总部位于上海，由前百度机器人与自动驾驶实验室主任、嬴彻科技CTO <strong>杨睿刚</strong>博士创立。公司聚焦社区与楼宇"最后500米"末端配送场景，自研视觉-语言移动模型（VLMM），以强化学习统一感知、导航与决策，实现无需高精地图的开放环境理解与复杂地形通行。2026年3月完成千万级人民币种子轮融资，已进入真实环境验证阶段。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper">
+        <table class="wikitable infotable">
+          <tr><th>项目</th><th>内容</th></tr>
+          <tr><td>公司全称</td><td>纽娲机器人（NeoWa Robotics）</td></tr>
+          <tr><td>成立时间</td><td>2026年2月</td></tr>
+          <tr><td>注册地</td><td>上海·长宁区</td></tr>
+          <tr><td>创始人</td><td>杨睿刚博士</td></tr>
+          <tr><td>赛道定位</td><td>具身智能·末端配送机器人</td></tr>
+          <tr><td>当前阶段</td><td>种子轮 / 真实环境验证</td></tr>
+          <tr><td>官方网站</td><td>暂未公开</td></tr>
+        </table>
+      </div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>时间</th><th>事件</th></tr>
+          <tr><td>2025年底—2026年初</td><td>杨睿刚从嬴彻科技离职，筹备具身智能创业</td></tr>
+          <tr><td>2026年2月</td><td>纽娲机器人在上海长宁区正式注册成立</td></tr>
+          <tr><td>2026年3月27日</td><td>36氪、投资界、澎湃新闻等多家媒体同步报道种子轮融资完成，金额千万级人民币</td></tr>
+          <tr><td>2026年3月起</td><td>已进入真实环境验证阶段，在社区/园区场景中测试配送机器人</td></tr>
+        </table>
+      </div>
+
+      <h3 id="founders">1.2 创始人及核心团队</h3>
+
+      <p>纽娲机器人的核心团队由创始人杨睿刚领衔，成员来自百度、华为、嬴彻科技等头部科技企业，覆盖AI大模型、机器人系统与自动驾驶三大关键技术领域。团队整体呈现典型的"产业大牛+学术精英"混合型人才结构。</p>
+
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+          <tr><td>创始人 & CEO</td><td>杨睿刚</td><td>清华大学计算机系本科（1996届），哥伦比亚大学硕士，美国肯塔基大学终身教授，2022年当选IEEE Fellow。曾任百度机器人与自动驾驶实验室主任，主导开发全球首个自动驾驶增强仿真系统AADS（登Science Robotics封面），主持ApolloScape开源数据集。后任嬴彻科技CTO，带领团队实现自动驾驶重卡5亿公里商业化运营、97%高速覆盖率、95%市占率。同时担任上海交通大学特聘教授。</td></tr>
+          <tr><td>核心团队</td><td>未公开披露</td><td>核心成员来自百度、华为、嬴彻科技，具备AI大模型训练、移动机器人硬件集成、自动驾驶系统工程等复合能力。截至2026年4月，公司总人数与研发占比未公开。</td></tr>
+        </table>
+      </div>
+
+      <p>团队人才特点：创始人兼具学术权威（IEEE Fellow、终身教授）与产业落地经验（嬴彻CTO、百度实验室主任），是典型的"产学研"复合型创业者。自动驾驶产业出身的团队在感知-决策-控制系统工程方面具有深厚积累，这一背景直接决定了公司切入末端配送场景的技术路线选择。</p>
+
+      <h3 id="financing">1.3 融资与股东</h3>
+
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>轮次</th><th>时间</th><th>金额</th><th>投资方</th><th>估值</th></tr>
+          <tr><td>种子轮</td><td>2026年3月</td><td>千万级人民币</td><td>未公开披露</td><td>未公开</td></tr>
+          <tr><td>种子+（追加）</td><td>2026年3—4月</td><td>金额未公开</td><td>未公开披露（知情人士称"被投资人堵门口投了一轮"）</td><td>未公开</td></tr>
+        </table>
+      </div>
+
+      <div class="callout">
+        <div class="callout-title">融资特点</div>
+        <p>种子轮由多家一线创投媒体（36氪、投资界、钛媒体、投中网）同步首发报道，属于典型的"明星创始人+热门赛道"高端抢投案例。投资方信息因早期保密协议未公开，但有报道称新一轮追加融资紧随其后，反映出资本市场对末端配送具身智能方向的强烈看好。</p>
+      </div>
+
+      <h3 id="tech">1.4 技术路线</h3>
+
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>技术维度</th><th>详情</th></tr>
+          <tr><td>AI架构</td><td>自研VLMM（Vision-Language Mobility Model）视觉-语言移动模型，通过强化学习统一感知、导航与决策</td></tr>
+          <tr><td>感知方案</td><td>视觉理解开放环境中障碍物、门禁、坡道、电梯、人流等元素，不依赖高精地图</td></tr>
+          <tr><td>语义理解</td><td>理解社区行为规则（排队优先级、通行礼仪），实现人机自然交互</td></tr>
+          <tr><td>仿真与泛化</td><td>生成式3D场景建模 + 高保真物理仿真引擎，提升多样化场景中的泛化能力</td></tr>
+          <tr><td>技术迁移</td><td>将自动驾驶时代积累的环境感知、决策规控、系统安全三项核心能力迁移至具身智能</td></tr>
+          <tr><td>路线选择</td><td>全栈自研（感知+决策+控制+仿真），不依赖第三方自动驾驶或机器人平台</td></tr>
+          <tr><td>差异化特色</td><td>从自动驾驶到具身智能的"范式迁移"路径：将L4级自动驾驶的系统工程能力应用于低速度、高复杂度、强交互的社区场景</td></tr>
+        </table>
+      </div>
+
+      <p>纽娲的技术路线核心在于将杨睿刚在百度AADS项目和嬴彻科技积累的自动驾驶仿真、感知、决策能力，系统性地迁移到具身智能领域。VLMM采用强化学习而非传统的监督学习或规划式方法，这一技术选择体现了公司对末端配送场景"开放、非结构化、强交互"特征的深刻理解——传统SLAM+规划的方法难以应对社区场景中海量的长尾corner case，而端到端的强化学习方案在泛化性上具有潜在优势。目前VLMM的技术白皮书、模型参数规模、benchmark评测数据等细节尚未公开披露。</p>
+
+      <h3 id="products">1.5 产品形态</h3>
+
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>产品分类</th><th>产品名称/代号</th><th>形态</th><th>主要参数</th><th>适用场景</th></tr>
+          <tr><td>末端配送机器人</td><td>首代配送机器人（名称未公开）</td><td>具身智能移动机器人（非传统无人配送车），需具备坡道/门禁/电梯通行能力</td><td>公开参数有限：具备环境理解、人机交互、自主导航能力，无需高精地图</td><td>社区/园区/楼宇末端配送（"最后500米"）</td></tr>
+        </table>
+      </div>
+
+      <p>产品形态的核心区别在于：纽娲的配送机器人被定义为"具身智能机器人"而非传统"无人配送车"，差异体现在三个层面——移动+环境理解+人机交互的复合能力、无需高精地图的开环运行、对社区基础设施（坡道/门禁/电梯/减速带）的全面适应。截至2026年4月，首代产品尚未正式发布，处于真实环境验证阶段。</p>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>场景类别</th><th>具体场景</th><th>阶段</th><th>核心能力要求</th></tr>
+          <tr><td>物流配送</td><td>社区/园区/楼宇"最后500米"末端配送</td><td>当前核心场景</td><td>空间导航、环境理解、复杂地形通行、人机交互</td></tr>
+          <tr><td>社区服务（规划）</td><td>社区巡检</td><td>第二阶段延展</td><td>复用配送场景积累的环境感知与导航能力</td></tr>
+          <tr><td>社区服务（规划）</td><td>物业服务</td><td>第二阶段延展</td><td>在巡检基础上叠加更多交互能力</td></tr>
+          <tr><td>通用平台（远期）</td><td>面向社区与楼宇空间的通用服务机器人平台</td><td>远期愿景</td><td>多场景、多任务、可扩展的通用机器人能力</td></tr>
+        </table>
+      </div>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+
+      <p>公司处于极早期阶段，商业化数据极为有限。截至2026年4月，已知情况如下：</p>
+      <ul>
+        <li>产品处于真实环境验证阶段，未进入量产或正式交付</li>
+        <li>无公开的出货量、订单量、产能数据</li>
+        <li>商业路线图分三步：①末端配送（当前）→ ②社区巡检+物业服务（能力延展）→ ③通用服务机器人平台（远期）</li>
+        <li>市场背景：2025年全国即时配送订单量首超600亿单，末端交付环节仍高度依赖人工；京东计划2026年建设全球首个全无人配送站；Amazon收购了专注"最后100米"配送机器人公司RIVR</li>
+      </ul>
+
+      <h3 id="financial">1.8 财务数据</h3>
+
+      <p>公司成立于2026年2月，尚无公开财务数据及运营指标。种子轮融资千万级人民币为其当前主要资金储备。</p>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>杨睿刚是典型的"清华系"连续创业者：本科清华，先后经历学术（肯塔基终身教授）、大厂（百度）、独角兽（嬴彻）三重身份后独立创业</li>
+        <li>公司在名称上与台湾成熟企业"女娲创造（NUWA Robotics）"中文名高度相似，但为完全独立的实体，赛道和阶段均不同</li>
+        <li>纽娲选择"最后500米"而非更热门的工业制造、家庭服务等赛道切入，体现了"从高频刚需场景沉淀核心能力后逐步泛化"的务实路线</li>
+        <li>公司尚未设立公开官网，信息主要来源于2026年3月的集中媒体报道</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="analysis-1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>杨睿刚的自动驾驶背景与末端配送场景存在高度匹配。自动驾驶重卡在高速场景中处理的感知、决策、系统安全问题，与社区配送机器人在低速但高复杂度环境中面临的挑战在系统工程层面具有同构性：感知建模、不确定性决策、安全保障三层能力可以直接迁移。相比从零起步的纯机器人团队，自动驾驶背景团队在"移动能力"上的先发优势使其能以更短时间完成配送机器人的原型验证。但团队在"交互层"（社区社交礼仪、人机自然交互）的积累相对薄弱，这取决于从百度、华为引入的AI团队成员能否补足。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>选择VLMM强化学习路线而非传统SLAM+规划方案，与末端配送场景的"开放、非结构化、强交互"特征高度适配。社区场景的corner case（如临时堆放的快递、突然窜出的宠物、老人推车等）数量远超结构化道路，传统规则驱动方案面临泛化瓶颈。然而强化学习路线本身收效慢、数据需求大、安全性验证困难，这对处于种子轮的初创公司构成了时间与资源上的双重压力。在配送这个对可靠性要求极高的场景中，如何平衡"探索性技术路线"与"交付可靠性"将是核心挑战。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>种子轮投资方未公开，无法判定是否有产业资本绑定场景资源。从融资节奏看（"被投资人堵门口投了一轮"），公司当前的资本吸引力主要来自创始人的行业声望和赛道热度，而非具体场景资源的绑定。这意味着短期内纽娲拥有较高的战略独立性，可以自由探索多种场景切入方式。但缺乏产业战略投资者也意味着在真实的社区/园区场景资源获取上（如物业合作、快递公司接口）需要花费更多精力自建渠道。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>作为2026年2月新成立的公司，纽娲尚未经历明显的试错周期。但值得关注的是杨睿刚个人的"路径转换"——从学术（肯塔基教授）到百度（L4自动驾驶研究）到嬴彻（重卡L3量产）再到具身智能创业，每一步都在从纯研究向工程化、商业化的方向收敛。这一路径转换逻辑在其创业公司的商业路线图中有清晰映射：先以高频刚需的配送场景切入，沉淀核心移动和交互能力，再逐步泛化到更广阔的社区服务场景。这种"做减法再加法"的策略在具身智能早期阶段具有合理性。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>纽娲做出了一个关键的"减法"决策：不做通用人形机器人，不做工厂场景，而是聚焦在"末端配送"这一垂直切口。相比大多数具身智能创业公司选择工业制造（抓取/装配）或商业服务（导览/清洁）等热门场景，杨睿刚明确走的是一条"以移动能力为核心、以配送为入口"的专用务实路线。这一路线的优势在于：场景痛点明确、商业闭环清晰（配送是刚需且可量化的成本中心）、技术能力可以从自动驾驶迁移。劣势在于：末端配送的进入壁垒较低（美团、京东、顺丰等巨头已有重兵布局），如何在巨头环伺中找到差异化的价值点将决定其长期生存空间。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-6">
+        <h4>2.6 其他重要观察与分析</h4>
+        <p>纽娲的公司命名（"纽娲"——再造女娲）暗示了其"用机器人重塑物理世界"的宏大愿景，而实际的商业切入点却是社区"最后500米"这一务实场景。这种"宏大愿景+务实切口"的叙事结构在当前具身智能赛道中较为典型，但能否跨越从技术验证到商业规模化之间的鸿沟，取决于其VLMM技术路线的实际落地效果。另一个值得关注的维度是：虽然公司名称与台湾NUWA Robotics高度相似，但搜狐报道中以"清华大牛、百度前高管二次创业"作为独立叙事框架，说明媒体和市场已将其视为独立的新实体而非台湾NUWA的关联公司。这种独立品牌认知的建立对于中国市场拓展至关重要。</p>
+      </div>
+
+      <h2 id="references">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://36kr.com/newsflashes/3740491913625601" target="_blank">36氪："NeoWa Robotics（纽娲机器人）"完成种子轮融资</a></li>
+          <li><a href="https://m.thepaper.cn/newsDetail_forward_32842245" target="_blank">澎湃新闻：杨睿刚投身创业——纽娲机器人种子轮被抢投了</a></li>
+          <li><a href="https://media.qimingpian.cn/2026/03/27/86bfb62b17cf0b991bff2e820228dc03.html" target="_blank">企名片资讯：首发 | 杨睿刚投身创业——纽娲机器人种子轮被抢投了</a></li>
+          <li><a href="https://www.chinaventure.com.cn/news/108-20260327-390685.html" target="_blank">投中网：自动驾驶大咖杨睿刚入局具身创业——押注"最后500米"配送入口</a></li>
+          <li><a href="https://www.163.com/dy/article/KP1GBLGB05568W0A.html" target="_blank">网易：百度前高管杨睿刚创业入局具身智能</a></li>
+          <li><a href="https://www.sohu.com/a/1003325097_701814" target="_blank">搜狐：清华大牛、百度前高管二次创业，种子轮被抢投，聚焦社区"最后500米"</a></li>
+          <li><a href="https://news.futunn.com/post/70712594" target="_blank">富途牛牛：百度前高管杨睿刚创业入局具身智能，已完成千万级种子轮融资</a></li>
+          <li><a href="http://finance.sina.com.cn/cj/2026-03-27/doc-inhsmamw5396957.shtml" target="_blank">新浪财经：百度前高管杨睿刚创业入局具身智能，已完成千万级种子轮融资</a></li>
+          <li><a href="https://www.leiphone.com/category/transportation/Zf6ymeaUyErESRaI.html" target="_blank">雷锋网：新智驾独家——嬴彻科技CTO杨睿刚离职，副总裁田琛接管研发</a></li>
+          <li><a href="https://www.zhongtouhuac.com/h-nd-4189.html" target="_blank">中投华创："NeoWa Robotics（纽娲机器人）"完成种子轮融资</a></li>
+          <li><a href="http://news.10jqka.com.cn/20260327/c675584347.shtml" target="_blank">同花顺：杨睿刚投身创业——纽娲机器人种子轮被抢投了</a></li>
+          <li><a href="https://www.taibo.cn/newsflashes/30436834" target="_blank">钛博：百度前高管杨睿刚创业入局具身智能</a></li>
+          <li><a href="https://zdh.xwboo.com/news/239181.html" target="_blank">自动化在线：科技领域融资多点开花——资本加速赋能前沿技术产业化</a></li>
+          <li><a href="https://w.geekpark.net/news/361762" target="_blank">极客公园：自动驾驶大咖杨睿刚入局具身创业：押注"最后500米"配送入口</a></li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">本页面基于公开信息整理，数据截至2026年4月。纽娲机器人为极早期创业公司，部分信息有限。—— 具身智能Wiki</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

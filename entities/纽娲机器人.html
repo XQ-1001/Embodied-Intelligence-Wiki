@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>纽娲机器人 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> › <span>纽娲机器人</span></div>
+  <div class="wiki-header"><h1>纽娲机器人</h1><div class="subtitle">NUWA Robotics Corp. · 女娲创造 · 2016年成立 · 富士康体系机器人平台 · 2026年营收目标突破1亿美元</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#team">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financials">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#a1">2.1 团队背景与场景选择匹配度</a></li>
+        <li class="toc-lvl4"><a href="#a2">2.2 技术路线与场景适配性</a></li>
+        <li class="toc-lvl4"><a href="#a3">2.3 股东/资本结构对战略的影响</a></li>
+        <li class="toc-lvl4"><a href="#a4">2.4 试错过程与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#a5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#a6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#references">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">纽娲机器人</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">女娲机器人有限公司（NUWA Robotics Corp.）</div></div>
+        <div class="ib-row"><div class="ib-label">英文名</div><div class="ib-value">NUWA Robotics</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2016年</div></div>
+        <div class="ib-row"><div class="ib-label">总部</div><div class="ib-value">中国台湾（台北）</div></div>
+        <div class="ib-row"><div class="ib-label">定位</div><div class="ib-value">全场景机器人解决方案</div></div>
+        <div class="ib-section">估值/市值</div>
+        <div class="ib-row"><div class="ib-label">B轮估值</div><div class="ib-value">~7,500万美元（约24亿新台币）</div></div>
+        <div class="ib-section">财务数据</div>
+        <div class="ib-row"><div class="ib-label">2023年营收</div><div class="ib-value">~300万美元</div></div>
+        <div class="ib-row"><div class="ib-label">2026目标营收</div><div class="ib-value">突破1亿美元</div></div>
+        <div class="ib-row"><div class="ib-label">累计融资</div><div class="ib-value">~2,268万美元（5轮）</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">全球部署</div><div class="ib-value">超20,000台</div></div>
+        <div class="ib-row"><div class="ib-label">AMR目标产量</div><div class="ib-value">2026年超6,000台</div></div>
+        <div class="ib-row"><div class="ib-label">进入国家</div><div class="ib-value">20+</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">赛道</div><div class="ib-value"><span class="tag">服务机器人</span><span class="tag">工业AMR</span><span class="tag">人形机器人</span><span class="tag">教育机器人</span></div></div>
+        <div class="ib-section">官网</div>
+        <div class="ib-row"><div class="ib-label">官网</div><div class="ib-value"><a href="https://www.nuwarobotics.com" target="_blank">nuwarobotics.com</a></div></div>
+      </aside>
+
+      <p class="article-intro"><b>纽娲机器人</b>（NUWA Robotics Corp.，亦称「女娲创造」），是一家2016年成立于中国台湾的全场景机器人解决方案科技创新企业。公司依托富士康（鸿海）体系供应链优势，构建了平台化软件 + RaaS商业模式 + 全球渠道的三重闭环，产品覆盖教育陪伴、商用服务、工业物流AMR及人形机器人四大板块。截至2025年，全球累计部署机器人超20,000台，客户包括亚马逊、软银、沃尔玛等国际巨头，2026年目标营收突破1亿美元。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper"><table class="wikitable infotable">
+        <tr><th>项目</th><th>内容</th></tr>
+        <tr><td>公司全称</td><td>女娲机器人有限公司（NUWA Robotics Corp.）</td></tr>
+        <tr><td>运营品牌</td><td>女娲创造（NUWA Robotics）</td></tr>
+        <tr><td>成立时间</td><td>2016年</td></tr>
+        <tr><td>注册地</td><td>中国台湾（台北）</td></tr>
+        <tr><td>上市状态</td><td>未上市</td></tr>
+        <tr><td>官网</td><td>www.nuwarobotics.com / www.nuwarobotics.cn</td></tr>
+        <tr><td>定位</td><td>全场景机器人解决方案科技创新企业</td></tr>
+      </table></div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>时间</th><th>事件</th></tr>
+        <tr><td>2016年</td><td>公司成立，以教育陪伴机器人Kebbi起步</td></tr>
+        <tr><td>2018年1月</td><td>完成A轮融资，投资方包括小米、富士康、韩国KIP</td></tr>
+        <tr><td>2023年8月</td><td>完成B轮融资近2亿新台币，富士康（鸿海）领投</td></tr>
+        <tr><td>2024年1月</td><td>完成B-II轮融资300万美元</td></tr>
+        <tr><td>2025年4月</td><td>美湖股份受让1.25%股权，战略入股</td></tr>
+        <tr><td>2025年6月</td><td>祥鑫科技受让1.25%股权，战略入股；美湖股份深化谐波减速器、关节模组战略合作</td></tr>
+        <tr><td>2025年11月</td><td>富士康年度科技展首次亮相两款自研人形机器人（双足型+轮式AMR底盘型）</td></tr>
+        <tr><td>2026年4月</td><td>与TechForce Robotics、富士康签署三方战略供应协议，进入全球商业化部署</td></tr>
+      </table></div>
+
+      <h3 id="team">1.2 创始人及核心团队</h3>
+      <p>纽娲机器人由台湾科技产业连续创业者创立，团队兼具机器人硬件研发、AI算法、动画设计及全球化市场拓展能力。核心团队在伺服电机、SLAM导航、AI交互等领域有深厚积累。公司拥有好莱坞级动画团队，专注于机器人肢体语言与情感表达。整体团队呈现技术研发+创意设计+产业制造的混合型特征。公司全球员工规模预计在百人级别，研发人员占比较高。由于公开信息有限，具体创始人姓名及详细履历待进一步披露。</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>角色</th><th>说明</th></tr>
+        <tr><td>创始团队</td><td>台湾科技产业连续创业者，具机器人开发与全球化运营背景</td></tr>
+        <tr><td>技术团队</td><td>覆盖伺服电机、AI算法、SLAM导航、语音语义识别等领域</td></tr>
+        <tr><td>动画团队</td><td>好莱坞级动画团队，负责机器人肢体语言与三维情感模型设计</td></tr>
+      </table></div>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>轮次</th><th>时间</th><th>金额</th><th>领投/主要投资方</th></tr>
+        <tr><td>A轮</td><td>2018年1月</td><td>未披露</td><td>小米、富士康、韩国KIP</td></tr>
+        <tr><td>B轮</td><td>2023年8月</td><td>~2亿新台币（约640万美元）</td><td>富士康（鸿海）领投</td></tr>
+        <tr><td>B-II轮</td><td>2024年1月</td><td>300万美元</td><td>未披露</td></tr>
+        <tr><td>战略入股</td><td>2025年4月</td><td>未披露</td><td>美湖股份（受让1.25%股权）</td></tr>
+        <tr><td>战略入股</td><td>2025年6月</td><td>未披露</td><td>祥鑫科技（受让1.25%股权）</td></tr>
+      </table></div>
+
+      <h4>股东结构</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>股东</th><th>持股比例</th><th>性质</th></tr>
+        <tr><td>鸿海/富士康体系</td><td>~22.71%</td><td>产业资本（核心股东+制造商）</td></tr>
+        <tr><td>祥鑫科技</td><td>1.25%</td><td>产业资本（A股上市公司）</td></tr>
+        <tr><td>美湖股份</td><td>1.25%</td><td>产业资本（A股上市公司）</td></tr>
+        <tr><td>其他投资者</td><td>~74.79%</td><td>含早期小米、KIP等财务投资方</td></tr>
+      </table></div>
+      <p>B轮估值约7,500万美元（约24亿新台币）。累计融资约2,268万美元（5轮），目前未上市。</p>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>技术维度</th><th>内容</th></tr>
+        <tr><td>AI交互</td><td>图像识别（人脸/物体/手势/场景）、语音语义识别、声源定位</td></tr>
+        <tr><td>导航系统</td><td>自研高精度SLAM，自主定位、地图构建、路径规划</td></tr>
+        <tr><td>执行器</td><td>自研AI伺服马达（舵机），高稳定性、高良率，突破成本壁垒</td></tr>
+        <tr><td>软件平台</td><td>NUWA Roflow无代码互动编辑平台、KebbiGPT（整合Azure OpenAI）、RaaS软硬一体方案</td></tr>
+        <tr><td>情感引擎</td><td>三维情感模型，模拟人类多变情绪反应</td></tr>
+        <tr><td>AI训练</td><td>使用NVIDIA GR00T-Mimic蓝图加速机器人训练</td></tr>
+      </table></div>
+      <p>纽娲采取全栈自研+平台化路线，自研核心零部件（AI伺服马达）和软件平台，同时整合英伟达AI训练工具和Azure OpenAI。技术路径上以模块化、平台化为核心，通过RaaS模式降低客户部署门槛。在工业AMR场景中引入MCS物料控制系统加速智能工厂转型。</p>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>产品类别</th><th>代表产品</th><th>参数/特点</th><th>应用场景</th></tr>
+        <tr><td>家用/教育机器人</td><td>Kebbi系列</td><td>STEAM编程教育、情感交互</td><td>教育辅助、儿童陪伴</td></tr>
+        <tr><td>商用服务机器人</td><td>RaaS服务机器人</td><td>月租$499，部署时间缩短98%</td><td>餐饮递送、导览、乐龄照护、物流巡检</td></tr>
+        <tr><td>工业物流AMR</td><td>自主移动机器人</td><td>目标2026年产超6,000台</td><td>富士康工厂物流自动化</td></tr>
+        <tr><td>人形机器人（研发中）</td><td>双足型 + 轮式AMR底盘型</td><td>2025年11月首次亮相</td><td>工业组装、物品抓放、插拔电缆</td></tr>
+      </table></div>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>场景</th><th>分类</th><th>合作方/客户</th><th>说明</th></tr>
+        <tr><td>教育</td><td>消费级</td><td>千所学校</td><td>Kebbi教育机器人覆盖STEAM编程教育</td></tr>
+        <tr><td>商业服务</td><td>商用</td><td>亚马逊、沃尔玛</td><td>餐饮递送、导览解说服务</td></tr>
+        <tr><td>乐龄照护</td><td>医疗/福利</td><td>韩国客户</td><td>高龄照护场景，已在韩国落地</td></tr>
+        <tr><td>工业物流</td><td>工业</td><td>富士康/鸿海</td><td>工厂内部物流AMR</td></tr>
+        <tr><td>人形机器人制造</td><td>工业</td><td>NVIDIA、富士康</td><td>休斯顿工厂部署人形机器人生产GB300 AI服务器</td></tr>
+        <tr><td>酒店/餐饮RaaS</td><td>商用</td><td>TechForce Robotics</td><td>2026年通过三方协议进入美国市场规模化部署</td></tr>
+      </table></div>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <p>全球累计部署机器人超20,000台，进入20+国家/地区（日本、韩国、美国、中国大陆、香港、东南亚、中亚等）。RaaS模式以月租$499的低门槛推动商用服务机器人规模化。工业AMR已在富士康工厂应用，目标2026年年产量超6,000台。2025年11月首次亮相自研人形机器人。2026年4月与TechForce Robotics、富士康签署三方供应协议，标志从研发试点进入全球规模化商业部署阶段。与NVIDIA合作在休斯顿工厂部署人形机器人用于AI服务器生产。</p>
+
+      <h3 id="financials">1.8 财务数据</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>年份</th><th>营收</th><th>备注</th></tr>
+        <tr><td>成立前5年</td><td>破亿新台币年营收</td><td>以Kebbi教育机器人实现</td></tr>
+        <tr><td>2023年</td><td>~300万美元</td><td>CB Insights数据</td></tr>
+        <tr><td>2026年（目标）</td><td>突破1亿美元</td><td>净利润目标超2,400万美元（净利率24%）</td></tr>
+      </table></div>
+      <p>公司目前尚未公开披露完整的年度财务报告，上述营收数据来源于媒体及第三方研究机构估算。截至2025年，累计融资约2,268万美元，B轮估值约7,500万美元，账面资金储备情况未公开。</p>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>纽娲机器人在中文语境中常被写作「女娲机器人」或「女娲创造」，均指同一实体NUWA Robotics Corp.。</li>
+        <li>公司最早以AI教育机器人Kebbi打入市场，众筹破千万，销往千所学校。</li>
+        <li>2025-2026年是关键转折期：人形机器人首次亮相、英伟达AI赋能、营收冲刺1亿美元、AMR量产超6,000台。</li>
+        <li>富士康体系的「机器人平台公司」定位为其在供应链成本和制造资源上提供了独特优势。</li>
+        <li>通过RaaS（Robot as a Service）模式将机器人硬件+软件+服务打包租赁，大幅降低B端客户采购门槛。</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="a1">
+        <h4>2.1 团队背景与场景选择匹配度</h4>
+        <p>纽娲创始团队具有台湾科技产业背景和连续创业经验，选择以教育陪伴机器人（Kebbi）作为切入点，这与其团队在消费电子、动画设计方面的优势高度匹配。台湾在全球消费电子供应链中的深厚积累，也为公司早期以硬件+内容（编程教育+情感交互）差异化竞争提供了土壤。然而教育机器人市场规模有限，团队逐步向商用服务和工业AMR转型的逻辑合理：利用富士康股东关系自然切入工业场景，利用RaaS模式降低商用服务门槛。团队从「IP驱动的消费级产品」向「工业化+平台化」的转型，每一步的场景扩展都有产业链和股东资源的支撑，匹配度较高。</p>
+      </div>
+
+      <div class="analysis-block" id="a2">
+        <h4>2.2 技术路线与场景适配性</h4>
+        <p>纽娲自研AI伺服马达、SLAM导航和情感引擎，走的是关键零部件自研+软件平台化的全栈路线。在教育场景中，情感交互和动画表现力是差异化关键，自研情感引擎和好莱坞动画团队形成竞争壁垒。在工业AMR场景中，自研SLAM和伺服马达可降低成本、提升可靠性，与富士康工厂场景形成闭环迭代。但在人形机器人领域，公司选择整合NVIDIA GR00T-Mimic进行AI训练，表明其在大模型和具身智能核心算法层面并非完全自研，而是借助英伟达生态。这种「核心零部件自研+AI能力借力巨头」的路线在当前阶段适配性合理，长期需关注AI核心能力的自主可控程度。</p>
+      </div>
+
+      <div class="analysis-block" id="a3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>富士康（鸿海）持有纽娲约22.71%股权，是最核心的产业股东，这为纽娲深度绑定了全球最大的电子制造供应链资源。富士康不仅提供工厂场景用于AMR和人形机器人测试迭代，还作为制造商承担规模化产能输出。祥鑫科技和美湖股份的入股则补强了国内产业链协同（精密结构件、谐波减速器、关节模组）。TechForce Robotics的三方协议则打开了美国RaaS市场通道。这种以产业资本为主导的股东结构，使得纽娲的场景绑定度极高（富士康→工业制造），但也意味着其战略独立性受制于富士康体系的整体机器人布局节奏，自主拓展非富士康体系客户的能力有待验证。</p>
+      </div>
+
+      <div class="analysis-block" id="a4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>纽娲的路径演变为：教育机器人（2016起）→ 商用服务机器人（RaaS模式）→ 工业物流AMR（富士康场景）→ 人形机器人（2025亮相）。这一路径体现了逐步上探技术难度和场景价值的逻辑：教育机器人验证了交互和情感技术，商用服务RaaS验证了商业模式，工业AMR利用了股东场景，人形机器人则是技术能力的终极整合。但公司从消费级产品转向工业级和人形机器人的跨度较大，在工业可靠性和人形机器人的泛化能力方面可能面临技术积累不足的挑战。转型中的关键支撑点是富士康的深度参与，这实质上是一种「场景驱动」而非「纯技术驱动」的路径选择。</p>
+      </div>
+
+      <div class="analysis-block" id="a5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>纽娲的核心取舍是选择做「富士康体系的机器人平台公司」，而非独立的全行业竞争者。这一选择类似iPod策略——聚焦一个超级客户/生态（富士康）做到极致，而非试图覆盖所有制造业场景。以富士康22.71%持股为锚，纽娲在工业AMR和人形机器人领域拥有天然的场景+制造优势，但这也意味着其天花板与富士康机器人需求的成长性高度绑定。在商业化路径上，RaaS模式（月租$499）降低了客户门槛，但需验证规模化后的毛利率能否支撑盈利。与NVIDIA在AI训练方面的合作表明其在核心大脑层面选择生态整合而非全栈自研。</p>
+      </div>
+
+      <div class="analysis-block" id="a6">
+        <h4>2.6 其他重要观察</h4>
+        <p>纽娲机器人是少数同时覆盖教育、商用服务、工业AMR、人形机器人四大场景的公司，这种全场景策略在行业里较为罕见，可能反映了富士康体系对机器人全场景覆盖的战略意图。其2026年1亿美元营收目标（含AMR 6000台+）相当激进，若达成将跻身全球机器人营收前列。「纽娲」一词在大陆投资界报道中偶有出现，可能与「女娲」为同一实体或关联实体——需注意中文名称的一致性。公司进入20+国家的全球化布局在台湾机器人创业公司中表现突出，与软银、亚马逊、沃尔玛等国际客户的合作关系值得持续跟踪。此外，富士康2025年底宣布在休斯顿工厂部署人形机器人生产GB300 AI服务器，表明其人形机器人已从概念验证进入实际生产环节。</p>
+      </div>
+
+      <h2 id="references">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://www.21jingji.com/article/20250611/herald/a0ccf01f6f1d77959f1863fe9231e22f.html">祥鑫科技拟入股女娲机器人，后者为亚马逊、富士康供应商 — 21世纪经济报道</a></li>
+          <li><a href="https://www.cbinsights.com/company/nuwa-robotics/financials">NUWA Robotics Stock Price, Funding, Valuation, Revenue — CB Insights</a></li>
+          <li><a href="https://www.chinatimes.com/realtimenews/20230821003318-260410?chdtv">鸿海领投加码 女娲创造获近2亿元B轮投资 — 工商时报</a></li>
+          <li><a href="https://techorange.com/2025/10/15/nuwa-robotics-ai/">不怕中国机器人竞争！专访女娲创造 — TechOrange</a></li>
+          <li><a href="https://nova.com.tw/article/event/content/64e57ba619373">从AI教育机器人至跨领域服务型机器人 — NOVA资讯广场</a></li>
+          <li><a href="https://techorange.com/2023/08/22/ai-robot-cross-domain-service-education-elderly-care/">富士康领投，台湾新创女娲创造获NT$2亿 — TechOrange</a></li>
+          <li><a href="http://www.chuangtouzhijia.com/news/17636.html">女娲创造获祥鑫科技战略投资 — 创投之家</a></li>
+          <li><a href="https://news.qq.com/rain/a/20250611A07KKT00">祥鑫科技投资女娲机器人 — 腾讯新闻</a></li>
+          <li><a href="https://www.sfccn.com/2025/6-11/4MMDE0NzNfMjAzODI4Mw.html">祥鑫科技拟入股女娲机器人 — 南方财经</a></li>
+          <li><a href="https://www.leaderobot.com/news/1673">台湾智能机器人公司女娲创造获2亿新台币B轮投资 — Leaderobot</a></li>
+          <li><a href="https://www.cls.cn/detail/2064397">美湖股份与富士康体系机器人平台公司合作深化 — 财联社</a></li>
+          <li><a href="https://www.thestar.com/globenewswire/nightfood-holdings-inc-dba-techforce-robotics-enters-strategic-supply-agreement-with-hon-hai-precision-industry/article_2b0cf8c1-a84e-5432-9fe4-4d4e066e2acf.html">TechForce Robotics × NUWA × Foxconn Strategic Supply Agreement — GlobeNewswire</a></li>
+          <li><a href="https://www.tipranks.com/news/company-announcements/nightfoods-techforce-robotics-moves-into-commercial-deployment">TechForce Robotics Moves Into Commercial Deployment — TipRanks</a></li>
+          <li><a href="https://stockhouse.com/news/press-releases/2026/04/16/nightfood-holdings-inc-dba-techforce-robotics-enters-strategic-supply-agreement">Nightfood Holdings Strategic Supply Agreement — Stockhouse</a></li>
+          <li><a href="https://finance.sina.com.cn/roll/2025-06-11/doc-inezskcm9447343.shtml">祥鑫科技拟入股女娲机器人 — 新浪财经</a></li>
+          <li><a href="https://caifuhao.eastmoney.com/news/20250610220714342698790">祥鑫科技投资公告 — 东方财富网</a></li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">此页面最后编辑于2026年5月4日 · 数据来源截至2026年4月公开信息 · <a href="../index.html">具身智能Wiki</a></div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>
