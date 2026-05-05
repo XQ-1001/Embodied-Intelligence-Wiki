@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>自变量机器人 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> <span class="breadcrumb-sep">›</span> <span>自变量机器人</span></div>
+  <div class="wiki-header"><h1>自变量机器人</h1><div class="subtitle">ZBL Robotics / X Square · 成立于2023年12月 · B轮估值超100亿元 · 四巨头唯一共同押注的具身大脑公司</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#founders">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financial">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#a1">2.1 团队背景与场景选择的匹配度</a></li>
+        <li class="toc-lvl4"><a href="#a2">2.2 技术路线与场景的适配性</a></li>
+        <li class="toc-lvl4"><a href="#a3">2.3 股东/资本结构对战略的影响</a></li>
+        <li class="toc-lvl4"><a href="#a4">2.4 试错过程与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#a5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#a6">2.6 其他重要观察、分析</a></li>
+        <li class="toc-lvl2"><a href="#refs">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">自变量机器人</div>
+        <div class="ib-row"><div class="ib-label">公司全称</div><div class="ib-value">自变量机器人科技（深圳）有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">英文品牌</div><div class="ib-value">ZBL Robotics / X Square</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2023年12月18日</div></div>
+        <div class="ib-row"><div class="ib-label">注册地</div><div class="ib-value">广东深圳</div></div>
+        <div class="ib-row"><div class="ib-label">创始人/CEO</div><div class="ib-value">王潜（清华+南加州大学博士）</div></div>
+        <div class="ib-row"><div class="ib-label">CTO</div><div class="ib-value">王昊（北大博士）</div></div>
+        <div class="ib-section">财务数据</div>
+        <div class="ib-row"><div class="ib-label">累计融资</div><div class="ib-value">超50亿元人民币（8轮）</div></div>
+        <div class="ib-row"><div class="ib-label">最新融资</div><div class="ib-value">B轮近20亿元（2026年4月）</div></div>
+        <div class="ib-row"><div class="ib-label">2025年营收</div><div class="ib-value">未公开披露</div></div>
+        <div class="ib-section">估值/市值</div>
+        <div class="ib-row"><div class="ib-label">最新估值</div><div class="ib-value">超100亿元（B轮投后）</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">员工规模</div><div class="ib-value">200+人（技术人员占比近90%）</div></div>
+        <div class="ib-row"><div class="ib-label">核心模型</div><div class="ib-value">WALL-A/B（VLA→WUM架构）</div></div>
+        <div class="ib-row"><div class="ib-label">产品形态</div><div class="ib-value">轮式双臂仿人形（量子系列）</div></div>
+        <div class="ib-row"><div class="ib-label">灵巧手自由度</div><div class="ib-value">五指20自由度</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">赛道</div><div class="ib-value"><span class="tag">具身大脑</span><span class="tag-info">VLA大模型</span></div></div>
+        <div class="ib-row"><div class="ib-label">路线</div><div class="ib-value">端到端大模型+软硬一体</div></div>
+        <div class="ib-section">官网</div>
+        <div class="ib-row"><div class="ib-label">官方信息</div><div class="ib-value">无公开官网（主要通过融资公告和媒体披露）</div></div>
+      </aside>
+
+      <p class="article-intro"><strong>自变量机器人</strong>（英文品牌：ZBL Robotics / X Square），全称自变量机器人科技（深圳）有限公司，成立于2023年12月，总部位于深圳，是一家专注于端到端统一大模型实现通用具身智能的科技公司。公司定位为具身智能的"大脑"提供商，坚持软硬件全栈自研。核心产品包括WALL系列具身智能基础模型（从VLA架构的WALL-A进化到世界首个WUM架构的WALL-B）和量子系列轮式双臂机器人本体。自变量是国内唯一同时获得字节跳动、阿里巴巴（阿里云）、美团、小米四家互联网巨头投资的具身智能企业，累计融资超50亿元人民币，估值突破100亿元。2026年3月，与58到家合作实现全球首次机器人进入真实家庭提供保洁服务。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper">
+        <table class="wikitable infotable">
+          <tr><th>项目</th><th>内容</th></tr>
+          <tr><td>公司全称</td><td>自变量机器人科技（深圳）有限公司</td></tr>
+          <tr><td>英文品牌</td><td>ZBL Robotics（亦称 X Square Robot）</td></tr>
+          <tr><td>成立时间</td><td>2023年12月18日</td></tr>
+          <tr><td>注册地</td><td>广东省深圳市（航天创新大厦31层）</td></tr>
+          <tr><td>法定代表人</td><td>王潜</td></tr>
+          <tr><td>上市状态</td><td>未上市。联合创始人COO杨倩曾表示部署筹备2026年招股上市，截至2026年5月尚未提交IPO申请</td></tr>
+          <tr><td>官网</td><td>无公开独立官网，信息主要通过融资公告及科技媒体报道披露</td></tr>
+          <tr><td>主营业务</td><td>具身智能基础大模型（WALL系列）研发+通用机器人本体（量子系列）制造与销售</td></tr>
+        </table>
+      </div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>时间</th><th>事件</th></tr>
+          <tr><td>2023年12月</td><td>王潜回国，在深圳注册成立自变量机器人科技（深圳）有限公司。初始团队仅数十人</td></tr>
+          <tr><td>2024年初</td><td>完成天使轮数千万元融资，联想之星等投资</td></tr>
+          <tr><td>2024年10月</td><td>发布WALL-A——全球最大参数规模具身操作大模型，采用端到端VLA架构，引发行业关注</td></tr>
+          <tr><td>2024年11月</td><td>初步搭建第一代自研本体量子1号（Quanta X1）</td></tr>
+          <tr><td>2025年5月</td><td>A轮融资，美团战投独家领投数亿元，美团龙珠参投</td></tr>
+          <tr><td>2025年8月</td><td>WRC 2025发布量子2号（Quanta X2）及五指灵巧手，展示制作冰沙、叠衣等能力</td></tr>
+          <tr><td>2025年9月</td><td>A+轮融资近10亿元，阿里云（首次投资具身智能）与国科投资联合领投；开源WALL-OSS</td></tr>
+          <tr><td>2026年1月</td><td>A++轮融资10亿元，字节跳动领投，估值突破100亿元</td></tr>
+          <tr><td>2026年3月</td><td>与58到家达成战略合作，搭载WALL-AS的机器人首次进入真实家庭提供保洁服务</td></tr>
+          <tr><td>2026年4月</td><td>B轮融资近20亿元，小米战投与红杉中国联合领投；发布全球首个WUM架构具身模型WALL-B</td></tr>
+          <tr><td>2026年5月</td><td>计划搭载WALL-B的新一代机器人首批入驻真实家庭，作为付费服务上线</td></tr>
+        </table>
+      </div>
+
+      <h3 id="founders">1.2 创始人及核心团队</h3>
+      <p>自变量机器人的创始团队是典型的"顶级AI学者+大模型工程专家"组合，核心团队200+人，技术人员占比近90%。</p>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+          <tr><td>创始人/CEO</td><td>王潜</td><td>清华大学本硕、南加州大学（USC）博士，专攻机器人学习与人机交互。全球最早在神经网络中引入注意力机制（Attention Mechanism）的学者之一，与Google在同一会议上发表相关首篇文章——这一贡献后来成为Transformer架构的关键技术基础。博士毕业后在美国创立量化基金公司。2023年因大语言模型技术突破，敏锐察觉机器人行业新契机，毅然解散基金回国创业。2023年12月18日首次到深圳，同日注册成立自变量机器人</td></tr>
+          <tr><td>联合创始人/CTO</td><td>王昊</td><td>北京大学博士。曾领导国内首个百亿级大模型"封神榜/姜子牙"的研发，在大规模模型训练与工程化方面有深厚积累。主导自变量技术路线迭代、开源进展与场景落地战略。提出"端到端大模型是底座，世界模型与VLA的融合是突破口"的技术蓝图</td></tr>
+          <tr><td>联合创始人/COO</td><td>杨倩</td><td>负责公司运营、商业化与融资事务，曾公开表示部署筹备2026年招股上市</td></tr>
+        </table>
+      </div>
+      <p>团队核心成员来自清华大学、北京大学、南加州大学等顶级学府，以及量化金融、大模型研发等跨界背景。王潜的注意力机制学术贡献使得自变量在端到端大模型路线上拥有全球领先的理论根基。王昊的大模型工程经验则为WALL系列模型的快速迭代提供了工业级落地能力。两人组合兼具学术前沿性（王潜的注意力机制研究）与工程落地性（王昊的百亿大模型经验），是具身智能赛道中学术+工程平衡度最高的创始团队之一。</p>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <h4>融资历史</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>轮次</th><th>时间</th><th>金额</th><th>核心投资方</th></tr>
+          <tr><td>天使轮/天使+</td><td>2024年初</td><td>数千万元</td><td>联想之星等</td></tr>
+          <tr><td>Pre-A系列</td><td>2024-2025年初</td><td>数亿元级</td><td>光速光合、君联资本、华映资本、云启资本、广发信德、北京机器人产业基金、南山战新投等</td></tr>
+          <tr><td>A轮</td><td>2025年5月</td><td>数亿元</td><td>美团战投独家领投，美团龙珠参投</td></tr>
+          <tr><td>A+轮</td><td>2025年9月</td><td>近10亿元</td><td>阿里云（首次投资具身智能）与国科投资联合领投；国开金融、红杉中国、渶策资本跟投；美团超额跟投</td></tr>
+          <tr><td>A++轮</td><td>2026年1月</td><td>10亿元</td><td>字节跳动领投，红杉中国、深创投跟投</td></tr>
+          <tr><td>B轮</td><td>2026年4月</td><td>近20亿元</td><td>小米战投与红杉中国联合领投</td></tr>
+        </table>
+      </div>
+      <p>自变量累计完成8轮融资，累计融资超50亿元，是国内同时获得字节跳动、阿里（阿里云）、美团、小米四家互联网巨头投资的唯一具身智能企业。估值从2025年中的数十亿元快速攀升至2026年初的百亿级别。红杉中国在A+、A++、B三轮中持续加码，显示出对具身大脑路线的长期信心。股东结构反映了一个清晰的格局：美团（本地生活场景）+ 阿里云（云计算基础设施）+ 字节跳动（AI交互技术）+ 小米（消费电子供应链与生态）= 四维覆盖的产业资本矩阵。</p>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>维度</th><th>详情</th></tr>
+          <tr><td>总体技术战略</td><td>"大小脑统一的端到端大模型"——从VLA（Vision-Language-Action）向WUM（World Unified Model，世界统一模型）演进。主张用一个统一大模型同时处理感知、推理、决策、动作生成和物理世界预测，而非分层/分模块的多模型方案</td></tr>
+          <tr><td>模型架构代际</td><td>WALL-A（VLA架构，2024.10）→ WALL-OSS（开源版，2025.9）→ WALL-AS（家庭场景版，2026.3）→ WALL-B（WUM架构，2026.4）</td></tr>
+          <tr><td>WALL-B（WUM）</td><td>全球首个世界统一模型架构：视觉/语言/动作/物理预测在同一网络中联合训练。原生多模态（视觉+语言+动作+触觉融合），原生物理世界观（预判重力、惯性、摩擦力），自我进化（失败后自主调整策略）</td></tr>
+          <tr><td>训练范式</td><td>首创"先离散、后连续、再联合"三阶段训练。端到端具身思维链推理：多模态输入→深度推理→多模态输出→自主决策/执行/探索/反思闭环</td></tr>
+          <tr><td>数据方案</td><td>全自研数据采集设备（主从遥操、外骨骼、无本体等）。已从100+真实家庭采集训练数据，覆盖猫跳上桌、玩具乱扔等碎片化随机场景</td></tr>
+          <tr><td>自研程度</td><td>软硬件全栈自研：大模型（WALL系列）+ 本体整机（量子系列）+ 高自由度灵巧手 + 外骨骼遥操数采设备。CEO明确表示"不会单独卖大模型，也不会单独卖硬件"</td></tr>
+          <tr><td>开源策略</td><td>WALL-OSS面向全球开发者开源，附带训练代码，"共享注意力+专家分流(FFN)"架构，目标降低具身智能研发门槛</td></tr>
+          <tr><td>差异化特色</td><td>"非共识路线先行者"——2023年底即坚定端到端统一VLA路线，当时行业主流是分层/专用模型。WALL-A发布后，斯坦福/伯克利的Physical Intelligence等也推出端到端方案，行业批量跟进</td></tr>
+        </table>
+      </div>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>产品</th><th>定位</th><th>形态</th><th>发布/特点</th></tr>
+          <tr><td>WALL-A</td><td>第一代VLA具身基础模型</td><td>软件/模型</td><td>2024年10月发布。全球最大参数规模具身操作大模型，端到端VLA架构。零样本泛化，具身思维链推理</td></tr>
+          <tr><td>WALL-OSS</td><td>开源具身基础模型</td><td>开源软件</td><td>2025年9月开源。"共享注意力+专家分流"架构，附带训练代码</td></tr>
+          <tr><td>WALL-AS</td><td>VLA升级/家庭场景版</td><td>软件/模型</td><td>2025-2026年迭代。与58到家合作部署于真实家庭保洁场景</td></tr>
+          <tr><td>WALL-B</td><td>全球首个WUM架构模型</td><td>软件/模型</td><td>2026年4月发布。视觉/语言/动作/物理预测联合训练，原生多模态+物理世界观+自我进化</td></tr>
+          <tr><td>量子1号（Quanta X1）</td><td>第一代自研本体</td><td>轮式双臂机器人</td><td>2024年11月初步搭建。面向科研教育、物流分拣、居家服务</td></tr>
+          <tr><td>量子2号（Quanta X2）</td><td>模型原生通用机器人</td><td>轮式双臂仿人形</td><td>2025年8月WRC发布。搭载WALL模型，全自研本体+灵巧手。演示：制作冰沙、做香囊、叠衣、切水果</td></tr>
+          <tr><td>五指灵巧手</td><td>高自由度操作末端</td><td>仿生五指手</td><td>单手20自由度，感知细微压力变化。演示：穿衣、削苹果、分发扑克牌。配合外骨骼遥操方案</td></tr>
+        </table>
+      </div>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>场景大类</th><th>具体场景</th><th>阶段</th><th>合作方</th></tr>
+          <tr><td>家庭服务（核心目标）</td><td>保洁、清洁、收纳、做饭、照顾老人宠物</td><td>POC→首批入驻（2026年5月）</td><td>58同城/58到家</td></tr>
+          <tr><td>酒店服务</td><td>客房服务、物品递送</td><td>探索阶段</td><td>美团（战略股东场景协同）</td></tr>
+          <tr><td>养老服务</td><td>日常照护、陪伴</td><td>探索阶段</td><td>美团本地生活生态</td></tr>
+          <tr><td>物流分拣</td><td>仓储物流物品分拣与搬运</td><td>验证阶段</td><td>量子1号应用场景</td></tr>
+          <tr><td>工业制造业</td><td>工厂操作、物料搬运</td><td>验证阶段</td><td>头部客户合作中</td></tr>
+          <tr><td>科研教育</td><td>高校机器人研究平台</td><td>在售</td><td>量子1号</td></tr>
+          <tr><td>零售服务</td><td>商超导购、商品整理</td><td>探索阶段</td><td>美团/京东生态可能</td></tr>
+        </table>
+      </div>
+      <p>自变量与行业主流的"先工厂、后家庭"路径相反，选择直面最复杂的家庭场景。CEO王潜认为"具身智能最大市场在C端"，家庭保洁是验证通用操作智能的最佳沙盒——碎片化、非结构化、长尾任务多、容错率低。58到家合作是全球首个机器人进入真实家庭提供付费服务的案例。</p>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <ul>
+        <li><strong>商业模式：</strong>软硬一体销售。CEO明确"不会单独卖大模型，也不会单独卖硬件"，目标以完整产品形态交付客户</li>
+        <li><strong>科研市场：</strong>量子1号已面向科研教育机构销售，提供硬件+解决方案</li>
+        <li><strong>服务业POC：</strong>与头部客户在工业/服务业多场景开展概念验证合作</li>
+        <li><strong>58到家合作（里程碑）：</strong>2026年3月，搭载WALL-AS的机器人首次进入真实家庭，与保洁阿姨协同作业。用户可在58到家APP自由下单。CEO宣布2026年5月25日搭载WALL-B的新一代机器人首批入驻真实付费家庭</li>
+        <li><strong>量产规划：</strong>量子2号2025年12月小规模量产→2026年上半年批量量产；灵巧手2025年底小规模量产</li>
+        <li><strong>C端时间表（CEO口径）：</strong>普通清洁/收纳完全自主需1-2年；物理世界"Aha Moment"（ChatGPT时刻）预期2-3年；第一批通用机器人真正走进家庭3-4年</li>
+        <li><strong>目标售价：</strong>消费者可接受价位1-2万美元（约10万元人民币），CEO坦承目前成本尚未达到</li>
+      </ul>
+
+      <h3 id="financial">1.8 财务数据</h3>
+      <p>自变量机器人为未上市私人公司，未公开披露经审计的财务报表。以下数据来源于融资公告与公开报道：</p>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>指标</th><th>2024年</th><th>2025年</th><th>2026年（截至Q1）</th></tr>
+          <tr><td>营收规模</td><td>未公开（产品化起步年，10月发布WALL-A）</td><td>未公开（量子2号小规模量产起步）</td><td>未公开</td></tr>
+          <tr><td>融资总额</td><td>约数千万元（天使+天使+）</td><td>超20亿元（Pre-A至B轮筹备）</td><td>近30亿元（A++轮10亿+B轮近20亿）</td></tr>
+          <tr><td>估值</td><td>未公开</td><td>数十亿元</td><td>超100亿元（B轮投后）</td></tr>
+          <tr><td>账面资金</td><td colspan="3">累计融资超50亿元，B轮后现金储备充裕，支撑家庭场景规模化推广与C端产品研发</td></tr>
+          <tr><td>员工人数</td><td>数十人</td><td>约150人</td><td>200+人（技术人员占比近90%）</td></tr>
+        </table>
+      </div>
+      <p>注：公司成立仅两年半，2024-2025年主要处于模型研发和本体搭建阶段，商业收入极少。迄今为止主要依靠融资支撑运营。58到家合作的家庭服务是首个产生持续性收入的商业化场景，但2026年仍处于"实习生"阶段（需人类远程兜底），短期内难以产生规模化利润。</p>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li><strong>注意力机制先驱：</strong>创始人王潜是全球最早在神经网络中引入注意力机制的学者之一（与Google同期），这一贡献后来成为Transformer和ChatGPT的底层技术基础。在具身智能领域，这一学术积淀赋予了自变量在"端到端大模型"路线上的独特理论深度</li>
+        <li><strong>"非共识路线"先行者：</strong>2023年底行业主流是分层/分模块方案时，自变量就坚定选择端到端统一大模型路线。WALL-A发布后斯坦福/伯克利PI也同步转向，CEO王潜认为基础模型壁垒比硬件"高得多"，领先期可达3年以上</li>
+        <li><strong>倒逼行业转向：</strong>WALL系列模型的连续发布（VLA→WUM）正在推动行业从"本体为王"到"大脑为王"的范式转移</li>
+        <li><strong>IPO计划：</strong>COO杨倩曾公开表示部署筹备2026年招股上市，但截至2026年5月尚未提交上市申请</li>
+        <li><strong>"实习生"策略：</strong>自变量将首批进家庭机器人定位为"实习生"——前期需人类远程兜底监督，边干边学持续进化。这一低预期、渐进式的策略有助于管理公众期望，避免因过早追求完美而引发信任危机</li>
+        <li><span class="tag-warn">风险提示</span> 商业收入极少，几乎完全依赖融资支撑；家庭场景复杂度远超工厂，真正全面替代人工仍需2-3年以上；目标10万元售价尚未实现，产业链成本压力大；四巨头同时投资带来的战略协同也可能伴随股东间潜在的战略分歧</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="a1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>王潜的学术背景（注意力机制先驱、南加州大学机器人学习博士）使自变量天然倾向于"模型驱动"而非"硬件驱动"的路径。CTO王昊的百亿大模型工程经验则保证了模型训练和迭代的工业级执行力。这种学术+工程的组合，使自变量选择"最复杂的家庭场景作为技术验证场"成为可能——家庭保洁需要的不是特定场景的专用方案，而是真正的通用操作智能。但团队在消费级硬件工程、供应链管理、C端品牌营销方面的经验相对欠缺，这对"2-3年内实现10万元级家庭机器人"的目标构成现实挑战。量化金融的创业背景（王潜的美国基金公司经历）赋予了团队风险管理和资本运作能力，这可能解释为何自变量能在短时间内完成8轮融资并精准把握四巨头入局节奏。</p>
+      </div>
+
+      <div class="analysis-block" id="a2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>端到端WUM（World Unified Model）架构与家庭场景的碎片化特质天然匹配。家庭保洁面临的问题（猫跳上桌、玩具乱扔、不同材质的清洁方式）无法用预设规则穷举，必须依赖模型的泛化能力和在线学习。WALL-B的"自我进化"能力（失败后自主调整策略）直击家庭场景的核心痛点。但WUM路线的风险在于：当前机器人领域没有足够的高质量多模态训练数据来支撑通用WUM达到生产级水平——即使100+家庭的数据采集，相比自动驾驶的数百万小时路测数据，仍杯水车薪。数据飞轮能否在家庭场景中真正转起来（更多部署→更多数据→更好模型→更多部署），是自变量技术路线成败的核心变量。</p>
+      </div>
+
+      <div class="analysis-block" id="a3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>四巨头（字节、阿里、美团、小米）的集体押注在具身智能赛道绝无仅有，形成了一个独特的"四维产业协同矩阵"：美团提供本地生活场景入口（酒店、配送、家政）；阿里云提供底层算力与AI基础设施；字节跳动提供多模态交互技术（豆包/云雀大模型经验）；小米提供消费电子供应链与消费级渠道。但"四家巨头都在股东名单上"也是一把双刃剑：每家巨头都有自己的具身智能布局（美团投了多家机器人公司、阿里云首次入局但态度谨慎、字节可能自研、小米生态链已有石头/追觅等），自变量的战略独立性是否会因股东结构而受限，是长期隐忧。红杉中国在多轮中持续加码，其长期主义视角为自变量提供了战略稳定性。</p>
+      </div>
+
+      <div class="analysis-block" id="a4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>自变量从VLA（WALL-A）到WUM（WALL-B）的架构升级，本质上是一次重要的技术路线调整。最初的VLA架构虽然实现了端到端的视觉-语言-动作统一，但在物理世界理解（重力、摩擦力、惯性的预判）上存在天然局限。WUM通过在同一网络中联合训练视觉、语言、动作和物理预测，试图用一个模型解决"感知-理解-动作-预测"的全链路。这种架构升级的合理性在于：家庭场景中的机器人错误往往不是"看不清"或"听不懂"，而是"没想到会滑"或"没算准力度"。WUM的升级是对VLA在物理操作层面能力不足的针对性补强。但如果WUM的训练数据仍然不足（尤其在触觉和力控数据方面），架构升级可能仅停留在理论层面。</p>
+      </div>
+
+      <div class="analysis-block" id="a5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>自变量在具身智能生态中的定位极为鲜明：做"大脑"（具身大模型），而非"身体"（硬件本体）。这与宇树科技（极致硬件降本）和众擎机器人（全栈硬件+AI双轮）形成根本性差异。CEO王潜的核心判断是："基础模型壁垒比硬件高得多，领先期可达3年以上"。这一判断如果正确，自变量将在行业进入"智能为王"阶段时占据绝对优势；如果错误——即硬件成本下降和场景专用方案能够更快实现商业闭环——则自变量可能陷入"模型最强但赚不到钱"的尴尬。自变量的取舍是清晰的：赌通用性而非专用性，赌长期智能壁垒而非短期硬件效率。这与OpenAI在LLM领域的策略一脉相承（赌AGI而非做垂直应用），但具身智能的物理约束可能使这条路径比纯软件AI更具挑战。</p>
+      </div>
+
+      <div class="analysis-block" id="a6">
+        <h4>2.6 其他重要观察、分析</h4>
+        <p>第一，"变量"与"自变量"的命名隐喻值得关注——在科学中，"自变量"是引起变化的原因，暗示公司定位为"基础设施"而非"终端应用"。第二，自变量选择轮式双臂（非双足）作为产品形态，是一种务实的工程取舍：双足行走在家庭场景中的边际价值远低于操作能力，轮式方案降低了稳定性风险、加速了场景落地。第三，与58到家的合作是全球首个机器人进入真实家庭提供付费服务的案例，如果成功，其"数据飞轮"效应（更多部署→更多真实数据→更强模型→更多部署）将形成竞争壁垒。但"实习生"阶段的人类远程兜底成本（需要后台运维人员实时监控和干预）是否被计入单位经济模型，是一个值得关注的实际问题。第四，自变量的高估值（百亿+）建立在未来2-3年家庭场景规模化落地的预期上，而当前商业化收入极少，估值与业绩之间存在显著的gap。第五，自变量与股东小米之间存在微妙的竞合关系——小米生态链已有追觅/石头等机器人公司，小米自身也在布局具身智能，自变量如何在享受小米供应链红利的同时保持独立性，是一个需要持续观察的动态。</p>
+      </div>
+
+      <h2 id="refs">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://www.stcn.com/article/detail/3771882.html" target="_blank">证券时报：自变量机器人完成近20亿元B轮融资，小米战投领投</a></li>
+          <li><a href="https://www.guandian.cn/article/20260421/556435.html" target="_blank">观点网：小米战投领投自变量机器人B轮，雷军的机器人帝国浮现</a></li>
+          <li><a href="https://news.qq.com/rain/a/20260427A0721500" target="_blank">腾讯新闻：超100亿元估值！同获字节、阿里、美团、小米投资的独角兽</a></li>
+          <li><a href="https://finance.eastmoney.com/a/202509083507880681.html" target="_blank">东方财富：阿里云首次投资具身智能，自变量拿下近10亿新融资</a></li>
+          <li><a href="https://www.chinastarmarket.cn/detail/2031285" target="_blank">科创板日报：王兴"接棒"！出手7轮融资的自变量机器人</a></li>
+          <li><a href="https://api3.cls.cn/share/article/2139526" target="_blank">财联社：阿里云首度落子具身智能，领投自变量机器人10亿规模融资</a></li>
+          <li><a href="https://www.21jingji.com/article/20260113/herald/c97172d8098f13ffa2fba48640f09393.html" target="_blank">21世纪经济报道：深圳青年造机器人，4个月融钱20亿</a></li>
+          <li><a href="http://www.iceo.com.cn/article/3092ff11-5414-4d2e-bfe7-24d6abe52957" target="_blank">中国企业家杂志：这家公司成立两年，获8轮融资，美团、阿里云重仓押注</a></li>
+          <li><a href="https://www.mrjjxw.com/articles/2026-04-22/4352789.html" target="_blank">每日经济新闻：机器人"实习生"要住家了！自变量CEO王潜专访</a></li>
+          <li><a href="https://tech.ifeng.com/c/8sWlBeFgxsw" target="_blank">凤凰科技：对话自变量CEO王潜——一个月后，机器人就可以接单进家了</a></li>
+          <li><a href="https://api3.cls.cn/share/article/2340881" target="_blank">科创板日报：对话自变量CTO王昊——在具身智能"无人区"探索端到端大模型</a></li>
+          <li><a href="https://m.jiemian.com/article/13723586.html" target="_blank">界面新闻：自变量机器人——端到端基础模型，押注通用机器人未来</a></li>
+          <li><a href="https://www.dutenews.com/n/article/8881303" target="_blank">读特新闻：自变量机器人创始人兼CEO王潜——让通用机器人走向千家万户</a></li>
+          <li><a href="https://www.sohu.com/a/1014754347_122014422" target="_blank">搜狐：自变量机器人发布具身智能基础模型WALL-B，并宣布小米投资</a></li>
+          <li><a href="https://finance.sina.com.cn/wm/2026-04-22/doc-inhvkcsk4361888.shtml" target="_blank">新浪财经：雷军，投了一家不跑马拉松的机器人企业</a></li>
+          <li><a href="https://m.ithome.com/html/936806.htm" target="_blank">IT之家：智平方vs自变量机器人——两家具身智能独角兽的全维度对比</a></li>
+          <li><a href="https://stcn.com/article/detail/3789661.html" target="_blank">证券时报：深圳具身智能"大脑"公司自变量完成B轮融资</a></li>
+          <li><a href="https://finance.jrj.com.cn/2025/09/08180052998774.shtml" target="_blank">金融界：阿里云首投具身智能，自变量CEO王潜——具身智能最大市场在C端</a></li>
+          <li><a href="https://ai.zhiding.cn/2026/0421/3184674.shtml" target="_blank">至顶网：自变量机器人的家庭落地计划</a></li>
+          <li><a href="http://www.shouchengholdings.com/news/4651.html" target="_blank">首程控股：自变量机器人获近10亿元A+轮融资</a></li>
+          <li><a href="https://www.nsseii.com/CaseStd_826.html" target="_blank">南山战新投：已投企业——自变量机器人获近10亿元A+轮融资</a></li>
+          <li><a href="https://www.jrtzb.cn/346yw/202604/83245797.html" target="_blank">金融投资报：四家互联网大厂同时押注一家独角兽</a></li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">本页面由具身智能Wiki项目自动生成 · 数据截止2026年5月 · 仅供信息参考，不构成投资建议</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

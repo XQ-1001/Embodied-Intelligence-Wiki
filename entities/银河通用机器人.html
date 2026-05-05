@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>银河通用机器人 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> <span class="breadcrumb-sep">›</span> <span>银河通用机器人</span></div>
+  <div class="wiki-header"><h1>银河通用机器人</h1><div class="subtitle">Galbot · 2023年成立 · 国内具身智能融资额最高独角兽 · 累计融资超70亿元 · 估值超200亿</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#founders">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#financing">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#technology">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financials">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#analysis1">2.1 团队背景与场景选择的匹配度</a></li>
+        <li class="toc-lvl4"><a href="#analysis2">2.2 技术路线与场景的适配性</a></li>
+        <li class="toc-lvl4"><a href="#analysis3">2.3 股东/资本结构对战略的影响</a></li>
+        <li class="toc-lvl4"><a href="#analysis4">2.4 试错过程与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#analysis5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#analysis6">2.6 其他重要观察与分析</a></li>
+        <li class="toc-lvl2"><a href="#references">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">银河通用机器人</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">北京银河通用机器人有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">英文名</div><div class="ib-value">Galbot</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2023年5月</div></div>
+        <div class="ib-row"><div class="ib-label">注册地</div><div class="ib-value">北京市海淀区</div></div>
+        <div class="ib-row"><div class="ib-label">创始人</div><div class="ib-value">王鹤（CTO）、姚腾洲（CEO）</div></div>
+        <div class="ib-row"><div class="ib-label">员工人数</div><div class="ib-value">约80人</div></div>
+        <div class="ib-section">融资与估值</div>
+        <div class="ib-row"><div class="ib-label">累计融资</div><div class="ib-value">超70亿元人民币（7+轮）</div></div>
+        <div class="ib-row"><div class="ib-label">最新估值</div><div class="ib-value">超200亿元（2026年3月D轮后）</div></div>
+        <div class="ib-row"><div class="ib-label">单轮最高</div><div class="ib-value">25亿元（2026.3，大基金三期领投）</div></div>
+        <div class="ib-section">财务数据（2025）</div>
+        <div class="ib-row"><div class="ib-label">营业收入</div><div class="ib-value">约9942万美元（CB Insights）</div></div>
+        <div class="ib-row"><div class="ib-label">盈利状态</div><div class="ib-value"><span class="tag tag-warn">尚未盈利</span></div></div>
+        <div class="ib-row"><div class="ib-label">订单规模</div><div class="ib-value">超7亿元（累计）</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">G1年出货</div><div class="ib-value">突破1200台（2025）</div></div>
+        <div class="ib-row"><div class="ib-label">抓取成功率</div><div class="ib-value">95%+（任意材质泛化）</div></div>
+        <div class="ib-row"><div class="ib-label">太空舱覆盖</div><div class="ib-value">20+城市、100+门店</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">领域</div><div class="ib-value"><span class="tag">具身智能</span><span class="tag">人形机器人</span><span class="tag">零售自动化</span><span class="tag">工业机器人</span></div></div>
+        <div class="ib-section">官网</div>
+        <div class="ib-row"><div class="ib-label">网址</div><div class="ib-value"><a href="https://www.galbot.com" target="_blank">www.galbot.com</a></div></div>
+      </aside>
+
+      <p class="article-intro"><strong>银河通用机器人</strong>（Galbot）是中国具身智能赛道累计融资额最高的独角兽企业，由斯坦福博士、北京大学助理教授王鹤与北航机器人所硕士、前ABB专家姚腾洲于2023年5月联合创立，总部位于北京市海淀区。公司以"合成数据驱动+端到端多模态大模型"为核心技术路线，主打轮式双臂人形机器人Galbot G1，率先打通"高质量数据集+端到端大模型+规模化应用"的产业化闭环。成立不到3年累计融资超70亿元、估值超200亿元，为国内估值最高的未上市具身智能企业。2026年成为首个登上央视春晚的具身大模型机器人，并以NVIDIA GTC 2026唯一中国具身智能案例身份获黄仁勋点名。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+
+      <div class="table-wrapper">
+        <table class="wikitable infotable">
+          <tr><th>项目</th><th>内容</th></tr>
+          <tr><td>公司全称</td><td>北京银河通用机器人有限公司</td></tr>
+          <tr><td>英文名称</td><td>Galbot (Beijing Galbot Co., Ltd.)</td></tr>
+          <tr><td>成立日期</td><td>2023年5月</td></tr>
+          <tr><td>注册地址</td><td>北京市海淀区</td></tr>
+          <tr><td>上市状态</td><td>未上市；2025年11月完成股改，计划IPO（港股为潜在选项）；预计2027-2030年之间上市</td></tr>
+          <tr><td>核心高管</td><td>王鹤（创始人/CTO）、姚腾洲（联合创始人/CEO/法定代表人）</td></tr>
+          <tr><td>员工人数</td><td>约80人（2025-2026年）</td></tr>
+          <tr><td>官网</td><td>www.galbot.com</td></tr>
+        </table>
+      </div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>时间</th><th>事件</th></tr>
+          <tr><td>2023年5月</td><td>王鹤与姚腾洲联合创立银河通用机器人，定位具身多模态大模型通用机器人</td></tr>
+          <tr><td>2023年6月</td><td>完成种子轮融资，经纬创投、蓝驰创投入局</td></tr>
+          <tr><td>2024年6月</td><td>完成7亿元天使轮（当时人形机器人赛道最大天使轮），发布首款产品Galbot G1</td></tr>
+          <tr><td>2024年11月</td><td>完成5亿元A轮战略融资，上汽集团、HKIC等入局</td></tr>
+          <tr><td>2025年6月</td><td>完成11亿元B轮融资，宁德时代领投，为当时具身智能单笔最大融资</td></tr>
+          <tr><td>2025年8月</td><td>银河太空舱在北京中关村首发，开启零售场景商业化</td></tr>
+          <tr><td>2025年11月</td><td>完成股改（变更为股份有限公司），被视为IPO铺路</td></tr>
+          <tr><td>2025年12月</td><td>完成超3亿美元C轮融资，估值30亿美元；获中国移动链长基金领投</td></tr>
+          <tr><td>2026年1月</td><td>发布工业重载机器人Galbot S1（双臂负载50kg）；CES 2026亮相；发布GroceryVLA 2.0</td></tr>
+          <tr><td>2026年2月</td><td>成为央视春晚史上首个"真正自主干活"的具身大模型机器人，春晚同款上线即售罄</td></tr>
+          <tr><td>2026年3月</td><td>完成25亿元D轮融资（国家大基金三期领投），刷新国内具身智能单轮融资纪录</td></tr>
+          <tr><td>2026年3月</td><td>NVIDIA GTC 2026主题演讲中，黄仁勋将Galbot作为唯一中国具身智能案例</td></tr>
+          <tr><td>2026年4月</td><td>与延锋国际签署战略合作，进入汽车零部件精密制造场景</td></tr>
+        </table>
+      </div>
+
+      <h3 id="founders">1.2 创始人及核心团队</h3>
+      <p>银河通用的创始双人组被投资界普遍评价为<strong>"学院派+产业派"互补创业的典范</strong>。王鹤提供AI算法与学术前沿视野，姚腾洲提供硬件工程化与量产经验，形成技术与商业的完整闭环。团队核心成员还来自华为"天才少年"计划、百度、微软等企业。</p>
+
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+          <tr><td>创始人/CTO</td><td>王鹤</td><td>1992年生，清华微纳电子本科（物理竞赛保送，2014），斯坦福大学电子工程博士（2021），师从美国三院院士Leonidas Guibas；现任北大前沿计算研究中心助理教授，创立EPIC Lab；北京智源人工智能研究院具身智能研究中心主任；2024年入选MIT TR35中国区榜单；主导公司AI算法与技术方向</td></tr>
+          <tr><td>联合创始人/CEO/法定代表人</td><td>姚腾洲</td><td>北京航空航天大学机器人研究所硕士，师从机器人泰斗王田苗教授；曾任ABB上海机器人研发中心研发工程师；曾任ROOBO机器人研发部要职，拥有千万级智能硬件量产经验；负责公司硬件方向与整体运营</td></tr>
+          <tr><td>核心成员</td><td>—</td><td>多名成员来自华为"天才少年"计划、百度、微软等企业，构成AI+硬件的复合型团队</td></tr>
+        </table>
+      </div>
+      <p>团队"学院派+产业派"的混合型人才结构是银河通用的核心竞争力之一——王鹤在斯坦福的学术积累和北大EPIC Lab的研究产出提供技术纵深，姚腾洲在ABB和ROOBO的产业经验确保产品能走出实验室进入工厂和零售场景。</p>
+
+      <h3 id="financing">1.3 融资与股东</h3>
+
+      <h4>融资历史</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>轮次</th><th>时间</th><th>金额</th><th>估值</th><th>核心投资方</th></tr>
+          <tr><td>种子轮</td><td>2023年6月</td><td>未披露</td><td>—</td><td>经纬创投、蓝驰创投</td></tr>
+          <tr><td>天使轮</td><td>2024年6月</td><td>7亿元</td><td>约30亿元</td><td>美团、北汽产投、蓝驰、启明、经纬、IDG</td></tr>
+          <tr><td>A轮</td><td>2024年11月</td><td>5亿元</td><td>—</td><td>上汽恒旭资本、HKIC（香港投资管理公司）、深创投、上海AI基金</td></tr>
+          <tr><td>B轮</td><td>2025年6月</td><td>11亿元</td><td>显著增长</td><td>宁德时代领投，国开科创、纪源资本等</td></tr>
+          <tr><td>C轮</td><td>2025年12月</td><td>超3亿美元（约21亿元）</td><td>30亿美元（约200亿元）</td><td>中国移动链长基金领投，中金资本、央视融媒体基金、中科院基金、新加坡/中东机构</td></tr>
+          <tr><td>D轮</td><td>2026年3月</td><td>25亿元</td><td>超200亿元</td><td>国家大基金三期领投，中国石化、中国银行、上汽金控、中芯聚源、亦庄国投、成都科创投等</td></tr>
+        </table>
+      </div>
+
+      <h4>股东结构</h4>
+      <p>银河通用的股东结构呈现<strong>"国家队+产业巨头+头部VC"三层架构</strong>。国家队层面：国家大基金三期（首次投资具身智能赛道）、国开科创、中金资本、亦庄国投、成都科创投等；产业巨头层面：宁德时代、美团、上汽（恒旭资本+金控双通道）、中国移动、中国石化、北汽产投等；头部VC层面：经纬、蓝驰、启明、IDG等。其中宁德时代为银河通用<strong>唯一投资的具身智能企业</strong>，且Galbot S1是其电池工厂唯一常态化作业的人形机器人。创始人王鹤为公司控股股东，2025年11月股改为IPO做准备。</p>
+
+      <h3 id="technology">1.4 技术路线</h3>
+
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>技术维度</th><th>详细说明</th></tr>
+          <tr><td>AI模型架构</td><td><strong>"银河星脑"（AstraBrain）</strong>——全球首个集成"大脑—小脑—神经控制"于一模的端到端具身大模型；核心技术组件：GraspVLA（全球首个基于十亿级仿真数据预训练的端到端抓取模型）、GroceryVLA（零售场景）、TrackVLA（导航）、NavFoM（导航基座模型，小时级长程自主导航）、DexNDM（灵巧手神经动力学模型）</td></tr>
+          <tr><td>数据方案</td><td><strong>"银河星坊"（AstraSynth）</strong>——全球规模最大的百亿级具身智能数据集，以合成仿真数据为主、真机数据为辅的虚实融合训练范式；突破"干活数据匮乏"瓶颈，是该赛道内唯一明确以"合成数据为核心"路线的头部企业</td></tr>
+          <tr><td>世界模型/仿真</td><td>GORM通用定向可达性映射技术，六自由度基座全身操作泛化；合成数据大规模生成+仿真环境批量训练</td></tr>
+          <tr><td>硬件合作</td><td>搭载NVIDIA Jetson AGX THOR（Blackwell架构），全球首秀；自研灵巧手获国际工业巨头千台级订单</td></tr>
+          <tr><td>核心指标</td><td>泛化抓取成功率95%+；六自由度操作精度误差＜0.5mm；2025智源大会18小时连续真机演示97%任务成功率；世界人形机器人运动会医药分拣赛冠军</td></tr>
+          <tr><td>技术合作方</td><td>NVIDIA（GTC 2026唯一中国具身智能案例）、北大EPIC Lab、北京智源人工智能研究院</td></tr>
+        </table>
+      </div>
+      <p>银河通用的技术路线在具身智能赛道中独树一帜：<strong>以合成仿真数据为核心驱动力</strong>，而非行业主流的"真机数据为王"路线。这一选择的理论基础是王鹤在斯坦福期间的学术信仰——仿真数据可以绕过真实世界机器人采集数据的物理瓶颈（速度慢、成本高、场景受限），实现数据规模的指数级增长。该路线已在实际场景中得到初步验证：GraspVLA零样本泛化、药房场景7×24运营超一年。</p>
+
+      <h3 id="products">1.5 产品形态</h3>
+
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>产品分类</th><th>型号</th><th>关键参数/特点</th><th>定位/定价</th></tr>
+          <tr><td rowspan="2">轮式双臂机器人</td><td>Galbot G1</td><td>身高1.73m，臂展1.9m，最高可触及2.4m；左手吸盘模块，右手自适应夹爪；360°全向移动；轮式底盘+可折叠腿部</td><td>通用零售/轻工业/医疗场景；售价约70万元/台</td></tr>
+          <tr><td>Galbot G1（春晚版）</td><td>升级版VLA能力，完成盘核桃、拾玻璃碎片、串烤肠、叠衣理物等精细任务</td><td>品牌旗舰；春晚同款上线即售罄</td></tr>
+          <tr><td>工业重载机器人</td><td>Galbot S1</td><td>双臂负载达50kg（100斤），突破行业极限；支持自主换电，7×24小时连续运行；可在粉尘、震动、温差等复杂工况下持续作业</td><td>工业制造；2026年1月发布，宁德时代工厂常态化部署</td></tr>
+          <tr><td>具身大模型</td><td>GraspVLA / GroceryVLA / TrackVLA</td><td>场景化端到端VLA；GraspVLA十亿级数据预训练；GroceryVLA 2.0 赋能零售</td><td>机器人"大脑"引擎</td></tr>
+          <tr><td>零售空间方案</td><td>银河太空舱</td><td>最小仅需9m²，15天交付；24小时无人全自主运营；500+品类支持；单舱日均2000人次服务能力</td><td>机器人便利店/药房/文创店；百万元级单舱</td></tr>
+          <tr><td>灵巧手</td><td>自研灵巧手</td><td>基于DexNDM神经动力学模型，精密操作高度自主化</td><td>获国际工业巨头千台级订单</td></tr>
+        </table>
+      </div>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>场景分类</th><th>具体应用</th><th>代表客户/合作伙伴</th></tr>
+          <tr><td>工业制造</td><td>电池工厂全自主作业、汽车零部件精密加工与柔性装配、重载物料搬运</td><td>宁德时代（唯一投资+唯一常态化部署）、德国博世（合资公司"博源合创"）、丰田、北汽、上汽、延锋国际、百达精工（1000+台计划）、极氪、长城汽车</td></tr>
+          <tr><td>零售/新消费</td><td>24小时机器人便利店、咖啡饮品售卖、文创零售、冰淇淋贩卖</td><td>银河太空舱"十城百店"（北京颐和园、鸟巢、上海外滩、杭州西湖、成都春熙路、厦门鼓浪屿等）</td></tr>
+          <tr><td>医疗康养</td><td>智慧药房7×24无人运营、药品分拣配送、体检引导、认知能力评估、医疗器械售卖</td><td>宣武医院、华西医院等三甲医院；24城市落地智慧药房</td></tr>
+          <tr><td>即时零售</td><td>全自主即时零售仓，单店管理5000+SKU、10000+商品</td><td>全球首个7×24不间断运营超一年行业纪录</td></tr>
+          <tr><td>文旅/海外</td><td>酒店迎宾导览、景区服务</td><td>阿联酋阿布扎比酒店、新加坡资本助力全球化</td></tr>
+        </table>
+      </div>
+      <p>银河通用的场景策略是<strong>"工业+商业服务双引擎，C端品牌破圈"</strong>：工业以宁德时代为锚、博世为全球化跳板；商业以太空舱"十城百店"为样板间；品牌以春晚+央视背书实现全民认知度。场景选择偏"可结构化"的室内环境（工厂产线、药店、便利店），回避开放室外场景的不确定性。</p>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <ul>
+        <li><strong>Galbot G1出货</strong>：2025年累计出货突破1200台，零售场景预计年收入近亿元</li>
+        <li><strong>累计订单</strong>：超7亿元（截至2025年12月），含某单一产业方千台级采购合同约7亿元</li>
+        <li><strong>工业部署</strong>：S1在宁德时代电池工厂实现常态化全自主作业，博世全球产线部署；累计工业订单数千台</li>
+        <li><strong>太空舱覆盖</strong>：20+城市、超100家门店；春节高峰期单舱单日破500单、销售额超万元</li>
+        <li><strong>智慧药房</strong>：全国24个城市落地，累计送出近百万盒药品，服务超30万订单</li>
+        <li><strong>春晚破圈</strong>：2026年央视春晚首位"干活"机器人，两台G1上线即售罄，极大提升品牌溢价</li>
+        <li><strong>全球亮相</strong>：CES 2026首秀；NVIDIA GTC 2026黄仁勋主题演讲唯一中国案例；日本市场战略合作协议签署</li>
+        <li><strong>合资公司</strong>：与德国博世成立"博源合创"，共同打造面向全球工业生态的新一代机器人平台</li>
+        <li><strong>2026年收入预期</strong>：预计3-4亿元</li>
+      </ul>
+
+      <h3 id="financials">1.8 财务数据</h3>
+
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>指标</th><th>2023年</th><th>2024年</th><th>2025年</th><th>2026年E</th></tr>
+          <tr><td>营业收入</td><td>0（初创期）</td><td>极小</td><td>约9942万美元（CB Insights）</td><td>预计3-4亿元</td></tr>
+          <tr><td>盈利状态</td><td>亏损</td><td>亏损</td><td>亏损</td><td>预计持续亏损</td></tr>
+          <tr><td>累计融资</td><td>种子轮</td><td>12亿元</td><td>约45亿元</td><td>超70亿元</td></tr>
+          <tr><td>估值</td><td>—</td><td>约30亿元</td><td>约200亿元</td><td>超200亿元</td></tr>
+          <tr><td>G1年出货</td><td>—</td><td>小批量</td><td>突破1200台</td><td>目标数千-万台</td></tr>
+        </table>
+      </div>
+      <p>银河通用仍处于高投入期，以融资驱动增长。2025年营收约1亿美元级别，主要来自G1本体销售和太空舱运营收入。公司目标2026年实现3-4亿元营收，并预计2027-2030年之间上市。单台G1售价约70万元，太空舱单舱百万元级投入，整体仍为亏损经营。</p>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>公司名称"银河"寓意宏大愿景，"通用"体现其"通用智能机器人"的终极目标——不做专用工具，要做通用平台</li>
+        <li>王鹤从半导体物理器件（清华本科）转向三维视觉与具身智能（斯坦福博士），这一跨学科背景为其"软硬一体"技术路线提供了独特视角</li>
+        <li>银河通用是具身智能赛道中<strong>唯一同时获得国家大基金三期、宁德时代、香港投资管理公司（HKIC）、央视融媒体基金四方"国家队+产业+国际+媒体"资本加持</strong>的企业</li>
+        <li>2026年春晚是具身智能机器人首次以"干活"而非"表演"身份登上春晚舞台，标志着具身智能从炫技走向实用</li>
+        <li>与宇树科技形成"南北双极"格局——宇树主双足+四足消费级路线，银河主轮式+工业零售B端路线</li>
+        <li>黄仁勋在GTC 2026主题演讲中评价其为"将物理AI带入真实世界的典范"，马斯克随后也在社交媒体公开点赞</li>
+        <li>公司已获医疗器械经营许可，机器人可合法售卖III类医疗器械——这是具身智能赛道中的罕见资质</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="analysis1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>银河通用"王鹤学术AI×姚腾洲工业量产"的双人组合与其"工业+零售"双场景战略高度匹配。王鹤在斯坦福的三维视觉与物理交互研究（师从Guibas院士）直接对应GraspVLA的泛化抓取能力，其学术信仰——"合成数据可以突破物理世界数据瓶颈"——与公司选择"仿真为主、真机为辅"的数据路线一脉相承。姚腾洲在ABB的工业机器人研发经验和ROOBO千万级量产经历，则确保了机器人本体从实验室到产线的工程化落地。团队短板在于缺乏零售运营和消费品牌管理背景——这也是银河通用选择"太空舱"轻资产模式（9m²模块化、15天交付），而非自建重资产零售网络的原因之一，体现了一种"技术能力边界内的务实场景选择"。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>银河通用"合成数据驱动"的技术路线，在其当前选择的场景中显示出高适配性。零售药房、便利店、电池工厂产线均为高度结构化的室内环境，物品类别和操作流程相对固定——这与合成数据擅长覆盖的"已知分布内泛化"天然吻合。GraspVLA的95%+抓取成功率、药房场景7×24运营超一年的连续可靠性，均验证了该路线在结构化场景中的可行性。然而，合成数据的核心风险在于"仿真到真实的鸿沟"（sim-to-real gap）：当场景从便利店扩展到开放室外、从固定SKU扩展到任意物体时，合成数据可能需要大量真机数据补充才能维持精度。GTC 2026上王鹤的演讲已透露，公司正在构建"虚实融合"的百亿级数据集，说明其在主动弥补纯合成路线的潜在短板。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>银河通用的股东结构是具身智能赛道中最为"场景绑定型"的：宁德时代→电池工厂场景（唯一投资+唯一部署），美团→零售/即时物流场景，上汽×北汽→汽车制造场景，中国石化→能源工业场景，中国移动→通信基础设施场景。每笔融资都附带了一个明确的场景入口，这种"资本即订单"的模式在短期内极大降低了商业化验证的不确定性。但深层次风险在于：其一，多产业资本共存可能导致场景优先级冲突——汽车、电池、零售三条战线的资源分配需要极强的战略定力；其二，"过于成功的融资"抬高了估值水位（200亿），后续IPO定价和二级市场表现面临压力。国家大基金三期的入场是双刃剑：既带来了25亿资金和政策背书，也意味着公司进入了"国家级战略资产"的审视范畴，组织灵活性可能受到一定约束。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>银河通用的发展路径体现了一种少见的"直线加速"而非"试错迭代"模式——成立3年几乎没有明显的战略摇摆。这在具身智能赛道中是罕见的，可能源于两个因素：一是王鹤在斯坦福期间已积累了足够的技术确信（合成数据路线的理论基础），二是姚腾洲在ABB和ROOBO的经历提供了"什么能落地、什么不能"的产业判断。值得注意的微调包括：从G1单一产品线扩展到S1工业重载品类的决策（响应宁德时代等客户需求），从零售药房（低频、高单位价值）扩展到便利店（高频、低单位价值）的场景延伸，以及与博世成立合资公司转向"技术平台输出"而非仅"本体销售"的模式升级。这些调整都是增量式的，而非颠覆性的——说明公司战略方向在创立之初就具有较高的成熟度。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>银河通用的核心取舍是：<strong>做"合成数据优先的具身大脑公司"而非"硬件驱动的机器人制造商"；做"B端场景的实干派"而非"C端消费的炫技派"</strong>。这一定位使其在行业中占据了一个独特生态位：与宇树（消费级四足+双足）、智元（全栈人形+开源）、星海图（开源VLA+数据飞轮）均有差异。银河选择轮式而非双足（节省了腿部控制的极高研发成本），选择零售药房和工厂产线而非开放家庭场景（回避了非结构化环境的泛化难题），选择合成数据为主而非真机采集为主（突破了物理数据采集的规模瓶颈）。这些取舍的实质是：<strong>用"场景降维+技术升维"换取最快的商业化验证速度</strong>。风险在于：如果双足技术和真机数据路线在未来成为必需品（例如家庭场景爆发），银河通用可能需要补课。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis6">
+        <h4>2.6 其他重要观察与分析</h4>
+        <p>银河通用是中国具身智能赛道中"资本效率"最高的企业之一：70亿融资对应约1亿美元年营收和1200台出货，位居行业商业化进度前列。其成功要素中有三个非技术变量值得关注：第一，"春晚+央视"的品牌杠杆——通过国家级媒体平台，将机器人从B端工业品转化为C端可感知的消费符号，这在同行中属首创；第二，"国家大基金三期首次出手具身智能"的信号效应——这意味着银河通用被视为国家级AI基础设施的一部分，而非纯粹的商业公司；第三，"博世合资公司"的全球化跳板——绕过了中国机器人企业出海常遇到的信赖壁垒，以"与德国工业巨头联合品牌"进入欧美市场。然而，银河通用面临的核心挑战是：轮式路线在当前是务实的，但在双足技术成熟后是否会被边缘化？合成数据路线在结构化场景中有效，但在开放世界AGI竞争中是否够用？这些问题的答案将决定银河通用是"具身智能时代的先驱"还是"特定场景的王者"。</p>
+      </div>
+
+      <h2 id="references">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://m.36kr.com/p/3608094670210057" target="_blank">北大92后，一把融资21亿 — 36氪</a></li>
+          <li><a href="https://www.thepaper.cn/newsDetail_forward_31029375" target="_blank">11亿！90后北大教授创纪录，拿下具身智能最大融资 — 澎湃新闻</a></li>
+          <li><a href="https://stock.10jqka.com.cn/hks/20260305/c675093674.shtml" target="_blank">银河通用三年融资70亿估值200亿，大基金宁德时代押注 — 同花顺</a></li>
+          <li><a href="https://cd.nbd.com.cn/articles/2026-03-03/4277337.html" target="_blank">银河通用完成25亿元融资 成都国资入局具身智能 — 每日经济新闻</a></li>
+          <li><a href="https://www.21jingji.com/article/20260218/herald/17d0c0d8d25b1cdadd12dde6850d3a28.html" target="_blank">春晚节目里给沈腾递水，机器人新贵估值超200亿 — 21世纪经济报道</a></li>
+          <li><a href="https://www.stcn.com/article/detail/2216529.html" target="_blank">宁德时代入局，银河通用完成新一轮融资 — 证券时报</a></li>
+          <li><a href="https://www.caixin.com/2024-11-19/102259040.html" target="_blank">人形机器人公司银河通用融资5亿元 成立一年共融资12亿元 — 财新网</a></li>
+          <li><a href="https://finance.sina.com.cn/cj/2025-12-19/doc-inhckerz7419070.shtml" target="_blank">银河通用200亿估值背后：为什么"不那么复杂"的场景反而能赢 — 新浪财经</a></li>
+          <li><a href="https://www.bkeconomy.com/detail-1756625503129299.html" target="_blank">经济热力站｜走进冠军企业银河通用：今年重点落地零售场景 — 北京经济网</a></li>
+          <li><a href="https://www.nbd.com.cn/articles/2025-08-09/4006759.html" target="_blank">北京街头出现24小时机器人便利店 — 每日经济新闻</a></li>
+          <li><a href="https://news.ynet.com/2026/02/17/3987467t70.html" target="_blank">春晚火出圈的机器人，已实现工业商业场景双落地 — 北京青年报</a></li>
+          <li><a href="https://hkcd.com.hk/content_app/2026-03/24/content_8746454.html" target="_blank">黄仁勋、马斯克点名"中意你"，银河通用助力京港人形机器人生态 — 香港商报</a></li>
+          <li><a href="https://www.chinastarmarket.cn/detail/2273847" target="_blank">银河通用发布首款工业级重载机器人 Galbot G1年出货破1200台 — 科创板日报</a></li>
+          <li><a href="https://www.guandian.hk/article/20260129/540439.html" target="_blank">银河通用发布首款工业级重载机器人Galbot S1 — 观点网</a></li>
+          <li><a href="https://aipfia.zhidx.com/p/540530.html" target="_blank">银河通用王鹤：以仿真数据为核心，把机器人送进药房、零售舱 — 智东西/GTC 2026</a></li>
+          <li><a href="https://www.shobserver.com/staticsg/res/html/web/newsDetail.html?id=1099656" target="_blank">延锋国际牵手银河通用——上汽具身智能场景再突破 — 上海观察</a></li>
+          <li><a href="http://bj.people.com.cn/BIG5/n2/2025/0819/c14540-41326104.html" target="_blank">人形机器人海淀上岗"卖"医疗器械 — 人民网</a></li>
+          <li><a href="https://www.qimingvc.com/en/node/7399" target="_blank">银河通用王鹤：专注研发具身智能多模态大模型通用机器人 — 启明创投</a></li>
+          <li><a href="https://www.eet-china.com/mp/a484492.html" target="_blank">银河通用机器人战略蓝图：以"合成数据驱动+端到端大模型"重塑具身智能 — 电子工程专辑</a></li>
+          <li><a href="https://www.cbinsights.com/company/yinhe-tongyong-jiqiren/financials" target="_blank">Galbot Financials — CB Insights</a></li>
+          <li><a href="https://pitchbook.com/profiles/company/539056-63" target="_blank">Galbot Company Profile — PitchBook</a></li>
+          <li><a href="https://1118.cctv.com/2026/03/10/ARTIlnvRQ1INxIjxB7RTz0mO260310.shtml" target="_blank">春晚出圈，银河通用解锁品牌新高度，最新估值超200亿元 — 央视网</a></li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">本页面内容基于公开信息整理，数据截至2026年5月。信息源于36氪、澎湃新闻、每日经济新闻、证券时报、财新网、CB Insights、PitchBook等媒体及研究平台。© 具身智能Wiki</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

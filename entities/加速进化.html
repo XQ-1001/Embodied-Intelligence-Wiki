@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>加速进化 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> › <span>加速进化</span></div>
+  <div class="wiki-header"><h1>加速进化</h1><div class="subtitle">Booster Robotics · 2023年成立 · 近10亿元融资 · K1累计出货超1,000台 · RoboCup冠军</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#founders">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financials">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#an1">2.1 团队背景与场景选择的匹配度</a></li>
+        <li class="toc-lvl4"><a href="#an2">2.2 技术路线与场景的适配性</a></li>
+        <li class="toc-lvl4"><a href="#an3">2.3 股东/资本结构对战略的影响</a></li>
+        <li class="toc-lvl4"><a href="#an4">2.4 试错过程与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#an5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#an6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#references">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">加速进化</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">北京加速进化科技有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">英文名</div><div class="ib-value">Booster Robotics</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2023年6月</div></div>
+        <div class="ib-row"><div class="ib-label">注册地</div><div class="ib-value">北京海淀</div></div>
+        <div class="ib-row"><div class="ib-label">创始人/CEO</div><div class="ib-value">程昊</div></div>
+        <div class="ib-row"><div class="ib-label">首席科学家</div><div class="ib-value">赵明国（清华研究员）</div></div>
+        <div class="ib-row"><div class="ib-label">总部</div><div class="ib-value">北京海淀</div></div>
+        <div class="ib-row"><div class="ib-label">上市状态</div><div class="ib-value">未上市</div></div>
+        <div class="ib-section">估值/市值</div>
+        <div class="ib-row"><div class="ib-label">估值</div><div class="ib-value">未公开披露（创始人刻意控制估值）</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">最新单轮融资</div><div class="ib-value">近10亿元（2026.4）</div></div>
+        <div class="ib-row"><div class="ib-label">K1累计出货</div><div class="ib-value">超1,000台</div></div>
+        <div class="ib-row"><div class="ib-label">全球覆盖</div><div class="ib-value">20+国家，400+客户</div></div>
+        <div class="ib-row"><div class="ib-label">K1国内定价</div><div class="ib-value">¥4万元以内</div></div>
+        <div class="ib-row"><div class="ib-label">K1海外定价</div><div class="ib-value">$6,000美元</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">赛道</div><div class="ib-value">小尺寸人形机器人 · 科研教育</div></div>
+        <div class="ib-row"><div class="ib-label">官网</div><div class="ib-value"><a href="https://www.boosterr.com" target="_blank">boosterr.com</a></div></div>
+      </aside>
+
+      <p class="article-intro">加速进化（Booster Robotics）成立于2023年6月，总部位于北京海淀，由前字节跳动飞书产品副总裁程昊创立，清华大学自动化系研究员赵明国担任首席科学家。公司专注于小尺寸高性能双足人形机器人及通用运控开发平台，走差异化"赛事+教育"路线，核心产品Booster K1定价4万元以内，是全球最具性价比的入门级人形机器人之一。2025年RoboCup巴西世界杯包揽成人组和儿童组双冠，成为中国28年来首支夺冠队伍。截至2026年4月，K1累计出货超1,000台，覆盖20+国家、400+客户，已实现月度经营性现金流回正，目标2026年全年盈利。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper">
+      <table class="wikitable infotable">
+        <tr><th>项目</th><th>内容</th></tr>
+        <tr><td>公司全称</td><td>北京加速进化科技有限公司</td></tr>
+        <tr><td>英文名称</td><td>Booster Robotics</td></tr>
+        <tr><td>成立时间</td><td>2023年6月</td></tr>
+        <tr><td>注册地</td><td>北京海淀</td></tr>
+        <tr><td>创始人/CEO</td><td>程昊</td></tr>
+        <tr><td>首席科学家</td><td>赵明国（清华大学自动化系研究员、机器人控制实验室主任）</td></tr>
+        <tr><td>总部</td><td>北京海淀</td></tr>
+        <tr><td>上市状态</td><td>未上市</td></tr>
+        <tr><td>官网</td><td>boosterr.com</td></tr>
+        <tr><td>赛道定位</td><td>小尺寸双足人形机器人 · 科研教育开发平台</td></tr>
+      </table>
+      </div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>时间</th><th>事件</th></tr>
+        <tr><td>2023年6月</td><td>程昊从字节跳动离职，正式创立加速进化</td></tr>
+        <tr><td>2023年9月</td><td>成立不到3个月即研发出第一代工程机BR001</td></tr>
+        <tr><td>2024年</td><td>推出首代产品Booster T1（1.18m，30kg）；3天内复现波士顿动力Atlas"旋转起身"动作；完成Pre-A轮融资</td></tr>
+        <tr><td>2024年9月</td><td>完成亿元Pre-A系列轮融资，源码资本、水木创投等参与</td></tr>
+        <tr><td>2025年7月</td><td>RoboCup巴西世界杯，Booster T1/K1包揽AdultSize和KidSize双组别冠亚军，中国28年来首冠</td></tr>
+        <tr><td>2025年8月</td><td>世界人形机器人运动会：25台T1完成全球首次AI机器人自主走方阵；包揽足球3v3和5v5全部奖牌</td></tr>
+        <tr><td>2025年10月</td><td>发布Booster K1（1米以下，3.99万元起），首批100台20分钟售罄</td></tr>
+        <tr><td>2025年12月</td><td>实现月度经营性现金流回正</td></tr>
+        <tr><td>2026年4月</td><td>宣布完成近10亿元融资；Q1出货量同比增长500%；提出"百城万校"三年目标</td></tr>
+      </table>
+      </div>
+
+      <h3 id="founders">1.2 创始人及核心团队</h3>
+      <p>加速进化的创始团队是典型的"清华系"组合。程昊（创始人/CEO）是清华自动化系本硕，师从赵明国教授，曾任清华火神足球队第三任队长，多次带队参加RoboCup。2013年创立智能日程APP"朝夕日历"，2017年被字节跳动以约1亿元估值收购后出任飞书产品副总裁，管理过千人规模团队，积累了大规模团队管理和复杂业务落地经验。赵明国（首席科学家）是清华大学自动化系研究员，在人形机器人运动控制领域深耕20余年，研究成果曾登上Nature封面。核心成员多出身清华自动化系及火神足球队前队员。团队具有"顶级学术+大厂产品+赛事基因"三重能力的罕见组合。</p>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+        <tr><td>创始人/CEO</td><td>程昊</td><td>清华自动化系本硕（2006-2013），师从赵明国；清华火神足球队第三任队长；2013年创立朝夕日历→2017年被字节跳动收购→飞书产品副总裁（管理超千人团队）</td></tr>
+        <tr><td>首席科学家</td><td>赵明国</td><td>清华大学自动化系研究员，机器人控制实验室及类脑机器人中心主任；人形机器人领域20+年研究经历，成果曾登Nature封面</td></tr>
+        <tr><td>核心团队</td><td>清华火神队前队员</td><td>多名清华自动化系校友，具备机器人研发+软件工程双重能力</td></tr>
+      </table>
+      </div>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <h4>融资历史</h4>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>时间</th><th>轮次</th><th>金额</th><th>主要投资方</th></tr>
+        <tr><td>2023年</td><td>天使轮</td><td>未公开</td><td>真成投资</td></tr>
+        <tr><td>2024年</td><td>Pre-A轮</td><td>数千万元</td><td>水木创投、源码资本等</td></tr>
+        <tr><td>2024年9月</td><td>Pre-A系列轮</td><td>超亿元</td><td>源码资本领投，英诺基金、IDG资本等</td></tr>
+        <tr><td>2024-2025年</td><td>A轮系列</td><td>累计近5亿元</td><td>深创投、源码资本、英诺基金、IDG资本、彼岸时代、民银国际、北京市人工智能产业投资基金</td></tr>
+        <tr><td>2026年4月</td><td>新一轮</td><td>近10亿元</td><td>北京高精尖产业基金、京国盛基金、华控基金联合领投；联想之星、国海创新资本、交银资本跟投；老股东深创投、源码资本、英诺、IDG、彼岸时代、民银国际、北京市人工智能产业投资基金持续加码</td></tr>
+      </table>
+      </div>
+
+      <h4>股东结构（关键股东）</h4>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>类别</th><th>股东</th><th>性质</th></tr>
+        <tr><td>创始人</td><td>程昊及创始团队</td><td>创始人/管理层持股</td></tr>
+        <tr><td>北京国资/政府引导</td><td>北京高精尖产业基金、京国盛基金、北京市人工智能产业投资基金</td><td>北京地方产业资本深度绑定</td></tr>
+        <tr><td>高校背景资本</td><td>华控基金（清华控股）、水木创投</td><td>清华系资本</td></tr>
+        <tr><td>头部VC</td><td>深创投、源码资本、IDG资本、英诺基金、联想之星</td><td>顶级VC持续加码</td></tr>
+        <tr><td>金融机构</td><td>交银资本、国海创新资本</td><td>金融/券商背景</td></tr>
+      </table>
+      </div>
+      <p>创始人程昊刻意控制估值上涨速度。天使投资人李剑威（真成投资）坦言："现在整个行业的估值都比较夸张，相比之下加速进化估值涨幅不算太快，始终按着自己的节奏在走。"FA曾评价程昊：竞对一年见200家投资人，他只见了60家。义柏资本连续6轮担任独家财务顾问。</p>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>技术维度</th><th>详情</th></tr>
+        <tr><td>AI架构</td><td>核心以运动控制为差异化——双足行走、踢足球、俯卧撑、叶问蹲等高难度动作；2026年融资重点投入具身模型算法开发</td></tr>
+        <tr><td>数据方案</td><td>赛事场景持续积累高动态运动数据；编队控制完成全球首次AI人形机器人自主行进方阵</td></tr>
+        <tr><td>供应链策略</td><td>"合作与自研并举"：关节等成熟部件与因克斯等供应商合作（2-3周快速迭代）；摄像头等视觉部件启动自研</td></tr>
+        <tr><td>工艺降本</td><td>K1采用铸造工艺替代机加工，胸壳成本从¥3,000降至¥30-40（降幅超过90%），体现极强的工程降本能力</td></tr>
+        <tr><td>技术特色</td><td>以"运动智能"为核心标签——通过RoboCup等国际赛事持续验证和迭代运动控制算法，形成"以赛促研"的技术迭代飞轮</td></tr>
+      </table>
+      </div>
+      <p>加速进化的技术路线以"运动控制"为护城河，而非大多数竞争对手强调的"大脑/大模型"。这一选择具有极强的务实性——在小尺寸、科研教育场景中，精准的双足运动能力是核心购买决策因素，而语义理解和复杂交互并非刚需。</p>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>产品</th><th>发布时间</th><th>关键参数</th><th>定价</th><th>定位</th><th>出货量</th></tr>
+        <tr><td>Booster T1</td><td>2024年</td><td>身高1.18m，体重30kg；中小尺寸双足人形机器人</td><td>未公开</td><td>科研/赛事开发级</td><td>量产中</td></tr>
+        <tr><td>Booster K1</td><td>2025年10月</td><td>1米以下小尺寸人形机器人；搭载力控关节；支持零编程示教和二次开发</td><td>¥3.99万起（国内）/ $6,000（海外）</td><td>入门级具身智能开发平台</td><td>累计超1,000台</td></tr>
+      </table>
+      </div>
+      <p>K1首批100台以¥2.99万元限量价发售，上线20分钟即售罄。K1定位为"开箱即用"的入门级具身智能开发平台，将人形机器人的入手门槛从行业普遍的¥50万-100万降至¥4万以内，极大推动了科研教育和开发者生态的扩展。</p>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>场景分类</th><th>具体场景</th><th>对应产品</th><th>合作方/客户</th></tr>
+        <tr><td>科研开发（核心）</td><td>高校实验室、具身智能算法训练、运动控制研究</td><td>Booster T1、K1</td><td>清华大学、全球400+客户</td></tr>
+        <tr><td>教育普及（增长）</td><td>中小学AI教育、职业院校实训、大学机器人课程</td><td>Booster K1</td><td>"百城万校"计划：目标1000+高校、2000+职业院校、7000+中小学</td></tr>
+        <tr><td>赛事竞技（品牌）</td><td>RoboCup、世界人形机器人运动会、中国机器人大赛</td><td>Booster T1</td><td>RoboCup组委会、北京市科委</td></tr>
+        <tr><td>商业服务（探索）</td><td>展馆导览、活动表演</td><td>Booster T1</td><td>渠道合作伙伴（北京机器人融资租赁公司等）</td></tr>
+      </table>
+      </div>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <p>加速进化2025年全年售出1,034台机器人，进入"千台俱乐部"。2026年Q1出货量同比增长500%，达到2025年前8个月总和。2026年1-2月新签订单同比增长800%以上，在手订单达数亿元。2025年12月实现月度经营性现金流回正，目标2026年全年盈利。海外客户占比超过50%，覆盖美国、德国、瑞士、日本、韩国、新加坡等20+国家。K1发布现场签约超千台（北京机器人融资租赁公司、湖北光谷东智、鲸海拾贝等渠道商）。</p>
+
+      <h3 id="financials">1.8 财务数据</h3>
+      <p>公司尚未上市，未披露完整财务数据。以下为公开渠道可获取信息：</p>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>指标</th><th>详情</th></tr>
+        <tr><td>收入数据</td><td>未公开；2025年12月实现月度经营性现金流回正；2026年目标全年盈利</td></tr>
+        <tr><td>出货数据</td><td>2025年全年1,034台；2026年Q1同比增长500%</td></tr>
+        <tr><td>订单数据</td><td>2026年1-2月新签订单同比增长800%+，在手订单数亿元</td></tr>
+        <tr><td>融资总额</td><td>累计超15亿元（含2026年4月近10亿融资）</td></tr>
+        <tr><td>研发投入</td><td>本轮融资重点用于具身模型算法开发及产品迭代</td></tr>
+      </table>
+      </div>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>2025年RoboCup巴西世界杯包揽AdultSize和KidSize双组别冠亚军，是中国28年来首支夺冠的RoboCup人形组别队伍。</li>
+        <li>2025世界人形机器人运动会：25台Booster T1完成人类史上首次AI机器人自主走方阵；包揽足球3v3和5v5全部奖牌（2金2银2铜）。</li>
+        <li>2026北京亦庄半马：Booster机器人以1小时53分钟跑完21公里。</li>
+        <li>程昊的FA评价他"竞对一年见200家投资人，他只见了60家"，反映其谨慎的资本节奏。</li>
+        <li>K1是全球价格最低的量产双足人形机器人之一，将行业入门价格从¥50万-100万拉低一个数量级。</li>
+        <li>公司在不到2年内从0做到年出货千台级别，增速远超行业平均。</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <h4 id="an1">2.1 团队背景与场景选择的匹配度</h4>
+      <div class="analysis-block">
+        <h4>团队背景与场景选择的匹配度</h4>
+        <p>程昊的"清华自动化+RoboCup+飞书产品副总裁"三重背景与加速进化选择的"赛事+教育"场景几乎是完美匹配。RoboCup参赛经验使团队在运动控制算法上积累深厚（世界冠军级），飞书产品经验赋予团队将复杂技术"产品化"和"定价策略"的能力（K1定价¥3.99万的精准卡位）。赵明国教授的人形机器人20年学术积累为技术方向提供了长期确定性。相比大多数纯学术或纯产业背景的具身智能公司，加速进化的团队组合在"科研教育"这一特定场景中几乎没有能力缺口——既能理解学术界需求，又能以互联网产品思维做定价和渠道。</p>
+      </div>
+
+      <h4 id="an2">2.2 技术路线与场景的适配性</h4>
+      <div class="analysis-block">
+        <h4>技术路线与场景的适配性</h4>
+        <p>加速进化选择以"运动控制"而非"AI大脑"作为技术核心，与其科研教育场景高度适配。科研教育用户的核心需求是可编程、可运动的硬件平台，而非具备自主决策能力的成品机器人。K1的"零编程示教+二次开发"定位精准满足了这一需求。铸造工艺替代机加工（成本降低90%+）的工程创新使K1具备规模化制造的可能，在小尺寸赛道上建立了成本壁垒。但需要关注的是，随着具身智能大模型的发展，科研教育场景的用户需求可能从"运动控制平台"升级为"运动+认知一体平台"，加速进化需要在AI能力上持续投入以保持产品竞争力。</p>
+      </div>
+
+      <h4 id="an3">2.3 股东/资本结构对战略的影响</h4>
+      <div class="analysis-block">
+        <h4>股东/资本结构对战略的影响</h4>
+        <p>北京高精尖产业基金、京国盛基金、北京市人工智能产业投资基金的密集入股，使加速进化具有显著的"北京国资"底色。这种资本结构为"百城万校"教育计划提供了天然的政策协调能力——进入公立教育体系需要的资质、标准和采购流程，国资股东可以提供关键支持。华控基金（清华控股）的存在进一步强化了与清华大学的产学研纽带。交银资本、国海创新资本的加入也为未来的债权融资和上市辅导埋下伏笔。但北京国资主导的结构也意味着公司在海外扩张时可能面临一定地缘政治敏感性的约束，海外客户占比已达50%以上，需要在国际化与政策合规之间取得平衡。</p>
+      </div>
+
+      <h4 id="an4">2.4 试错过程与路径调整</h4>
+      <div class="analysis-block">
+        <h4>试错过程与路径调整</h4>
+        <p>加速进化经历了一条清晰的"从大到小"的产品策略调整。早期BR001工程机和Booster T1（1.18m）定位更偏向通用开发平台，但K1（1m以下）的推出是关键的路径收敛——将产品尺寸缩小、价格下探至4万以内，彻底打开了教育市场的普及空间。这一调整的逻辑是：1.7m全尺寸人形机器人在2B工业场景的商业化周期远超预期，而1m以下小尺寸机器人在教育科研场景的商业确定性远高于前者。程昊"创业公司必须走逐步升级的务实路线"的论述印证了这一战略判断。从供应链策略看，早期100%依赖外部供应商（因克斯），到2025年后逐步"合作与自研并举"（摄像头自研），也体现了渐进式的纵向整合逻辑。</p>
+      </div>
+
+      <h4 id="an5">2.5 竞争定位与取舍</h4>
+      <div class="analysis-block">
+        <h4>竞争定位与取舍</h4>
+        <p>加速进化在行业中的核心取舍是：<strong>走"iPod路线"而非"iPhone路线"</strong>——专注小尺寸、低价格、单一场景（科研教育），而非追求全尺寸通用人形机器人。这一策略与宇树科技的G1（也是小尺寸低价路线）形成直接竞争，但加速进化的差异化在于"赛事冠军"带来的运动控制能力和品牌溢价。与行业主流"全尺寸进工厂"路线（如智元、傅利叶）相比，加速进化的研发投入和商业化周期更短、更可预测，但天花板也更低——教育市场的总规模远小于工业制造市场。公司需要在K1教育市场站稳后，找到向更大场景扩展的路径，否则可能被锁定在"小而美"的市场中。</p>
+      </div>
+
+      <h4 id="an6">2.6 其他重要观察</h4>
+      <div class="analysis-block">
+        <h4>其他重要观察</h4>
+        <p>加速进化2026年Q1出货量同比增长500%和订单同比增长800%的数据，在当前具身智能行业普遍"融资热但出货冷"的背景下极为亮眼。程昊刻意控制估值、月现金流已回正、目标全年盈利的经营风格也与大多数"烧钱换规模"的人形机器人公司形成鲜明对比。K1的铸造工艺降本（胸壳成本降90%+）展现出的工程制造能力值得关注——这在行业普遍依赖CNC加工的成本结构中是稀缺优势。另一个值得跟踪的指标是"百城万校"的落地速度——如果能在2026-2027年实际覆盖1,000+高校，加速进化将在教育场景建立起极强的渠道壁垒和品牌认知，形成类似"大疆在无人机教育市场"的生态位。</p>
+      </div>
+
+      <h2 id="references">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="http://www.iceo.com.cn/article/f6355ea9-45fd-4ae5-a91b-7f28a0c87afa">中国企业家 - 清华系创业者的机器人项目，刚融资近10亿元，今年要盈利</a></li>
+          <li><a href="https://www.163.com/dy/article/KQO9Q6UI05568W0A.html">网易 - 加速进化完成近10亿元融资，"赛事+教育"双飞轮构建商业闭环</a></li>
+          <li><a href="https://www.ncsti.gov.cn/kjdt/scyq/zgckxc/zgcdt/202604/t20260422_244584.html">北京市科委 - 从海淀走出的机器人冠军！加速进化宣布完成近10亿元融资</a></li>
+          <li><a href="https://www.iyiou.com/briefing/202604171899135">亿欧 - 加速进化完成近10亿元融资，披露关键经营数据</a></li>
+          <li><a href="http://stock.stockstar.com/IG2026041700022496.shtml">证券之星 - 加速进化2026年一季度出货量同比增长500%</a></li>
+          <li><a href="https://finance.sina.cn/2026-04-17/detail-inhuuptn1131292.d.html">新浪财经 - 北京最会踢球的人形机器人，融资近10亿</a></li>
+          <li><a href="https://news.dayoo.com/gzrbrmt/202604/17/170629_54949203.htm">大洋网 - 机器人参考："足球冠军"加速进化完成近10亿元融资</a></li>
+          <li><a href="https://www.chinaventure.com.cn/news/114-20260417-390990.html">投中网 - 加速进化完成近10亿元融资</a></li>
+          <li><a href="http://app.cb.com.cn/share/article/296564">中国经营报 - 加速进化推2.99万元人形机器人，提出"百城万校"三年目标</a></li>
+          <li><a href="http://www.bjnews.com.cn/detail/1743602721129659.html">新京报 - 从世界杯夺冠到中关村论坛舞台：加速进化人形机器人两年迭代</a></li>
+          <li><a href="https://baike.baidu.com/item/程昊/64635340">百度百科 - 程昊</a></li>
+          <li><a href="https://www.zhidx.com/p/549993.html">智东西 - 北京最会踢球的人形机器人，融资近10亿</a></li>
+          <li><a href="https://www.donews.com/news/detail/8/5315662.html">DoNews - 人形机器人公司"加速进化"完成A轮融资</a></li>
+          <li><a href="https://lieyunpro.com/archives/494489">猎云网 - 加速进化完成亿元Pre-A系列轮融资</a></li>
+          <li><a href="https://forbeschina.com/fga/67771">福布斯中国 - 加速进化完成数千万Pre-A轮融资，源码领投</a></li>
+          <li><a href="https://www.sohu.com/a/1006894844_765681">搜狐 - 智能无人系统产学研联盟走进加速进化</a></li>
+          <li><a href="https://autonews.gasgoo.com/articles/news/embodied-ai-company-booster-robotics-completes-nearly-1-billion-yuan-financing">Gasgoo - Booster Robotics Completes Nearly 1 Billion Yuan Financing</a></li>
+          <li><a href="https://shenkexin.com/news/info-learning-17125.html">深科技 - 订单暴涨800%！融资10亿，加速进化程昊干出一个机器人黑马</a></li>
+          <li><a href="https://www.itsjzx.com/388348.html">IT之家 - 加速进化完成近10亿元融资，商业化增速领跑行业</a></li>
+          <li><a href="https://huacheng.gz-cmc.com/pages/2026/04/17/dcb58164b88c44bc9575f33ef4ef3204.html">花城+ - 2026年一季度出货量同比增长500%</a></li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">本页面由具身智能Wiki自动分发器于2026年5月4日生成。数据来源截至当日公开信息。如有更新或纠错，请提交至维护团队。</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

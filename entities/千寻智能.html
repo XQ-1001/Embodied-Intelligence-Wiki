@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>千寻智能 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style></head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> <span class="breadcrumb-sep">›</span> <span>千寻智能</span></div>
+  <div class="wiki-header"><h1>千寻智能</h1><div class="subtitle">Spirit AI · 2024年成立 · 估值超200亿元 · 杭州</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#team">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#product">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenario">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financial">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#a1">2.1 团队与场景匹配度</a></li>
+        <li class="toc-lvl4"><a href="#a2">2.2 技术路线适配性</a></li>
+        <li class="toc-lvl4"><a href="#a3">2.3 股东对战略的影响</a></li>
+        <li class="toc-lvl4"><a href="#a4">2.4 试错与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#a5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#a6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#refs">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">千寻智能</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">千寻智能（杭州）科技有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">英文名</div><div class="ib-value">Spirit AI</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2024年1月16日</div></div>
+        <div class="ib-row"><div class="ib-label">注册地</div><div class="ib-value">浙江杭州</div></div>
+        <div class="ib-row"><div class="ib-label">创始人</div><div class="ib-value">韩峰涛（CEO）</div></div>
+        <div class="ib-row"><div class="ib-label">首席科学家</div><div class="ib-value">高阳（清华助理教授）</div></div>
+        <div class="ib-row"><div class="ib-label">COO</div><div class="ib-value">郑灵茵</div></div>
+        <div class="ib-row"><div class="ib-label">注册资本</div><div class="ib-value">237万元</div></div>
+        <div class="ib-section">估值/市值</div>
+        <div class="ib-row"><div class="ib-label">最新估值</div><div class="ib-value">200亿元+（2026年4月）</div></div>
+        <div class="ib-row"><div class="ib-label">百亿节点</div><div class="ib-value">2026年2月突破100亿</div></div>
+        <div class="ib-section">财务数据</div>
+        <div class="ib-row"><div class="ib-label">累计融资</div><div class="ib-value">约35亿元（至2026年4月）</div></div>
+        <div class="ib-row"><div class="ib-label">营收</div><div class="ib-value">未公开披露（早期阶段）</div></div>
+        <div class="ib-row"><div class="ib-label">2025年订单规模</div><div class="ib-value">千万元级别</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">核心产品</div><div class="ib-value">Moz1轮式人形机器人</div></div>
+        <div class="ib-row"><div class="ib-label">AI模型</div><div class="ib-value">Spirit v1.5（VLA开源）</div></div>
+        <div class="ib-row"><div class="ib-label">数据积累</div><div class="ib-value">超20万小时真实交互</div></div>
+        <div class="ib-row"><div class="ib-label">企业类型</div><div class="ib-value">具身智能全栈创业公司</div></div>
+        <div class="ib-section">官网</div>
+        <div class="ib-row"><div class="ib-label">网址</div><div class="ib-value"><a href="https://spirit-ai.com" target="_blank">spirit-ai.com</a></div></div>
+      </aside>
+
+      <p class="article-intro"><strong>千寻智能（Spirit AI）</strong>是一家成立于2024年1月的中国具身智能公司，总部位于浙江杭州，由前珞石机器人联合创始人韩峰涛、清华大学交叉信息研究院助理教授高阳及工业机器人出海专家郑灵茵联合创办。公司以研发机器人「通用大脑」为核心使命，自研Spirit系列VLA（视觉-语言-动作）大模型及Moz系列人形机器人本体，是国内少有的「软件+硬件」双线自研的具身智能全栈企业。成立仅两年多，千寻智能累计完成约35亿元融资，2026年4月估值突破200亿元，跻身中国具身智能第一梯队。其开源模型Spirit v1.5在RoboChallenge全球评测榜上超越美国Pi0.5登顶第一，Moz1机器人已在宁德时代动力电池产线和京东零售场景实现商业落地。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper">
+      <table class="wikitable infotable">
+        <tr><th>项目</th><th>内容</th></tr>
+        <tr><td>公司全称</td><td>千寻智能（杭州）科技有限公司</td></tr>
+        <tr><td>英文名称</td><td>Spirit AI</td></tr>
+        <tr><td>成立日期</td><td>2024年1月16日</td></tr>
+        <tr><td>注册地</td><td>浙江省杭州市</td></tr>
+        <tr><td>注册资本</td><td>237万元人民币（截至2025年9月）</td></tr>
+        <tr><td>法定代表人</td><td>韩峰涛</td></tr>
+        <tr><td>上市情况</td><td>未上市</td></tr>
+        <tr><td>官网</td><td>spirit-ai.com</td></tr>
+        <tr><td>北京研发中心</td><td>万境千寻（北京）科技有限公司</td></tr>
+      </table>
+      </div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>时间</th><th>关键事件</th></tr>
+        <tr><td>2024年1月</td><td>公司在杭州注册成立，获顺为资本、绿洲资本种子轮投资</td></tr>
+        <tr><td>2024年7月</td><td>Moz0初代机器人诞生</td></tr>
+        <tr><td>2024年8月</td><td>完成近2亿元种子+/天使轮融资，弘晖基金领投</td></tr>
+        <tr><td>2024年11月</td><td>完成数千万元天使+轮，宁德时代关联方柏睿资本入局</td></tr>
+        <tr><td>2025年3月</td><td>发布Spirit v1 VLA模型抢先版；完成5.28亿元Pre-A轮，Prosperity7领投</td></tr>
+        <tr><td>2025年6月</td><td>Moz1轮式人形机器人正式发布</td></tr>
+        <tr><td>2025年7月</td><td>WAIC 2025世界人工智能大会首展；完成近6亿元Pre-A+轮（京东领投）</td></tr>
+        <tr><td>2025年9月</td><td>数贸会上与浙江省科创母基金签署战略合作协议</td></tr>
+        <tr><td>2025年11月</td><td>入选《The Information》2025全球最具潜力50家创业公司，亚洲区第2名</td></tr>
+        <tr><td>2025年12月</td><td>Moz1在宁德时代中州基地投运——全球首条人形具身智能产线</td></tr>
+        <tr><td>2026年1月</td><td>Spirit v1.5开源，RoboChallenge评测登顶全球第一，超越美国Pi0.5</td></tr>
+        <tr><td>2026年2月</td><td>完成近20亿元融资（云锋、红杉中国等），估值突破100亿</td></tr>
+        <tr><td>2026年3月</td><td>VLA/VLM融合模型发布；与京东签署2026-2029战略合作协议</td></tr>
+        <tr><td>2026年4月</td><td>再获10亿元融资（顺为+云锋联合领投），估值突破200亿；数据团队将扩展至千人规模</td></tr>
+      </table>
+      </div>
+
+      <h3 id="team">1.2 创始人及核心团队</h3>
+      <p>千寻智能由「产业老炮+顶尖科学家+商业化专家」构成的「铁三角」组合创办，团队骨干成员来自UC Berkeley、CMU、清华大学、北京大学、浙江大学等顶尖高校以及字节跳动、小米、华为、腾讯、大疆等科技企业，平均年龄不到30岁。截至2025年9月，公司注册资本237万元，具体总员工人数未公开披露，但2026年4月透露数据采集团队将扩展至千人规模。团队八成精力投入数据处理，研发导向明显。</p>
+
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>角色</th><th>姓名</th><th>背景 / 履历</th></tr>
+        <tr><td>创始人 & CEO</td><td>韩峰涛</td><td>80后，河北石家庄人。华中科技大学自动化本科，浙江大学博士（师从丁汉院士）。2014-2015年参与联合创办珞石机器人（Rokae），任联合创始人兼CTO近10年，主导交付超2万台工业机器人，覆盖20+行业、100+场景、1000+客户。2024年在珞石筹备上市前夕退出、重新创业。负责千寻整体战略、硬件本体、工程化与量产。</td></tr>
+        <tr><td>联合创始人 & 首席科学家</td><td>高阳</td><td>清华大学计算机系本科，UC Berkeley博士（师从Trevor Darrell，与Pieter Abbeel、Sergey Levine深度合作）。现任清华大学交叉信息研究院助理教授、视觉与具身智能实验室主任。提出EfficientZero（全球样本效率最高的强化学习算法）、ViLa和CoPa模型（ViLa被Figure 01顶层规划模块采用）。被誉为「伯克利归国四子」之一。负责具身大脑大模型研发。</td></tr>
+        <tr><td>联合创始人 & COO</td><td>郑灵茵</td><td>工业机器人出海先行者，曾从0到1搭建海外事业部，在全球多个市场有深度布局经验；曾任职于国内上市公司及全球500强企业市场总监。负责商业化落地、海外市场拓展与运营管理。</td></tr>
+      </table>
+      </div>
+      <p>团队整体呈现出强「产学研」融合特征——韩峰涛深耕工业机器人产业十余年带来量产和工程化基因，高阳作为清华教授带来学术前沿和AI算法能力，郑灵茵补齐全球化商业运营短板。这种「产业+学术+商业」黄金三角是资本市场给出超高估值的重要原因。</p>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <p>千寻智能成立仅两年多，累计完成约7轮融资，总额约35亿元人民币，是中国具身智能赛道融资密度最高的企业之一。</p>
+
+      <h4>融资历史</h4>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>时间</th><th>轮次</th><th>金额</th><th>核心投资方</th></tr>
+        <tr><td>2024年2-3月</td><td>种子轮</td><td>未披露</td><td>顺为资本、绿洲资本</td></tr>
+        <tr><td>2024年8月</td><td>种子+/天使轮</td><td>近2亿元</td><td>弘晖基金领投，达晨创投、千乘资本跟投</td></tr>
+        <tr><td>2024年11月</td><td>天使+轮</td><td>数千万元</td><td>柏睿资本（宁德时代副董事长李平创办）</td></tr>
+        <tr><td>2025年3月</td><td>Pre-A轮</td><td>5.28亿元</td><td>Prosperity7 Ventures（P7/沙特阿美）领投，招商局创投等跟投</td></tr>
+        <tr><td>2025年7月</td><td>Pre-A+轮</td><td>近6亿元</td><td>京东领投，中国互联网投资基金（中网投）等跟投</td></tr>
+        <tr><td>2026年2月</td><td>新两轮</td><td>近20亿元</td><td>云锋基金、红杉中国、混沌投资（葛卫东）、TCL创投、重庆产业母基金等</td></tr>
+        <tr><td>2026年4月</td><td>新一轮</td><td>10亿元</td><td>顺为资本、云锋基金联合领投（雷军与马云首次在具身智能赛道同场押注）</td></tr>
+      </table>
+      </div>
+
+      <h4>主要股东结构（截至2026年4月）</h4>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>股东类型</th><th>代表机构</th><th>关联产业</th></tr>
+        <tr><td>顶级VC/PE</td><td>红杉中国、云锋基金、顺为资本、混沌投资、弘晖基金、达晨创投</td><td>泛科技投资</td></tr>
+        <tr><td>产业资本-新能源</td><td>柏睿资本（宁德时代）、Prosperity7（沙特阿美）</td><td>新能源/动力电池/能源</td></tr>
+        <tr><td>产业资本-物流零售</td><td>京东</td><td>电商/物流/零售</td></tr>
+        <tr><td>产业资本-制造</td><td>TCL创投</td><td>消费电子/家电制造</td></tr>
+        <tr><td>国资/政府基金</td><td>中国互联网投资基金（中网投）、重庆产业母基金、招商局创投、浙江省科创母基金</td><td>战略产业引导</td></tr>
+      </table>
+      </div>
+      <p>公司目前未上市，无公开市场股票。多位投资方兼具产业资源属性，形成了「投资+场景落地」的深度绑定格局。</p>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>技术维度</th><th>路线选择</th><th>说明</th></tr>
+        <tr><td>AI架构</td><td>端到端VLA（视觉-语言-动作）模型</td><td>Spirit系列模型，从Spirit v1演进至v1.5，打通「感知→决策→执行」闭环。采用OneTwoVLA 「快慢系统」架构，能自主判断任务复杂度后切换推理/反应模式。</td></tr>
+        <tr><td>训练范式</td><td>互联网视频预训练 + 遥操作SFT + RL微调</td><td>独创「数据金字塔」理念：海量人类互联网视频建立基础世界理解 → 可穿戴设备低成本多样化数据 → 真机遥操作监督微调 → 强化学习roll-out持续优化。</td></tr>
+        <tr><td>数据策略</td><td>「脏数据」路线（多样性 > 洁净度）</td><td>反共识创新：不再追求脚本化「黄金数据」，允许失败、打翻、中断后继续完成。验证表明在相同数据规模下多样性数据使模型迁移效率显著提升，所需迭代次数减少约40%。</td></tr>
+        <tr><td>数据采集</td><td>多源融合（5种采数方式）</td><td>自研第5代HRPI可穿戴设备（成本降至遥操作1/10）、UMI轻量化手持设备、uDAS 3.0全身外骨骼、真机遥操作、真实场景roll-out。</td></tr>
+        <tr><td>硬件自研</td><td>全栈自研（本体+关节+力控+大脑）</td><td>自研一体化力控关节（功率密度超Tesla Optimus 15%）、WBC全身运动控制算法（毫秒级扭矩响应）、26自由度全向移动底盘。</td></tr>
+        <tr><td>开源策略</td><td>选择性开源</td><td>Spirit v1.5模型开源，以技术标杆效应吸引开发者生态和产业合作，但硬件本体和核心数据体系保持闭源。</td></tr>
+        <tr><td>模型迭代</td><td>小时级快速迭代</td><td>依托数据飞轮实现模型以小时为单位持续更新，与真实场景部署形成正循环。</td></tr>
+      </table>
+      </div>
+
+      <h4>核心技术学术渊源</h4>
+      <p>千寻智能的技术路线与首席科学家高阳在伯克利和清华的学术积累深度绑定。高阳提出的EfficientZero算法奠定了超高样本效率的强化学习基础，其ViLa/CoPa模型在VLM任务级泛化领域已成为行业标杆——ViLa被Figure 01机器人采用为顶层规划模块，CoPa性能超越斯坦福李飞飞团队的VoxPoser。这些学术积累构成了千寻Spirit模型的理论地基。</p>
+
+      <h3 id="product">1.5 产品形态</h3>
+
+      <h4>Moz1 轮式人形机器人</h4>
+      <p>Moz1是千寻智能首款商用级具身智能机器人，2025年6月正式发布，定位为「国内首款高精度全身力控的具身智能机器人」，别名「小墨」/「墨子机器人」。</p>
+
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>参数项</th><th>规格</th></tr>
+        <tr><td>产品形态</td><td>轮式底盘 + 人形上身（非双足）</td></tr>
+        <tr><td>全身自由度</td><td>26个（不含灵巧手）</td></tr>
+        <tr><td>关节系统</td><td>自研一体化力控关节，全球功率密度最高，较Tesla Optimus高15%</td></tr>
+        <tr><td>控制系统</td><td>WBC全身运动控制算法，毫秒级扭矩响应</td></tr>
+        <tr><td>负载自重比</td><td>1:1</td></tr>
+        <tr><td>力控精度</td><td>动态控制误差 &lt; 1mm</td></tr>
+        <tr><td>底盘</td><td>全向移动底盘，26自由度零空间运动规划，厘米级避障</td></tr>
+        <tr><td>灵巧手</td><td>三指结构（支持穿戴式数据采集），WAIC展会使用夹爪演示</td></tr>
+        <tr><td>遥操作</td><td>全身零延时遥操作，力觉/视觉双反馈</td></tr>
+        <tr><td>身高/体重/续航</td><td>未公开披露</td></tr>
+      </table>
+      </div>
+
+      <h4>Spirit v1.5 VLA模型</h4>
+      <p>Spirit v1.5是千寻智能于2026年1月开源的新一代VLA端到端模型，在RoboChallenge全球权威基准评测中获66.09分（任务成功率50.33%），超越美国Physical Intelligence的Pi0.5模型，成为首个在该基准登顶的中国开源具身模型。该模型具备零样本泛化能力——无需额外训练即可完成擦拭、开合铰链、处理柔性物体等复杂操作。2026年3月进一步引入VLM语义理解增强，可响应「桌子好脏」「我口渴了」等自然语言指令。</p>
+
+      <h4>数据采集产品矩阵</h4>
+      <ul>
+        <li><strong>HRPI系列（第五代可穿戴设备）</strong>：三指外骨骼结构，成本为传统遥操作的1/10，数据可用性从30%提升至95%</li>
+        <li><strong>UMI系列轻量化手持设备</strong>：工人可边作业边采集，混合10%真机遥采数据训练效果超预期</li>
+        <li><strong>uDAS 3.0</strong>：脱离外骨骼框架，适配全国多地开放场景数据采集</li>
+      </ul>
+
+      <h3 id="scenario">1.6 应用场景</h3>
+
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>场景分类</th><th>子场景</th><th>当前阶段</th><th>合作方</th><th>说明</th></tr>
+        <tr><td rowspan="3">工业制造</td><td>动力电池PACK产线（EOL/DCR检测）</td><td>已落地</td><td>宁德时代</td><td>全球首条人形具身智能产线，插接成功率99%+，超千块电池零故障量产</td></tr>
+        <tr><td>汽车零部件上下料</td><td>试点中</td><td>多家全球Tier 1供应商</td><td>目标基础模型快速达60-70%成功率，客户1-2月完成本地微调</td></tr>
+        <tr><td>新能源电池检测</td><td>拓展中</td><td>多家电池企业</td><td>从宁德时代中州基地向其他基地/企业复制</td></tr>
+        <tr><td rowspan="4">商业服务</td><td>智慧零售（咖啡制作/导购）</td><td>已落地</td><td>京东MALL</td><td>Moz1担任咖啡师角色，可远程操作完成高精度咖啡制作</td></tr>
+        <tr><td>巡检导览</td><td>推进中</td><td>京东</td><td>京东MALL内巡检和智能导览服务</td></tr>
+        <tr><td>自动化清洁</td><td>推进中</td><td>京东</td><td>商业空间清洁场景</td></tr>
+        <tr><td>药房自动分拣配药</td><td>规划中</td><td>京东药房</td><td>2026-2029战略合作框架下的远期方向</td></tr>
+        <tr><td>未来（家庭）</td><td>洗衣/叠衣/清理猫砂/简餐</td><td>预研</td><td>—</td><td>「双十计划」长期愿景：2035年让全球10%人口拥有机器人</td></tr>
+      </table>
+      </div>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+
+      <h4>出货与订单</h4>
+      <ul>
+        <li>2025年Q4开始商业化，订单规模为<strong>千万元级别</strong>（未披露具体台数）</li>
+        <li>创始人韩峰涛提出「中厂」目标：年销<strong>10万台</strong>机器人</li>
+        <li>宁德时代中州基地：2025年12月投运，Moz1完成近千块电池零故障量产，插接成功率<strong>99%以上</strong></li>
+        <li>京东MALL：2026年3月入驻，承担咖啡师等商业服务角色</li>
+      </ul>
+
+      <h4>商业化节奏（韩峰涛三阶段路线图）</h4>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>阶段</th><th>场景</th><th>进展</th></tr>
+        <tr><td>第一阶段</td><td>工业制造（电池产线、汽车零部件）</td><td>已落地，标杆案例：宁德时代</td></tr>
+        <tr><td>第二阶段</td><td>商用服务（零售、餐饮、物流、药房）</td><td>已启动，标杆案例：京东</td></tr>
+        <tr><td>第三阶段</td><td>家庭场景（洗衣、叠衣、家务）</td><td>预研，长期远景</td></tr>
+      </table>
+      </div>
+
+      <h4>战略合作里程碑</h4>
+      <ul>
+        <li>2025年9月：与浙江省科创母基金签署战略合作，聚焦具身场景落地与生态构建</li>
+        <li>2025年12月：宁德时代中州基地——全球首条人形具身智能规模化产线投运</li>
+        <li>2026年3月：与京东签署<strong>2026-2029年战略合作协议</strong>，涵盖京东MALL、京东药房等多场景</li>
+      </ul>
+
+      <h3 id="financial">1.8 财务数据</h3>
+      <p>千寻智能目前未上市，无公开财务报告。公司处于商业化极早期，营收尚未公开披露。以下是基于公开信息的关键财务指标梳理：</p>
+
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>指标</th><th>2024年</th><th>2025年</th><th>2026年（截至4月）</th></tr>
+        <tr><td>累计融资额</td><td>约3亿元</td><td>约15亿元（含Pre-A/Pre-A+）</td><td>约35亿元（含2月20亿+4月10亿）</td></tr>
+        <tr><td>估值</td><td>未公开</td><td>未公开</td><td>突破200亿元（4月）</td></tr>
+        <tr><td>营收</td><td>—</td><td>千万元级别（Q4起）</td><td>未披露</td></tr>
+        <tr><td>账面现金储备</td><td>未披露</td><td>未披露</td><td>约30亿元+（据最近融资推算）</td></tr>
+        <tr><td>净利润</td><td>—</td><td>亏损（大量研发投入）</td><td>亏损（数据体系建设持续投入）</td></tr>
+      </table>
+      </div>
+
+      <div class="callout"><div class="callout-title">行业对照</div>据测算，2025年中国具身智能第一梯队所有公司的全年营收加总仍不足100亿元，与近400亿元的融资总额形成数倍以上的巨大落差，行业整体处于「高融资、低营收」的早期阶段。</div>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>2025年11月入选《The Information》「2025全球最具潜力50家创业公司」榜单，亚洲区排名第2位。</li>
+        <li>联合创始人高阳获WAIC 2025云帆奖「璀璨明星」奖项。</li>
+        <li>公司旗舰产品Moz1在WAIC 2025上展示了S弯行走、太空步（手臂拿水不洒）、叠衣、搭积木、掌上迷宫走珠、串糖葫芦、冰箱取饮料等多项技能演示。</li>
+        <li>英伟达机器人业务主管Jim Fan曾在社交媒体上对Spirit v1.5模型公开点赞。</li>
+        <li>雷军（顺为资本）和马云（云锋基金）于2026年4月首次在具身智能赛道联手领投同一家公司，被视为行业标志性事件。</li>
+        <li>公司坚持「沿途下蛋」商业策略——在真实场景部署中获取高频数据以反哺模型迭代。</li>
+        <li>提出「双十计划」长期愿景：到2035年让全球10%人口拥有专属机器人。</li>
+        <li>团队八成精力投入数据处理，研发导向明显。</li>
+        <li>中国互联网投资基金（中网投）于2025年8月宣布战略性投资千寻智能，标志着国家级产业资本对具身智能赛道的正式布局。</li>
+        <li>创始人韩峰涛公开表示：「我们的目标是——把具身模型做到全球Top 3。」</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="a1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>千寻智能的场景选择可以清晰地追溯到其「铁三角」团队的基因。韩峰涛在珞石机器人十年交付超2万台工业机器人的经历，使其对工业场景的痛点——良率、节拍、可靠性、产线适配——有深度理解，这解释了为什么千寻的首个商业落地选择是宁德时代的动力电池PACK产线，且能快速实现99%+插接成功率。高阳的ViLa/CoPa学术积累偏重任务级泛化和VLM语义理解，这使得千寻选择了从工业检测这类「边界相对明确、但操作需柔性泛化」的场景切入——既不需要像家庭场景那样面对完全开放的环境，又能充分发挥VLA模型相对于传统工业机器人编程的优势。郑灵茵的出海经历在当前阶段尚未完全释放价值，但预埋了全球化扩展的可能性。总体看，这是一个「工业know-how + AI前沿」高度自洽的组合。</p>
+      </div>
+
+      <div class="analysis-block" id="a2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>千寻的技术路线与其场景选择形成了较紧密的适配闭环。电池检测场景中，EOL/DCR工序的核心挑战是插接精度和柔性物体的力控操作——这恰好对应Moz1的「力控精度<1mm」和WBC全身运动控制能力。更重要的是，千寻的「数据金字塔」训练范式（互联网视频预训练→可穿戴采集→遥操作SFT→RL rollout）让模型在工业部署初期就能利用互联网视频获得基本常识，再通过产线遥操作数据快速微调，显著降低了单一场景的冷启动成本。但需注意：轮式底盘选择意味着千寻切入了「结构化环境」场景，这与双足机器人的「全地形通用」是不同的技术路线，场景天花板更低，但商业化可行性更高——这种务实选择在早期阶段是理性的。</p>
+      </div>
+
+      <div class="analysis-block" id="a3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>千寻的股东结构呈现出清晰的「产业资源导向型」特征。宁德时代（柏睿资本）在天使轮即入局，不仅提供资金，更提供了动力电池产线这一稀缺的工业验证场景；京东在Pre-A+轮领投后迅速转化为京东MALL、京东药房等多场景合作，体现了「资本+订单」的深度绑定。TCL创投和招商局创投的入局则进一步拓展了消费电子制造和物流港口等潜在场景。但另一方面，多达十余家投资方的复杂股东结构可能在后续战略决策中形成协调成本。Prosperity7（沙特阿美）的入局暗示了中东市场的潜在布局方向。国资系（中网投、重庆产业母基金、浙江省科创母基金）的集中入场则意味着合规和产业安全层面的约束将逐渐增强。</p>
+      </div>
+
+      <div class="analysis-block" id="a4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>千寻的路径调整主要体现在产品形态和数据策略两个维度。产品形态上，Moz0（初代）到Moz1的迭代体现了从「验证可行性」到「面向商用」的转向——Moz1选择了轮式底盘而非双足，这在人形机器人赛道是一个务实的妥协，大幅降低了运动控制的难度和成本，使公司能集中资源攻克操作能力。数据策略上，从早期追求「精雕细琢的黄金数据」转向「脏数据」路线，是一个重要的范式调整：创始人韩峰涛公开表示这一转向使模型迭代效率提升约40%，且验证误差持续下降未出现早期饱和——说明团队有意识地在纠正行业惯性的「数据洁癖」。这种从学术界「完美数据假设」到工业界「数据多样性优先」的认识跨越，是千寻在短时间内实现技术突破的关键认知红利。</p>
+      </div>
+
+      <div class="analysis-block" id="a5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>千寻的竞争定位可以概括为「以软件定义硬件、以数据驱动泛化」的全栈路线，其核心取舍体现在三个方面。第一，选择「通用大脑+专用本体」而非「通用本体」——Moz1的轮式底盘是场景适配的务实选择，但意味着无法参与双足全地形通用机器人的竞争。第二，选择「模型开源+数据闭源」——Spirit v1.5开源是建立技术标杆和开发者生态的战略动作，但数据采集体系和核心训练pipeline保持闭源，形成可持续的竞争壁垒。第三，选择「沿途下蛋」而非「一步到位」——先工业、再商业、后家庭的三阶段路线图，本质是在融资窗口期内快速建立营收证明和数据飞轮，再逐步拓展场景泛化能力。在行业格局中，千寻更接近「Android模式的具身智能平台」——以开源模型为核心、吸纳多产业资本协同、在多个垂直场景中铺开。</p>
+      </div>
+
+      <div class="analysis-block" id="a6">
+        <h4>2.6 其他重要观察、分析</h4>
+        <p>千寻智能是中国具身智能赛道中融资节奏最为激进的企业之一——30天融资30亿、两年估值破200亿——这种速度在硬科技领域极为罕见。高估值背后是市场对「具身智能大模型+真实场景数据飞轮」叙事的强烈买单，但风险同样显著：第一，行业整体营收远未匹配融资规模，2025年全赛道营收不足100亿元；第二，大厂（特斯拉、小鹏、比亚迪、华为）全面入局可能挤压初创企业的场景空间和人才供给；第三，工业场景对MTBF（平均无故障时间）的要求高达5000-8000小时，而人形机器人当前远未达到这一可靠性门槛。千寻的应对策略——开源模型建立生态位、多产业资本构筑场景壁垒、大规模数据建设拉高竞争门槛——逻辑上是成立的，但需要持续观察2026年「交付元年」的实际落地节奏能否支撑估值叙事。</p>
+      </div>
+
+      <h2 id="refs">3 参考资料</h2>
+      <div class="references">
+      <ol>
+        <li><a href="https://www.donews.com/news/detail/4/6443729.html" target="_blank">千寻智能两年估值破百亿，聚焦具身模型与工业落地 — DoNews</a></li>
+        <li><a href="https://finance.eastmoney.com/a/202602243652401958.html" target="_blank">千寻智能完成近20亿融资 估值破百亿元 — 东方财富网</a></li>
+        <li><a href="https://www.21jingji.com/article/20260224/herald/37b0862cfae4d90c1bfbd024d3fe4c13.html" target="_blank">云锋红杉20亿重仓「顶配玩家」：千寻智能跃升百亿独角兽 — 21世纪经济报道</a></li>
+        <li><a href="https://baike.baidu.com/item/%E5%8D%83%E5%AF%BB%E6%99%BA%E8%83%BD/65099257" target="_blank">千寻智能（杭州）科技有限公司 — 百度百科</a></li>
+        <li><a href="https://www.donews.com/article/detail/8480/97297.html" target="_blank">千寻智能的Spirit v1.5堆出了一座「金山」？— DoNews专栏</a></li>
+        <li><a href="https://hkcd.com/content_app/2026-04/08/content_8748966.html" target="_blank">北京机器人公司千寻智能加速融资 顺为云峰联合领投 — 香港商报</a></li>
+        <li><a href="https://www.21jingji.com/article/20260409/herald/5fada821db647bb788dd048c0475f8a7.html" target="_blank">雷军马云罕见联手领投：千寻智能30天融资30亿，估值破200亿 — 21世纪经济报道</a></li>
+        <li><a href="https://www.stcn.com/article/detail/3648597.html" target="_blank">华科博士联手清华教授 跑出100亿机器人黑马 — 证券时报</a></li>
+        <li><a href="https://www.latepost.com/news/dj_detail?id=3427" target="_blank">独家专访千寻创始人：20亿新融资、具身模型淘汰赛、落地非共识 — 晚点LatePost</a></li>
+        <li><a href="https://mp.ofweek.com/robot/a356714041617" target="_blank">河北80后，融资20亿：创业才2年 — OFweek机器人网</a></li>
+        <li><a href="https://egs.stcn.com/news/detail/2092288.html" target="_blank">千寻智能首次亮相WAIC 展示Moz1高精度全身力控具身智能机器人 — 证券时报</a></li>
+        <li><a href="https://www.x-techcon.com/article/5650.html" target="_blank">您的下一位「超级员工」「全能管家」，准备入职：千寻智能推出Moz1 — CyberRobo</a></li>
+        <li><a href="https://www.donews.com/news/detail/4/6474852.html" target="_blank">千寻智能发布VLA/VLM融合模型及轻量化数采方案 — DoNews</a></li>
+        <li><a href="https://www.stdaily.com/web/gdxw/2025-07/22/content_374175.html" target="_blank">千寻智能完成近6亿元PreA+轮融资 — 科技日报</a></li>
+        <li><a href="https://www.ebrun.com/20250722/586701.shtml" target="_blank">京东领投 千寻智能完成近6亿元PreA+轮融资 — 亿邦动力</a></li>
+        <li><a href="https://www.leaderobot.com/news/5728" target="_blank">破解人形机器人商业化密码：千寻智能以「办公室练兵场」实现生产力与进化力双赢 — 中国机器人网</a></li>
+        <li><a href="https://m.163.com/dy/article/K5E18M7P0511AQHO.html" target="_blank">WAIC机器人探展：我被全场最靓的崽「Moz1」种草了 — 网易</a></li>
+        <li><a href="https://www.itiger.com/hans/news/2613754790" target="_blank">红杉中国领投！杭州又一初创公司晋升具身智能百亿独角兽 — iTiger</a></li>
+        <li><a href="https://www.c114.net.cn/industry/73701.html" target="_blank">与Generalist顶峰相见，30天狂吸30亿 — C114通信网</a></li>
+        <li><a href="https://www.neican.ai/insights/article-20260227184004539-0/" target="_blank">百亿「铁疙瘩」的成人礼：千寻智能的极速冲刺与沉重皇冠 — 内参</a></li>
+        <li><a href="https://articles.e-works.net.cn/viewpoint/article155645.htm" target="_blank">4个月内融资超10亿，千寻智能凭什么领跑「具身智能」赛道？— e-works</a></li>
+        <li><a href="https://www.pingwest.com/a/306437" target="_blank">千寻智能闪耀世界人工智能大会，奏响全球智能革新强音 — 品玩</a></li>
+        <li><a href="https://g.pconline.com.cn/x/2102/21025412.html" target="_blank">融资20亿，估值破百亿，成立仅2年的千寻智能凭什么杀出重围？— 太平洋科技</a></li>
+        <li><a href="https://www.zdone.com/article/7454" target="_blank">2年吸金30亿！千寻智能到底什么来头？— 真知</a></li>
+        <li><a href="https://finance.sina.cn/2025-09-26/detail-infruvpi7746900.d.html" target="_blank">千寻智能在数贸会与浙江省科创母基金战略签约 — 新浪财经</a></li>
+        <li><a href="https://www.huobi.eu.com/zh-cn/news/Industry%20News-DjjJRsXM/" target="_blank">与Generalist顶峰相见，30天狂吸30亿，千寻智能做对了什么？— 火币资讯</a></li>
+        <li><a href="https://news.futunn.com/hk/post/69126262" target="_blank">小米、宁德时代、京东组团下注！这家机器人公司刚融了20亿 — 富途牛牛</a></li>
+        <li><a href="http://www.ciifund.cn/zwt/gsxw/202508/c9f548d77f174059a833a76470ee32ec.shtml" target="_blank">中网投投资千寻智能，具身智能赛道再布局 — 中国互联网投资基金</a></li>
+      </ol>
+      </div>
+
+    </article>
+  </div>
+  <div class="page-footer">此页面最后编辑于2026年5月4日 · 内容遵循具身智能Wiki编辑规范 · 所有数据来自公开可查来源</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

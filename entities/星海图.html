@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>星海图 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> <span class="breadcrumb-sep">›</span> <span>星海图</span></div>
+  <div class="wiki-header"><h1>星海图</h1><div class="subtitle">Galaxea AI · 2023年成立 · 一级市场估值最高具身智能独角兽 · 28个月估值破200亿</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#founders">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#financing">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#technology">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financials">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#analysis1">2.1 团队背景与场景选择的匹配度</a></li>
+        <li class="toc-lvl4"><a href="#analysis2">2.2 技术路线与场景的适配性</a></li>
+        <li class="toc-lvl4"><a href="#analysis3">2.3 股东/资本结构对战略的影响</a></li>
+        <li class="toc-lvl4"><a href="#analysis4">2.4 试错过程与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#analysis5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#analysis6">2.6 其他重要观察与分析</a></li>
+        <li class="toc-lvl2"><a href="#references">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">星海图</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">星海图（北京）人工智能科技股份有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">英文名</div><div class="ib-value">Galaxea AI</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2023年9月</div></div>
+        <div class="ib-row"><div class="ib-label">注册地</div><div class="ib-value">北京亦庄（原苏州，后迁址）</div></div>
+        <div class="ib-row"><div class="ib-label">创始人/CEO</div><div class="ib-value">高继扬</div></div>
+        <div class="ib-row"><div class="ib-label">员工人数</div><div class="ib-value">约80人（2025-2026）</div></div>
+        <div class="ib-section">融资与估值</div>
+        <div class="ib-row"><div class="ib-label">累计融资</div><div class="ib-value">近50亿元人民币（约11轮）</div></div>
+        <div class="ib-row"><div class="ib-label">最新估值</div><div class="ib-value">约200亿元（2026年4月B+轮）</div></div>
+        <div class="ib-row"><div class="ib-label">IPO计划</div><div class="ib-value">拟赴港上市，目标集资约5亿美元</div></div>
+        <div class="ib-section">财务数据（2025）</div>
+        <div class="ib-row"><div class="ib-label">营业收入</div><div class="ib-value">约140-1384万美元（CB Insights估）</div></div>
+        <div class="ib-row"><div class="ib-label">盈利状态</div><div class="ib-value"><span class="tag tag-warn">尚未盈利</span></div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">出货量</div><div class="ib-value">数千台（2025），2026目标万台级</div></div>
+        <div class="ib-row"><div class="ib-label">开源数据集</div><div class="ib-value">GOD，全球下载量超60万次</div></div>
+        <div class="ib-row"><div class="ib-label">开发者客户</div><div class="ib-value">150+家全球顶尖机构</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">领域</div><div class="ib-value"><span class="tag">具身智能</span><span class="tag">VLA大模型</span><span class="tag">人形机器人</span><span class="tag">开源生态</span></div></div>
+        <div class="ib-section">官网</div>
+        <div class="ib-row"><div class="ib-label">网址</div><div class="ib-value"><a href="https://galaxea-ai.com" target="_blank">galaxea-ai.com</a></div></div>
+      </aside>
+
+      <p class="article-intro"><strong>星海图</strong>（Galaxea AI）是中国具身智能赛道增长最快的独角兽企业之一，由前Waymo/Momenta背景的清华系团队于2023年9月创立，总部位于北京亦庄。公司以"一脑多形"为核心理念，构建"数据-模型-整机"全栈能力，主打VLA（视觉-语言-动作）大模型与轮式双臂机器人，并以全面开源策略构建全球开发者生态。成立仅28个月即完成近11轮融资，估值突破200亿元，成为一级市场估值最高的具身智能创业公司。2025年出货数千台同构型机器人居行业第一，2026年目标万台级规模化放量，并已启动港股IPO流程。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+
+      <div class="table-wrapper">
+        <table class="wikitable infotable">
+          <tr><th>项目</th><th>内容</th></tr>
+          <tr><td>公司全称</td><td>星海图（北京）人工智能科技股份有限公司</td></tr>
+          <tr><td>英文名称</td><td>Galaxea AI（原注册名：星海图（苏州）人工智能科技有限公司）</td></tr>
+          <tr><td>成立日期</td><td>2023年9月</td></tr>
+          <tr><td>注册地址</td><td>北京经济技术开发区（亦庄）；初创于苏州，2025年迁址北京</td></tr>
+          <tr><td>上市状态</td><td>未上市；2026年1月完成股改（变更为股份有限公司，外商投资）；计划赴港上市，目标集资约5亿美元</td></tr>
+          <tr><td>法定代表人/CEO</td><td>高继扬</td></tr>
+          <tr><td>员工人数</td><td>约80人（PitchBook 2025-2026数据）</td></tr>
+          <tr><td>官网</td><td>galaxea-ai.com</td></tr>
+        </table>
+      </div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>时间</th><th>事件</th></tr>
+          <tr><td>2023年9月</td><td>高继扬与赵行、李天威、许华哲在苏州联合创立星海图</td></tr>
+          <tr><td>2023年底</td><td>完成千万美元级天使轮融资</td></tr>
+          <tr><td>2024年8月</td><td>完成A轮融资，高瓴资本、蚂蚁集团等入局</td></tr>
+          <tr><td>2024年11月</td><td>完成新一轮约2亿元融资，一年三轮融资累计超14亿元</td></tr>
+          <tr><td>2025年</td><td>完成5轮A系列融资，累计近10亿元；R1系列机器人出货数千台，居同构型行业第一</td></tr>
+          <tr><td>2025年8月</td><td>发布G0 VLA模型（当时SOTA）及GOD开源数据集</td></tr>
+          <tr><td>2026年1月</td><td>CES 2026全球首秀，发布G0 Plus开箱即用VLA模型、DEXO灵巧手；完成股改</td></tr>
+          <tr><td>2026年2月</td><td>B轮融资近10亿元，估值约100亿元，成为第四家具身智能百亿独角兽</td></tr>
+          <tr><td>2026年4月</td><td>B+轮融资近20亿元，估值约200亿元；传启动港股IPO，目标集资5亿美元</td></tr>
+          <tr><td>2026年5月</td><td>计划发布双足人形机器人，灵巧手正式发布</td></tr>
+        </table>
+      </div>
+
+      <h3 id="founders">1.2 创始人及核心团队</h3>
+      <p>星海图创始团队被业内称为具身智能赛道的<strong>"银河战舰"</strong>级配置。四位联合创始人分别来自Waymo自动驾驶感知、Momenta量产产品、MIT/Stanford具身智能研究——兼具顶级学术背景与工业级系统工程能力。团队整体呈现"清华系学术派+硅谷工业派"混合结构。</p>
+
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+          <tr><td>创始人兼CEO</td><td>高继扬</td><td>1992年生，清华电子工程本科（物理竞赛保送），南加州大学（USC）计算机视觉博士，师从Ram Nevatia，仅3.5年毕业创实验室最短纪录；曾任Waymo高级工程师/技术负责人（感知方向）、Momenta执行总监（量产产品）；负责公司全盘统筹</td></tr>
+          <tr><td>联合创始人</td><td>赵行</td><td>清华本科，MIT计算机视觉博士，研究方向多模态感知（视觉+激光雷达+毫米波雷达+声音融合），曾提出"Sound of Pixels"等跨模态方法；曾任Waymo研究员；现为清华大学交叉信息研究院助理教授，创立MARS实验室；负责具身智能算法</td></tr>
+          <tr><td>联合创始人</td><td>李天威</td><td>伦敦大学学院（UCL）硕士，校招进入Momenta后5年升职4次成为高级总监；负责机器人本体和系统研发</td></tr>
+          <tr><td>前联合创始人</td><td>许华哲</td><td>清华本科，UC Berkeley博士，Stanford博士后；开发DP3算法（3D扩散策略）大幅提升机器人学习效率；现为清华交叉信息研究院助理教授（TEA Lab）；已离职创立"破壳机器人"聚焦家庭C端，星海图给予种子轮投资</td></tr>
+        </table>
+      </div>
+      <p>核心团队纽带：高继扬与赵行在Waymo共事，高继扬与李天威在Momenta共事，赵行与许华哲在清华交叉信息院为同事。四人的"自动驾驶+具身智能"跨界背景，使星海图在感知算法、系统集成和量产工程化上具备复合优势。公司关键高管还包括CFO罗天奇（负责融资与资本运作）。</p>
+
+      <h3 id="financing">1.3 融资与股东</h3>
+
+      <h4>融资历史</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>轮次</th><th>时间</th><th>金额</th><th>估值</th><th>核心投资方</th></tr>
+          <tr><td>天使轮</td><td>2023年底</td><td>千万美元级</td><td>—</td><td>未公开</td></tr>
+          <tr><td>A轮</td><td>2024年8月</td><td>未披露</td><td>—</td><td>高瓴资本、蚂蚁集团</td></tr>
+          <tr><td>A+轮</td><td>2024年11月</td><td>约2亿元</td><td>—</td><td>高瓴创投、蚂蚁集团等</td></tr>
+          <tr><td>A系列（5轮）</td><td>2025年</td><td>累计近10亿元</td><td>—</td><td>IDG、联想创投、今日资本等</td></tr>
+          <tr><td>B轮</td><td>2026年2月</td><td>近10亿元</td><td>约100亿元</td><td>金鼎资本、北汽产投、碧鸿投资（吉利系）、正心谷、美团龙珠、毅峰资本（淡马锡系）</td></tr>
+          <tr><td>B+轮</td><td>2026年4月</td><td>近20亿元</td><td>约200亿元</td><td>华登科技、蓝思科技、矽芯投资、金融街资本、北京科创、普华资本、中金资本、洪泰基金等</td></tr>
+        </table>
+      </div>
+
+      <h4>股东结构</h4>
+      <p>星海图股东结构呈现<strong>"产业资本+财务投资者+国家队"混合型</strong>特征。产业资本方包括北汽产投（汽车场景）、碧鸿投资（吉利系/智能制造）、蓝思科技（硬件供应链与量产协同）、美团龙珠（物流/商业服务）；国家队包括金融街资本、北京科创、中金资本等；头部基金包括高瓴、IDG、蚂蚁集团、普华资本等。创始人高继扬为控股股东。2026年1月完成股改为股份有限公司（外商投资、未上市），为港股IPO及海外资本进入铺路。</p>
+
+      <h3 id="technology">1.4 技术路线</h3>
+
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>技术维度</th><th>详细说明</th></tr>
+          <tr><td>AI模型架构</td><td><strong>"慢-快双系统"VLA架构</strong>：G0系列模型，慢系统（System 2）负责深度理解场景与规划，快系统（System 1）负责毫秒级实时执行；G0（2025.8发布，当时SOTA）→ G0 Plus（2026.1，全球首个开箱即用VLA）→ G0 Tiny（2026.2，轻量化端侧）→ G0.5（研发中）</td></tr>
+          <tr><td>世界模型</td><td>Fast-WAM，2026年2月发布，号称全球最快世界模型，重构底层架构提升推理速度</td></tr>
+          <tr><td>数据方案</td><td><strong>"真机数据驱动"</strong>为核心信仰，构建"数据金字塔"：人类第一视角无本体数据（底层）→ 仿真数据（中层）→ 精锐真机数据（顶层）；2025年采集约10万小时真机数据，2026年目标数十万小时</td></tr>
+          <tr><td>开源策略</td><td>业内唯一同时开源<strong>本体、数据、模型与开发工具链</strong>的企业；GOD数据集覆盖200+物品操作，全球下载量超60万次，登顶全球具身智能真机数据集榜首</td></tr>
+          <tr><td>硬件自研</td><td>全栈自研：R1机器人本体（轮式双臂）+ DEXO灵巧手（17自由度四指）+ EDP开发平台</td></tr>
+          <tr><td>技术合作方</td><td>NVIDIA（EgoScale项目使用星海图数据）、蚂蚁灵波（Lingbot-VLA使用星海图数据）、清华、斯坦福、MIT、UC Berkeley等</td></tr>
+          <tr><td>核心方法论</td><td>"智能定义本体"——以AI模型能力边界决定硬件形态，而非先造硬件再适配AI</td></tr>
+        </table>
+      </div>
+      <p>星海图的技术路线以<strong>"开源生态+真机数据飞轮+软硬一体"</strong>为三大支柱。公司认为具身智能的核心瓶颈在于数据规模和质量，因此采取激进的开源策略吸引全球开发者贡献数据；通过自建数采团队+外包数采网络+生态投资（已投近10家数据采集相关企业）多路径扩大数据入口。19.9万元起的R1定价意在降低开发者门槛，加速数据飞轮转动。</p>
+
+      <h3 id="products">1.5 产品形态</h3>
+
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>产品分类</th><th>型号</th><th>关键参数/特点</th><th>定位</th></tr>
+          <tr><td rowspan="2">轮式双臂机器人</td><td>R1 Lite</td><td>轮式底盘+双臂，19.9万元起；入门级开发者平台</td><td>高校实验室、科研机构、POC验证</td></tr>
+          <tr><td>R1 Pro</td><td>轮式底盘+双臂，更高负载与精度；量产主力型号</td><td>工业搬运、物流分拣、商业服务</td></tr>
+          <tr><td>灵巧手</td><td>DEXO</td><td>17自由度四指灵巧手，CES 2026首秀，2026年5月正式发布</td><td>精细操作、物体抓取与操控</td></tr>
+          <tr><td>VLA模型</td><td>G0 / G0 Plus / G0 Tiny</td><td>端到端视觉-语言-动作；G0 Plus支持开箱即用；G0 Tiny轻量化端侧部署</td><td>机器人"大脑"，可供第三方使用</td></tr>
+          <tr><td>世界模型</td><td>Fast-WAM</td><td>重构底层架构，全球最快推理速度</td><td>仿真训练、动作规划</td></tr>
+          <tr><td>开发平台</td><td>EDP</td><td>全链路数据工具：采集→质检→标注→评测→微调→部署</td><td>开发者工具链</td></tr>
+          <tr><td>双足人形机器人</td><td>（未命名）</td><td>计划2026年5月发布</td><td>通用人形，拓宽硬件品类</td></tr>
+        </table>
+      </div>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>场景分类</th><th>具体应用</th><th>代表客户/合作伙伴</th></tr>
+          <tr><td>科研教育</td><td>具身智能算法训练、机器人教学实验、VLA模型研究</td><td>斯坦福（李飞飞团队）、MIT、UC Berkeley、清华、浙大；Physical Intelligence (PI)</td></tr>
+          <tr><td>智能制造</td><td>工业搬运、物料移动、产线柔性适配</td><td>比亚迪、蓝思科技、赛力斯、北汽</td></tr>
+          <tr><td>物流仓储</td><td>搬运移动、抓拿放置、封装打包、设备串联</td><td>美团、国内头部物流运营商</td></tr>
+          <tr><td>商业服务</td><td>商业展示、零售场景</td><td>腾讯、字节跳动、华为</td></tr>
+          <tr><td>消费电子</td><td>3C产品线应用</td><td>荣耀、vivo、美的</td></tr>
+          <tr><td>AI平台</td><td>具身大模型数据与训练支持</td><td>NVIDIA（EgoScale）、蚂蚁灵波、Google DeepMind、OpenAI</td></tr>
+        </table>
+      </div>
+      <p>星海图2025年场景分布呈现鲜明的"开发者优先"特征——90%客户为开发者（高校实验室+大厂研究院），科研用户占30%。2026年五大落地场景明确为：搬运移动、抓拿放置、封装打包、织物叠放、设备串联。公司计划将科研占比降至20%，长期目标开发者生产力客户占90%以上。已获国内头部汽车制造商与物流企业千台级订单。</p>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <ul>
+        <li><strong>累计出货</strong>：2025年R1系列出货数千台，同构型本体出货量居行业第一；2026年目标万台级规模化放量</li>
+        <li><strong>客户覆盖</strong>：150+家全球顶尖开发者客户，头部覆盖率超90%；覆盖全球顶尖AI实验室、大厂研究院、头部产业集团</li>
+        <li><strong>订单储备</strong>：已获国内头部汽车制造商与物流企业千台级订单</li>
+        <li><strong>开源生态</strong>：GOD数据集全球下载量超60万次，登顶全球第一；R1平台赋能超90%全球顶级具身智能开发者</li>
+        <li><strong>海外布局</strong>：CES 2026全球首秀；引入新加坡淡马锡系毅峰资本探索海外市场；2026年上半年在全球启动多项行业试点</li>
+        <li><strong>生态投资</strong>：已投资近10家数据采集/场景应用企业（含破壳机器人、UMI数据采集等），2026年计划扩展至15-20家</li>
+        <li><strong>IPO进程</strong>：2026年1月完成股改，传已启动港股IPO，目标集资约5亿美元</li>
+      </ul>
+
+      <h3 id="financials">1.8 财务数据</h3>
+
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>指标</th><th>2023年</th><th>2024年</th><th>2025年</th><th>2026年（目标/预测）</th></tr>
+          <tr><td>营业收入</td><td>0（初创期）</td><td>极小</td><td>约140-1384万美元（CB Insights）</td><td>目标万台级出货</td></tr>
+          <tr><td>盈利状态</td><td>亏损</td><td>亏损</td><td>亏损</td><td>预计持续亏损</td></tr>
+          <tr><td>累计融资</td><td>千万美元级</td><td>超14亿元</td><td>近30亿元</td><td>近50亿元</td></tr>
+          <tr><td>估值</td><td>—</td><td>—</td><td>数十亿元</td><td>约200亿元（B+轮）</td></tr>
+          <tr><td>员工人数</td><td>—</td><td>—</td><td>约80人</td><td>—</td></tr>
+        </table>
+      </div>
+      <p>星海图仍处于高投入期，营收规模极小，主要依赖融资支撑研发与扩张。2025年研发费用为公司成立以来的数倍，CEO高继扬坦承20亿新融资在百万级真机数据训练面前仍"杯水车薪"。公司目标是在2026年下半年完成商业验证——证明机器人在真实生产力场景中的经济价值。</p>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>公司名称"星海图"寓意"星辰大海的图景"，英文Galaxea为"星系"的拉丁语变体，体现公司对通用人工智能（AGI）终极愿景的追求</li>
+        <li>高继扬提出的终局判断："人类到最后只剩下两样东西——创造力和判断力"，所有体力劳动和流程性脑力劳动由机器人完成</li>
+        <li>星海图是国内唯一同时开源本体硬件、VLA模型、训练数据和开发工具链的具身智能企业，开源深度远超宇树、智元等同行</li>
+        <li>许华哲离职创立"破壳机器人"聚焦家庭C端场景，星海图以种子轮投资方式保持生态绑定，形成"B端星海图+C端破壳"的场景互补</li>
+        <li>公司2026年1月CES首秀引发海外关注，被海外媒体视为中国具身智能出海的代表企业之一</li>
+        <li>星海图与宇树科技、智元机器人、银河通用并列为国内具身智能"百亿估值俱乐部"成员</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="analysis1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>星海图创始团队的"自动驾驶×具身智能"跨界背景与其当前"先开发者、后产业"的场景路径高度匹配。高继扬在Waymo的感知系统经验和Momenta的量产产品管理经验，使团队既具备顶级AI算法能力，又深谙系统工程化落地的方法论。赵行的多模态感知研究和许华哲的3D扩散策略（DP3）算法，直接对应VLA模型所需的感知-规划-执行全链路。然而，团队缺乏传统制造业、物流运营等"重场景"背景，这可能解释了为何公司选择"开源数据飞轮"路径切入——以开发者为第一站积累数据，而非直接杀入工厂产线。这一选择回避了团队在工业场景know-how上的短板，但也意味着从"服务开发者"到"服务工厂工人"之间仍存在场景跨越的鸿沟。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>星海图选择的"开源VLA+真机数据+软硬一体"路线，在开发者场景中高度适配——开源降低接入门槛、数据集提供训练素材、R1低价（19.9万起）降低硬件成本。但在生产力场景（工厂、物流中心）中，这条路线面临三大挑战：一是真机数据虽多但以实验室环境为主，与工厂复杂工况存在分布偏移；二是G0系列模型在结构化任务上表现出色，但在开放世界的长尾场景中泛化能力尚未被验证；三是"双系统架构"（慢思考+快执行）虽然优雅，但在工业场景中客户更关心"可靠性99.99%"而非架构的学术创新。当前路线在学术/开发者圈层取得了极大的关注度（GOD数据集60万+下载），但"从学术影响力到商业生产力"的翻译效率尚待观察。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>星海图B/B+轮引入的产业资本阵容堪称豪华且布局精妙：北汽产投绑定汽车制造场景，碧鸿投资（吉利系）打通智能制造，蓝思科技提供硬件供应链与量产协同，美团龙珠锚定物流商业场景。这种"每笔融资对应一个场景入口"的资本运作策略，使星海图在尚未证明大规模商业落地能力时，已提前锁定了多个潜在产业场景。但也带来双重压力：一是产业资本天然期待场景绑定和排他性合作，可能限制公司的场景自由度；二是200亿高估值意味着资本已有极高期望，一旦2026年下半年商业验证不及预期，估值面临大幅回调风险。CFO罗天奇的表述——"资本赌我们能率先在物理世界证明Scaling Law"——精准概括了这一高风险的赌注性质。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>星海图成立仅28个月，试错历史尚短，但已出现几个值得注意的调整信号：其一，2025年从苏州迁址北京亦庄，这意味着从"创业城市"到"政策高地+产业聚集区"的战略跃迁，北京亦庄是机器人产业政策最密集的区域之一；其二，从R1轮式双臂扩展至双足人形（计划2026年5月发布），标志着从"务实轮式路线"到"通用人形路线"的品类扩张——这可能是因为市场竞争（宇树、智元等均已推出双足产品）或产业资本推动；其三，原联合创始人许华哲离职去创业，但星海图以投资而非切割的方式处理——这在具身智能赛道尚属少见，体现了一种"生态化裂变"而非"零和分裂"的团队管理策略。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>星海图的核心取舍可概括为：<strong>"赌开源飞轮，而非闭源护城河"；"做AI模型公司而非机器人硬件公司"</strong>。在具身智能赛道的"开源vs闭源"之争中，星海图选择了最激进的开源路线——同时开源硬件、数据、模型、工具链，这在同行中独树一帜（宇树主闭源硬件，智元选择性开源）。这一策略的潜在收益是：如果开源飞轮转动起来，星海图将成为具身智能时代的"Android"——通过生态锁定获得数据优势和标准制定权。风险是：如果开源未能转化为商业壁垒，竞争对手可以低成本复现其技术路线，而星海图投入巨资采集的开源数据可能成为"行业的公共品"。CEO高继扬将其比作"证明物理世界的Scaling Law类比于ChatGPT时刻"，这场豪赌的结果将决定星海图是成为具身智能的"OpenAI"还是"又一个有理想的开源项目"。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis6">
+        <h4>2.6 其他重要观察与分析</h4>
+        <p>星海图面临的最核心矛盾是<strong>"估值速度远超收入增长速度"</strong>：200亿估值vs约千万级美元营收，PS倍数高达数百倍，这在任何资产类别中都属极端水平。支撑这一估值的并非当前财务数据，而是两个未经验证的假设：一是"具身智能Scaling Law"成立（更多数据→更好表现→更多部署→更多数据），二是星海图将在飞轮中占据数据分发者的平台地位。此外，公司80人团队规模与其生态野心之间存在张力——要同时维护VLA模型迭代、数据采集网络、R1硬件生产、DEXO灵巧手和双足人形研发，以及150+开发者客户支持，资源的极度分散是显而易见的。CEO高继扬在多个场合强调"2026年下半年是生死线"，这一表态的坦诚程度在创投圈罕见，也反映了公司面临的压力之真实。</p>
+      </div>
+
+      <h2 id="references">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://m.chinatimes.net.cn/article/152296.html" target="_blank">星海图如何撑起200亿元高估值 — 华夏时报</a></li>
+          <li><a href="https://m.21jingji.com/article/20260212/herald/749ec7e87213e59bb51f18545108c713.html" target="_blank">34岁清华毕业生，28个月制造百亿独角兽 — 21世纪经济报道</a></li>
+          <li><a href="https://jg-static.eeo.com.cn/article/info?id=d71c0de35d2f4745b300ddb1ae7c051b" target="_blank">星海图又拿下20亿元融资 CFO罗天奇：资本赌我们率先证明Scaling Law — 经济观察报</a></li>
+          <li><a href="https://www.eet-china.com/mp/a485979.html" target="_blank">成立不到三年估值突破200亿，星海图凭什么？ — 电子工程专辑</a></li>
+          <li><a href="https://finance.stockstar.com/SS2026042300026331.shtml" target="_blank">星海图：两个月的造神运动 — 证券之星</a></li>
+          <li><a href="https://m.36kr.com/p/3651931827741062" target="_blank">星海图股改、估值百亿、千台交付，它离IPO还有多远？ — 36氪</a></li>
+          <li><a href="https://www.163.com/dy/article/KPGNKTS305129QAF.html" target="_blank">星海图两月内估值翻倍破200亿元，具身智能融资竞赛白热化 — 网易</a></li>
+          <li><a href="https://www.thepaper.cn/newsDetail_forward_32581687" target="_blank">清华90后带队，刚刚星海图又融10亿 — 澎湃新闻</a></li>
+          <li><a href="https://www.forbeschina.com/Billionaires/71114" target="_blank">星海图完成10亿元B轮融资，成最年轻具身智能独角兽 — 福布斯中国</a></li>
+          <li><a href="https://www.zidonghua.com.cn/news/exhibition/81143.html" target="_blank">星海图旗下品牌Galaxea Dynamics首登CES 2026 — 自动化网</a></li>
+          <li><a href="https://finance.sina.cn/tech/2026-01-12/detail-inhfzcpa0137835.d.html" target="_blank">星海图CES 2026打造具身智能物理引擎 — 新浪财经</a></li>
+          <li><a href="https://m.36kr.com/p/3678199520846464" target="_blank">星海图完成10亿元B轮融资，成第四家估值百亿具身智能创企 — 36氪</a></li>
+          <li><a href="https://news.ynet.com/2026/02/12/3986520t70.html" target="_blank">北京第二家具身智能行业百亿独角兽来了 — 北京青年报</a></li>
+          <li><a href="https://auto.gasgoo.com/news/202604/2I70451836C601.shtml" target="_blank">星海图再融20亿 — 盖世汽车</a></li>
+          <li><a href="https://m.36kr.com/p/3749636171973380" target="_blank">刚获20亿，百亿独角兽CEO的终局推演 — 36氪</a></li>
+          <li><a href="https://www.iyiou.com/briefing/202605041904588" target="_blank">传星海图拟赴港上市 目标集资5亿美元 — 亿欧</a></li>
+          <li><a href="https://finance.eastmoney.com/a/202604023693138284.html" target="_blank">星海图再获20亿融资，具身智能行业加速分化 — 东方财富网</a></li>
+          <li><a href="https://www.c114.net.cn/industry/54751.html" target="_blank">星海图股改、估值百亿、千台交付 — C114通信网</a></li>
+          <li><a href="https://finance.eastmoney.com/a/202510283546943169.html" target="_blank">星海图开放世界数据集下载量突破40万次 — 东方财富网</a></li>
+          <li><a href="https://hub.baai.ac.cn/view/48070" target="_blank">星海图端到端双系统全身智能VLA — 智源社区</a></li>
+          <li><a href="https://galaxea-ai.com/en" target="_blank">星海图官网 — Galaxea AI</a></li>
+          <li><a href="https://pitchbook.com/profiles/company/540003-61" target="_blank">Galaxea AI Company Profile — PitchBook</a></li>
+          <li><a href="http://field.10jqka.com.cn/20260430/c676410050.shtml" target="_blank">2026具身智能独角兽商业化进展追踪 — 同花顺</a></li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">本页面内容基于公开信息整理，数据截至2026年5月。信息源于36氪、澎湃新闻、福布斯中国、东方财富网、PitchBook等媒体及研究平台。© 具身智能Wiki</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

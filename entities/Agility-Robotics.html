@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>Agility Robotics — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> <span class="breadcrumb-sep">›</span> <span>Agility Robotics</span></div>
+  <div class="wiki-header"><h1>Agility Robotics</h1><div class="subtitle">Agility · 未上市 · 2015年成立 · $17.5—21亿估值 · 全球首个商业部署人形机器人</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#founders">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#finance">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl3"><a href="#a2-1">2.1 团队背景与场景选择</a></li>
+        <li class="toc-lvl3"><a href="#a2-2">2.2 技术路线与场景适配</a></li>
+        <li class="toc-lvl3"><a href="#a2-3">2.3 股东/资本结构影响</a></li>
+        <li class="toc-lvl3"><a href="#a2-4">2.4 试错与路径调整</a></li>
+        <li class="toc-lvl3"><a href="#a2-5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl3"><a href="#a2-6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#references">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">Agility Robotics</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">Agility Robotics, Inc.（2026年3月更名为Agility）</div></div>
+        <div class="ib-row"><div class="ib-label">成立</div><div class="ib-value">2015年</div></div>
+        <div class="ib-row"><div class="ib-label">总部</div><div class="ib-value">美国俄勒冈州塞勒姆 (Salem, OR)</div></div>
+        <div class="ib-row"><div class="ib-label">CEO</div><div class="ib-value">Peggy Johnson（2024.3—今）</div></div>
+        <div class="ib-row"><div class="ib-label">联合创始人</div><div class="ib-value">Jonathan Hurst、Damion Shelton、Mikhail Jones</div></div>
+        <div class="ib-row"><div class="ib-label">员工</div><div class="ib-value">~273—500+人</div></div>
+        <div class="ib-section">财务数据</div>
+        <div class="ib-row"><div class="ib-label">估值（2025.6）</div><div class="ib-value">~$17.5—21亿</div></div>
+        <div class="ib-row"><div class="ib-label">累计融资</div><div class="ib-value">~$6.4—6.83亿</div></div>
+        <div class="ib-row"><div class="ib-label">最新轮次</div><div class="ib-value">C-3轮 $4亿（2025.6）</div></div>
+        <div class="ib-row"><div class="ib-label">Digit单价</div><div class="ib-value">~$25万/台</div></div>
+        <div class="ib-section">估值/市值</div>
+        <div class="ib-row"><div class="ib-label">C轮估值（2024.10）</div><div class="ib-value">~$10亿</div></div>
+        <div class="ib-row"><div class="ib-label">C-3轮估值（2025.6）</div><div class="ib-value">~$17.5—21亿</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">投资方</div><div class="ib-value">DCVC, Playground Global, Amazon, 软银, NVIDIA, Schaeffler等38家</div></div>
+        <div class="ib-row"><div class="ib-label">旗舰产品</div><div class="ib-value">Digit双足人形机器人、Agility Arc云平台</div></div>
+        <div class="ib-row"><div class="ib-label">自建工厂</div><div class="ib-value">RoboFab（7万平方英尺，年产目标10,000+台）</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">类别</div><div class="ib-value"><span class="tag">人形机器人</span><span class="tag">物流自动化</span><span class="tag">RaaS</span></div></div>
+        <div class="ib-section">官网</div>
+        <div class="ib-row"><div class="ib-label">官网</div><div class="ib-value"><a href="https://agilityrobotics.com" target="_blank">agilityrobotics.com</a></div></div>
+      </aside>
+      <p class="article-intro">Agility Robotics（2026年3月起品牌简化为Agility）是美国具身智能和人形机器人领域的先锋企业，由俄勒冈州立大学动态机器人实验室的三位联合创始人于2015年分拆创立。公司以双足人形机器人Digit为核心产品，专注物流仓储场景的自动化搬运。Agility是全球第一家实现人形机器人付费商业部署并产生持续营收的企业，其Digit机器人在Amazon、GXO Logistics、Schaeffler和Toyota等Fortune 500客户处已累计搬运超过30万个订单/10万个周转箱。公司于2025年6月完成$4亿C-3轮融资后估值达$17.5—21亿，拥有全球首座专门生产人形机器人的工厂RoboFab。</p>
+
+<h2 id="facts">1 事实层</h2>
+
+<h3 id="basic">1.1 公司基本信息</h3>
+<div class="table-wrapper"><table class="wikitable infotable">
+<tr><th>项目</th><th>内容</th></tr>
+<tr><td>公司全称</td><td>Agility Robotics, Inc.（2026年3月品牌更名为Agility）</td></tr>
+<tr><td>英文名称</td><td>Agility Robotics / Agility</td></tr>
+<tr><td>成立时间</td><td>2015年，从俄勒冈州立大学（OSU）动态机器人实验室分拆</td></tr>
+<tr><td>注册地</td><td>美国俄勒冈州塞勒姆</td></tr>
+<tr><td>上市情况</td><td>未上市（私募阶段；曾于StartEngine开放二级市场交易）</td></tr>
+<tr><td>官方网站</td><td>https://agilityrobotics.com</td></tr>
+<tr><td>主营业务</td><td>双足人形机器人研发制造、物流自动化RaaS服务、机器人云平台</td></tr>
+</table></div>
+
+<h4>发展沿革</h4>
+<div class="table-wrapper"><table class="wikitable">
+<tr><th>时间</th><th>事件</th></tr>
+<tr><td>2015年</td><td>Hurst、Shelton、Jones从OSU动态机器人实验室分拆创立Agility Robotics</td></tr>
+<tr><td>2017年</td><td>发布首款双足机器人Cassie（研究平台）；发布Digit人形机器人</td></tr>
+<tr><td>2019年</td><td>Ford试点Digit末端配送（项目后终止）</td></tr>
+<tr><td>2022年4月</td><td>完成$1.5亿B轮融资；Amazon Industrial Innovation Fund投资</td></tr>
+<tr><td>2023年</td><td>在ProMat发布当前代Digit；宣布RoboFab工厂计划；Amazon与GXO签约</td></tr>
+<tr><td>2024年3月</td><td>Peggy Johnson（前微软EVP、Magic Leap CEO）出任CEO，Damion Shelton转任总裁</td></tr>
+<tr><td>2024年10月</td><td>完成$1.5亿C轮融资，估值约$10亿</td></tr>
+<tr><td>2024年11月</td><td>Schaeffler战略投资+采购协议，计划全球100家工厂部署Digit</td></tr>
+<tr><td>2025年6月</td><td>完成$4亿C-3轮融资（WP Global Partners风投部门领投），估值$17.5—21亿</td></tr>
+<tr><td>2025年</td><td>NVIDIA NVentures投资；Digit在GXO累计处理超10万个周转箱</td></tr>
+<tr><td>2026年2月</td><td>与Toyota加拿大工厂签署商业协议</td></tr>
+<tr><td>2026年3月</td><td>品牌更名"Agility"；Digit在Schaeffler工厂实现8小时轮班制</td></tr>
+</table></div>
+
+<h3 id="founders">1.2 创始人及核心团队</h3>
+<p>Agility Robotics由三位俄勒冈州立大学（OSU）成员共同创立：Jonathan Hurst（OSU动态机器人实验室创建者、首席机器人官）、Damion Shelton（前任CEO/现任总裁、CMU机器人学研究生背景）、Mikhail Jones。Hurst在OSU期间率先重现了人类双足行走动力学，奠定了Digit的学术基础。</p>
+<div class="table-wrapper"><table class="wikitable">
+<tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+<tr><td>CEO（2024.3—今）</td><td>Peggy Johnson</td><td>前Microsoft业务发展EVP（2014—2020），直接向Satya Nadella汇报，创立M12企业风投基金（80+组合公司）；前Qualcomm高管24年，推出BREW移动平台（$10亿+营收）；前Magic Leap CEO（2020—2023），主导消费→企业转型；Business Insider"美国最强大女工程师"（2017）</td></tr>
+<tr><td>联合创始人/首席机器人官</td><td>Jonathan Hurst</td><td>CMU校友；OSU动态机器人实验室创建者；双足动态行走稳定性科学基础奠基人</td></tr>
+<tr><td>联合创始人/总裁</td><td>Damion Shelton</td><td>CMU机器人学研究生；2015—2024年任CEO；前3D扫描公司创始人</td></tr>
+<tr><td>联合创始人</td><td>Mikhail Jones</td><td>OSU动态机器人实验室核心成员，技术细节公开信息有限</td></tr>
+<tr><td>首席商务官</td><td>Daniel Diez</td><td>主导RaaS商业模式和品牌更名</td></tr>
+</table></div>
+<p>团队整体为典型的"学术派创始人+产业派职业经理人"混合结构。2024年Peggy Johnson的CEO任命标志着公司从R&D驱动转向商业化规模化运营。员工总数约273—500+人（不同来源口径差异）。</p>
+
+<h3 id="funding">1.3 融资与股东</h3>
+<div class="table-wrapper"><table class="wikitable">
+<tr><th>轮次</th><th>时间</th><th>金额</th><th>核心投资方</th><th>估值</th></tr>
+<tr><td>种子轮/早期</td><td>2015—2020</td><td>~$3,000万</td><td>早期风投</td><td>—</td></tr>
+<tr><td>B轮</td><td>2022年4月</td><td>$1.5亿</td><td>DCVC, Playground Global</td><td>—</td></tr>
+<tr><td>C轮</td><td>2024年10月</td><td>$1.5亿</td><td>DCVC</td><td>~$10亿</td></tr>
+<tr><td>C-3轮</td><td>2025年6月</td><td>$4亿</td><td>WP Global Partners风投部门</td><td>~$17.5—21亿</td></tr>
+</table></div>
+<p>累计融资约$6.4亿—$6.83亿（PitchBook数据）。总计38家机构投资方。</p>
+<div class="table-wrapper"><table class="wikitable">
+<tr><th>投资方</th><th>类型</th><th>战略意义</th></tr>
+<tr><td>DCVC</td><td>深度科技VC</td><td>B轮和C轮的坚定支持者，专注深科技长期投资</td></tr>
+<tr><td>Amazon Industrial Innovation Fund</td><td>产业资本+客户</td><td>既是投资方也是最大部署方，提供物流场景验证</td></tr>
+<tr><td>SoftBank Group</td><td>战略/财务</td><td>C-3轮参投，全球分销渠道和资本支持</td></tr>
+<tr><td>NVIDIA NVentures</td><td>技术战略</td><td>物理AI生态布局，Isaac Sim/Isaac Lab数字孪生训练</td></tr>
+<tr><td>Playground Global</td><td>深度科技VC</td><td>Andy Rubin联合创立，Android生态资源</td></tr>
+<tr><td>Schaeffler Group</td><td>产业资本+采购方</td><td>战略投资+全球100家工厂部署承诺</td></tr>
+<tr><td>Sony Innovation Fund</td><td>产业资本</td><td>消费电子传感器技术协同</td></tr>
+</table></div>
+
+<h3 id="tech">1.4 技术路线</h3>
+<div class="table-wrapper"><table class="wikitable infotable">
+<tr><th>技术维度</th><th>内容</th></tr>
+<tr><td>总体AI架构</td><td>全身控制（Whole-Body Controller）+强化学习，基于NVIDIA Isaac Sim/Isaac Lab仿真训练</td></tr>
+<tr><td>核心AI平台</td><td>Agility Arc云平台——机器人机队管理、数据采集与远程运维</td></tr>
+<tr><td>数据方案</td><td>仿真数据为主（NVIDIA Isaac），真实场景数据来自Amazon和GXO物流中心的实际运行积累</td></tr>
+<tr><td>硬件路线</td><td>反关节"鸵鸟腿"设计——独特的后弯膝盖结构，专为人类建筑环境（楼梯、坡道、狭窄通道）优化</td></tr>
+<tr><td>执行器方案</td><td>双臂+电动夹爪（非灵巧手），聚焦搬运而非精细操作</td></tr>
+<tr><td>安全认证</td><td>已通过OSHA认可的NRTL现场安全审查；2026年目标为全球首款"协同安全"人形机器人认证</td></tr>
+<tr><td>全栈/专用路线</td><td>专用路线——深度聚焦物流搬运场景，不做通用人形</td></tr>
+</table></div>
+<p>Agility的技术路线是行业内最典型的"专用务实主义"代表：Digit不是为了替代所有人类工作而设计，而是专门解决物流仓库中"周转箱从AMR搬到传送带"这一具体任务。反关节腿设计在学术界早有争议，但在实际仓库环境中确实提供了卓越的狭窄空间通过能力。</p>
+
+<h3 id="products">1.5 产品形态</h3>
+<div class="table-wrapper"><table class="wikitable">
+<tr><th>产品</th><th>类别</th><th>关键参数</th><th>适用场景</th><th>参考价格</th></tr>
+<tr><td>Digit（当前代）</td><td>双足人形机器人</td><td>高5'9"（175cm），重~140磅（63.5kg），负载35磅（~16kg），续航最长8小时（自动对接充电），摄像头+LiDAR+多模态传感器</td><td>物流仓库周转箱搬运、AMR到传送带转运</td><td>~$25万/台；RaaS ~$30/小时</td></tr>
+<tr><td>Digit（下一代）</td><td>双足人形机器人</td><td>目标负载50磅，协同安全认证，与人类无护栏协作</td><td>物流、制造工厂</td><td>待公布</td></tr>
+<tr><td>Agility Arc</td><td>云平台</td><td>机队管理、任务编排、数据采集</td><td>所有部署场景</td><td>包含在RaaS中</td></tr>
+<tr><td>Cassie（历史产品）</td><td>双足研究平台</td><td>2017年发布，首个商业化双足机器人（面向学术界）</td><td>学术研究</td><td>已停售</td></tr>
+</table></div>
+
+<h3 id="scenarios">1.6 应用场景</h3>
+<div class="table-wrapper"><table class="wikitable">
+<tr><th>场景分类</th><th>具体场景</th><th>客户/合作方</th><th>部署状态</th></tr>
+<tr><td>物流仓储</td><td>周转箱筛选、AMR到传送带转运、容器卸垛</td><td>Amazon、GXO Logistics（30万+订单/10万+周转箱）、Mercado Libre</td><td>持续付费运营</td></tr>
+<tr><td>汽车/工业制造</td><td>轴承搬运、产线物料补给</td><td>Schaeffler（8小时轮班制）、Toyota Motor Manufacturing Canada</td><td>商业部署中</td></tr>
+<tr><td>系统集成</td><td>仓储自动化方案整合</td><td>Zion Solutions Group</td><td>合作中</td></tr>
+</table></div>
+
+<h3 id="commercial">1.7 商业化进展</h3>
+<p>Agility Robotics是全球人形机器人赛道中商业化进度最领先的企业——没有之一。截至2026年3月，Digit已在以下客户处产生实际的付费商业部署：Amazon（物流仓库中筛选和搬运周转箱）、GXO Logistics（佐治亚州物流中心，累计处理超10万个周转箱/30万个订单——这是全球首个人形机器人RaaS合同）、Schaeffler（南卡罗来纳州工厂，Digit已实现8小时轮班制，搬运25磅轴承篮，无人工监督）、Toyota Motor Manufacturing Canada（2026年2月签署商业协议，Toyota最大的日本以外工厂）、Mercado Libre（拉美电商/金融科技新增客户）。</p>
+<p>商业模式采用RaaS（机器人即服务，客户按月付费，Agility保留所有权）和整机销售双轨并行。RaaS定价约$30/小时（对标美国人工全成本），客户目标回报期为两年。整机售价约$25万/台。当前运营成本$10—$12/小时，目标降至$2—$3/小时。RoboFab工厂设计产能从数百台起步扩至年产10,000+台。</p>
+
+<h3 id="finance">1.8 财务数据</h3>
+<div class="table-wrapper"><table class="wikitable">
+<tr><th>指标</th><th>2024年</th><th>2025年</th><th>2026年</th></tr>
+<tr><td>估值</td><td>$10亿（C轮）</td><td>$17.5—21亿（C-3轮）</td><td>约$17.5—21亿</td></tr>
+<tr><td>累计融资</td><td>~$2.8亿</td><td>~$6.4—6.83亿</td><td>~$6.8亿</td></tr>
+<tr><td>Digit部署数</td><td>~10—30台</td><td>~100—150台</td><td>持续增长</td></tr>
+<tr><td>Digit运营成本</td><td>—</td><td>$10—$12/小时</td><td>目标$2—$3/小时</td></tr>
+<tr><td>员工</td><td>~250</td><td>~273—500</td><td>~300—500+</td></tr>
+</table></div>
+<p>注：Agility未公开披露营收数据。单位经济数据（$30/小时RaaS定价、$10—$12/小时运营成本）来自公开采访和媒体报道。公司尚处亏损阶段。</p>
+
+<h3 id="other">1.9 其他信息</h3>
+<ul>
+<li>2026年3月，公司将品牌从"Agility Robotics"简化为"Agility"，首席商务官Daniel Diez表示这一更名标志着"已准备好超越当前部署规模"</li>
+<li>Agility是全球唯一拥有自建人形机器人工厂（RoboFab）的企业</li>
+<li>2022年，公司联合Boston Dynamics等发布"不武器化"承诺</li>
+<li>Digit已通过OSHA认可的NRTL现场安全审查，可在人工环境中运行</li>
+<li>公司曾于Ford合作试点末端配送（2019年），项目后被终止——这是公司最大的场景试错</li>
+<li>Agility是Amazon Industrial Innovation Fund的首批被投企业之一</li>
+<li>2025年NVIDIA NVentures投资后，公司开始大量利用Isaac Sim/Isaac Lab进行Digit全身控制器的仿真训练</li>
+</ul>
+
+<h2 id="analysis">2 分析层</h2>
+
+<div class="analysis-block" id="a2-1">
+<h4>2.1 团队背景与场景选择的匹配度</h4>
+<p>Jonathan Hurst的学术背景（OSU动态机器人实验室，双足动态行走研究）直接决定了Digit的核心形态——反关节腿设计源自对鸵鸟/鸟类下肢运动力学的深入研究。这种"学术基因"使Agility在双足行走稳定性上具有先发优势，但也让Digit的形态（尤其是反关节腿）在美学上不如图Figure AI和Tesla Optimus的"直腿"设计更具大众接受度。2024年引入Peggy Johnson是一个关键节点：她的Microsoft（企业BD/风投）+Qualcomm（24年通信硬件）+Magic Leap（AR企业化转型）的"产业铁三角"履历，恰好覆盖了Agility从R&D走向规模商业化所需的全部能力拼图——企业销售、供应链管理、品牌建设。这一人事安排明确表明Agility选择了"商业化优先于技术炫技"的路径。</p>
+</div>
+
+<div class="analysis-block" id="a2-2">
+<h4>2.2 技术路线与场景的适配性</h4>
+<p>Digit的反关节"鸵鸟腿"设计是Agility技术路线中最具争议也最具特色的选择。从场景适配角度看，这一设计在仓库环境中具有明确优势：后弯膝盖使机器人可以在狭窄货架间更紧凑地转身，下蹲拾取地面物品时上身保持水平（方便搬运），爬楼梯时步伐更自然。然而，这一设计的代价也很明显：反关节腿的非人类外观限制了Digit向面向消费者的场景（零售、酒店、家庭）拓展的可能性。Agility的技术专注度在行业中堪称最高——不做灵巧手（只有电动夹爪），不做通用AI大脑（深耕全身运动控制+强化学习），不做消费场景——这种"做减法"的技术策略使其在物流搬运这一具体任务上建立了深厚的工程护城河。</p>
+</div>
+
+<div class="analysis-block" id="a2-3">
+<h4>2.3 股东/资本结构对战略的影响</h4>
+<p>Amazon Industrial Innovation Fund作为投资方和最大部署方的双重身份，是Agility资本市场故事中最大的双刃剑。正面效应：Amazon提供了全球最丰富的物流场景数据和真实测试环境，使Digit成为第一个在真实仓库中产生付费营收的人形机器人。负面效应：Amazon也是全球最大的仓储自动化采购方，其与Agility的绑定可能限制Digit向Amazon的竞争对手（Walmart、京东物流、Shopee等）销售。软银的参投提供了全球分销渠道（尤其是在日本和亚洲市场），NVIDIA的加入则保证了仿真训练基础设施的持续供给。值得注意的是，与Neura Robotics不同，Agility的股东结构中没有加密资本——其$6.8亿融资全部来自深度科技VC（DCVC）和产业资本（Amazon、Schaeffler、软银），资本结构更为稳健。</p>
+</div>
+
+<div class="analysis-block" id="a2-4">
+<h4>2.4 试错过程与路径调整</h4>
+<p>Agility最显著的路径调整是2019年Ford末端配送试点的终止。当时Digit被用于"最后一公里"包裹配送场景——从配送车取下包裹步行送到客户门口。这一试点最终未转化为商业合同，主要原因推测包括：户外非结构化环境对双足机器人的挑战远超室内仓库、末端配送的单位经济效益难以与人类快递员竞争、行人安全与监管不确定性。这次"失败"实际上是Agility后来成功的最重要铺垫：公司果断砍掉消费/末端配送方向，All-in物流仓库内物料搬运。此后的产品迭代完全围绕"周转箱搬运"这一单一任务优化——从Cassie研究平台→Digit v1通用人形→Digit v2物流专用→下一代协同安全Digit，每一步都更聚焦、更务实。</p>
+</div>
+
+<div class="analysis-block" id="a2-5">
+<h4>2.5 竞争定位与取舍</h4>
+<p>Agility在人形机器人竞争格局中做出了最清晰的取舍：做"仓库里的iPod"而非"全能iPhone"。Figure AI的定位是"通用人形机器人，最终走进家庭"，Tesla Optimus的定位是"替代工厂所有重复劳动"。而Agility的定位精准到近乎狭窄——"从AMR搬周转箱到传送带"这一项任务。这一定位的商业逻辑是：物流仓库中有数以百万计的"物料搬运工"岗位空缺（美国仓库工人年离职率超过40%），即使只解决这一个任务，市场规模也足以支撑一家百亿美元级公司。Agility不追求灵巧手、不看消费市场、不做"通用大脑"——这些取舍在融资叙事上可能不如竞争对手性感，但在商业落地上却是最务实的选择。其核心赌注是：人形机器人的第一波价值不在C端，甚至不在通用工业制造，而在物流搬运这一有明确ROI计算和即时劳动力短缺的场景。</p>
+</div>
+
+<div class="analysis-block" id="a2-6">
+<h4>2.6 其他重要观察、分析</h4>
+<p>第一，Agility的"全球首款协同安全人形机器人"认证努力（2026年目标）如果成功，将是一个重要的监管里程碑——这可能使其成为第一个不需要安全护栏就能与人类在同一空间工作的双臂人形机器人，在竞争对手中建立先发监管优势。第二，公司从"Agility Robotics"更名为"Agility"的时机（2026年3月）值得注意——这通常是一家公司准备IPO或重大市场推广的信号（类似Google→Alphabet，Facebook→Meta）。第三，Digit的$25万单价和$30/小时RaaS定价在当前阶段仍远高于美国仓库工人$18—$22/小时的综合成本。只有当运营成本降至$2—$3/小时（目标路径），Digit才能在经济性上取得突破。第四，中国低价竞争者（如宇树科技Unitree的$1.6万人形机器人）的崛起可能对Digit的定价构成中长期压力——如果中国厂商能以显著更低的价格提供类似物流搬运能力，Agility可能被迫加速降价。</p>
+</div>
+
+<h2 id="references">3 参考资料</h2>
+<div class="references">
+<ol>
+<li><a href="https://en.wikipedia.org/wiki/Agility_Robotics" target="_blank">Wikipedia — Agility Robotics</a></li>
+<li><a href="https://pitchbook.com/profiles/company/171265-96#overview" target="_blank">PitchBook — Agility Robotics Company Profile (2026)</a></li>
+<li><a href="https://www.startengine.com/offering/agility-robotics" target="_blank">StartEngine — Invest in Agility Robotics (Secondary Market)</a></li>
+<li><a href="https://tsginvest.com/agility-robotics/" target="_blank">TSG Invest — Agility Robotics Stock: $2.1B Valuation Analysis</a></li>
+<li><a href="https://www.ipo.club/deals/agility-robotics" target="_blank">IPO CLUB — Agility Robotics Deal Profile</a></li>
+<li><a href="https://interestingengineering.com/ai-robotics/agility-humanoid-robot-maker-rebrands" target="_blank">Interesting Engineering — Agility Rebrands as Factories Face Labor Gaps (Mar 2026)</a></li>
+<li><a href="https://theaiinsider.tech/2026/03/06/humanoid-robot-maker-agility-robotics-rebrands-becomes-agility/" target="_blank">The AI Insider — Agility Robotics Rebrands, Becomes Agility (Mar 2026)</a></li>
+<li><a href="https://robohorizon.cn/zh/news/2026/03/digit-humanoid-schaeffler-factory/" target="_blank">RoboHorizon — Digit人形机器人现已在舍弗勒工厂开启8小时轮班模式 (Mar 2026)</a></li>
+<li><a href="https://www.ien.com/operations/news/22961007/toyota-to-deploy-robots-in-its-largest-factory-outside-of-japan" target="_blank">IEN — Toyota to Deploy Robots in Its Largest Factory Outside of Japan (Feb 2026)</a></li>
+<li><a href="https://www.therobotreport.com/veteran-tech-exec-peggy-johnson-named-agility-robotics-ceo/" target="_blank">The Robot Report — Peggy Johnson named Agility Robotics CEO (Mar 2024)</a></li>
+<li><a href="https://www.oregonlive.com/silicon-forest/2024/03/oregon-startup-agility-robotics-names-former-microsoft-exec-peggy-johnson-ceo.html" target="_blank">OregonLive — Agility Robotics names former Microsoft exec Peggy Johnson CEO (Mar 2024)</a></li>
+<li><a href="https://www.163.com/dy/article/KRJ82P8605568W0A.html" target="_blank">网易 — 具身智能美国五强，谁是背后的VC推手？</a></li>
+<li><a href="http://www.jushenyanxishe.com/archives/498906" target="_blank">具身研习社 — 第一家能赚钱的人形企业，回来了</a></li>
+<li><a href="https://www.sohu.com/a/762014987_99985415" target="_blank">搜狐 — 对手还在卷Demo，他们已经开卷CEO了</a></li>
+<li><a href="https://www.post-gazette.com/business/tech-news/2024/03/04/humanoid-agility-peggy-johnson-ceo-microsoft-ai-damion-shelton/stories/202403040050" target="_blank">Pittsburgh Post-Gazette — Agility names former Microsoft exec Peggy Johnson as new CEO</a></li>
+<li><a href="https://retailtechinnovationhub.com/home/2024/3/5/agility-robotics-appoints-technology-veteran-peggy-johnson-as-chief-executive-officer-for-next-phase-of-growth" target="_blank">Retail Tech Innovation Hub — Agility appoints Peggy Johnson as CEO</a></li>
+<li><a href="https://forbeschina.com/business/60461" target="_blank">Forbes China — 亚马逊的新产业创新基金都投资了哪些初创公司？</a></li>
+<li><a href="https://robot.ofweek.com/2024-03/ART-8321200-8100-30627882.html" target="_blank">OFweek机器人 — 人形机器人制造商突发换帅，备战大规模量产</a></li>
+<li><a href="https://baike.baidu.com/item/Agility%20Robotics/65295709" target="_blank">百度百科 — Agility Robotics</a></li>
+<li><a href="https://xix.ai/ainews/agility-robotics-launches-new-brand-identity-as-humanoid-robot-developer.html" target="_blank">XIX.ai — Agility Robotics Launches New Brand Identity</a></li>
+<li><a href="https://ainext.tw/companies/agility-robotics/" target="_blank">AI Next — Agility Robotics Company Profile</a></li>
+</ol>
+</div>
+    </article>
+  </div>
+  <div class="page-footer">本页面最后更新于2026年5月4日 · 数据来源均标注于参考资料 · 具身智能Wiki项目</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

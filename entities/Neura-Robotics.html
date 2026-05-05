@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>Neura Robotics — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> <span class="breadcrumb-sep">›</span> <span>Neura Robotics</span></div>
+  <div class="wiki-header"><h1>Neura Robotics</h1><div class="subtitle">NEURA Robotics GmbH · 未上市 · 2019年成立 · €40亿估值 · 德国最大人形机器人独角兽</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#founders">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#finance">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl3"><a href="#a2-1">2.1 团队背景与场景选择</a></li>
+        <li class="toc-lvl3"><a href="#a2-2">2.2 技术路线与场景适配</a></li>
+        <li class="toc-lvl3"><a href="#a2-3">2.3 股东/资本结构影响</a></li>
+        <li class="toc-lvl3"><a href="#a2-4">2.4 试错与路径调整</a></li>
+        <li class="toc-lvl3"><a href="#a2-5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl3"><a href="#a2-6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#references">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">Neura Robotics</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">NEURA Robotics GmbH</div></div>
+        <div class="ib-row"><div class="ib-label">成立</div><div class="ib-value">2019年</div></div>
+        <div class="ib-row"><div class="ib-label">总部</div><div class="ib-value">德国梅青根 (Metzingen)</div></div>
+        <div class="ib-row"><div class="ib-label">研发中心</div><div class="ib-value">瑞士苏黎世</div></div>
+        <div class="ib-row"><div class="ib-label">创始人/CEO</div><div class="ib-value">David Reger</div></div>
+        <div class="ib-row"><div class="ib-label">员工</div><div class="ib-value">~1,200人（45国）</div></div>
+        <div class="ib-section">财务数据</div>
+        <div class="ib-row"><div class="ib-label">估值（2026.3）</div><div class="ib-value">~€40亿（~$46亿）</div></div>
+        <div class="ib-row"><div class="ib-label">累计融资</div><div class="ib-value">~$14.4亿</div></div>
+        <div class="ib-row"><div class="ib-label">2025年营收</div><div class="ib-value">~$11.6亿（含收购并表）</div></div>
+        <div class="ib-row"><div class="ib-label">订单积压</div><div class="ib-value">€10亿+</div></div>
+        <div class="ib-section">估值/市值</div>
+        <div class="ib-row"><div class="ib-label">最新估值</div><div class="ib-value">~€40亿（2026.3）</div></div>
+        <div class="ib-row"><div class="ib-label">B轮估值</div><div class="ib-value">~$10亿（2025.1）</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">投资方</div><div class="ib-value">Tether, Amazon, Qualcomm, Bosch, Schaeffler, Volvo等22家</div></div>
+        <div class="ib-row"><div class="ib-label">旗舰产品</div><div class="ib-value">4NE-1人形机器人、MiPA、MAiRA协作臂</div></div>
+        <div class="ib-row"><div class="ib-label">2030年目标</div><div class="ib-value">年产500万台认知机器人</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">类别</div><div class="ib-value"><span class="tag">人形机器人</span><span class="tag">认知机器人</span><span class="tag">协作机器人</span></div></div>
+        <div class="ib-section">官网</div>
+        <div class="ib-row"><div class="ib-label">官网</div><div class="ib-value"><a href="https://neura-robotics.com" target="_blank">neura-robotics.com</a></div></div>
+      </aside>
+      <p class="article-intro">Neura Robotics（全称NEURA Robotics GmbH）是一家总部位于德国梅青根、研发中心设在瑞士苏黎世的认知机器人公司，由David Reger于2019年创立。公司以"认知机器人"（Cognitive Robotics）概念为核心，致力于打造具备视觉、听觉和触觉感知能力的通用机器人。旗下产品矩阵覆盖人形机器人4NE-1、模块化服务机器人MiPA、协作机械臂MAiRA、四足机器人及自动驾驶物流车MAV。2026年3月完成由Tether领投的约€10亿战略融资后，估值跃升至约€40亿，成为欧洲估值最高的人形机器人公司。公司2025年拥有约€10亿订单积压，目标到2030年生产500万台认知机器人。</p>
+
+<h2 id="facts">1 事实层</h2>
+
+<h3 id="basic">1.1 公司基本信息</h3>
+<div class="table-wrapper"><table class="wikitable infotable">
+<tr><th>项目</th><th>内容</th></tr>
+<tr><td>公司全称</td><td>NEURA Robotics GmbH</td></tr>
+<tr><td>英文名称</td><td>NEURA Robotics</td></tr>
+<tr><td>成立时间</td><td>2019年</td></tr>
+<tr><td>注册地</td><td>德国巴登-符腾堡州梅青根</td></tr>
+<tr><td>上市情况</td><td>未上市（私募阶段）</td></tr>
+<tr><td>官方网站</td><td>https://neura-robotics.com</td></tr>
+<tr><td>主营业务</td><td>认知人形机器人、协作机器人、自动驾驶物流机器人、机器人AI平台</td></tr>
+<tr><td>全球布局</td><td>8个办公室分布于德国、瑞士、中国（杭州）、日本、美国等地</td></tr>
+</table></div>
+
+<h4>发展沿革</h4>
+<div class="table-wrapper"><table class="wikitable">
+<tr><th>时间</th><th>事件</th></tr>
+<tr><td>2019年</td><td>David Reger在德国梅青根创立Neura Robotics</td></tr>
+<tr><td>2021年</td><td>发布全球首款"认知"协作机器人MAiRA，集成视觉、听觉与触觉传感器</td></tr>
+<tr><td>2023年</td><td>推出模块化服务机器人MiPA；团队规模约300人</td></tr>
+<tr><td>2024年</td><td>发布4NE-1人形机器人概念，加入NVIDIA人形机器人开发者计划</td></tr>
+<tr><td>2025年1月</td><td>完成€1.2亿B轮融资，估值约$10亿，投资方含Exor/Volvo；订单积压€10亿</td></tr>
+<tr><td>2025年5月</td><td>收购B.A.H. Industrial Solutions，拓展电气设备能力</td></tr>
+<tr><td>2025年10月</td><td>收购德国AGV公司ek robotics GmbH（60年历史、~€6000万年营收、300员工）；杭州子公司开业，计划€1.35亿投资</td></tr>
+<tr><td>2025年11月</td><td>与Schaeffler建立人形机器人关键部件战略联盟</td></tr>
+<tr><td>2025年12月</td><td>发布四足机器人Neural Quadruped和4NE-1 Mini小型人形机器人</td></tr>
+<tr><td>2026年1月</td><td>CES 2026旗舰展示，与AWS达成云基础设施战略合作；4NE-1亮相亚马逊物流试用</td></tr>
+<tr><td>2026年3月</td><td>完成约€10亿战略融资（Tether领投，Amazon/Qualcomm/Bosch/Schaeffler参投），估值跃至约€40亿</td></tr>
+<tr><td>2026年</td><td>苏黎世1800m²研发中心启用；员工总数达1,200人</td></tr>
+</table></div>
+
+<h3 id="founders">1.2 创始人及核心团队</h3>
+<p>Neura Robotics由David Reger创立并担任CEO。Reger具有独特的跨领域背景：出身德国技术模型工匠/机械工程师，2009—2013年在旧金山从事社会服务工作，帮助无家可归者和药物成瘾者；2013—2019年在瑞士MABI Robotic工作，积累了工业AGV和协作机器人的全栈经验。他的团队声称曾在2011年（早于KUKA）推出工业协作机器人。Reger现为德国经济参议院、欧洲经济与技术参议院成员，其个人哲学"我们服务人类"（We Serve Humanity）贯穿公司品牌叙事。</p>
+<div class="table-wrapper"><table class="wikitable">
+<tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+<tr><td>创始人/CEO</td><td>David Reger</td><td>德国机械工程师；2009—2013年旧金山社工；2013—2019年MABI Robotic；自称"认知机器人"概念提出者</td></tr>
+<tr><td>核心技术团队</td><td>—</td><td>来自ETH Zurich机器人实验室、Bosch、Daimler等德国工业巨头，团队整体为产业派+学术派混合型</td></tr>
+</table></div>
+<p>团队规模从2023年约300人急速扩张至2026年约1,200人，来自45个国家，分布于8个全球办公室。研发人员占比据估计超过60%（基于苏黎世R&D中心规模和NVIDIA/Qualcomm合作深度推断）。团队以德国精密制造传统叠加硅谷式快速扩张文化为特色。</p>
+
+<h3 id="funding">1.3 融资与股东</h3>
+<div class="table-wrapper"><table class="wikitable">
+<tr><th>轮次</th><th>时间</th><th>金额</th><th>领投/核心投资方</th><th>估值</th></tr>
+<tr><td>种子轮/早期</td><td>2019—2023</td><td>未披露</td><td>早期天使及风投</td><td>—</td></tr>
+<tr><td>B轮</td><td>2025年1月</td><td>€1.2亿（~$1.3亿）</td><td>Lingotto Investment (Exor/Agnelli家族)，Volvo Cars Tech Fund，Delta Electronics，HV Capital，L-Bank等</td><td>~$10亿</td></tr>
+<tr><td>战略融资</td><td>2026年3月</td><td>~€10亿（~$12亿）</td><td>Tether Holdings（USDT稳定币发行方），Amazon，Qualcomm Ventures，Bosch，Schaeffler</td><td>~€40亿（~$46亿）</td></tr>
+</table></div>
+<p>截至2026年4月，累计融资约$14.4亿—$21亿（各来源口径略有差异）。总计22家机构投资方，包括Amazon Industrial Innovation Fund、Bosch Ventures、Qualcomm Ventures、Prime Capital等。公司未上市。</p>
+<div class="table-wrapper"><table class="wikitable">
+<tr><th>投资方</th><th>类型</th><th>战略意义</th></tr>
+<tr><td>Tether Holdings</td><td>战略投资者（加密货币）</td><td>领投€10亿轮次，标志着加密资本向物理AI的多元化布局</td></tr>
+<tr><td>Amazon/AWS</td><td>产业资本+云合作伙伴</td><td>既是投资方也是物流部署客户；AWS提供云基础设施</td></tr>
+<tr><td>Qualcomm Ventures</td><td>芯片/技术战略</td><td>Dragonwing IQ10处理器，边缘AI"大脑+神经系统"架构</td></tr>
+<tr><td>Bosch</td><td>产业资本</td><td>联合开发AI核心软件、传感器、驱动系统及真实场景数据采集</td></tr>
+<tr><td>Schaeffler</td><td>产业资本+采购方</td><td>人形机器人关节减速器联合开发；承诺全球工厂部署</td></tr>
+<tr><td>Volvo Cars Tech Fund</td><td>产业资本</td><td>汽车制造场景入口</td></tr>
+</table></div>
+
+<h3 id="tech">1.4 技术路线</h3>
+<div class="table-wrapper"><table class="wikitable infotable">
+<tr><th>技术维度</th><th>内容</th></tr>
+<tr><td>总体AI架构</td><td>全栈"认知机器人"：感知-推理-执行一体化，强调物理AI（理解重力、摩擦、惯性等物理规律），不依赖纯云端推理</td></tr>
+<tr><td>核心AI平台</td><td>NeuRAverse云平台（基于NVIDIA Isaac GR00T XX基础模型 + Isaac Sim/Lab仿真），Aura AI上下文智能引擎</td></tr>
+<tr><td>数据方案</td><td>NeuRA Gym真实世界训练数据采集 + 共享学习网络：单机学到的技能即时同步到全机队</td></tr>
+<tr><td>全栈/专用路线</td><td>全栈自研："One-Device"哲学——硬件+传感器+AI软件垂直整合，对标Apple模式</td></tr>
+<tr><td>芯片合作</td><td>Qualcomm Dragonwing IQ10边缘AI处理器 → "大脑+神经系统"架构，降低云端依赖</td></tr>
+<tr><td>仿真平台</td><td>NVIDIA Isaac Sim + Isaac Lab（数字孪生仿真与强化学习训练）</td></tr>
+<tr><td>传感器方案</td><td>自研SenseKit多模态传感器模块（可为第三方机器人加装），360°感知（4NE-1 Gen 3）</td></tr>
+</table></div>
+<p>Neura Robotics的技术路线核心是"Physical AI"而非纯软件AI。其NeuRAverse平台定位为机器人领域的"App Store"，通过开放生态实现跨设备技能共享，与Tesla全封闭路线形成差异化。在芯片层面通过与Qualcomm的深度合作构建边缘AI优势，在仿真层面与NVIDIA深度绑定。</p>
+
+<h3 id="products">1.5 产品形态</h3>
+<div class="table-wrapper"><table class="wikitable">
+<tr><th>产品</th><th>类别</th><th>关键参数</th><th>适用场景</th><th>参考价格</th></tr>
+<tr><td>4NE-1</td><td>全尺寸人形机器人</td><td>高1.8m，重80kg，负载15kg（部分配置达220磅），速度~3mph，360°感知，自然语言交互</td><td>工业制造、物流仓储</td><td>未公布</td></tr>
+<tr><td>4NE-1 Mini</td><td>小型人形机器人</td><td>高52英寸（~132cm），自然语言交互，计算机视觉，强化学习</td><td>科研、教育、轻量服务</td><td>€19,999（标准）/ €29,999（Pro）</td></tr>
+<tr><td>MiPA</td><td>模块化服务机器人</td><td>可定制化（背包、桌面、工具模块），多用途平台</td><td>家庭、轻商业服务</td><td>未公布</td></tr>
+<tr><td>MAiRA</td><td>认知协作机械臂</td><td>全球首款"认知"cobot，可视化编程界面（无需编程代码），集成视觉/听觉/触觉</td><td>工业制造、精密装配</td><td>未公布</td></tr>
+<tr><td>LARA</td><td>轻量级机器人助手</td><td>轻量设计</td><td>多场景辅助</td><td>未公布</td></tr>
+<tr><td>MAV</td><td>自动驾驶物流车</td><td>载重1.5吨</td><td>工厂内物流、仓储运输</td><td>未公布</td></tr>
+<tr><td>Neural Quadruped</td><td>四足机器人</td><td>高&lt;1m，负载48.5磅，多传感器融合，360°环境视觉</td><td>复杂地形巡检、船舶焊接</td><td>€50,000</td></tr>
+<tr><td>SenseKit</td><td>传感器模块</td><td>可为第三方机器人加装的多模态传感套件</td><td>机器人升级</td><td>未公布</td></tr>
+<tr><td>NeuRAverse</td><td>云AI平台</td><td>机器人技能市场+NEURA Sync（设备通信）+NEURA Gym（训练）+Aura AI</td><td>全产品线</td><td>订阅制</td></tr>
+</table></div>
+
+<h3 id="scenarios">1.6 应用场景</h3>
+<div class="table-wrapper"><table class="wikitable">
+<tr><th>场景分类</th><th>具体场景</th><th>对应产品</th><th>合作方/客户</th></tr>
+<tr><td>工业制造</td><td>工厂内物料搬运、精密装配、质检</td><td>MAiRA、4NE-1</td><td>Schaeffler、Volvo Cars、Bosch</td></tr>
+<tr><td>物流仓储</td><td>仓库拣选、传送带上下料、AGV运输</td><td>4NE-1、MAV、ek robotics AGV</td><td>Amazon/AWS、Kawasaki Heavy、Omron</td></tr>
+<tr><td>船舶制造</td><td>船体焊接、船舱巡检</td><td>Neural Quadruped</td><td>HD Hyundai</td></tr>
+<tr><td>商业服务</td><td>商场导引、办公助理</td><td>MiPA</td><td>多行业客户</td></tr>
+<tr><td>科研教育</td><td>机器人研究、高校教学</td><td>4NE-1 Mini</td><td>ETH Zurich等高校</td></tr>
+<tr><td>家庭/消费</td><td>家庭助理概念阶段</td><td>MiPA、4NE-1</td><td>长期愿景</td></tr>
+</table></div>
+
+<h3 id="commercial">1.7 商业化进展</h3>
+<p>Neura Robotics在商业化方面展现出欧洲机器人公司中罕见的激进增长姿态。2025年公司拥有约€10亿（~$10亿）的订单积压，主要来自日本市场客户Kawasaki Heavy Industries和Omron Corp。2025年营收据CB Insights数据约为$11.6亿（含收购并表因素）。公司通过收购ek robotics（€6000万年营收）将产品线拓展至AGV/物流机器人领域。</p>
+<p>2025—2026年的商业里程碑包括：Amazon将4NE-1部署于仓库/物流试用；Schaeffler承诺在其全球工厂部署人形机器人；与SAP合作仓库管理系统集成（自主拣选）；2026年CES展后与AWS签署云基础设施战略合作协议。公司2026年提出"到2030年生产500万台认知机器人"的宏大目标，但该目标在当前产能和供应链条件下备受市场质疑。</p>
+
+<h3 id="finance">1.8 财务数据</h3>
+<div class="table-wrapper"><table class="wikitable">
+<tr><th>指标</th><th>2024年</th><th>2025年</th><th>2026年（预测）</th></tr>
+<tr><td>营收</td><td>未公开</td><td>~$11.6亿（含ek robotics并表）</td><td>未披露</td></tr>
+<tr><td>订单积压</td><td>—</td><td>~€10亿</td><td>持续增长</td></tr>
+<tr><td>估值</td><td>—</td><td>$10亿（B轮）→ €40亿（战略轮）</td><td>约€40亿</td></tr>
+<tr><td>员工</td><td>~300</td><td>600—1,100</td><td>~1,200</td></tr>
+<tr><td>账面资金</td><td>—</td><td>~€10亿+（2026年3月融资后）</td><td>充沛</td></tr>
+</table></div>
+<p>注：因公司未上市，财务数据主要来自CB Insights、PitchBook及公开融资公告，部分数据含估算成分。$11.6亿营收数据来自单一来源（CB Insights），含收购并表影响，需审慎对待。</p>
+
+<h3 id="other">1.9 其他信息</h3>
+<ul>
+<li>Neura Robotics在德国和中国（杭州）设有双总部模式，中国子公司投资计划€1.35亿，包含智能机器人训练中心</li>
+<li>公司与印度Sona Comstar签署制造合作伙伴关系，探索印度市场的本地化生产</li>
+<li>公司收购了拥有60年历史的德国AGV企业ek robotics GmbH，保留其独立品牌运营</li>
+<li>2025年收购了Huber Automotive开发部门，向消费产品领域拓展</li>
+<li>Neura Robotics定位为"欧洲人形机器人冠军"，刻意对标Tesla Optimus，强调欧盟数据合规与安全标准的"合规护城河"</li>
+<li>公司曾传出€80—100亿估值的融资传闻，最终落地为约€40亿</li>
+<li>CEO David Reger曾在旧金山从事社会服务工作，其"We Serve Humanity"口号与特斯拉"让人类免于危险工作"形成差异化叙事</li>
+</ul>
+
+<h2 id="analysis">2 分析层</h2>
+
+<div class="analysis-block" id="a2-1">
+<h4>2.1 团队背景与场景选择的匹配度</h4>
+<p>David Reger的混合背景（德国精密制造技工+旧金山社工+瑞士机器人产业经验）塑造了Neura Robotics独特的"产业务实主义+社会使命"双重叙事。他的MABI Robotic履历赋予公司工业AGV和协作机器人的全栈工程能力，这直接支撑了公司从MAiRA协作臂→4NE-1人形机器人的多产品线布局。团队同时吸纳了ETH Zurich学术资源（苏黎世研发中心邻近ETH机器人实验室）和Bosch/Daimler等德国工业巨头的人才，形成"学术前沿+产业落地"的混合人才结构。这种结构使其能在工业制造场景（Schaeffler工厂部署、Volvo合作）中快速验证技术，同时保持前沿AI研发能力。值得注意的是，Reger非传统的社工经历使公司在品牌叙事上与竞争对手形成明显差异，吸引了对"技术向善"叙事敏感的欧洲资本和政策支持。</p>
+</div>
+
+<div class="analysis-block" id="a2-2">
+<h4>2.2 技术路线与场景的适配性</h4>
+<p>Neura Robotics的"认知机器人"概念本质上是对物理AI的全栈追求——机器人不仅需要AI大脑，还需要理解物理世界的重力、摩擦和惯性。这一路线与工业制造和物流场景高度适配，因为这些场景恰恰要求机器人在非结构化环境中进行精准物理交互。然而，公司同时向消费级产品（MiPA、4NE-1 Mini）和重工业（船舶焊接四足机器人）两个方向拓展，场景跨度极大。NeuRAverse的"共享学习网络"概念在理论上能降低多场景拓展的边际成本——一个机器人在工厂学会的抓取技能可即时同步给家庭服务机器人——但在实践中，不同场景的技能可迁移性高度存疑。公司在NVIDIA（仿真）和Qualcomm（边缘AI芯片）两个技术栈上同时深度绑定，形成了双重依赖，在供应链多元化方面存在单点风险。</p>
+</div>
+
+<div class="analysis-block" id="a2-3">
+<h4>2.3 股东/资本结构对战略的影响</h4>
+<p>Neura Robotics的股东结构呈现出极不寻常的组合：Tether（加密货币稳定币发行方）作为最大战略投资者领投约€10亿——这在硬件/机器人领域几乎史无前例。Tether的参投带来了充裕资本（公司2026年融资后账面资金约€10亿+），但也将公司置于加密资产波动性和监管不确定性的阴影之下。Amazon/AWS的参与既是财务投资也是客户绑定——类似于Agility Robotics与Amazon的关系，这可能限制了公司向Amazon竞争对手（如Walmart、京东物流）获取客户的自由度。Bosch和Schaeffler作为德国产业资本的双重参与，为公司提供了可靠的零部件供应链和首批部署场景，但也可能在定价权和部件标准化方面形成约束。Qualcomm的角色（芯片供应+投资）进一步加强了技术栈锁定。</p>
+</div>
+
+<div class="analysis-block" id="a2-4">
+<h4>2.4 试错过程与路径调整</h4>
+<p>Neura Robotics的发展轨迹显示出明显的"平台+多品类"扩张模式，而非单一品类深耕。从MAiRA协作臂（2021）→MiPA服务机器人（2023）→4NE-1人形机器人（2024）→收购ek robotics AGV业务（2025）→发布四足机器人（2025）→CES 2026发布4NE-1 Mini和NeuRAverse平台，公司在5年内完成了从单一工业机器人向全品类机器人平台的战略跃迁。这种"先建平台、再铺品类"的路径与Apple模式（iOS先建生态系统，再推iPhone/iPad/Mac）具有表面相似性，但机器人硬件的跨品类技术复用度远低于消费电子。收购ek robotics可视为对AGV/物流能力的快速补齐——与其自研不如并购成熟资产，这反映了务实的一面。公司约€10亿的巨额融资使试错空间极大，但也加大了"烧钱试错"的风险。</p>
+</div>
+
+<div class="analysis-block" id="a2-5">
+<h4>2.5 竞争定位与取舍</h4>
+<p>Neura Robotics在竞争格局中的核心定位可类比为"欧洲的Apple + Android混合体"：硬件走Apple式垂直整合路线（"One-Device"哲学），生态走Android式开放平台路线（NeuRAverse技能市场）。这与Tesla Optimus的完全封闭路线和Figure AI的专注通用人形路线形成三角差异化。公司最显著的取舍是"平台优先于产品"——在单一人形产品尚未稳定量产的阶段就同步推进四足、协作臂、服务机器人、AGV等多条产品线。这一策略的赌注在于：机器人市场的最终赢家将是拥有最丰富数据和最广泛场景覆盖的平台方，而非某一品类的单项冠军。然而，这种多线作战策略在资本效率方面受到质疑，尤其是面对Figure AI（专注单一通用人形）和Agility Robotics（专注物流人形）等更聚焦的竞争对手时。</p>
+</div>
+
+<div class="analysis-block" id="a2-6">
+<h4>2.6 其他重要观察、分析</h4>
+<p>第一，Tether的战略投资值得特别关注。作为全球最大稳定币发行方（2024年利润$134亿），Tether进入物理AI领域标志着加密资本正在寻找AI硬件的"实体经济锚点"。这一交易如果成功，可能引发加密资本对人形机器人赛道的新一轮涌入。第二，Neura Robotics的"欧洲合规护城河"（EU数据隐私+安全标准）可能在全球监管趋严的背景下转化为实际竞争壁垒——尤其是在医疗、核电等高度监管场景。第三，公司"2030年500万台"的目标在当前年产可能不足千台的现实下显得极度激进，更像是融资叙事而非实际产能规划。第四，Neura Robotics在中国杭州的双总部布局引人注目——在欧美日益收紧对华技术出口管制的背景下，同时运营欧洲和中国两个实体可能面临地缘政治合规挑战。</p>
+</div>
+
+<h2 id="references">3 参考资料</h2>
+<div class="references">
+<ol>
+<li><a href="https://neura-robotics.com/company-about-us/" target="_blank">NEURA Robotics — About Us (Official)</a></li>
+<li><a href="https://neura-robotics.com/neura-robotics-at-ces-2026/" target="_blank">NEURA Robotics at CES 2026 (Official)</a></li>
+<li><a href="https://neura-robotics.com/neura-robotics-secures-euro-120-million-series-b/" target="_blank">NEURA Robotics Secures €120 Million Series B (Official, Jan 2025)</a></li>
+<li><a href="https://pitchbook.com/profiles/company/459542-98" target="_blank">PitchBook — Neura Robotics Company Profile (2026)</a></li>
+<li><a href="https://www.cbinsights.com/company/neura-robotics/financials" target="_blank">CB Insights — Neura Robotics Financials</a></li>
+<li><a href="https://siliconangle.com/2026/03/04/humanoid-robot-maker-neura-robotics-reportedly-raising-1-2b-funding/" target="_blank">SiliconANGLE — Neura Robotics Reportedly Raising $1.2B Funding (Mar 2026)</a></li>
+<li><a href="https://www.vestbee.com/insights/articles/neura-robotics-secures-1-b" target="_blank">Vestbee — NEURA Robotics secures €1B and partners with AWS (2026)</a></li>
+<li><a href="https://www.therobotreport.com/neura-robotics-partners-bosch-advance-german-made-robotics/" target="_blank">The Robot Report — Neura partners with Bosch (2025)</a></li>
+<li><a href="https://inspenet.com/en/news/schaeffler-neura-team-up-humanoid-robots/" target="_blank">Inspenet — Schaeffler and NEURA commit to humanoid robots</a></li>
+<li><a href="https://www.163.com/dy/article/KN99ONCN05568W0A.html" target="_blank">网易 — 德国人形机器人公司同稳定币巨头洽谈10亿欧元融资</a></li>
+<li><a href="https://www.163.com/dy/article/KCVAB6PT05568W0A.html" target="_blank">网易 — 从公益社工到10亿美元估值CEO：一个德国人的机器人中国梦</a></li>
+<li><a href="https://incrypted.com/en/media-humanoid-robot-developer-neura-robotics-will-receive-1-2-billion-investment-backed-by-tether/" target="_blank">Incrypted — Neura Robotics Will Receive $1.2B Investment Backed by Tether</a></li>
+<li><a href="https://www.humanoidsdaily.com/news/neura-robotics-reportedly-secures-1-billion-from-tether-to-scale-humanoid-vision" target="_blank">Humanoids Daily — Neura Robotics Reportedly Secures €1 Billion from Tether</a></li>
+<li><a href="https://www.chaincatcher.com/en/article/2249670" target="_blank">ChainCatcher — German robotics startup Neura completes $1.2B financing with Tether</a></li>
+<li><a href="https://www.aparobot.com/articles/strategic-scaling-neura-robotics-secures-eu1-billion-funding" target="_blank">Aparobot — Strategic Scaling: Neura Robotics Secures €1 Billion Funding</a></li>
+<li><a href="https://blockchain.news/ainews/humanoid-robotics-and-open-source-llms-amazon-neura-4ne1-agile-robots-71-dof-agile-1-with-deepmind-integration-and-kimi-k2-6-coding-benchmark-breakthrough" target="_blank">Blockchain.News — Amazon–NEURA 4NE1 and DeepMind Integration (2026)</a></li>
+<li><a href="https://www.ces.tech/success-stories/neura-robotics/" target="_blank">CES — NEURA: Exhibitor Success Story</a></li>
+<li><a href="https://www.istis.sh.cn/cms/news/article/76/27796" target="_blank">ISTIS Shanghai — Neura Robotics：德国崛起的机器人企业新星</a></li>
+<li><a href="https://getlatka.com/companies/neura-robotics.com" target="_blank">GetLatka — How NEURA Robotics hit $156.6M revenue with 358 person team</a></li>
+<li><a href="http://www.robotsj.cn/brand/1608.html" target="_blank">中国机器人网 — 纽鼐机器人 NEURA Robotics</a></li>
+<li><a href="https://www.industrysourcing.cn/article/473368" target="_blank">Industrysourcing — 博世联手 Neura 阻击特斯拉人形机器人</a></li>
+<li><a href="https://www.kucoin.com/news/flash/german-robotics-startup-neura-completes-1-billion-funding-round-with-tether-participation" target="_blank">KuCoin — Neura completes €1 billion funding with Tether participation</a></li>
+<li><a href="https://www.me.news/news/262997" target="_blank">ME News — 机器人公司Neura Robotics获Tether领投约10亿欧元融资，估值达40亿欧元</a></li>
+</ol>
+</div>
+    </article>
+  </div>
+  <div class="page-footer">本页面最后更新于2026年5月4日 · 数据来源均标注于参考资料 · 具身智能Wiki项目</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

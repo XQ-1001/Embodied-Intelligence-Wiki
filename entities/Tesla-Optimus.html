@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>Tesla Optimus — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> › <span>Tesla Optimus</span></div>
+  <div class="wiki-header"><h1>Tesla Optimus</h1><div class="subtitle">Tesla, Inc. · NASDAQ: TSLA · 2021年启动 · 2026年量产 · 目标年产100万台</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#team">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financials">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#a2-1">2.1 团队背景与场景匹配度</a></li>
+        <li class="toc-lvl4"><a href="#a2-2">2.2 技术路线与场景适配性</a></li>
+        <li class="toc-lvl4"><a href="#a2-3">2.3 股东/资本结构影响</a></li>
+        <li class="toc-lvl4"><a href="#a2-4">2.4 试错与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#a2-5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#a2-6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#references">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">Tesla Optimus</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">Tesla Optimus人形机器人</div></div>
+        <div class="ib-row"><div class="ib-label">所属公司</div><div class="ib-value">Tesla, Inc.</div></div>
+        <div class="ib-row"><div class="ib-label">上市代码</div><div class="ib-value">NASDAQ: TSLA</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">Tesla 2003；Optimus项目 2021</div></div>
+        <div class="ib-row"><div class="ib-label">总部</div><div class="ib-value">美国得州奥斯汀</div></div>
+        <div class="ib-row"><div class="ib-label">CEO</div><div class="ib-value">Elon Musk（2008年起）</div></div>
+        <div class="ib-section">财务数据（2025年）</div>
+        <div class="ib-row"><div class="ib-label">全年营收</div><div class="ib-value">$94.83B（▼2.9%）</div></div>
+        <div class="ib-row"><div class="ib-label">净利润</div><div class="ib-value">$3.79B（▼46.8%）</div></div>
+        <div class="ib-row"><div class="ib-label">毛利率</div><div class="ib-value">~18.0%</div></div>
+        <div class="ib-row"><div class="ib-label">现金储备</div><div class="ib-value">$44.1B</div></div>
+        <div class="ib-section">估值/市值</div>
+        <div class="ib-row"><div class="ib-label">市值</div><div class="ib-value">~$1.47T（2026年初）</div></div>
+        <div class="ib-row"><div class="ib-label">市盈率</div><div class="ib-value">~380x</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">员工</div><div class="ib-value">~134,785（2025）</div></div>
+        <div class="ib-row"><div class="ib-label">Optimus团队</div><div class="ib-value">~200人</div></div>
+        <div class="ib-row"><div class="ib-label">产品代际</div><div class="ib-value">Gen1（2022）→ Gen2（2023）→ Gen3（2026）</div></div>
+        <div class="ib-row"><div class="ib-label">量产目标</div><div class="ib-value">100万台/年（2030）</div></div>
+        <div class="ib-row"><div class="ib-label">单台成本目标</div><div class="ib-value"><$20,000（规模化）</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-value" style="width:100%;padding:6px"><span class="tag">人形机器人</span><span class="tag">全栈自研</span><span class="tag">量产先行者</span><span class="tag">汽车基因</span><span class="tag">AI驱动</span><span class="tag">美国</span></div></div>
+        <div class="ib-section">官网</div>
+        <div class="ib-row"><div class="ib-value" style="width:100%;padding:4px"><a href="https://www.tesla.com/optimus" target="_blank">tesla.com/optimus</a></div></div>
+      </aside>
+
+      <p class="article-intro"><strong>Tesla Optimus</strong>（亦称Tesla Bot）是Tesla公司自2021年AI Day发布以来全力推进的人形机器人项目。Optimus复用Tesla在电动车领域的4680电池、FSD视觉神经网络和Dojo超级计算机，计划2026年下半年在加州Fremont工厂启动量产，2030年目标年产100万台。Elon Musk将其定位为Tesla长期价值的核心——"最终没人会记得特斯拉曾经造过车"。Optimus目前处于从实验室原型向产线量产转折的关键阶段。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper"><table class="wikitable infotable">
+        <tr><th>项目</th><th>内容</th></tr>
+        <tr><td>公司全称</td><td>Tesla, Inc.（特斯拉公司）</td></tr>
+        <tr><td>英文名称</td><td>Tesla, Inc. / Tesla Optimus (Humanoid Robot)</td></tr>
+        <tr><td>成立时间</td><td>2003年（Tesla公司）；2021年8月（Optimus项目发布）</td></tr>
+        <tr><td>注册地</td><td>美国特拉华州</td></tr>
+        <tr><td>上市交易所</td><td>NASDAQ（纳斯达克全球精选市场）</td></tr>
+        <tr><td>股票代码</td><td>TSLA</td></tr>
+        <tr><td>总部地址</td><td>1 Tesla Road, Austin, Texas 78725, United States</td></tr>
+        <tr><td>官网</td><td>https://www.tesla.com/optimus</td></tr>
+      </table></div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>时间</th><th>事件</th></tr>
+        <tr><td>2003年</td><td>Martin Eberhard与Marc Tarpenning创立Tesla Motors</td></tr>
+        <tr><td>2004年</td><td>Elon Musk领投A轮，成为最大股东及董事长</td></tr>
+        <tr><td>2008年</td><td>Elon Musk出任CEO</td></tr>
+        <tr><td>2010年</td><td>Tesla在NASDAQ上市（IPO价格$17/股）</td></tr>
+        <tr><td>2021年8月</td><td>AI Day首次发布Optimus概念，代号"Tesla Bot"</td></tr>
+        <tr><td>2022年9月</td><td>AI Day展示Bumblebee行走原型及Gen 1</td></tr>
+        <tr><td>2023年12月</td><td>发布Optimus Gen 2：步行提速30%，减重10kg，11-DOF灵巧手</td></tr>
+        <tr><td>2024年</td><td>Optimus在Fremont工厂执行基础分拣任务；Palo Alto办公室导航测试</td></tr>
+        <tr><td>2025年6月</td><td>Optimus工程VP Milan Kovac离职；AI/FSD VP Ashok Elluswamy接任</td></tr>
+        <tr><td>2026年Q1</td><td>Optimus Gen 3原型亮相，首款面向量产的设计</td></tr>
+        <tr><td>2026年7-8月</td><td>Fremont工厂启动Optimus量产（Model S/X产线改造完成）</td></tr>
+        <tr><td>2027年</td><td>计划开始对外销售（企业客户优先，后拓展消费者）</td></tr>
+      </table></div>
+
+      <h3 id="team">1.2 创始人及核心团队</h3>
+      <p>Tesla公司由Martin Eberhard和Marc Tarpenning于2003年创立。Elon Musk于2004年领投Series A后担任董事长，2008年起出任CEO至今。Optimus核心团队规模约200人，复用Tesla Autopilot/FSD的AI基础设施。2025年6月，Optimus工程负责人Milan Kovac（前Boston Dynamics工程师）离职，由AI与Autopilot软件VP Ashok Elluswamy接任——这一"软硬一体"的换帅标志着Optimus进入AI深度整合阶段。团队整体属于典型的产业派+技术极客混合型，核心成员多由Musk直接招募。</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+        <tr><td>CEO / 产品架构师</td><td>Elon Musk</td><td>宾夕法尼亚大学物理+经济学双学士。Zip2、PayPal、SpaceX、Tesla、Neuralink、xAI创始人。以第一性原理驱动产品定义，亲自参与Optimus每周五例会（有时开到午夜）。2025年身价约$3930亿，全球首富。</td></tr>
+        <tr><td>Optimus负责人 / AI VP</td><td>Ashok Elluswamy</td><td>印度钦奈人，Anna University学士、卡内基梅隆大学机器人学硕士。2014年成为Tesla Autopilot首位工程师（Musk通过推文亲自招募）。2025年6月起统管Autopilot+Optimus，推动FSD与机器人AI深度融合。</td></tr>
+        <tr><td>前Optimus工程VP（已离职）</td><td>Milan Kovac</td><td>前Boston Dynamics工程师。2022-2025年领导Optimus从0到1的硬件架构、供应链搭建，2025年6月因家庭原因离职。</td></tr>
+        <tr><td>CFO</td><td>Vaibhav Taneja</td><td>长期Tesla财务高管，2025年警告Optimus+Robotaxi投资将导致短期负自由现金流。</td></tr>
+      </table></div>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <p>Tesla为上市公司（NASDAQ: TSLA），Optimus作为内部业务线无独立融资。Tesla历史上累计股权融资超$200亿（含IPO及后续增发），2025年末账面现金$44.1B，为Optimus等新业务的资本密集型投入提供充足弹药。2026年全年计划资本支出超$250亿（此前预期$200亿），重点投向AI训练芯片、Optimus产线及Robotaxi。</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>轮次</th><th>时间</th><th>金额</th><th>估值</th><th>关键投资方</th></tr>
+        <tr><td>Series A</td><td>2004</td><td>$7.5M</td><td>—</td><td>Elon Musk领投</td></tr>
+        <tr><td>Series B</td><td>2005</td><td>$13M</td><td>—</td><td>Valor Equity Partners</td></tr>
+        <tr><td>Series C</td><td>2006</td><td>$40M</td><td>—</td><td>VantagePoint, Draper Fisher Jurvetson</td></tr>
+        <tr><td>Series D</td><td>2007</td><td>$45M</td><td>—</td><td>Technology Partners等</td></tr>
+        <tr><td>IPO</td><td>2010.06</td><td>$226M</td><td>$1.7B</td><td>NASDAQ公开发行</td></tr>
+        <tr><td>后续增发</td><td>2011-2020</td><td>>$140亿</td><td>—</td><td>多次增发（2019、2020各约$20亿）</td></tr>
+      </table></div>
+      <p>Tesla主要机构股东包括Vanguard Group、BlackRock、State Street等大型指数基金，Elon Musk个人持股约13%（含期权）。2025年11月，Musk获得价值约$1万亿的薪酬方案——与"生产100万台Optimus"等宏伟目标挂钩。</p>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <div class="table-wrapper"><table class="wikitable infotable">
+        <tr><th>维度</th><th>内容</th></tr>
+        <tr><td>AI架构</td><td>端到端视觉→动作（End-to-End Vision-to-Action），共享FSD自动驾驶的Occupancy Network与实时推理框架</td></tr>
+        <tr><td>大模型</td><td>xAI Grok大模型集成，用于高层任务规划与自然语言理解；"Digital Optimus"软件层在研</td></tr>
+        <tr><td>计算芯片</td><td>当前使用Dojo D1训练芯片；AI5推理芯片在研（10x算力、9x内存、50x综合性能，2027年）</td></tr>
+        <tr><td>数据方案</td><td>真实工厂数据（Fremont/Giga Texas内部部署）+ 仿真数据 + 人类遥操作示范</td></tr>
+        <tr><td>全栈/专用</td><td>全栈自研：从电机、减速器、传感器到AI软件全链自主设计</td></tr>
+        <tr><td>能源系统</td><td>复用4680电池（与Model Y共享），BMS直接继承电动车方案</td></tr>
+        <tr><td>灵巧手</td><td>Gen3：22自由度，指尖精度±0.08mm，全掌触觉传感，肌腱+连杆混合驱动</td></tr>
+        <tr><td>差异化</td><td>汽车制造经验带来的规模化降本能力；FSD数据飞轮复用；全球最大AI训练集群之一</td></tr>
+      </table></div>
+      <p>Tesla Optimus的技术路线核心逻辑是"生态复用"：将电动车FSD的视觉神经网络、4680电池、Dojo超级计算机、以及汽车供应链管理能力系统性地复用到人形机器人，实现跨界降本。其路线属于全栈自研+汽车基因混合型，区别于传统工业机器人公司的专用控制器路线，也不同于纯AI公司的"大脑优先"策略。</p>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>代际</th><th>发布时间</th><th>核心参数</th><th>主要能力</th></tr>
+        <tr><td>Bumblebee（原型）</td><td>2022.09</td><td>28关节；基础行走</td><td>演示自主行走、搬运纸箱</td></tr>
+        <tr><td>Optimus Gen 1</td><td>2022.09</td><td>28执行器；~73kg；电池续航~8h</td><td>工厂基础任务；端到端物体操作</td></tr>
+        <tr><td>Optimus Gen 2</td><td>2023.12</td><td>步行提速30%；减重10kg（~63kg）；11-DOF灵巧手；触觉指尖传感；颈部2-DOF</td><td>行速度提升；轻量化；精细手部操作（捏鸡蛋等）</td></tr>
+        <tr><td>Optimus Gen 3</td><td>2026 Q1（亮相）</td><td>45体自由度；22-DOF灵巧手；每臂26执行器；全掌触觉；续航~10h；轻量化框架</td><td>面向规模化量产设计；可观察人类学习新任务；更高灵巧性</td></tr>
+      </table></div>
+      <p>2025年实际产出仅"数百台"，远低于5,000台目标。Gen 3被Musk称为"第一款真正为量产设计的人形机器人"，目标单台物料成本在量产100万台时降至$20,000-$25,000（当前小批量BOM约$43,000）。</p>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>场景类别</th><th>具体场景</th><th>部署进度</th><th>合作方/备注</th></tr>
+        <tr><td>工业制造</td><td>汽车产线零件分拣、搬运、质量巡检</td><td>已在Fremont和Giga Texas工厂内部部署（数百台测试）</td><td>Tesla自有工厂；未来可能向第三方制造商销售</td></tr>
+        <tr><td>仓储物流</td><td>物料搬运、库存管理、包装</td><td>概念阶段</td><td>与Tesla Semi物流网络协同</td></tr>
+        <tr><td>商业服务</td><td>餐饮服务（LA Tesla Diner popcorn售卖）</td><td>小范围试点</td><td>面向零售、餐饮等商业场景</td></tr>
+        <tr><td>消费/家庭</td><td>家务助理、陪伴、教育</td><td>远期规划（2027年后）</td><td>预计定价$25,000-$60,000</td></tr>
+        <tr><td>特殊环境</td><td>危险环境作业、太空任务</td><td>概念讨论</td><td>可能复用SpaceX航天技术</td></tr>
+      </table></div>
+      <p>Optimus当前应用策略为"先内部验证，再外部推广"：优先在Tesla自有工厂完成规模化部署验证（内部年部署目标5,000+台），2027年起向企业客户交付，再逐步进入消费者市场。</p>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <p><strong>当前阶段（2025-2026）：</strong>Optimus尚未产生对外商业收入。2025年实际产出仅"数百台"原型机，全部在Tesla内部工厂用于测试和基础任务。2026年7-8月Fremont工厂正式量产启动后，预计全年生产50,000-150,000台（管理层指引分歧较大）。</p>
+      <p><strong>订单/客户：</strong>尚无公开外部订单。Elon Musk表示"特斯拉就是Optimus的第一个客户"——自有工厂的替代性用人需求即是首批"订单"。</p>
+      <p><strong>中国制造布局：</strong>2026年4月闭门会议确认上海超级工厂将部署Optimus生产线，初期目标年产10万台。60-70%的核心零部件来自中国供应链（拓普集团、三花智控、绿的谐波、五洲新春、鸣志电器等），中国供应商成本较日德低约40%。</p>
+
+      <h3 id="financials">1.8 财务数据</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>项目</th><th>FY 2022</th><th>FY 2023</th><th>FY 2024</th><th>FY 2025</th></tr>
+        <tr><td>总营收（$B）</td><td>81.46</td><td>96.77</td><td>97.69</td><td>94.83</td></tr>
+        <tr><td>汽车营收（$B）</td><td>71.46</td><td>82.42</td><td>77.07</td><td>69.52</td></tr>
+        <tr><td>能源营收（$B）</td><td>3.91</td><td>6.04</td><td>10.06</td><td>12.77</td></tr>
+        <tr><td>毛利（$B）</td><td>20.86</td><td>17.66</td><td>17.45</td><td>17.09</td></tr>
+        <tr><td>毛利率</td><td>25.6%</td><td>18.3%</td><td>17.9%</td><td>~18.0%</td></tr>
+        <tr><td>净利润（$B）</td><td>12.58</td><td>14.99</td><td>7.13</td><td>3.79</td></tr>
+        <tr><td>净利率</td><td>15.4%</td><td>15.5%</td><td>7.3%</td><td>4.0%</td></tr>
+        <tr><td>员工数</td><td>127,855</td><td>140,473</td><td>125,665</td><td>134,785</td></tr>
+        <tr><td>现金（$B）</td><td>22.19</td><td>29.09</td><td>36.58</td><td>44.10</td></tr>
+      </table></div>
+      <p>2025年是Tesla史上首次全年营收同比下滑（-2.9%），净利润几乎腰斩（-46.8%）。但能源业务增长亮眼（+27%，毛利率29.8%）。$44.1B账面现金为Optimus等资本密集型项目提供了充裕的安全垫。CFO Taneja警告2026年可能出现负自由现金流，因Optimus产线建设和AI基础设施投资大幅攀升。</p>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li><strong>Musk薪酬方案：</strong>2025年11月获批价值约$1万亿的薪酬方案，里程碑之一为"生产100万台Optimus"。</li>
+        <li><strong>中国供应链依赖：</strong>Optimus约60-70%零部件来自中国供应商，长三角200+家伺服/减速器/传感器企业构成全球唯一的"研发-零部件-整机-场景"闭环。</li>
+        <li><strong>Samsung芯片合作：</strong>Tesla与三星合作生产机器人及FSD专用芯片。</li>
+        <li><strong>竞争态势：</strong>Musk认为最大竞争对手在中国（宇树科技、智元机器人等），但声称Optimus"在AI、手部设计、机电灵巧性等方面远超任何中国竞品"。</li>
+        <li><strong>SpaceX协同：</strong>Starlink提供全球低延迟通信；SpaceX近地轨道数据中心提供弹性计算。</li>
+        <li><strong>FSD订阅收入：</strong>约1.1-1.3亿付费用户，年收入约$13亿（$99/月）。</li>
+        <li><strong>Austin晶圆厂：</strong>投资约$30亿，与Intel 14A工艺合作。</li>
+        <li><strong>安全争议：</strong>MIT机器人学家Rodney Brooks持续质疑"人形机器人短期内难以胜任多种复杂任务"，认为业界过度乐观。</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="a2-1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>Tesla Optimus团队的"汽车制造基因+AI软件基因"双螺旋结构高度匹配其"工厂先行"的场景策略。Elon Musk以第一性原理将工业机器人重新定义为"大规模制造的制造设备"——正如Tesla用Giga Press一体化压铸颠覆车身制造，Optimus的野心是成为工厂里可泛化的"通用执行单元"。Ashok Elluswamy接任后，FSD的视觉AI能力将更深嵌入Optimus，这意味着Optimus更像一台"有手有脚的特斯拉车"，而非传统的单任务工业机械臂。Milan Kovac的离开虽然造成硬件连续性的短暂损失，但Elluswamy的"软件定义硬件"思路在逻辑上更适合量产阶段的标准化和迭代。团队仅200人的精简规模（对比Boston Dynamics约500+人）体现Musk"精英化、去官僚"的管理哲学，但也对每个人的产出密度提出极高要求。</p>
+      </div>
+
+      <div class="analysis-block" id="a2-2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>端到端视觉→动作（Vision-to-Action）架构与"工厂通用操作"场景之间存在"高上限、低起点"的结构性矛盾。优势在于：复用FSD的数十亿英里真实驾驶数据和Occupancy Network，Optimus的3D场景理解能力起点极高；劣势在于：驾驶环境的可预测性远强于工厂操作（后者涉及未知物体的柔顺抓取、力控、人机协作等），单纯的视觉输入不足以解决力反馈和触觉问题。Gen 3引入全掌触觉传感正是对这一短板的补课。4680电池直用的策略在工程上合理（降本），但约10小时的续航制约了全天候工业场景的适用性——Gen 3能否按承诺提升续航是关键变量。整体而言，该路线在"结构化的工厂内部物流"场景适配性较高，但在"非结构化家庭服务"场景仍有明显缺口。</p>
+      </div>
+
+      <div class="analysis-block" id="a2-3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>Tesla的公众持股结构赋予Optimus项目极大的战略自由度：无需迁就单一产业资本（如车企或物流公司）的绑定需求，可自选最优应用场景。但这也意味着Optimus完全暴露在公开市场的估值压力之下——当Musk将Optimus叙事深度嵌入Tesla股价（声称占长期价值的80%），任何量产延迟或技术挫折都将被市场放大。$44.1B现金储备给予"烧钱进行长期投入"的底气，但CFO已预警负自由现金流，说明Optimus的回报周期可能超出零售股东的耐心。另一方面，中国供应链（60-70%零部件）的深度绑定形成了一种"软性股东关系"：拓普、三花、绿的谐波等供应商的利益与Optimus量产成败高度关联，实际构成了一套非股权的"产业利益共同体"。</p>
+      </div>
+
+      <div class="analysis-block" id="a2-4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>Optimus过去四年经历了三次显著调整：第一，从"陪跑概念"（2021 AI Day舞台上的穿紧身衣舞者）到"验证产品"（Gen 2在工厂执行分拣任务），标志着从PR驱动转向工程驱动。第二，2025年Milan Kovac的离职和Ashok Elluswamy接任，反映了从"硬件优先→软硬融合"的组织架构调整——量产阶段的瓶颈不再是"能不能动"，而是"能不能大规模一致地动"，这本质上是软件/数据/标定问题。第三，Fremont产线改造计划（停产Model S/X，转向Optimus）是公司层面对汽车-机器人资源零和博弈的一次性抉择，体现Musk"all-in机器人"的决心。2025年实际产出远低预期（数百 vs. 5,000台目标）是典型的硬件创业"生产地狱"——与2018年Model 3产能地狱高度相似，教训是：目标数字更多是叙事工具，不宜作为精确预测依据。</p>
+      </div>
+
+      <div class="analysis-block" id="a2-5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>Tesla Optimus的核心取舍是做"机器人领域的iPhone"——即全栈整合、垂直一体化、全球规模化——而非"机器人领域的Android"（开放平台，让第三方做硬件）。其优势在于复用Tesla已有的制造、电池、AI和数据基础设施，边际成本远低于从零起步的竞品。但风险也在于此：Optimus的成功窗口与Tesla汽车业务的健康度深度绑定——如果汽车业务持续萎缩（2025年营收-10%），Optimus的"输血"能力将受质疑。相比于Figure AI走"OpenAI大脑+自研身体"路线、Boston Dynamics走"极致运动能力"路线、中国厂商走"供应链性价比+场景深耕"路线，Tesla选择了一条"用供给侧规模碾压需求侧不确定性"的路径——先产百万台，再找场景。这是一场典型的Musk式豪赌。</p>
+      </div>
+
+      <div class="analysis-block" id="a2-6">
+        <h4>2.6 其他重要观察</h4>
+        <p>其一，Optimus的"上海工厂落地"信号极具战略分量。若2026年底真的在上海启动年产10万台产线，意味着人形机器人的制造成本结构将经历类似电动车中国供应链带来的降本曲线——这对所有西方竞品构成结构性竞争压力。其二，Musk将个人薪酬与"100万台Optimus"挂钩，创造了一个极为强力的执行驱动机制，但也增加了"为达标而牺牲质量"的道德风险。其三，Optimus几乎完全依赖中国供应链的这个事实，在地缘政治震荡上升的背景下是一把双刃剑——"硅谷定义未来，长三角实现未来"的分工模式可能因贸易摩擦或技术管制而中断。其四，一个常被忽略但关键的变量是Optimus的安全性（功能安全和机械安全）尚未在任何监管框架下被系统性验证——大规模部署前夕的这一空白可能成为实际的上市速度瓶颈。</p>
+      </div>
+
+      <h2 id="references">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://www.nasdaq.com/articles/teslas-3-trillion-opportunity-how-optimus-could-dominate-robotics-market-2026" target="_blank">Nasdaq: Tesla's $3 Trillion Opportunity — How Optimus Could Dominate the Robotics Market in 2026</a></li>
+          <li><a href="https://www.therobotreport.com/from-evs-to-robotics-tesla-targets-10m-optimus-units-with-new-texas-plant/" target="_blank">The Robot Report: From EVs to robotics — Tesla targets 10M Optimus units with new Texas plant</a></li>
+          <li><a href="https://www.theverge.com/news/682613/tesla-optimus-humanoid-robot-head-quit-left-milan-kovac" target="_blank">The Verge: Tesla just lost the head of its robotics division (Milan Kovac resignation)</a></li>
+          <li><a href="https://nripulse.com/ashok-elluswamy-to-lead-teslas-humanoid-robot-program/" target="_blank">NRI Pulse: Ashok Elluswamy to Lead Tesla's Humanoid Robot Program</a></li>
+          <li><a href="https://www.just-auto.com/news/tesla-2025-revenue-slips/" target="_blank">Just Auto: Tesla revenue slips in 2025 as vehicle sales fall</a></li>
+          <li><a href="https://www.ccidnet.com/p1/news/20260302/1096880.html" target="_blank">赛迪网：特斯拉（TSLA）2025年财报全面分析——史上首次年度营收下滑</a></li>
+          <li><a href="https://finance.eastmoney.com/a/202601293634885043.html" target="_blank">东方财富：特斯拉发布2025全年财报——营收首次下滑，四季度净利润暴跌61%</a></li>
+          <li><a href="https://www.cnfin.com/gs-lb/detail/20260129/4373297_1.html" target="_blank">中国金融新闻网：特斯拉发布2025全年财报</a></li>
+          <li><a href="https://stockanalysis.com/stocks/tsla/employees/" target="_blank">StockAnalysis: Tesla (TSLA) Number of Employees 2009-2025</a></li>
+          <li><a href="https://nai500.com/blog/2026/04/teslas-future-isnt-cars-its-robotaxis-and-humanoids-will-the-bet-pay-off/" target="_blank">NAI500: Tesla's Future Isn't Cars — It's Robotaxis and Humanoids. Will the Bet Pay Off?</a></li>
+          <li><a href="https://m.thepaper.cn/newsDetail_forward_32926113" target="_blank">澎湃新闻：特斯拉Optimus Gen3量产在即，哪些环节最具确定性？</a></li>
+          <li><a href="https://m.thepaper.cn/newsDetail_forward_33043760" target="_blank">澎湃新闻：马斯克百万台机器人，70%零件是中国的</a></li>
+          <li><a href="https://auto.gasgoo.com/news/202604/23I70454902C601.shtml" target="_blank">盖世汽车：从造车到"造人"——特斯拉的战略赌注与Optimus的量产变局</a></li>
+          <li><a href="https://inews.hket.com/article/4078775/TSLA｜Tesla：第三代人形機械人Optimus即將亮相 料年產100萬台" target="_blank">香港经济日报：Tesla第三代人形机器人Optimus即将亮相，料年产100万台</a></li>
+          <li><a href="https://m.36kr.com/p/3671701306647170" target="_blank">36氪：马斯克又"造梦"，没人会记得特斯拉曾造过车</a></li>
+          <li><a href="https://m.ofweek.com/ai/2026-04/ART-201717-8420-30685235.html" target="_blank">OFweek：特斯拉Optimus Gen3量产在即，哪些环节最具确定性？</a></li>
+          <li><a href="https://api.cmoney.tw/notes/note-detail.aspx?nid=1173568" target="_blank">CMoney：特斯拉拼未來大投資——2025-2026年資本支出逾250億美元</a></li>
+          <li><a href="https://www.marketwatch.com/investing/stock/tsla/financials" target="_blank">MarketWatch: TSLA Annual Income Statement</a></li>
+          <li><a href="https://gulfnews.com/technology/ashok-elluswamy-from-chennai-boy-to-tesla-robotics-chief-1.500156499" target="_blank">Gulf News: Ashok Elluswamy — From Chennai boy to Tesla robotics chief</a></li>
+          <li><a href="https://www.21jingji.com/article/20251027/herald/c48efb01b99e8e307bd2a83ac1a51dbe.html" target="_blank">21世纪经济报道："一只手"掐住了特斯拉的万亿市值</a></li>
+          <li><a href="https://finance.yahoo.com/news/musk-claims-tesla-optimus-3-144428690.html" target="_blank">Yahoo Finance: Musk Claims Tesla's Optimus 3 Robot Will 'Move the Needle' on US GDP</a></li>
+          <li><a href="https://www.britannica.com/money/Elon-Musk" target="_blank">Britannica: Elon Musk Biography</a></li>
+          <li><a href="https://news.sina.cn/bignews/insight/2026-04-24/detail-inhvpyyh4504818.d.html" target="_blank">新浪新闻：Optimus机器人年产目标百万台，特斯拉如何突破技术瓶颈实现制造业革命？</a></li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">本页面为具身智能Wiki项目自动生成 · 数据截至2026年5月 · 由Cowork调度系统维护</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

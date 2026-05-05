@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>优必选 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> › <span>优必选</span></div>
+  <div class="wiki-header"><h1>优必选</h1><div class="subtitle">UBTECH ROBOTICS CORP LTD · 09880.HK · 2012年成立 · 全球人形机器人第一股 · 2025年营收20亿元</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#founders">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financials">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#a1">2.1 团队背景与场景选择</a></li>
+        <li class="toc-lvl4"><a href="#a2">2.2 技术路线与场景适配</a></li>
+        <li class="toc-lvl4"><a href="#a3">2.3 股东资本对战略的影响</a></li>
+        <li class="toc-lvl4"><a href="#a4">2.4 试错过程与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#a5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#a6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#refs">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">优必选</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">深圳市优必选科技股份有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">英文</div><div class="ib-value">UBTECH ROBOTICS CORP LTD</div></div>
+        <div class="ib-row"><div class="ib-label">成立</div><div class="ib-value">2012年3月</div></div>
+        <div class="ib-row"><div class="ib-label">总部</div><div class="ib-value">中国深圳</div></div>
+        <div class="ib-row"><div class="ib-label">创始人/CEO</div><div class="ib-value">周剑</div></div>
+        <div class="ib-row"><div class="ib-label">上市</div><div class="ib-value">港交所 09880.HK（2023年12月）</div></div>
+        <div class="ib-section">财务数据（2025年）</div>
+        <div class="ib-row"><div class="ib-label">营收</div><div class="ib-value">20.01亿元（+53.3%）</div></div>
+        <div class="ib-row"><div class="ib-label">毛利</div><div class="ib-value">7.54亿元（毛利率37.7%）</div></div>
+        <div class="ib-row"><div class="ib-label">净亏损</div><div class="ib-value">7.90亿元（收窄31.9%）</div></div>
+        <div class="ib-row"><div class="ib-label">研发投入</div><div class="ib-value">5.07亿元（占营收25.4%）</div></div>
+        <div class="ib-row"><div class="ib-label">现金储备</div><div class="ib-value">48.88亿元</div></div>
+        <div class="ib-section">核心数据（2025年）</div>
+        <div class="ib-row"><div class="ib-label">人形机器人销量</div><div class="ib-value">1,079台（全球第一）</div></div>
+        <div class="ib-row"><div class="ib-label">人形机器人收入</div><div class="ib-value">8.21亿元（占41.1%）</div></div>
+        <div class="ib-row"><div class="ib-label">年化产能</div><div class="ib-value">6,000+台</div></div>
+        <div class="ib-row"><div class="ib-label">累计专利</div><div class="ib-value">2,985项（发明1,742项）</div></div>
+        <div class="ib-section">官网</div>
+        <div class="ib-row"><div class="ib-label">官网</div><div class="ib-value"><a href="https://www.ubtrobot.com">ubtrobot.com</a></div></div>
+      </aside>
+
+      <p class="article-intro"><strong>优必选</strong>（UBTECH ROBOTICS CORP LTD，港交所：09880.HK）成立于2012年，总部位于深圳，是全球人形机器人行业的领先企业，也是<strong>全球首家以人形机器人为主营业务的上市公司</strong>（"全球人形机器人第一股"，2023年12月港股上市）。公司创始人周剑在经历300多次失败后攻克伺服驱动器核心技术，将成本降至国外十分之一。2025年是优必选的"爆发之年"——全年营收突破20亿元人民币（同比+53%），全尺寸人形机器人Walker系列交付1,079台（全球第一），人形机器人业务收入8.21亿元（同比暴增22倍），正式从"研发验证"迈入"规模化商业落地"阶段。公司构建了<strong>BrainNet群脑网络+Thinker大模型家族+全自研硬件</strong>的完整技术栈，并与西门子、本田贸易、德马科技等建立战略合作，2026年目标冲刺万台产能。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper">
+        <table class="wikitable infotable">
+          <tr><th>项目</th><th>内容</th></tr>
+          <tr><td>公司全称</td><td>深圳市优必选科技股份有限公司</td></tr>
+          <tr><td>英文名称</td><td>UBTECH ROBOTICS CORP LTD</td></tr>
+          <tr><td>成立时间</td><td>2012年3月</td></tr>
+          <tr><td>注册地/总部</td><td>中国广东省深圳市</td></tr>
+          <tr><td>上市信息</td><td>香港联交所主板：09880.HK（2023年12月29日上市）</td></tr>
+          <tr><td>创始人/CEO</td><td>周剑</td></tr>
+          <tr><td>官网</td><td><a href="https://www.ubtrobot.com">www.ubtrobot.com</a></td></tr>
+          <tr><td>所属赛道</td><td>人形机器人、具身智能、工业自动化、消费级机器人</td></tr>
+          <tr><td>标签</td><td><span class="tag tag-info">港股上市</span><span class="tag tag-info">全尺寸人形机器人</span><span class="tag tag-info">自研伺服驱动</span><span class="tag tag-info">开源大模型</span></td></tr>
+        </table>
+      </div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>时间</th><th>事件</th></tr>
+          <tr><td>2009年</td><td>周剑在日本展会初遇本田ASIMO，受震撼且被日方傲慢刺痛，决心自研中国人的人形机器人</td></tr>
+          <tr><td>2012年3月</td><td>优必选正式成立；经历300+次失败后攻克伺服驱动器核心技术，将成本降至国外1/10</td></tr>
+          <tr><td>2016年</td><td>540台Alpha机器人亮相央视春晚，一战成名</td></tr>
+          <tr><td>2018年</td><td>发布第一代Walker双足人形机器人（CES亮相）</td></tr>
+          <tr><td>2023年12月</td><td>香港联交所主板上市（09880.HK），成为"全球人形机器人第一股"</td></tr>
+          <tr><td>2024年</td><td>Walker S1发布，开始在比亚迪等工厂实训验证</td></tr>
+          <tr><td>2025年7月</td><td>Walker S2发布，搭载BrainNet 2.0、Co-Agent、第四代灵巧手；启动千台级量产交付</td></tr>
+          <tr><td>2025年全年</td><td>完成三次H股配售，合计募资约58亿元人民币；收购锋龙股份（002931.SZ）29.99%股权</td></tr>
+          <tr><td>2026年2月</td><td>开源百亿参数具身智能大模型Thinker，10B以下权威基准9项全球第一</td></tr>
+          <tr><td>2026年3月</td><td>与西门子签署战略合作，冲刺万台产能目标</td></tr>
+          <tr><td>2026年4月</td><td>与本田贸易签约合作；发布第五代Walker X机器人；发布Thinker cosmos开发者社区</td></tr>
+        </table>
+      </div>
+
+      <h3 id="founders">1.2 创始人及核心团队</h3>
+      <p>优必选的核心团队兼具<strong>技术攻坚精神与产业运营经验</strong>。创始人周剑以"卖掉三套房产"式的all in风格著称，被媒体称为"人形机器人领域的偏执狂"。管理团队以产业背景为主，属于<strong>产业派技术型团队</strong>。</p>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+          <tr><td>创始人/CEO</td><td>周剑</td><td>德国留学归来；曾任迈克·威力集团中国区最年轻总经理（4年晋升）；后创业做自动化设备年入千万；2009年因本田ASIMO触动创业，卖房all in机器人；经历300+次失败攻克伺服驱动技术，打破日韩垄断</td></tr>
+          <tr><td>副总裁/研究院院长</td><td>焦继超</td><td>主导优必选具身智能技术研发方向，负责Thinker大模型、BrainNet架构等AI技术栈</td></tr>
+          <tr><td>副总裁/研究院副院长</td><td>梅兴泰</td><td>负责机器人运动控制、机械设计等技术方向</td></tr>
+          <tr><td>副总裁</td><td>林旭</td><td>负责公司运营与业务管理</td></tr>
+          <tr><td>制造中心总经理</td><td>孙昌荣</td><td>负责万台级产能建设与供应链管理</td></tr>
+        </table>
+      </div>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <h4>融资历史</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>阶段</th><th>时间</th><th>金额/事件</th><th>详情</th></tr>
+          <tr><td>天使轮~Pre-IPO</td><td>2013-2023</td><td>多轮融资</td><td>投资方包括腾讯、启明创投、鼎晖投资、海尔、科大讯飞、居然之家、工商银行等</td></tr>
+          <tr><td>IPO</td><td>2023年12月</td><td>港交所上市（09880.HK）</td><td>成为"全球人形机器人第一股"</td></tr>
+          <tr><td>H股配售（第1次）</td><td>2025年</td><td>约20亿港元</td><td>优化资本结构，补充营运资金</td></tr>
+          <tr><td>H股配售（第2次）</td><td>2025年</td><td>约28亿港元</td><td>用于研发及产能扩张</td></tr>
+          <tr><td>H股配售（第3次）</td><td>2025年底</td><td>约20亿港元</td><td>合计2025年募资约68亿港元（约58亿元人民币）</td></tr>
+        </table>
+      </div>
+      <h4>上市公司股东结构</h4>
+      <p>优必选作为港股上市公司，股权结构较分散。周剑为控股股东及实际控制人。2025年完成的三次H股配售引入了多家机构投资者。公司还于2025年通过要约收购获得深交所上市公司锋龙股份（002931.SZ）29.99%股权，将其作为产业链上游布局平台。</p>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>技术维度</th><th>具体方案</th></tr>
+          <tr><td>AI大模型</td><td><strong>Thinker家族</strong>：Thinker（百亿参数具身智能基座，2026年2月开源，10B以下权威基准9项全球第一）→ Thinker-VLA（灵巧操作）→ Thinker-WM（世界模型）→ Thinker 3.0（2026Q2开源）</td></tr>
+          <tr><td>群脑架构</td><td><strong>BrainNet 2.0</strong>：端云协同——云端"超级大脑"全局决策 + 端侧"智能小脑"实时执行；推理型节点与技能型节点自组织互联，实现多机群体协作</td></tr>
+          <tr><td>智能体技术</td><td><strong>Co-Agent</strong>：全球首个专用于工业人形机器人的智能体，融合多模态推理+具身交互+技能模型+类人思维链，实现意图理解→任务规划→工具调用→异常处理全闭环</td></tr>
+          <tr><td>运动控制</td><td>分层强化学习框架；VLA-RL端到端运动控制；全身运动轨迹跟踪；通用拆码垛模式；最高行走速度2m/s</td></tr>
+          <tr><td>感知系统</td><td>国内首个纯RGB双目视觉方案（1.5米内深度误差≤±6mm，动态避障<40ms）；3D感知+时空记忆+跨地形导航</td></tr>
+          <tr><td>硬件自研</td><td>全自研伺服驱动器（成本降至国外1/10）；第五代灵巧手（19自由度全驱+触觉/视觉传感器）；热插拔自主换电系统（3分钟，7×24h连续作业）；航空级铝合金3D打印骨架</td></tr>
+          <tr><td>数据方案</td><td>数亿条工业制造场景真实数据积累；仿真预训练→真机验证→数据回流→模型迭代的智能闭环；预计年采集超千万条行业数据</td></tr>
+          <tr><td>开源战略</td><td>Thinker基座大模型全开源；Thinker cosmos开发者社区平台；推动行业标准化</td></tr>
+        </table>
+      </div>
+      <p>优必选的总体技术路线是<strong>"全栈自研+开源生态"双驱动</strong>：底层硬件（伺服、灵巧手、骨架）完全自研确保成本优势；中间AI层（Thinker+BrainNet+Co-Agent）自主攻关并与开源社区共建；上层应用按场景（工业/物流/商用/消费）提供完整解决方案。从"单机自主"向"群体智能"演进是其核心战略方向。</p>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>产品分类</th><th>型号</th><th>关键参数</th><th>定位/场景</th></tr>
+          <tr><td rowspan="3"><strong>全尺寸工业人形机器人</strong></td><td>Walker S1（2024）</td><td>全尺寸双足，基础工业操作能力</td><td>工厂实训验证</td></tr>
+          <tr><td>Walker S2（2025）</td><td>身高1.72-1.76m，体重76kg，41个伺服关节，52自由度，负载15kg，行走2m/s，热插拔换电，第四代灵巧手（11DOF/指尖12.5N），IP42</td><td>汽车/3C/物流/航空等工业场景主力</td></tr>
+          <tr><td>Walker S3（2026Q3上市）</td><td>S2迭代升级，进一步提升灵巧操作与群体协作</td><td>万台级规模化工业部署</td></tr>
+          <tr><td><strong>第五代人形机器人</strong></td><td>Walker X（2026年4月）</td><td>第五代平台，集最新Thinker 3.0+群脑网络，多场景通用能力</td><td>通用多场景平台</td></tr>
+          <tr><td><strong>轮式人形机器人</strong></td><td>Cruzr S2（2026）</td><td>全尺寸通用轮式人形机器人，面向北美物流市场发布</td><td>智慧物流、仓储</td></tr>
+          <tr><td><strong>消费级机器人</strong></td><td>优理奇 Wanda（计划2026底量产）</td><td>家用消费级机器人</td><td>家庭陪伴/教育</td></tr>
+          <tr><td><strong>AI平台</strong></td><td>Thinker cosmos（2026年4月）</td><td>一站式具身智能开发者社区平台</td><td>开源生态、开发者社区</td></tr>
+        </table>
+      </div>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>场景分类</th><th>具体场景</th><th>产品/方案</th><th>合作方/客户</th></tr>
+          <tr><td>汽车制造</td><td>装配线上下料、物料搬运、质检、拧紧等</td><td>Walker S2</td><td>比亚迪、吉利、东风柳汽、奥迪一汽</td></tr>
+          <tr><td>3C电子制造</td><td>精密装配、分拣、测试上下料</td><td>Walker S2 + 第五代灵巧手</td><td>富士康、德州仪器</td></tr>
+          <tr><td>航空制造</td><td>大部件辅助装配、检测</td><td>Walker S2</td><td>空客（Airbus）</td></tr>
+          <tr><td>智慧物流</td><td>仓储搬运、分拣、与无人车协同</td><td>Cruzr S2 + 优奇无人物流车</td><td>德马科技、Amazon、Temu等</td></tr>
+          <tr><td>具身数据采集</td><td>政府主导的数据采集与测试中心</td><td>Walker系列</td><td>多个地方政府的具身智能数据采集中心</td></tr>
+          <tr><td>汽车供应链（海外）</td><td>全球汽车工厂场景渗透</td><td>Walker系列</td><td>本田贸易（覆盖19国56分支）</td></tr>
+          <tr><td>数字化升级</td><td>产品全生命周期数字化</td><td>西门子工业软件</td><td>西门子</td></tr>
+        </table>
+      </div>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <p>2025年是优必选从"实训验证"到"规模化商业落地"的关键转折年，核心数据如下：</p>
+      <ul>
+        <li><strong>全尺寸人形机器人出货1,079台</strong>，全球第一，同比增长358倍；手持订单约14亿元</li>
+        <li>单笔最大订单不断刷新：9月获2.5亿元合同，11月获2.64亿元项目</li>
+        <li>2025年人形机器人收入8.21亿元，<strong>毛利率54.6%</strong>，显著高于公司整体毛利率37.7%</li>
+        <li>80%以上出货用于工业制造场景（汽车/3C/物流/航空）</li>
+        <li>2026年保守出货目标5,000台（+400%），产能规划达万台级别</li>
+        <li><strong>需注意</strong>：部分订单来自政府主导的具身智能数据采集中心项目，纯市场化订单占比仍需提升；当前工业搬运效率仅为人类的30-40%</li>
+      </ul>
+
+      <h3 id="financials">1.8 财务数据</h3>
+      <h4>近年财务对比</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>指标</th><th>2023年</th><th>2024年</th><th>2025年</th></tr>
+          <tr><td>总营收</td><td>约10.5亿元</td><td>13.05亿元</td><td>20.01亿元（+53.3%）</td></tr>
+          <tr><td>毛利</td><td>—</td><td>3.74亿元（毛利率28.7%）</td><td>7.54亿元（毛利率37.7%）</td></tr>
+          <tr><td>人形机器人收入</td><td>—</td><td>0.36亿元</td><td>8.21亿元（+2,203.7%）</td></tr>
+          <tr><td>人形机器人毛利率</td><td>—</td><td>—</td><td>54.6%</td></tr>
+          <tr><td>净亏损</td><td>—</td><td>11.60亿元</td><td>7.90亿元（收窄31.9%）</td></tr>
+          <tr><td>研发投入</td><td>—</td><td>—</td><td>5.07亿元（占营收25.4%）</td></tr>
+          <tr><td>2022-2025累计研发</td><td colspan="3">约19亿元</td></tr>
+          <tr><td>现金储备</td><td>—</td><td>11.91亿元</td><td>48.88亿元（+302%）</td></tr>
+          <tr><td>应收账款</td><td>—</td><td>—</td><td>18.42亿元（接近全年营收）</td></tr>
+        </table>
+      </div>
+      <p>国海证券预测2026年营收约35.91亿元，2027年有望实现扭亏为盈。</p>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>周剑曾被问及"为什么非要造人形机器人"时回答："<strong>因为中国人也应该有一个自己的人形机器人。</strong>"这句话源自2009年他在日本展会上被日方人员傲慢对待的刺痛记忆。</li>
+        <li>2016年春晚，540台优必选Alpha机器人同步舞蹈的画面，成为中国机器人行业最具标志性的公众记忆之一。</li>
+        <li>17年后的2026年，当年激发周剑创业的本田ASIMO已经停产，而优必选与本田贸易签署了战略合作协议——完成了从中日技术差距的"仰望着"到平起平坐的合作伙伴的<strong>完整逆袭闭环</strong>。</li>
+        <li>优必选2025年完成收购锋龙股份（002931.SZ）29.99%股权，交易金额16.65亿元，被认为是在为关键零部件自主可控和A股融资平台做布局。</li>
+        <li>人形机器人专利数全球第一（累计2,985项，其中发明专利1,742项），在伺服驱动、运动控制、灵巧手等关键领域形成深厚壁垒。</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="a1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>优必选的团队背景与工业场景选择之间经历了<strong>从"错配"到"校准"的演变</strong>。周剑的创业初心是消费级/家庭陪伴机器人（受ASIMO启发），早期产品也是Alpha、Jimu等教育/娱乐机器人。但2023年IPO后，公司战略急剧转向工业制造场景，这背后既有资本市场的压力（工业场景是唯一当前有明确付费意愿的市场），也有创始团队中不断补充的工业基因。焦继超、梅兴泰等技术高管具备扎实的工程背景。然而，与直接从工业自动化赛道起家的埃斯顿、新松等公司相比，优必选团队在工业客户资源、产线适配经验方面仍属"跨界者"。2025年工业场景收入的爆发验证了场景切换的方向正确，但核心团队的"消费电子+学术"基因能否持续驱动工业级产品的可靠性迭代，仍需时间检验。</p>
+      </div>
+
+      <div class="analysis-block" id="a2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>优必选的<strong>"全栈自研+开源生态"双轨策略</strong>在工业场景中既有优势也有张力。自研伺服驱动器将成本压低至国外1/10，是Walker系列能以约76万元/台价格实现54.6%毛利率的基础——这在人形机器人行业极为罕见。Thinker大模型的开源策略有利于吸引开发者生态、加速行业标准化，但同时也意味着核心技术能力的差异化门槛可能被降低。BrainNet群脑网络+Co-Agent智能体的群体协作路线，直接对标工业场景中"多机协同替代单工位"的刚性需求，路线选择合理。然而，当前Walker S2在工业搬运场景的效率仅为人类30-40%，技术路线与场景需求的"最后一公里"适配仍是最核心的工程挑战。如果2027年能达到80%效率的目标，工业场景的商业化闭环将基本确立。</p>
+      </div>
+
+      <div class="analysis-block" id="a3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>优必选的资本结构具有<strong>典型的"双轨制"特征</strong>：一方面，早期投资者（腾讯、启明、鼎晖、海尔、科大讯飞等）带来了品牌背书和产业链资源，但作为财务投资者其影响力随IPO逐步减弱；另一方面，2025年三次H股配售引入了大量机构投资者，公司的资本决策更加市场化。收购锋龙股份29.99%股权的操作显示管理层已开始主动运用资本工具进行产业链整合。值得关注的是，部分订单来自政府主导的具身智能数据采集中心——这反映了优必选在<strong>政府关系与政策资源方面的优势</strong>，但也引发了关于"真实市场化程度"的质疑。预计2026-2027年随着汽车制造等纯商业场景占比提升，这一结构性问题将逐步缓解。</p>
+      </div>
+
+      <div class="analysis-block" id="a4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>优必选的发展史本身就是一部<strong>大型战略试错与校准史</strong>。从2012年成立到2023年IPO，公司经历了多次方向调整：早期聚焦教育机器人（Alpha、Jimu系列），试图以"编程教育"打开消费市场；中期拓展商用服务机器人（Cruzr系列），瞄准商场、银行、政务等场景；晚期（2023年后）全速转向工业人形机器人。这一路径调整的背后逻辑是：消费级和教育级机器人虽然建立了品牌，但单体价值低、增长天花板有限，无法支撑上市公司体量；<strong>工业制造是人形机器人当前唯一有规模化付费能力的场景</strong>。这条试错路径的成本是10年时间和持续亏损，但收益是积累了伺服驱动、运动控制、AI交互等底层核心技术，使工业场景的快速切入成为可能。2025年1,079台的交付量证明这次"向工业转舵"是正确的。</p>
+      </div>
+
+      <div class="analysis-block" id="a5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>优必选在行业中做出了清晰的取舍：<strong>走"iPhone路线"而非"iPod路线"——做全栈通用平台，而非单一功能工具</strong>。与Figure AI（聚焦单一工业场景+AI大脑）、宇树科技（中尺寸/低价策略）、特斯拉Optimus（自用为主、不对外销售）相比，优必选的定位更接近"人形机器人操作系统+硬件平台"的整合者。这一定位要求公司同时在硬件（伺服/灵巧手/骨架）、软件（Thinker/BrainNet/Co-Agent）、场景（汽车/3C/物流/航空）三条战线上作战，资源消耗巨大（年研发5亿+元，持续亏损），但一旦建立生态壁垒，天花板也远高于单一场景玩家。与西门子的合作明确指向"万台产能"的工业化量产能力，与本田贸易的合作打通全球汽车供应链渠道——这两步棋显示出优必选正在将"全栈平台"的定位从技术创新层面向产业生态层面延伸。</p>
+      </div>
+
+      <div class="analysis-block" id="a6">
+        <h4>2.6 其他重要观察</h4>
+        <p>优必选当前面临的核心矛盾是<strong>"高速增长与盈利时间表的赛跑"</strong>。账上48.88亿元现金给予约2-3年的安全垫（按当前亏损速度），但18.42亿元应收账款接近全年营收暗示现金流质量有待改善。市场给予的估值逻辑正在从"炒概念"转向"看真实订单和毛利率"，54.6%的人形机器人毛利率是积极信号，但产能利用率不到20%（6,000台产能仅交付1,079台）说明规模效应尚未释放。此外，"具身智能数据采集中心"的政府订单虽短期贡献了可观收入，但这类订单的可持续性和定价市场化程度存疑。2026年的5,000台目标如果能以超过70%的市场化订单（汽车/3C/物流企业直接采购）实现，将是真正意义上的"拐点"。国际竞争维度上，优必选借助本田贸易进入全球汽车供应链是其独特的"借船出海"策略——相比自行开拓海外市场，这一路径成本更低但受制于合作伙伴的推进节奏。</p>
+      </div>
+
+      <h2 id="refs">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://www.donews.com/news/detail/4/6492641.html">DoNews — 优必选2025年营收20.01亿元，全尺寸人形机器人收入增22倍</a></li>
+          <li><a href="https://m.jiemian.com/article/14209949.html">界面新闻 — 人形机器人卖出8亿，优必选还没走到赚钱那一步</a></li>
+          <li><a href="https://www.iheima.com/article-395750.html">i黑马 — 优必选年营收突破20亿，人形机器人业务成为第一支柱</a></li>
+          <li><a href="https://www.21jingji.com/article/20260402/herald/eaa0588aafb0de2817b0fe9249bbe85b.html">21世纪经济报道 — 悄悄地，优必选卖了和宇树一样多的人形机器人</a></li>
+          <li><a href="https://hk.stockstar.com/IG2026040100040889.shtml">证券之星 — 优必选的千台时刻：人形机器人，真拐点还是假繁荣？</a></li>
+          <li><a href="https://wallstreetcn.com/articles/3768895">华尔街见闻 — 优必选2025年人形机器人收入暴增2203.7%，亏损收窄32%</a></li>
+          <li><a href="https://api3.cls.cn/share/article/2332542">财联社 — 优必选股价大涨17%，这份财报解释了一切</a></li>
+          <li><a href="https://www.thepaper.cn/newsDetail_forward_32868398">澎湃新闻 — 优必选去年营收20亿元，全尺寸人形机器人收入增长22倍</a></li>
+          <li><a href="https://m.ithome.com/html/934684.htm">IT之家 — 优必选2025年营收突破20亿元</a></li>
+          <li><a href="https://news.qq.com/rain/a/20260402A03YF300">腾讯新闻 — 1079台、8.2亿元、暴增22倍：优必选交出人形机器人史上首份成绩单</a></li>
+          <li><a href="https://www.thecover.cn/news/BkEZK3cXVDOH90qSdq8Jkw==">封面新闻 — 优必选去年实现营收超20亿元</a></li>
+          <li><a href="https://www.21jingji.com/article/20250723/herald/2e03b3c79c0955c4ae38037f7ce3c21d.html">21世纪经济报道 — 软硬件全面升级，优必选工业人形Walker S2来了</a></li>
+          <li><a href="https://www.stcn.com/article/detail/2726004.html">证券时报 — 群体智能再升级！优必选推出全尺寸工业人形机器人Walker S2</a></li>
+          <li><a href="https://k.sina.cn/article_3649418972_d985b6dc01901jhps.html">新浪 — 群脑网络2.0+Co-Agent构建AI双循环</a></li>
+          <li><a href="https://www.hk01.com/即時中國/60331193/優必選與西門子合作佈局人形機械人-2026年萬台量產加速落地">HK01 — 优必选与西门子合作布局人形机器人，2026年万台量产加速落地</a></li>
+          <li><a href="https://www.x-techcon.com/article/126385.html">X-TechCon — 优必选牵手本田贸易，人形机器人加速驶入汽车供应链场景</a></li>
+          <li><a href="https://www.damon-group.cn/company-news-267">德马科技 — 德马科技与优必选战略签约，共绘物流具身商业蓝图</a></li>
+          <li><a href="https://wap.stockstar.com/detail/RB2026040100008334">证券之星 — 优必选2025年度管理层讨论与分析</a></li>
+          <li><a href="https://www.ainet.cn/znw/_01-ABC00000000000371521.shtml">中国智能制造网 — 优必选携手德马科技首秀MODEX 2026</a></li>
+          <li><a href="https://www.ceweekly.cn/company/2025/0730/477970.html">经济网 — 机器人能给自己换电池了？优必选人形机器人Walker S2再进化</a></li>
+          <li><a href="http://www.aastock.tw/sc/stocks/news/aafn-con/.HK.260424_160012/ipo-news/AAFN">AASTOCKS — 优必选发布Thinker cosmos推动人形机器人走向规模化</a></li>
+          <li><a href="https://jg-mvvm.eeo.com.cn/-article/info?viewLevel=3&id=38fca62c4a384b329d78b41202ebf074">经济观察报 — 优必选2026年关键事件：要约收购锋龙股份、发布Walker X机器人</a></li>
+          <li><a href="https://q.futunn.com/feed/116372747387284">富途 — 卖掉三套房、失败300次：他用17年完成了一场对日本机器人的逆袭</a></li>
+          <li><a href="https://www.163.com/dy/article/KQ33U8S705535KLV.html">网易 — 卖掉三套房、失败300次：他用17年完成了一场对日本机器人的逆袭</a></li>
+          <li><a href="https://stock.finance.sina.com.cn/hkstock/view/hk_report.php?reportid=828881360651">新浪财经 — 优必选动态研究：全尺寸人形收入8.2亿，迈入市场化落地元年</a></li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">此页面最后编辑于2026年5月4日 · 内容基于公开可用信息编制 · 具身智能Wiki</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body>
+</html>

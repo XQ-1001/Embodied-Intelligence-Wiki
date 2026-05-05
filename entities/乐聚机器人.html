@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>乐聚机器人 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> <span class="breadcrumb-sep">›</span> <span>乐聚机器人</span></div>
+  <div class="wiki-header"><h1>乐聚机器人</h1><div class="subtitle">Leju Robot · 冲刺科创板/创业板IPO · 2016年成立 · 全尺寸人形机器人量产先行者</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#team">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financial">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#analysis1">2.1 团队背景与场景选择</a></li>
+        <li class="toc-lvl4"><a href="#analysis2">2.2 技术路线与场景适配</a></li>
+        <li class="toc-lvl4"><a href="#analysis3">2.3 股东结构对战略影响</a></li>
+        <li class="toc-lvl4"><a href="#analysis4">2.4 试错与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#analysis5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#analysis6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#references">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">乐聚机器人</div>
+        <div class="ib-section">融资/估值</div>
+        <div class="ib-row"><div class="ib-label">累计融资</div><div class="ib-value">超18亿元</div></div>
+        <div class="ib-row"><div class="ib-label">Pre-IPO估值</div><div class="ib-value">约105亿元</div></div>
+        <div class="ib-row"><div class="ib-label">Pre-IPO融资</div><div class="ib-value">近15亿元（2025.10）</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">2025预计交付</div><div class="ib-value">1,000-2,000台</div></div>
+        <div class="ib-row"><div class="ib-label">夸父自由度</div><div class="ib-value">40+个</div></div>
+        <div class="ib-row"><div class="ib-label">国产化率</div><div class="ib-value">90%+</div></div>
+        <div class="ib-row"><div class="ib-label">教育覆盖学校</div><div class="ib-value">近5,000所</div></div>
+        <div class="ib-row"><div class="ib-label">专利总数</div><div class="ib-value">124件（发明62件）</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">领域</div><div class="ib-value">人形机器人 · 具身智能</div></div>
+        <div class="ib-row"><div class="ib-label">上市目标</div><div class="ib-value">科创板/创业板（2026）</div></div>
+        <div class="ib-row"><div class="ib-label">成立年份</div><div class="ib-value">2016年</div></div>
+        <div class="ib-row"><div class="ib-label">总部</div><div class="ib-value">深圳</div></div>
+        <div class="ib-section">官网</div>
+        <div class="ib-row"><div class="ib-label">网址</div><div class="ib-value"><a href="https://www.lejurobot.com" target="_blank">lejurobot.com</a></div></div>
+      </aside>
+
+      <p class="article-intro">乐聚机器人（Leju Robot）成立于2016年，总部位于深圳，由哈尔滨工业大学三位校友——冷晓琨、常琳、安子威联合创立，定位为全尺寸通用人形机器人研发与制造商。公司旗舰产品"夸父"（KUAVO）为全球首款搭载开源鸿蒙操作系统及5G-A通信的全尺寸人形机器人，国产化率超过90%。累计完成8轮超18亿元融资，投资方包括腾讯、深创投、深投控、茅台金石基金、东方精工等。2025年10月完成近15亿元Pre-IPO轮融资（投后估值约105亿元），2026年4月完成IPO辅导验收，冲刺科创板或创业板，有望成为A股"人形机器人第一股"有力竞争者。2025年预计交付全尺寸人形机器人1,000-2,000台，工业场景已进入一汽、北汽、蔚来、赛力斯等头部车企工厂。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper"><table class="wikitable infotable">
+        <tr><th>项目</th><th>内容</th></tr>
+        <tr><td>公司全称</td><td>乐聚智能（深圳）股份有限公司</td></tr>
+        <tr><td>英文名称</td><td>Leju (Shenzhen) Robot Technology Co., Ltd.</td></tr>
+        <tr><td>成立时间</td><td>2016年</td></tr>
+        <tr><td>总部</td><td>中国深圳</td></tr>
+        <tr><td>各地布局</td><td>深圳、苏州、潍坊、青岛、北京</td></tr>
+        <tr><td>上市目标</td><td>科创板或创业板（2026年）</td></tr>
+        <tr><td>IPO状态</td><td>2026年4月完成辅导验收，东方证券辅导</td></tr>
+        <tr><td>创始人/董事长/CTO</td><td>冷晓琨</td></tr>
+        <tr><td>CEO</td><td>常琳</td></tr>
+        <tr><td>COO</td><td>安子威</td></tr>
+        <tr><td>企业资质</td><td>国家级专精特新"小巨人"企业</td></tr>
+        <tr><td>主营业务</td><td>全尺寸人形机器人、教育机器人、关节模组</td></tr>
+      </table></div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>时间</th><th>事件</th></tr>
+        <tr><td>2016年</td><td>冷晓琨、常琳、安子威三位哈工大校友联合创立乐聚，天使轮1,000万元（松禾资本、深创投）</td></tr>
+        <tr><td>2017年</td><td>A轮5,000万元，腾讯入股；AELOS教育机器人系列上市</td></tr>
+        <tr><td>2019年</td><td>B轮2.5亿元，洪泰基金、深报一本领投，腾讯跟投</td></tr>
+        <tr><td>2023年</td><td>C轮融资；启动全尺寸人形机器人"夸父"研发</td></tr>
+        <tr><td>2024年</td><td>夸父量产交付；获评国家级专精特新"小巨人"；联合华为发布首款鸿蒙人形机器人</td></tr>
+        <tr><td>2025年1月</td><td>第100台全尺寸人形机器人交付北汽越野车</td></tr>
+        <tr><td>2025年6月</td><td>联合中国移动、华为发布全球首款5G-A人形机器人</td></tr>
+        <tr><td>2025年9月</td><td>完成股份制改造</td></tr>
+        <tr><td>2025年10月</td><td>Pre-IPO轮近15亿元（深投控、龙华资本、茅台金石等），投后估值约105亿元</td></tr>
+        <tr><td>2026年3月</td><td>MWC 2026巴塞罗那亮相，CEO常琳获GTI AWARDS荣誉奖</td></tr>
+        <tr><td>2026年4月</td><td>完成IPO辅导验收，正式进入申报阶段</td></tr>
+      </table></div>
+
+      <h3 id="team">1.2 创始人及核心团队</h3>
+      <p>乐聚机器人创始团队由三位哈工大校友组成，呈现典型的"学术+工程"复合型人才结构。团队在双足机器人领域有近十年研发积累，是国内少数同时掌握人形机器人硬件设计、运动控制和AI操作系统全栈能力的技术团队。</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+        <tr><td>董事长/CTO</td><td>冷晓琨</td><td>哈工大博士，90后创业者。双足机器人技术核心领军人物，主导夸父系列机械结构设计与运动控制算法研发。获2025年中国青年五四奖章等20余项荣誉，持股约19.77%为实控人</td></tr>
+        <tr><td>CEO</td><td>常琳</td><td>哈工大校友，负责公司整体运营、商业化落地与生态合作。2026年MWC获GTI AWARDS"荣誉奖"（全球仅5位），推动与华为、中国移动等战略合作及海外拓展</td></tr>
+        <tr><td>COO</td><td>安子威</td><td>哈工大校友，负责供应链管理、产能规划及产业链投资布局，主导与东方精工、蓝黛科技等上市公司的产线共建</td></tr>
+      </table></div>
+      <p>三位创始人合计控制公司约33.72%股份，无绝对控股股东。团队整体呈"技术驱动型"风格，以冷晓琨为核心的技术研发团队在双足机器人动力学控制领域有深厚积累。公司产业链投资布局广泛，通过投资泉智博、立聚动力、灵心巧手、刻行时空、具脑磐石、具识智能等企业构建了核心零部件自主可控的产业闭环。</p>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <h4>融资历史</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>轮次</th><th>时间</th><th>金额</th><th>核心投资方</th></tr>
+        <tr><td>天使轮</td><td>2016.07</td><td>1,000万元</td><td>松禾资本、深创投</td></tr>
+        <tr><td>Pre-A轮</td><td>2017.06</td><td>未披露</td><td>深创投</td></tr>
+        <tr><td>A轮</td><td>2017.08</td><td>5,000万元</td><td>腾讯（林芝利新）</td></tr>
+        <tr><td>B轮</td><td>2019.06</td><td>2.5亿元</td><td>洪泰基金、深报一本、腾讯跟投</td></tr>
+        <tr><td>C轮</td><td>2023.02</td><td>未披露</td><td>玖兆投资等</td></tr>
+        <tr><td>Pre-IPO</td><td>2025.10</td><td>近15亿元</td><td>深投控资本、龙华资本、前海基础投资、东方精工、拓普集团、中信金石、茅台金石基金等15家</td></tr>
+      </table></div>
+
+      <h4>主要股东结构（Pre-IPO后）</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>股东</th><th>持股比例</th><th>类型</th></tr>
+        <tr><td>冷晓琨（实控人）</td><td>约19.77%</td><td>创始团队</td></tr>
+        <tr><td>玖兆投资</td><td>10.27%</td><td>最大外部股东</td></tr>
+        <tr><td>腾讯（林芝利新）</td><td>7.92%</td><td>产业资本</td></tr>
+        <tr><td>深创投</td><td>7.87%</td><td>国资/财务</td></tr>
+        <tr><td>东方精工</td><td>6.83%</td><td>产业资本</td></tr>
+        <tr><td>松禾资本</td><td>3.17%</td><td>财务投资</td></tr>
+        <tr><td>茅台金石基金</td><td>1.42%</td><td>财务投资</td></tr>
+        <tr><td>上汽尚颀资本</td><td>1.42%</td><td>产业资本</td></tr>
+      </table></div>
+
+      <div class="callout">
+        <div class="callout-title">IPO进展</div>
+        <p>2025年9月完成股份制改造，2026年4月22日完成IPO辅导验收（东方证券担任辅导券商），目标板块为科创板或创业板。国内人形机器人赛道中，宇树科技已于2026年3月科创板IPO获受理（拟募资约42亿元），乐聚有望紧随其后成为"A股人形机器人第一股"的有力竞争者。</p>
+      </div>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>技术维度</th><th>方案/路线</th><th>说明</th></tr>
+        <tr><td>操作系统</td><td>开源鸿蒙 M-Robots OS</td><td>微秒级硬实时虚拟化内核，分布式架构支持多机协同，国内首款鸿蒙人形机器人</td></tr>
+        <tr><td>AI大模型</td><td>华为云盘古大模型 + 智谱大模型</td><td>"指令理解→任务规划→执行反馈"全流程自主决策</td></tr>
+        <tr><td>运动控制</td><td>CDM-MPC框架 + 全身动量控制 + Model-Based RL</td><td>联合北京通用人工智能研究院研发，支持不平地面自适应行走、跳跃</td></tr>
+        <tr><td>通信技术</td><td>5G-A（全球首款）</td><td>联合中国移动、华为发布，20ms端到端时延，降低本体算力40%，单台芯片成本削减约2.3万元</td></tr>
+        <tr><td>计算平台</td><td>NVIDIA Jetson Thor</td><td>2,070 FP4 TFLOPS，支持五大工业场景端侧推理</td></tr>
+        <tr><td>一体化关节</td><td>自研+蓝黛科技/泉智博联合</td><td>15弧秒级重复定位精度，扭矩密度较进口提升33%，国产化率95%</td></tr>
+        <tr><td>谐波减速器</td><td>纳米晶合金钢锻造，扭矩密度16Nm/kg</td><td>超越日本HD公司主流产品，成本较进口低40%</td></tr>
+        <tr><td>传感器</td><td>六维力传感器（柯力传感，0.1%精度）+ 3D结构光（奥比中光）</td><td>多传感器融合实现±3cm定位精度</td></tr>
+        <tr><td>电池</td><td>固态电池（与宁德时代合作）</td><td>下一代夸父续航目标8-10小时</td></tr>
+        <tr><td>国产化率</td><td>整机90%+，核心关节95%</td><td>全自主可控供应链</td></tr>
+      </table></div>
+      <p>乐聚的技术路径核心特征是"高国产化率+鸿蒙生态深度绑定"。区别于依赖进口核心零部件的同行，乐聚通过对蓝黛科技、泉智博、立聚动力等上游企业进行股权投资，实现了谐波减速器、一体化关节、电机等核心零部件的自主可控。软件层面，基于开源鸿蒙的M-Robots OS与华为云盘古大模型形成"操作系统+AI大脑"的闭环，5G-A通信技术的引入则通过"云端算力卸载"策略降低了对机器人本体算力的依赖。</p>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>产品系列</th><th>定位</th><th>关键参数</th><th>应用场景</th><th>价格区间</th></tr>
+        <tr><td>夸父（KUAVO）</td><td>全尺寸通用人形机器人（旗舰）</td><td>1.6-1.7m/45-55kg/40+自由度/7km·h奔跑/搬运16kg</td><td>工业智造、商业服务、科研</td><td>60-80万元/台</td></tr>
+        <tr><td>AELOS系列</td><td>小型双足机器人</td><td>30-70cm/教育编程平台</td><td>K12教育、AI实验室</td><td>数千至数万元</td></tr>
+        <tr><td>ROBAN</td><td>中型双足机器人</td><td>AI展示平台/ROS应用</td><td>高校科研、赛事</td><td>—</td></tr>
+        <tr><td>Fluvo</td><td>医疗物流机器人</td><td>轮式移动底盘</td><td>医院智慧物流</td><td>—</td></tr>
+        <tr><td>攀山侠</td><td>全地形履带式重载运输</td><td>履带式底盘、重载运输</td><td>山地/沙漠等恶劣环境</td><td>—</td></tr>
+        <tr><td>PANDO/CUBE</td><td>编程教育机器人/积木</td><td>编程套件</td><td>编程教育下沉市场</td><td>数百至数千元</td></tr>
+      </table></div>
+      <p>乐聚的产品矩阵呈现"金字塔"结构：旗舰夸父系列面向工业和商业高端场景，AELOS/ROBAN系列面向教育科研中端市场，PANDO/CUBE面向编程教育下沉市场。这种多层次布局使公司在人形机器人商业化早期即可通过教育市场获取现金流，同时以工业场景作为核心增长引擎。2026年目标包括整机自由度提升至60个、单腿跳跃高度突破35cm、推出固态电池版续航提升至8-10小时。</p>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>场景分类</th><th>子场景</th><th>关键合作方/客户</th><th>核心应用</th></tr>
+        <tr><td rowspan="5">工业智造（核心战场）</td><td>汽车装配</td><td>一汽红旗</td><td>空箱搬运、多机长时连续作业（120箱/小时）</td></tr>
+        <tr><td>汽车装配</td><td>北汽越野车</td><td>零配件搬运（第100台交付客户）</td></tr>
+        <tr><td>质检</td><td>蔚来汽车</td><td>车辆瑕疵检测</td></tr>
+        <tr><td>智能制造</td><td>赛力斯超级工厂</td><td>SMT料盘出库全流程</td></tr>
+        <tr><td>线缆分拣</td><td>苏州亨通工厂</td><td>约2年可收回机器人成本</td></tr>
+        <tr><td rowspan="2">商业服务</td><td>导览导购</td><td>荣耀、海信等</td><td>商业场所接待、导引</td></tr>
+        <tr><td>电网巡检</td><td>南方电网</td><td>5G-A具身智能机器人电网巡检</td></tr>
+        <tr><td rowspan="2">教育科研</td><td>中小学教育</td><td>全国近5,000所学校</td><td>AELOS编程教育、AI实验室</td></tr>
+        <tr><td>高校科研</td><td>哈工大、北大、港中大（深圳）等</td><td>ROBAN/夸父作为科研平台</td></tr>
+        <tr><td>重大活动</td><td>火炬手/主持</td><td>亚冬会、十五运会、中关村论坛</td><td>品牌曝光和技术验证</td></tr>
+      </table></div>
+      <p>乐聚的场景策略遵循"教育养现金流→工业冲规模→家庭等未来"的三阶段路径。当前核心战场为工业场景，已与40余家行业头部企业建立合作（华为、腾讯、阿里云、中国移动、荣耀、一汽、南方电网、海尔、海信等）。十五运会"无人陪跑"自主火炬传递事件展示了5G-A技术在复杂动态环境下的可靠性。</p>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>指标</th><th>数据</th><th>时间</th></tr>
+        <tr><td>累计交付全尺寸人形机器人</td><td>约300台</td><td>截至2025年Q1</td></tr>
+        <tr><td>2024年全年销量</td><td>约110+台</td><td>2024年</td></tr>
+        <tr><td>2025年预计交付</td><td>1,000-2,000台</td><td>2025全年</td></tr>
+        <tr><td>订单同比增速</td><td>+200%</td><td>2025年Q1</td></tr>
+        <tr><td>2026年底订单交付目标</td><td>10,000台</td><td>2026年</td></tr>
+        <tr><td>教育机器人覆盖学校</td><td>近5,000所</td><td>截至2025年</td></tr>
+        <tr><td>头部企业合作伙伴</td><td>40余家</td><td>截至2025年</td></tr>
+        <tr><td>重庆工厂规划产能</td><td>年产5万台</td><td>规划中</td></tr>
+        <tr><td>深圳龙华工厂规划产能</td><td>年产10万台（投资30亿元）</td><td>规划中</td></tr>
+        <tr><td>核心供应商蓝黛科技预计年收入</td><td>约1亿元（来自乐聚）</td><td>2025年</td></tr>
+      </table></div>
+      <p>乐聚的产能扩张速度超过行业平均水平：从2024年的110台到2025年预计1,000-2,000台，再到2026年目标10,000台，呈现数量级增长。2025年Q1产线"即产即销"，订单排至年中。但需注意，预计交付量与实际确认收入之间可能存在差距，具体财务数据有待IPO招股书披露。</p>
+
+      <h3 id="financial">1.8 财务数据</h3>
+      <div class="table-wrapper"><table class="wikitable infotable">
+        <tr><th>指标</th><th>数据</th><th>备注</th></tr>
+        <tr><td>2025年预计交付</td><td>1,000-2,000台</td><td>全尺寸人形机器人</td></tr>
+        <tr><td>估算营收（2025E）</td><td>5-10亿元</td><td>按均价50万元×1,000-2,000台估算</td></tr>
+        <tr><td>核心供应商营收（蓝黛科技）</td><td>约1亿元（来自乐聚）</td><td>毛利率约45%</td></tr>
+        <tr><td>累计融资</td><td>超18亿元</td><td>8轮</td></tr>
+        <tr><td>Pre-IPO估值</td><td>约105亿元</td><td>2025年10月</td></tr>
+        <tr><td>IPO目标估值</td><td>待披露</td><td>参考宇树科技拟募42亿元</td></tr>
+        <tr><td>关节模组需求（2025E）</td><td>5-10万套</td><td>零部件收入</td></tr>
+      </table></div>
+      <div class="callout">
+        <div class="callout-title">财务透明度说明</div>
+        <p>乐聚机器人目前处于IPO申报前静默期，未公开披露具体营收、利润及毛利率等详细财务数据。上述营收数据为基于公开产能和售价信息的估算值，精确财务数据将以IPO招股书为准。</p>
+      </div>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>全球首款搭载开源鸿蒙操作系统的人形机器人</li>
+        <li>全球首款5G-A具身智能人形机器人（联合中国移动、华为）</li>
+        <li>2025年十五运会"无人陪跑"完成自主火炬传递，验证5G-A复杂环境可靠性</li>
+        <li>冷晓琨获2025年中国青年五四奖章等20余项国家级/省部级荣誉</li>
+        <li>CEO常琳获GTI AWARDS 2026"荣誉奖"（全球仅5位产业专家）</li>
+        <li>核心零部件国产化率超90%，核心关节达95%</li>
+        <li>产业链投资布局6家核心企业：泉智博（关节）、立聚动力（电机）、灵心巧手（灵巧手）、刻行时空（数据平台）、具脑磐石（具身大脑）、具识智能（操作系统）</li>
+        <li>与东方精工共建年产5万台产线，与和而泰、东方精工联合成立控制器公司，与海晨股份成立物流场景合资公司</li>
+        <li>入选华为《无线网络迈向智能世界白皮书》十大标杆案例（火炬手+电网巡检）</li>
+        <li>2026年MWC巴塞罗那展品，GSMA联合15家全球产业伙伴发起5G-A倡议</li>
+        <li>已启动东南亚市场调研，关注欧洲老龄化市场机会</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="analysis1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>冷晓琨团队的哈工大双足机器人学术背景天然匹配其选择的"全尺寸人形"技术路线。哈工大在国内双足机器人动力学控制领域具有数十年的深厚积累，这使乐聚在人形机器人的"根本难题"——双足运动平衡——上具备了先发优势。然而，团队的学术基因也存在潜在的不匹配：当前核心工业化场景（汽车装配、SMT产线、线缆分拣）对机器人的要求更多在于"操作精度"和"任务可靠性"而非"动态运动能力"。工人们真正需要的是熟练操作而非炫酷跑跳。乐聚团队正从"运动控制专家"向"工业应用专家"转型，这条路上的试错成本不可低估。教育场景（AELOS系列覆盖5,000所学校）倒是与团队背景高度匹配，并提供了稳定的现金流缓冲。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>乐聚的"鸿蒙+盘古+5G-A+NVIDIA"技术栈呈现出鲜明的"华为生态深度绑定"特征，这条路线的核心优势是自主可控（国产化率90%+）和通信能力（5G-A的20ms端到端低延迟），但劣势同样明显：过度依赖华为生态可能限制其技术选择的灵活性。5G-A"云端算力卸载"策略虽然降低了单台2.3万元的芯片成本，但也使机器人在网络覆盖不佳的工业场景中面临性能断崖的风险。另外，乐聚采用基于模型（Model-Based）与强化学习（RL）融合的控制策略，这条路在工业场景的可靠性尚待大规模验证——基于模型的方法在高精度场景中更稳定但泛化性差，而RL方法泛化性强但可靠性不足。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>乐聚的股东结构具有鲜明的"产业资本导向"特征：腾讯（7.92%）提供云与AI生态支持，上汽（1.42%）绑定汽车产业链场景，东方精工（6.83%）共建产线和控制器公司，深投控、龙华资本等深圳国资背景基金提供政策和土地支持。这种结构下，乐聚很难成为一个"中立平台"——它更像是华为鸿蒙生态在人形机器人领域的"硬件代言人"。好处是场景绑定紧密（汽车场景由一汽/北汽/蔚来/赛力斯直接验证），坏处是跨出华为生态的场景拓展空间有限。茅台金石基金的入股尤其值得玩味——消费类LP的介入可能暗示乐聚的长期战略中家庭服务场景占有重要分量。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>乐聚的发展轨迹体现了从"教育玩具"到"工业工具"再到"通用平台"的三级跳。2016-2019年以AELOS教育机器人积累第一桶金和工程化经验，2023年开始全力转向全尺寸人形机器人。这一转向背后的逻辑是清晰的：教育市场的天花板太低（中小学编程教育市场规模有限），只有进入工业场景才能支撑105亿的估值。但目前工业场景的落地仍处于"PoC（概念验证）"阶段——一汽120箱/小时的搬运效率与熟练工人的效率仍有差距（约为人力的50%），亨通工厂的2年回本周期也是理想化计算。从PoC到真正的规模化工业部署，乐聚还需要完成从"能工作"到"比工人更经济"的跨越。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>在人形机器人赛道中，乐聚的核心取舍是"全栈自主+鸿蒙生态绑定"vs"通用开放+多元生态"。与宇树科技（市占率51.72%）的"硬件优先+全球化"策略不同，乐聚选择了更重的全产业链布局——从谐波减速器的纳米晶合金锻造到M-Robots OS操作系统，再到对上游6家核心零部件企业的股权投资。这种"垂直整合"策略在产业早期能降低成本、保证交付可控，但随着行业成熟，可能面临"大而全却不够精"的风险。与优必选的"服务场景优先"相比，乐聚的"工业先导"策略商业化确定性更强，但面向C端家庭服务的想象空间更小。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis6">
+        <h4>2.6 其他重要观察</h4>
+        <p>乐聚机器人的IPO进度是当前最值得关注的变量。2026年4月辅导验收的完成意味着正式招股书即将披露，届时公司的真实营收、利润、现金流和出货量数据将首次全面公开。需要重点关注三点：(1)2025年"预计交付1,000-2,000台"中实际确认收入的数量，二者之间的差距将反映渠道压货程度；(2)毛利率是否如核心供应商蓝黛科技所示的"约45%"那样健康，还是整机端毛利率显著低于零部件端；(3)研发费用率是否如优必选（2024年约46%）那样高企，这将决定盈利拐点的时间线。另外，固态电池版"夸父"如果能在2026年内实现8-10小时续航，将极大改善工业场景的实用性，可能成为估值的下一级催化剂。</p>
+      </div>
+
+      <h2 id="references">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://36kr.com/p/3524527689390980">36氪：山东潍坊90后做人形机器人：一把融资15亿，冲刺上市，腾讯押注</a></li>
+          <li><a href="http://www.iheima.com/article-396516.html">i黑马：乐聚机器人完成IPO辅导验收，人形机器人上市潮谁先盈利？</a></li>
+          <li><a href="https://www.baoshandaily.com/html/20251022/content_17611333701535.html">宝山日报：乐聚机器人完成股改及15亿Pre-IPO融资</a></li>
+          <li><a href="https://m.21jingji.com/article/20251022/herald/2f5212453ea1d399421007c41d79d8cf_zaker.html">21世纪经济报道：冲刺IPO 乐聚机器人融了15亿</a></li>
+          <li><a href="https://news.pedaily.cn/202510/556705.shtml">投资界：刚融资15亿，这家具身智能公司筹备IPO</a></li>
+          <li><a href="https://www.163.com/dy/article/KCFD3U24051180F7.html">网易：腾讯投的哈工大校友，拿下15亿融资，冲刺IPO</a></li>
+          <li><a href="https://forbeschina.com/investment/70531">福布斯中国：竞逐"人形机器人第一股"：乐聚机器人获15亿元融资</a></li>
+          <li><a href="http://xzlrobot.com/c14576.html">新战略机器人：乐聚夸父机器人基于NVIDIA Jetson Thor加速具身智能通用进程</a></li>
+          <li><a href="https://baijiahao.baidu.com/s?id=1847374303501694529">百家号：乐聚机器人深度拆解：夸父技术内核与IPO进程</a></li>
+          <li><a href="https://www.zhineng518.com/page119?article_id=13495">智能518：MWC 2026 乐聚机器人亮出5G-A具身智能落地成绩单</a></li>
+          <li><a href="https://news.10jqka.com.cn/20260305/c675087825.shtml">同花顺：乐聚机器人亮出5G-A具身智能落地成绩单</a></li>
+          <li><a href="https://m.ebrun.com/583519.html">亿邦动力：中国移动联合乐聚发布业界首款5G-A人形机器人</a></li>
+          <li><a href="https://www.88sup.com/news/content/114.html">88sup：国内首款鸿蒙人形机器人"夸父"量产亮相</a></li>
+          <li><a href="https://www.tsinghua.edu.cn/info/1182/118035.htm">清华大学：人形机器人背后有牛人</a></li>
+          <li><a href="http://stock.finance.sina.com.cn/stock/go.php/vReport_Show/kind/industry/rptid/811010563674/index.phtml">新浪财经：人形机器人行业观点报告：看好乐聚机器人产业链</a></li>
+          <li><a href="https://www.eet-china.com/mp/a449720.html">电子工程专辑：乐聚机器人启动IPO，人形机器人"独角兽"加速冲刺科创板</a></li>
+          <li><a href="https://guba.eastmoney.com/news,cjpl,1614084690.html">东方财富：腾讯是三股东：乐聚机器人完成15亿元Pre-IPO</a></li>
+          <li><a href="https://www.rccaijing.com/news-7389846370654025503.html">融中财经：乐聚机器人IPO前夕完成近15亿融资，腾讯、茅台位列股东</a></li>
+          <li><a href="https://www.cnenergynews.cn/trz_IPO/2025/10/22/detail_20251022241604.html">中国能源网：又一人形机器人企业推进IPO！乐聚机器人完成15亿元Pre-IPO轮融资</a></li>
+          <li><a href="http://bgimg.ce.cn/cysc/tech/gd2012/202502/25/t20250225_39302495.shtml">中国经济网：人形未来 江南"智"造</a></li>
+          <li><a href="https://m.jfdaily.com/wx/detail.do?id=865655">解放日报：从春晚舞台到生产车间，长三角人形机器人开启"打工热潮"</a></li>
+          <li><a href="http://mrdx.cn/content/20250321/Articel05004NU.htm">新华每日电讯：人形机器人产业发展观察</a></li>
+          <li><a href="https://www.163.com/dy/article/JR77APU105346RC6.html">网易：人形机器人创始人冷晓琨访谈</a></li>
+          <li><a href="https://blog.csdn.net/weixin_29103191/article/details/159180792">CSDN：华为携手16家机器人企业，共探具身智能新生态</a></li>
+          <li><a href="https://www.jiuyangongshe.com/a/1zvlvwfq0ty">九研公社：冲刺IPO 乐聚机器人融了15亿</a></li>
+        </ol>
+      </div>
+
+    </article>
+  </div>
+  <div class="page-footer">本页面最后更新于2026年5月4日 · 具身智能Wiki项目 · 数据来源于公开信息及公司官方披露 · 财务数据为估算值，以IPO招股书为准</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body>
+</html>

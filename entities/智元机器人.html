@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>智元机器人 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> <span class="breadcrumb-sep">›</span> <span>智元机器人</span></div>
+  <div class="wiki-header"><h1>智元机器人</h1><div class="subtitle">AgiBot · 未上市 · 2023年成立 · 2025年营收10.5亿元 · 估值约150亿元</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#team">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financials">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#analysis-1">2.1 团队背景与场景匹配度</a></li>
+        <li class="toc-lvl4"><a href="#analysis-2">2.2 技术路线与场景适配性</a></li>
+        <li class="toc-lvl4"><a href="#analysis-3">2.3 股东结构对战略的影响</a></li>
+        <li class="toc-lvl4"><a href="#analysis-4">2.4 试错与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#analysis-5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#analysis-6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#references">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">智元机器人</div>
+        <div class="ib-row"><div class="ib-label">公司全称</div><div class="ib-value">智元创新（上海）科技有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">英文名称</div><div class="ib-value">AgiBot / Agibot</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2023年2月</div></div>
+        <div class="ib-row"><div class="ib-label">注册地</div><div class="ib-value">中国上海</div></div>
+        <div class="ib-row"><div class="ib-label">上市状态</div><div class="ib-value">未上市（控股上纬新材688585）</div></div>
+        <div class="ib-row"><div class="ib-label">创始人/CEO</div><div class="ib-value">邓泰华</div></div>
+        <div class="ib-row"><div class="ib-label">联合创始人/CTO</div><div class="ib-value">彭志辉（稚晖君）</div></div>
+        <div class="ib-section">财务数据（2025）</div>
+        <div class="ib-row"><div class="ib-label">营业收入</div><div class="ib-value">10.5亿元</div></div>
+        <div class="ib-row"><div class="ib-label">净利润</div><div class="ib-value">仍在亏损</div></div>
+        <div class="ib-row"><div class="ib-label">出货量（累计）</div><div class="ib-value">超10,000台</div></div>
+        <div class="ib-section">估值/融资</div>
+        <div class="ib-row"><div class="ib-label">最新估值</div><div class="ib-value">约150亿元</div></div>
+        <div class="ib-row"><div class="ib-label">累计融资</div><div class="ib-value">约11轮</div></div>
+        <div class="ib-row"><div class="ib-label">主要投资方</div><div class="ib-value">腾讯、高瓴、红杉中国、比亚迪、京东、LG</div></div>
+        <div class="ib-section">官网</div>
+        <div class="ib-row"><div class="ib-label">官方网站</div><div class="ib-value"><a href="https://www.agibot.com" target="_blank">agibot.com</a></div></div>
+      </aside>
+
+      <p class="article-intro">智元机器人（AgiBot）成立于2023年2月，总部位于上海，是中国具身智能与人形机器人赛道的头部企业。公司由前华为副总裁邓泰华与"华为天才少年"彭志辉（稚晖君）联合创办，成立不到三年已完成约11轮融资，估值约150亿元。2025年实现营收10.5亿元，成为中国最快突破10亿元营收的机器人公司。智元以"数据—仿真—模型—平台—部署"全栈闭环为核心竞争力，旗下拥有远征（全尺寸人形）、灵犀（轻量人形）、精灵（工业轮式）、酷拓（四足）四大产品线，截至2026年3月累计下线超10,000台通用具身机器人。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper"><table class="wikitable infotable">
+      <tr><th>项目</th><th>内容</th></tr>
+      <tr><td>公司全称</td><td>智元创新（上海）科技有限公司（原上海智元新创技术有限公司）</td></tr>
+      <tr><td>英文名称</td><td>AgiBot / Agibot</td></tr>
+      <tr><td>成立时间</td><td>2023年2月</td></tr>
+      <tr><td>注册地</td><td>中国上海市浦东新区张江</td></tr>
+      <tr><td>上市状态</td><td>未上市；2025年7月通过智元恒岳控股科创板上市公司上纬新材（688585.SH），持股约63.62%</td></tr>
+      <tr><td>官方网站</td><td>www.agibot.com</td></tr>
+      <tr><td>所属赛道</td><td><span class="tag">具身智能</span><span class="tag">人形机器人</span><span class="tag">通用机器人</span></td></tr>
+      </table></div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper"><table class="wikitable">
+      <tr><th>时间</th><th>事件</th></tr>
+      <tr><td>2023年2月</td><td>上海智元新创技术有限公司成立，总部设于上海张江</td></tr>
+      <tr><td>2023年8月</td><td>完成A+轮融资，估值达35亿元，一年内完成5轮融资</td></tr>
+      <tr><td>2024年Q4</td><td>完成B轮融资，单轮超15亿元，红杉中国、高瓴创投等追加投资</td></tr>
+      <tr><td>2025年1月</td><td>第1000台通用具身机器人下线，成为全球量产规模最大的人形机器人企业</td></tr>
+      <tr><td>2025年3月</td><td>发布中国首个通用具身基座模型GO-1；腾讯领投战略融资，估值跃升至150亿元</td></tr>
+      <tr><td>2025年7月</td><td>以约21亿元收购上纬新材（688585.SH）约63.62%股份，邓泰华成为实际控制人</td></tr>
+      <tr><td>2025年8月</td><td>LG电子、韩国未来资产集团联合领投，国际化战略加速</td></tr>
+      <tr><td>2026年3月</td><td>累计下线超10,000台通用具身机器人</td></tr>
+      <tr><td>2026年4月</td><td>"AI发布周"密集发布GO-2大模型、灵渠OS、AGIBOT WORLD 2026数据集、Genie Sim 3.0等</td></tr>
+      <tr><td>2026年4月17日</td><td>举办2026全球合作伙伴大会（APC 2026），来自34国2500+人参会，正式宣布进入"部署态"</td></tr>
+      </table></div>
+
+      <h3 id="team">1.2 创始人及核心团队</h3>
+      <p>智元机器人的核心团队堪称"华为系+DeepMind+大疆"的高度混合型豪华阵容。团队整体呈现产业背景与学术研究并重的特点：创始人邓泰华自带华为ICT产业体系的深度经验与生态资源，CTO彭志辉兼具硬核工程能力与公众影响力，首席科学家罗剑岚带来全球顶级机器人强化学习研究能力。研发人员中约73%投入作业智能/大小脑方向。</p>
+
+      <div class="table-wrapper"><table class="wikitable">
+      <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+      <tr><td>创始人、董事长兼CEO</td><td>邓泰华</td><td>前华为公司副总裁、计算产品线总裁，主导鲲鹏/昇腾AI生态构建；电子科技大学1995级校友；2026年4月起罕见公开发声全面阐述智元战略</td></tr>
+      <tr><td>联合创始人、CTO</td><td>彭志辉（稚晖君）</td><td>1993年出生，B站282万粉丝百大UP主；2020年以"华为天才少年计划"最高档年薪加入华为；电子科技大学2011级校友</td></tr>
+      <tr><td>联合创始人</td><td>闫维新</td><td>上海交通大学机器人研究所博士生导师，曾研发烹饪机器人、核酸采样机器人等</td></tr>
+      <tr><td>高级副总裁、首席科学家</td><td>罗剑岚</td><td>前Google DeepMind研究科学家，伯克利Sergey Levine团队核心成员，主导研发出全球首个超人类机器人强化学习系统</td></tr>
+      <tr><td>合伙人、具身业务部总裁</td><td>姚卯青</td><td>清华大学博士，前Waymo、蔚来汽车自动驾驶技术总监</td></tr>
+      <tr><td>高级副总裁、营销服总裁</td><td>姜青松</td><td>前华为P&S产品管理部部长，超20年ICT大厂B端市场经验</td></tr>
+      <tr><td>COO</td><td>邱恒</td><td>华为背景，负责公司运营管理</td></tr>
+      <tr><td>高级副总裁、通用业务部总裁</td><td>王闯</td><td>前大疆激光雷达产品线创始团队成员</td></tr>
+      <tr><td>副总裁、首席人力资源官</td><td>钮嘉</td><td>前华为云计算HRD、寒武纪HRD</td></tr>
+      </table></div>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <p>智元机器人成立不到三年完成约11轮融资，融资节奏之快创中国机器人行业之最。2025年3月腾讯战略入股后估值约150亿元，跻身中国具身智能"百亿俱乐部"第一梯队。彭志辉公开表示"我们不缺钱"，公司已具备较强的独立造血能力。</p>
+
+      <h4>融资历史</h4>
+      <div class="table-wrapper"><table class="wikitable">
+      <tr><th>时间</th><th>轮次</th><th>关键信息</th></tr>
+      <tr><td>2023年（全年）</td><td>天使轮至A+轮</td><td>5轮融资，一年内跻身独角兽（估值超10亿美元）；A+轮估值35亿元</td></tr>
+      <tr><td>2024年Q4</td><td>B轮</td><td>红杉中国、高瓴创投等追加投资，单轮超15亿元</td></tr>
+      <tr><td>2025年3月</td><td>战略融资</td><td>腾讯领投（首次入局人形机器人），卧龙电驱、龙旗科技、华发集团、蓝驰创投等跟投；估值约150亿元</td></tr>
+      <tr><td>2025年5月</td><td>新一轮</td><td>京东、上海具身智能基金参投，红杉中国、TCL创投、尚颀资本等增资</td></tr>
+      <tr><td>2025年8月</td><td>战略入股</td><td>LG电子、韩国未来资产集团（Mirae Asset）联合领投</td></tr>
+      </table></div>
+
+      <h4>主要股东结构</h4>
+      <div class="table-wrapper"><table class="wikitable">
+      <tr><th>类别</th><th>股东</th><th>持股/关联</th></tr>
+      <tr><td>创始团队</td><td>邓泰华、彭志辉等</td><td>通过智元恒岳等持股平台控制</td></tr>
+      <tr><td>财务投资者</td><td>高瓴创投</td><td>持股约7.2%，第二大股东</td></tr>
+      <tr><td>财务投资者</td><td>腾讯</td><td>持股约2.06%，2025年3月首次入局</td></tr>
+      <tr><td>产业资本</td><td>比亚迪</td><td>持股约2.38%-2.5%</td></tr>
+      <tr><td>产业资本</td><td>软通动力</td><td>持股约1.41%，鸿蒙生态核心服务商</td></tr>
+      <tr><td>产业资本</td><td>卧龙电驱</td><td>上游电机产业链交叉持股</td></tr>
+      <tr><td>产业资本</td><td>京东</td><td>2025年5月入股</td></tr>
+      <tr><td>产业资本</td><td>LG电子</td><td>2025年8月联合领投</td></tr>
+      <tr><td>其他财务投资方</td><td>红杉中国、鼎晖投资、经纬创投、蓝驰创投、高榕资本、百度、上汽集团（尚颀资本）、TCL创投</td><td>多轮跟投</td></tr>
+      </table></div>
+
+      <div class="callout"><div class="callout-title">重要资本运作</div>2025年7月，智元机器人通过持股平台"智元恒岳"斥资约21亿元，以协议转让+主动要约方式收购上纬新材（688585.SH）约63.62%股份，邓泰华成为实际控制人，彭志辉进入董事会。公司澄清此举并非"借壳上市"。智元还对外投资了数字华夏、灵初智能、千觉机器人等超10家具身智能相关企业，并与博众精工、大丰实业、卧龙电驱、软通动力等上市公司成立合资公司。</div>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <p>智元机器人坚持"全栈垂直整合"技术路线，构建了从数据采集、仿真训练、大模型推理到平台部署的完整闭环。公司以自研VLA基座大模型GO-2为核心大脑，灵渠OS为操作系统底座，Genie Sim为数字孪生仿真引擎，AGIBOT WORLD为真实世界数据基础设施。</p>
+
+      <div class="table-wrapper"><table class="wikitable">
+      <tr><th>技术维度</th><th>方案</th><th>说明</th></tr>
+      <tr><td>AI架构</td><td>VLA基座大模型GO-2</td><td>引入"动作思维链"与异步双系统架构（低频规划+高频跟随），LIBERO基准成功率98.5%</td></tr>
+      <tr><td>操作系统</td><td>灵渠Link-U OS（自研）</td><td>原生适配具身智能，向下管理全谱系硬件，向上对接GO-2模型与Genie Studio平台</td></tr>
+      <tr><td>数据方案</td><td>AGIBOT WORLD 2026 + 觅蜂数据平台</td><td>全球首个真实场景开源具身数据集（100万+轨迹/43.8TB）；目标千万小时级数据产能</td></tr>
+      <tr><td>仿真平台</td><td>Genie Sim 3.0 + GE-Sim 2.0世界模型</td><td>基于NVIDIA Isaac Sim深度定制；LLM驱动场景生成；支持零样本Sim2Real迁移</td></tr>
+      <tr><td>部署平台</td><td>Genie Studio Agent</td><td>零代码拖拽式应用编排，将传统3-6个月集成周期大幅缩短</td></tr>
+      <tr><td>技术架构</td><td>"一体三智"（稳定本体+运动/交互/作业智能）</td><td>本体硬件与三类AI智能深度耦合</td></tr>
+      <tr><td>生态体系</td><td>AIMA全栈生态 + "元笙"计划</td><td>覆盖OS、模型、平台、数据的一站式开放生态；5年投入超20亿元</td></tr>
+      </table></div>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <p>智元机器人拥有四大本体系列，覆盖全尺寸人形到四足巡检。截至2026年3月累计下线的10,000台中，灵犀系列（半尺寸/轻量人形）占比最高，精灵系列（工业轮式）为当前商业化主力。</p>
+
+      <div class="table-wrapper"><table class="wikitable">
+      <tr><th>产品系列</th><th>型号</th><th>形态</th><th>定位</th><th>关键参数/场景</th></tr>
+      <tr><td>远征系列</td><td>A1/A2/A3</td><td>全尺寸双足人形</td><td>旗舰通用人形</td><td>A3为第三代旗舰，2026年4月发布；适用于科研、服务、工业等通用场景</td></tr>
+      <tr><td>灵犀系列</td><td>X1/X2/X3</td><td>半尺寸/轻量人形</td><td>轻量级通用机器人</td><td>X2曾在中美"乒乓外交"55周年活动中展示乒乓球对打；X3为2026年新一代</td></tr>
+      <tr><td>精灵系列</td><td>G1/G2/G2 Max</td><td>轮式双臂</td><td>工业部署主力</td><td>G2在3C产线实现8小时零失误作业，单台UPH 310件，支持7×24双班运行</td></tr>
+      <tr><td>酷拓系列</td><td>D2等</td><td>四足机器人</td><td>巡检/安防场景</td><td>2026年子公司"智元酷拓"独立运营，2026年营收目标5亿元</td></tr>
+      </table></div>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <p>智元以"先工厂后家庭"为应用落地次序，2026年明确了七大部署态生产力解决方案。彭志辉判断机器人进入家庭至少还需5年。</p>
+
+      <div class="table-wrapper"><table class="wikitable">
+      <tr><th>场景分类</th><th>具体场景</th><th>部署状态</th><th>合作方</th></tr>
+      <tr><td>工业制造</td><td>3C精密零件上下料</td><td>已验证+付费订单</td><td>龙旗科技（8小时零失误直播验证）</td></tr>
+      <tr><td>工业制造</td><td>工业搬运拆码垛</td><td>常态化部署</td><td>富临精工</td></tr>
+      <tr><td>物流仓储</td><td>物流分拣</td><td>2026年启动海外部署</td><td>京东（股东）等</td></tr>
+      <tr><td>商业服务</td><td>导览导购导引</td><td>已签约</td><td>海底捞、安踏</td></tr>
+      <tr><td>商业服务</td><td>服务零售站</td><td>方案发布中</td><td>—</td></tr>
+      <tr><td>安防巡检</td><td>电网、园区、边境巡检</td><td>部署中</td><td>酷拓四足产品线</td></tr>
+      <tr><td>工商业清洁</td><td>商业/工业清洁</td><td>万台级出货</td><td>—</td></tr>
+      <tr><td>消费/家庭</td><td>家庭服务</td><td>远期（5年+）</td><td>—</td></tr>
+      <tr><td>教育科研</td><td>高校/科研机构</td><td>"教育生态百千万计划"</td><td>中科院、北大、复旦、牛津、剑桥等</td></tr>
+      </table></div>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <p>智元机器人2025年营收10.5亿元，2026年Q1表现良好。核心商业化里程碑如下：</p>
+      <ul>
+        <li>截至2026年3月，累计下线通用具身机器人超10,000台，为全球量产规模最大的人形机器人厂商之一</li>
+        <li>精灵G2在龙旗科技3C产线完成8小时连续作业直播，2,283次任务零失误，成功率100%，单台UPH约310件</li>
+        <li>合作伙伴销售占比从2024年近乎0提升至2025年约25%，2026年目标60%</li>
+        <li>推出RaaS租赁平台"擎天租"，以按需使用、按价值付费模式降低客户部署门槛</li>
+        <li>自建上海临港制造工厂，规划年产能6,500台</li>
+        <li>七大部署态生产力解决方案进入规模化推广阶段</li>
+        <li>四足机器人业务拆分为子公司"智元酷拓"，2026年营收目标5亿元</li>
+      </ul>
+
+      <h3 id="financials">1.8 财务数据</h3>
+      <p>智元机器人未上市，以下数据来自2026年4月17日合作伙伴大会邓泰华公开披露及媒体报道。</p>
+
+      <div class="table-wrapper"><table class="wikitable">
+      <tr><th>指标</th><th>2023年</th><th>2024年</th><th>2025年</th><th>2026年（目标）</th></tr>
+      <tr><td>营业收入</td><td>约30万元</td><td>约6,000万元</td><td>10.5亿元</td><td>数倍增长</td></tr>
+      <tr><td>同比增速</td><td>—</td><td>约200倍</td><td>约17.5倍</td><td>—</td></tr>
+      <tr><td>净利润</td><td>亏损</td><td>亏损</td><td>亏损（收窄中）</td><td>—</td></tr>
+      <tr><td>研发投入占比</td><td>—</td><td>—</td><td>超3/4研发人员投入AI方向</td><td>—</td></tr>
+      <tr><td>累计出货量</td><td>—</td><td>—</td><td>约5,000台</td><td>超10,000台（截至3月）</td></tr>
+      <tr><td>估值</td><td>35亿元</td><td>—</td><td>约150亿元</td><td>—</td></tr>
+      </table></div>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>公司名称曾为"上海智元新创技术有限公司"，后更名为"智元创新（上海）科技有限公司"</li>
+        <li>彭志辉（稚晖君）在B站拥有超282万粉丝，为公司带来显著的公众关注度和人才吸引力</li>
+        <li>2026年提出"358宏图"：3年10亿（2025年已实现）、5年100亿+（2027年）、8年1000亿+（2030年）</li>
+        <li>提出供应商"30分钟生态圈"标准，强调中国供应链整合与工程化落地优势</li>
+        <li>旗下控股上市公司上纬新材（688585.SH）2025年营收17.97亿元（+20.29%），但归母净利润同比降53.67%至4108.56万元，机器人新业务仍处研发阶段</li>
+        <li>与Hitch Open签署战略合作，远征A3将亮相国际AI自主决策乒乓挑战赛</li>
+        <li>提出具身智能行业"XYZ曲线"理论框架，将具身智能体定义为"AI时代最大Token消费者"</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="analysis-1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>智元的创始团队组合在具身智能赛道中极为独特：邓泰华带来华为ICT产业体系的生态思维与大规模工程化管理经验，彭志辉提供了顶尖的单兵工程能力和"网红效应"带来的品牌与人才杠杆，罗剑岚则补齐了全球最前沿的机器人强化学习研究能力。这一"产业老兵+明星工程师+顶会科学家"的三角结构，使其场景选择呈现出明显的"工业优先"逻辑——邓泰华的华为供应链管理经验、姜青松的B端市场背景，天然指向制造业场景；而姚卯青的自动驾驶背景（Waymo/蔚来）则为智元在感知-规划-控制的技术闭环上提供了方法论迁移。团队中缺乏消费电子或C端产品经验的高管，这与彭志辉"家庭至少还需5年"的判断高度一致。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>智元的"全栈垂直整合"路线——从AGIBOT WORLD数据采集到GO-2大模型再到Genie Studio部署——与工业场景的严苛要求高度匹配。工业场景对可靠性、可复现性、低延迟的要求远高于实验室Demo，而智元的异步双系统架构（低频规划+高频跟随）正是针对这一矛盾的工程化解法。在数据路线上，智元选择"真实采集+虚拟增强"双轮驱动，对于数据极度稀缺的具身智能领域来说是正确的策略。但值得关注的是，Sim2Real的零样本迁移虽然在3C产线取得了100%成功率，这一指标是否能在更多非结构化场景中保持仍有待验证。全栈路线也意味着巨大的研发投入压力——公司坦承超3/4研发资源投入AI方向，这在商业化初期是合理的取舍。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>智元的股东阵容呈现出"财务投资+产业资本+国际资本"的三层结构。产业资本层面，比亚迪（新能源汽车供应链协同）、卧龙电驱（电机上游）、软通动力（鸿蒙生态）、龙旗科技（3C制造场景）均为自然绑定的场景资源方；LG电子与韩国未来资产的入局则为海外扩张铺设了通道。财务投资者方面，高瓴（约7.2%）和红杉的持续加注提供了充足的资金弹药，但腾讯仅2.06%的持股比例显示其并未追求控股权，这给予了创始团队更大的战略独立性。然而，控股上纬新材（持股63.62%）这一操作将一家传统化工材料上市公司装入具身智能叙事中，虽然短期内股价暴涨约16倍带来巨额账面浮盈，但上纬新材2025年净利润腰斩、毛利率仅13.6%、机器人业务零收入的基本面与估值之间存在显著张力。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>智元在不足三年的发展历程中经历了数次值得关注的战略调整。首先，公司成立初期以人形机器人通用平台为定位，但实际商业化主力从远征系列（全尺寸人形）逐渐转向精灵系列（工业轮式），这一转向反映了市场对人形形态付费意愿有限、而轮式方案在工业场景中更务实的现实。其次，四足机器人业务拆分为独立子公司"智元酷拓"，表明公司在安防巡检等专用场景上采取了更灵活的治理架构。此外，从"卖机器人"向"交付结果"（RaaS平台"擎天租"）的模式转变，本质上是从硬件销售向服务化运营的转型，这与云计算行业的演进逻辑相似。最值得关注的是，公司从"研发态"向"部署态"的阶段性跨越——2026年合作伙伴大会将"交付结果"而非"出货数量"作为核心KPI，这标志着从技术demo到产业价值的实质性跃迁。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>智元在竞争格局中的核心取舍可以概括为"全栈vs专用"和"通用平台vs解决方案"两条轴线。与宇树科技（侧重硬件与成本控制，走"iPod"式单一爆品路线）不同，智元选择了类似"iPhone+App Store"的全栈平台型路线——既做硬件（四大本体系列），又做操作系统（灵渠OS），还做大模型（GO-2）和开发者生态（元笙计划）。这一策略的优势在于一旦生态成型，壁垒极高；风险在于资源分散，且需要在多个战场上同时保持竞争力。在"大脑vs身体"的经典取舍上，智元明确选择了以大脑（GO-2模型）为核心差异化，同时通过全谱系硬件确保场景覆盖——这与彭志辉"缺数据不缺钱"的判断一致，因为数据是训练大脑的根本。相比特斯拉Optimus的垂直整合（机器人+汽车工厂+Dojo超算+FSD技术迁移），智元缺乏自有的规模化应用场景，这使其更依赖合作伙伴生态来构建数据飞轮。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-6">
+        <h4>2.6 其他重要观察与分析</h4>
+        <p>第一，智元的"358宏图"（2025年10亿→2027年100亿+→2030年1000亿+）虽然极具野心，但考虑到公司2023年营收仅30万元、2024年6,000万元、2025年10.5亿元的增长曲线，以及具身智能仍处于产业化早期的事实，这一目标的实现路径高度依赖于行业整体的渗透速度，而非公司单方面的执行能力。第二，智元通过资本运作控股上纬新材的操作，虽然在短期内创造了巨额账面收益（浮盈超200亿元），但也引入了A股市场的监管约束和业绩承诺压力（上纬新材业绩承诺完成率低于54%），这可能影响公司未来的融资节奏和业务灵活性。第三，彭志辉个人IP的价值是一把双刃剑——"稚晖君"的品牌效应在吸引人才、媒体关注和融资方面极为有效，但也使公司的公众认知过度集中于个人，而邓泰华2026年4月的罕见公开发声可视为对这种不对称的有意识纠正。第四，随着国际竞争加剧（特斯拉Optimus、Figure AI、1X等），智元的海外布局（LG/韩国资本入股、Hitch Open合作）将成为其能否从"中国冠军"升级为"全球玩家"的关键变量。</p>
+      </div>
+
+      <h2 id="references">3 参考资料</h2>
+      <div class="references">
+      <ol>
+        <li><a href="https://finance.eastmoney.com/a/202604173708657235.html" target="_blank">智元董事长邓泰华：公司2025年收入10.5亿元 较2024年0.6亿元收入大幅增长 — 东方财富网</a></li>
+        <li><a href="https://stcn.com/article/detail/3758456.html" target="_blank">智元董事长邓泰华：公司2025年收入10.5亿元 — 证券时报</a></li>
+        <li><a href="https://www.sfccn.com/2026/4-18/xMMDE0NDlfMjEzMTkxMg.html" target="_blank">智元稚晖君："我们不缺钱，但缺数据" — 时代财经</a></li>
+        <li><a href="https://m.cnfin.com/qy-lb//zixun/20260418/4401415_1.html" target="_blank">智元邓泰华：2026年为具身智能"部署态元年" — 中国金融新闻网</a></li>
+        <li><a href="https://auto.gasgoo.com/news/202604/17I70454106C601.shtml" target="_blank">从0.6亿到10.5亿再到千亿目标：智元的"358"计划是野心还是泡沫？— 盖世汽车</a></li>
+        <li><a href="http://www.iceo.com.cn/article/8fe31c30-8f0b-41f1-a217-8b19b5930baf" target="_blank">不到3年，估值超150亿，华为天才少年的具身野望 — 中国企业家</a></li>
+        <li><a href="https://www.stcn.com/article/detail/1605342.html" target="_blank">华为"天才少年"再获投资，腾讯领投智元机器人 — 证券时报</a></li>
+        <li><a href="https://m.nbd.com.cn/articles/2025-03-24/3802689.html" target="_blank">腾讯出手！投资华为"天才少年"，估值已达150亿元 — 每日经济新闻</a></li>
+        <li><a href="https://36kr.com/p/3230111523847553" target="_blank">朱啸虎看不上的赛道，腾讯投了150亿独角兽 — 36氪</a></li>
+        <li><a href="https://m.thepaper.cn/newsDetail_forward_31139515" target="_blank">智元机器人，21亿拿下一家上市公司 — 澎湃新闻</a></li>
+        <li><a href="https://www.nbd.com.cn/articles/2025-09-24/4073098.html" target="_blank">"十倍牛股"上纬新材正式易主！智元机器人团队或将浮盈超200亿元 — 每日经济新闻</a></li>
+        <li><a href="https://stock.hexun.com/2026-03-31/223883119.html" target="_blank">10倍牛股上纬新材增收不增利，业绩承诺完成率低于54% — 和讯</a></li>
+        <li><a href="https://www.cs.com.cn/ssgs/gsxw/202603/t20260331_6543952.html" target="_blank">上纬新材2025年净利润同比下降53.67% 消费级具身智能机器人业务仍处于研发阶段 — 中证网</a></li>
+        <li><a href="https://www.yemacaijing.com/Index/view/id/86428.html" target="_blank">成立2年估值150亿，控股上市公司却不重组，智元机器人图什么？— 野马财经</a></li>
+        <li><a href="https://www.dutenews.com/n/article/10138167" target="_blank">从"稚晖君"到"华为系"大佬，起底智元机器人爆火的真正底牌 — 读特新闻</a></li>
+        <li><a href="https://export.shobserver.com/sgh/detail?id=1736728" target="_blank">共启具身智能生产力新时代，2026智元合作伙伴大会举行 — 上海观察</a></li>
+        <li><a href="http://sh.news.cn/20260421/b1b5b4e5c653478ca69e8bc92108e33e/c.html" target="_blank">具身智能迎来"公开考场"：智元携手 Hitch Open 重构物理智能竞技生态 — 新华网</a></li>
+        <li><a href="https://news.17173.com/content/04122026/200716441.shtml" target="_blank">智元机器人4月17日举办2026合作伙伴大会，将发4款本体新品及4个AI大模型 — 17173</a></li>
+        <li><a href="https://www.leiphone.com/category/industrynews/DNm9uCEqB79qKm8k.html" target="_blank">智元×Hitch Open｜深耕具身智能，共建全球物理智能学术生态 — 雷锋网</a></li>
+        <li><a href="http://stock.stockstar.com/IG2026040900018477.shtml" target="_blank">智元正式发布新一代VLA基座大模型Genie Operator-2（GO-2）— 证券之星</a></li>
+        <li><a href="https://finance.eastmoney.com/a/202604153706414016.html" target="_blank">具身智能向产业化"部署态"跨越，智元"AI发布周"收官 — 东方财富网</a></li>
+        <li><a href="https://finance.eastmoney.com/a/202604193709803912.html" target="_blank">智元机器人重申"不缺钱"，自我造血能力成色几何？— 东方财富网</a></li>
+        <li><a href="https://m.tmtpost.com/7958725.html" target="_blank">宇树证明了自己，现在轮到智元了 — 钛媒体</a></li>
+        <li><a href="http://www.jingjiribao.cn/static/detail.jsp?id=650982" target="_blank">2026智元合作伙伴大会在沪举行 — 经济日报</a></li>
+      </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">本页面为具身智能Wiki项目内容，遵循学术引用规范。最后更新：2026年5月4日。数据来源均为公开报道与公司官方披露。</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

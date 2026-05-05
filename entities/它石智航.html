@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>它石智航 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style></head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> <span class="breadcrumb-sep">›</span> <span>它石智航</span></div>
+  <div class="wiki-header"><h1>它石智航</h1><div class="subtitle">TARS · 2025年成立 · 估值约150亿元 · 上海</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#team">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#product">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenario">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financial">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#a1">2.1 团队与场景匹配度</a></li>
+        <li class="toc-lvl4"><a href="#a2">2.2 技术路线适配性</a></li>
+        <li class="toc-lvl4"><a href="#a3">2.3 股东对战略的影响</a></li>
+        <li class="toc-lvl4"><a href="#a4">2.4 试错与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#a5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#a6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#refs">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">它石智航</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">上海它石智航技术有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">英文名</div><div class="ib-value">TARS</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2025年2月5日</div></div>
+        <div class="ib-row"><div class="ib-label">注册地</div><div class="ib-value">上海</div></div>
+        <div class="ib-row"><div class="ib-label">CEO</div><div class="ib-value">陈亦伦（前华为自动驾驶CTO）</div></div>
+        <div class="ib-row"><div class="ib-label">董事长</div><div class="ib-value">李震宇（前百度智能驾驶总裁）</div></div>
+        <div class="ib-row"><div class="ib-label">首席科学家</div><div class="ib-value">丁文超（华为首批天才少年）</div></div>
+        <div class="ib-section">估值/市值</div>
+        <div class="ib-row"><div class="ib-label">最新估值</div><div class="ib-value">约150亿元（2026年4月）</div></div>
+        <div class="ib-row"><div class="ib-label">下一轮预期</div><div class="ib-value">180-200亿元</div></div>
+        <div class="ib-section">财务数据</div>
+        <div class="ib-row"><div class="ib-label">累计融资</div><div class="ib-value">约7亿美元（约50亿人民币）</div></div>
+        <div class="ib-row"><div class="ib-label">2026年预期营收</div><div class="ib-value">约数亿元</div></div>
+        <div class="ib-row"><div class="ib-label">2026年预期产能</div><div class="ib-value">1000台（已被预定）</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">核心产品</div><div class="ib-value">A系列/T系列人形机器人</div></div>
+        <div class="ib-row"><div class="ib-label">AI大脑</div><div class="ib-value">AWE 3.0（世界模型，非VLA）</div></div>
+        <div class="ib-row"><div class="ib-label">企业类型</div><div class="ib-value">具身智能全栈创业公司</div></div>
+      </aside>
+
+      <p class="article-intro"><strong>它石智航（TARS）</strong>是一家成立于2025年2月的中国具身智能公司，总部位于上海。公司由前华为自动驾驶系统CTO陈亦伦、前百度智能驾驶事业群总裁李震宇、华为首批「天才少年」丁文超等来自华为、百度、大疆的顶尖人才联合创办，被誉为「智驾黄埔军校」团队。它石智航以「大脑优先」为核心理念，自研AWE（AI World Engine）通用具身世界模型——这是国内少数明确拒绝VLA（视觉-语言-动作）路线、转而走世界模型路线的头部企业。成立14个月内，公司连续刷新国内具身智能天使轮（1.2亿美元）和Pre-A轮（4.55亿美元）单轮最高融资纪录，累计融资近7亿美元，2026年4月估值约150亿元。其A1机器人在工业自动化最难场景之一——线束装配中创造了吉尼斯世界纪录，2026年预期交付产能1000台。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper">
+      <table class="wikitable infotable">
+        <tr><th>项目</th><th>内容</th></tr>
+        <tr><td>公司全称</td><td>上海它石智航技术有限公司</td></tr>
+        <tr><td>英文名称</td><td>TARS</td></tr>
+        <tr><td>成立日期</td><td>2025年2月5日</td></tr>
+        <tr><td>注册地</td><td>上海市</td></tr>
+        <tr><td>控股股东</td><td>上海奇航它石科技合伙企业（有限合伙）</td></tr>
+        <tr><td>法定代表人</td><td>陈亦伦</td></tr>
+        <tr><td>上市情况</td><td>未上市</td></tr>
+        <tr><td>官网</td><td>未公开披露</td></tr>
+      </table>
+      </div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>时间</th><th>关键事件</th></tr>
+        <tr><td>2025年2月</td><td>公司在上海正式注册成立</td></tr>
+        <tr><td>2025年3月</td><td>完成1.2亿美元天使轮融资，创中国具身智能天使轮最大纪录；蓝驰创投、启明创投领投</td></tr>
+        <tr><td>2025年7月</td><td>完成1.22亿美元天使+轮融资，美团战投领投，投前估值约50亿元</td></tr>
+        <tr><td>2025年底</td><td>首次技术发布会，展示世界首台会刺绣的机器人</td></tr>
+        <tr><td>2026年2月</td><td>与阿布扎比TII（技术创新研究所）达成国际合作，联合研发下一代具身智能大模型</td></tr>
+        <tr><td>2026年3月10日</td><td>CEO陈亦伦在英伟达GTC 2026大会上全球首次系统性披露AWE 3.0完整技术架构</td></tr>
+        <tr><td>2026年3月12日</td><td>AWE 2026展会上A1机器人创吉尼斯世界纪录——1小时105次亚毫米级线束装配</td></tr>
+        <tr><td>2026年3月14日</td><td>AWE 3.0「全球首个能干活的通用具身大模型」正式发布；SenseHub数据采集方案亮相</td></tr>
+        <tr><td>2026年4月16日</td><td>完成4.55亿美元Pre-A轮融资，再创中国具身智能单轮最高融资纪录</td></tr>
+      </table>
+      </div>
+
+      <h3 id="team">1.2 创始人及核心团队</h3>
+      <p>它石智航的创始团队被誉为具身智能赛道的「智驾黄埔军校」，核心成员均来自华为、百度、大疆等顶级科技企业的自动驾驶核心岗位。团队呈现出「顶级产业经验+前沿学术积累」的双重特征。</p>
+
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>角色</th><th>姓名</th><th>背景 / 履历</th></tr>
+        <tr><td>创始人 & CEO</td><td>陈亦伦</td><td>前华为车BU自动驾驶系统CTO/首席科学家，主导华为ADS智驾系统从0到1的技术架构；曾任大疆机器视觉总工程师；清华大学智能产业研究院（AIR）智能机器人方向首席科学家。兼具顶级AI算法能力和大厂系统工程化经验。</td></tr>
+        <tr><td>董事长</td><td>李震宇</td><td>前百度智能驾驶事业群（IDG）总裁，一手打造阿波罗（Apollo）自动驾驶开放平台和全球最大Robotaxi服务平台「萝卜快跑」。拥有顶级的产业资源整合能力和商业生态构建经验。</td></tr>
+        <tr><td>联合创始人 & 首席科学家</td><td>丁文超</td><td>华为首批「天才少年」入选者，从0到1主导华为智驾端到端决策网络（预测-决策-规划）；复旦大学机器人研究院研究员，牵头打造复旦首个人形机器人。在端到端学习和机器人操作领域有深厚的学术积累。</td></tr>
+        <tr><td>首席架构师</td><td>陈同庆</td><td>清华大学博士，前华为ADS智能导航部部长、空间感知首席技术专家，国家重大专项首席科学家。在空间感知和导航领域具备世界级技术视野。</td></tr>
+        <tr><td>首席战略官</td><td>Vincent</td><td>曾任华为、百度关键技术岗位负责人，负责公司战略规划和产业生态建设。</td></tr>
+      </table>
+      </div>
+      <p>团队的核心特征是「自动驾驶→具身智能」的能力迁移——将自动驾驶领域积累的感知-决策-规划-控制全栈能力，从「四个轮子的机器人」迁移到「有手有脚的机器人」。这种背景使团队在空间感知、端到端决策、实时控制等关键技术上拥有天然的领先优势。团队总人数和研发占比未公开披露。</p>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <p>它石智航连续两次刷新了中国具身智能领域的融资纪录，累计融资约7亿美元（约50亿人民币）。</p>
+
+      <h4>融资历史</h4>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>时间</th><th>轮次</th><th>金额</th><th>估值</th><th>核心投资方</th></tr>
+        <tr><td>2025年3月</td><td>天使轮</td><td>1.2亿美元（约8.7亿元）</td><td>未披露</td><td>蓝驰创投、启明创投领投，线性资本、襄禾资本、洪泰基金、联想创投等跟投</td></tr>
+        <tr><td>2025年7月</td><td>天使+轮</td><td>1.22亿美元（约8.8亿元）</td><td>投前约50亿元</td><td>美团战投领投，线性资本、襄禾资本持续加码</td></tr>
+        <tr><td>2026年4月</td><td>Pre-A轮</td><td>4.55亿美元（约30亿元）</td><td>约150亿元</td><td>高瓴创投、红杉中国、美团战投联合领投，中金资本、TCL产投、上汽恒旭、首程控股、凯联资本、东方富海、钧山投资、建发新兴投资、国汽投资、北京机器人产业发展投资基金、上海国投先导、孚腾资本、临港科创投等超20家机构参投</td></tr>
+      </table>
+      </div>
+
+      <h4>主要股东结构（截至2026年4月）</h4>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>股东类型</th><th>代表机构</th><th>关联产业</th></tr>
+        <tr><td>顶级VC/PE</td><td>高瓴创投、红杉中国、中金资本、蓝驰创投、启明创投、线性资本、襄禾资本、洪泰基金、联想创投、凯联资本、东方富海</td><td>泛科技/PI投资</td></tr>
+        <tr><td>产业资本-互联网</td><td>美团战投/龙珠</td><td>本地生活/即时零售/自动配送</td></tr>
+        <tr><td>产业资本-汽车</td><td>上汽恒旭、国汽投资</td><td>汽车制造/智能出行</td></tr>
+        <tr><td>产业资本-制造</td><td>TCL产投</td><td>消费电子/家电制造</td></tr>
+        <tr><td>产业资本-基础设施</td><td>首程控股、建发新兴投资</td><td>产业园区/基础设施</td></tr>
+        <tr><td>国资/政府基金</td><td>北京机器人产业发展投资基金、上海国投先导、孚腾资本、临港科创投</td><td>京沪双城战略产业引导</td></tr>
+      </table>
+      </div>
+      <p>公司目前未上市。Pre-A轮后已有报道称下一轮（B轮）融资方案已确定，预期估值将升至180-200亿元。</p>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>技术维度</th><th>路线选择</th><th>说明</th></tr>
+        <tr><td>AI架构</td><td>端到端世界模型（AWE，非VLA）</td><td>AWE 3.0（AI World Engine）是自研通用具身大模型。明确拒绝行业主流的VLA（视觉-语言-动作）路线，转而构建统一感知-决策-动作的世界模型。核心能力包括理解时间、空间、力等物理量，而非仅处理像素级信息。</td></tr>
+        <tr><td>技术子模块</td><td>五大核心能力</td><td>OSD全视角通感决策（新视角成功率提升3倍）+ HTS高密度触觉感知（毫米级闭环）+ LAS隐空间丝滑动作（抖动降低45%）+ DSR动态时空推理（空间精度超基准21%，推理速度2.21倍）+ E2E-WBC全身端到端学习。</td></tr>
+        <tr><td>数据策略</td><td>Human-Centric范式（拒绝遥操作+仿真路线）</td><td>让真实从业者（产线工人、老师傅）穿戴轻量采集设备在真实环境工作。「你工作，我记录」。数据必须满足：场景真实+任务有效完成+过程信息全量记录。反对纯仿真和遥操作路线。</td></tr>
+        <tr><td>数据规模</td><td>百万小时+开源</td><td>WIYH（World In Your Hands）数据集：全球首个大规模真实世界具身VLTA多模态数据集，超百万小时规模，覆盖数万场景。发起「具身数据星火计划」推进数据共享。</td></tr>
+        <tr><td>触觉技术</td><td>视触觉融合（OmniVTA）</td><td>联合六大顶尖机构推出OmniVTA视触觉操作框架和OmniViTac数据集（迄今规模最大的视触觉数据集），将触觉反馈闭环引入机器人控制。</td></tr>
+        <tr><td>硬件自研</td><td>全栈自研（本体+关节+灵巧手）</td><td>双足和轮足两类形态、高自由度灵巧手、SenseHub可穿戴数采套件（毫米级运动捕捉+亚毫秒级多源同步）。</td></tr>
+        <tr><td>开源策略</td><td>数据开源+模型部分公开</td><td>WIYH数据集开源，发起数据共享计划。AWE 3.0核心模型架构在GTC大会上全球公开披露。</td></tr>
+      </table>
+      </div>
+
+      <div class="callout"><div class="callout-title">路线选择的核心分歧</div>它石智航的技术路线与中国具身智能同行（如千寻智能用VLA、银河通用用模仿学习）形成显著差异化。丁文超公开表示：「VLA路线是从语言和视觉角度理解具身智能，而我们认为具身智能的核心是对物理世界——时间、空间、力的深度理解。世界模型路线更接近物理AI的本质。」</div>
+
+      <h3 id="product">1.5 产品形态</h3>
+
+      <h4>A系列/T系列人形机器人</h4>
+      <p>它石智航推出A系列和T系列两条硬件产品线，覆盖双足和轮足两种形态。</p>
+
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>产品线</th><th>定位</th><th>核心能力</th><th>落地场景</th></tr>
+        <tr><td>A系列</td><td>工业精密操作</td><td>亚毫米级装配精度，线束装配超越熟练人类工人</td><td>汽车线束装配、3C精密制造、家电制造</td></tr>
+        <tr><td>T系列</td><td>通用型</td><td>「大小脑」协同能力，更广泛的场景泛化</td><td>工厂、物流、仓储、洗衣房、酒店等</td></tr>
+      </table>
+      </div>
+
+      <h4>A1机器人关键参数</h4>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>参数项</th><th>规格</th></tr>
+        <tr><td>产品形态</td><td>双足 / 轮足两种可选</td></tr>
+        <tr><td>灵巧手</td><td>自研高自由度灵巧手，适配精密操作</td></tr>
+        <tr><td>力控能力</td><td>高密度触觉感知（HTS），毫米级细粒度动作</td></tr>
+        <tr><td>视觉系统</td><td>全视角通感，摆脱单一视角依赖</td></tr>
+        <tr><td>自我纠错</td><td>Failure Recovery——插接异常时自主拔出换角度重试</td></tr>
+        <tr><td>标杆成就</td><td>吉尼斯世界纪录：1小时105次亚毫米级线束完整装配</td></tr>
+        <tr><td>售价区间</td><td>工业场景约20万-40万元/台</td></tr>
+        <tr><td>身高/体重/续航</td><td>未公开披露</td></tr>
+      </table>
+      </div>
+
+      <h4>SenseHub数据采集系统</h4>
+      <p>全球首个工业级Human-Centric数据采集方案，包括TARS Glove采集手套、第一视角全景摄像头、五指/两指夹爪等模块。具备毫米级运动捕捉精度、亚毫秒级多源数据同步、高带宽低延时无线传输能力。设计理念为极致轻量化+人体工学+模块化多场景适配，覆盖从数据采集到自动化标注、质量评估、管理分析的全链条。</p>
+
+      <h4>WIYH数据集</h4>
+      <p>World In Your Hands——全球首个大规模真实世界具身VLTA（视觉-语言-触觉-动作）多模态数据集。超百万小时规模，覆盖数万真实场景，含丰富触觉数据。已开源，并发起「具身数据星火计划」推动行业数据共享。</p>
+
+      <h3 id="scenario">1.6 应用场景</h3>
+
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>场景分类</th><th>子场景</th><th>当前阶段</th><th>合作方/产业入口</th><th>说明</th></tr>
+        <tr><td rowspan="3">工业制造</td><td>汽车线束装配</td><td>已落地</td><td>上汽（恒旭资本）、长三角某汽车工厂</td><td>攻克工业自动化公认最难场景，准确率和效率超越熟练人类工人。线束装配被称为工业自动化「哥德巴赫猜想」。</td></tr>
+        <tr><td>3C精密制造</td><td>试点中</td><td>TCL产投</td><td>消费电子领域精密装配与检测</td></tr>
+        <tr><td>家电制造</td><td>试点中</td><td>TCL产投</td><td>家电产线柔性装配</td></tr>
+        <tr><td>商业服务</td><td>物流/仓储/洗衣房/酒店</td><td>数据采集阶段</td><td>美团（战投）</td><td>通过Human-Centric数采方案在这些场景积累真实数据，为通用泛化做准备</td></tr>
+      </table>
+      </div>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+
+      <h4>出货与订单</h4>
+      <ul>
+        <li>2026年预期产能<strong>1000台</strong>机器人，已全部被客户预定</li>
+        <li>2026年预期营收<strong>约数亿元</strong></li>
+        <li>已向长三角某汽车制造工厂<strong>部分交付</strong>机器人，插拔线束环节达人工70-80%水平，但可长时间持续工作</li>
+        <li>工业机器人售价在<strong>20万-40万元/台</strong>区间</li>
+      </ul>
+
+      <h4>合作模式</h4>
+      <p>它石智航采用「轻量赋能、弱绑定、不直接下定」的产业合作模式——产业股东贡献真实场景与数据，而不直接下订单绑定。这种模式的核心逻辑是：在商业化早期阶段以场景数据为第一优先级，随着模型能力提升自然转化为订单。</p>
+
+      <h4>商业化节奏</h4>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>阶段</th><th>时间</th><th>重点</th></tr>
+        <tr><td>数据积累期</td><td>2025年</td><td>建立Human-Centric数据采集网络，积累百万小时真实数据</td></tr>
+        <tr><td>标杆突破期</td><td>2026年H1</td><td>A1机器人在线束装配创吉尼斯纪录，向汽车产业验证技术可行性</td></tr>
+        <tr><td>规模交付期</td><td>2026年H2起</td><td>1000台产能释放，从汽车线束拓展至3C、家电</td></tr>
+      </table>
+      </div>
+
+      <h3 id="financial">1.8 财务数据</h3>
+      <p>它石智航目前未上市，无公开财务报告。公司处于商业化起步阶段。</p>
+
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>指标</th><th>2025年</th><th>2026年（预计）</th></tr>
+        <tr><td>累计融资额</td><td>约2.42亿美元（约17亿元）</td><td>约6.97亿美元（约50亿元）</td></tr>
+        <tr><td>估值</td><td>约50亿元（投前，7月）</td><td>约150亿元（4月）；预期升至180-200亿元</td></tr>
+        <tr><td>营收</td><td>—（未产生营收）</td><td>约数亿元（预期）</td></tr>
+        <tr><td>账面现金储备</td><td>未披露</td><td>约30亿元+（据最近融资推算）</td></tr>
+        <tr><td>净利润</td><td>亏损（研发密集投入）</td><td>亏损（产能爬坡+数据体系建设）</td></tr>
+      </table>
+      </div>
+
+      <div class="callout"><div class="callout-title">行业对照</div><p>它石智航的Pre-A轮4.55亿美元（约30亿人民币）是中国具身智能史上单轮最高融资额。作为参照，宇树科技2025年营收约17亿元，智元机器人2025年营收突破10亿元，均在它石智航成立同期更早进入商业化阶段。</p></div>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>公司名「它石」取自「它山之石，可以攻玉」——寓意以跨界思维攻克具身智能难题。</li>
+        <li>天使轮被36氪称为「神秘具身团队」，因团队在获得1.2亿美元融资后才首次公开亮相。</li>
+        <li>CEO陈亦伦在2026年GTC大会上受邀做主题演讲，是中国具身智能企业首次在英伟达GTC全球舞台系统性披露技术架构。</li>
+        <li>发起业内首个「机器人柔性操作图灵测试」——超过50%投票者无法分辨机器人与人类操作。</li>
+        <li>AWE 3.0的发布被行业媒体称为「具身大脑终于等来自己的时刻」。</li>
+        <li>与阿布扎比TII（技术创新研究所）的合作是中国具身智能企业少有的国际研发合作案例。</li>
+        <li>北京机器人产业发展投资基金与上海国投先导在Pre-A轮首次联合投资同一家具身智能公司，被解读为京沪双城竞合布局的战略信号。</li>
+        <li>公司明确拒绝遥操作（teleoperation）路线，丁文超公开称：「遥操作是给机器人当拐杖，去掉拐杖它就不会走了。」</li>
+        <li>公司预测行业可能在2027年末至2028年初迎来C端「GPT时刻」。</li>
+        <li>创始团队的核心叙事是「自动驾驶→具身智能」的能力迁移——将四个轮子的机器人的全栈能力迁移到有手有脚的机器人上。</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="a1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>它石智航的团队背景与其选择的工业精密操作场景之间形成了高度自洽的逻辑链条。自动驾驶系统本质上是「高速移动的机器人决策系统」，其核心技术挑战——多传感器融合、实时空间感知、毫秒级决策、安全裕度管理——与人形机器人在工业场景中面临的挑战高度同构。陈亦伦在华为ADS的端到端智驾架构经验、丁文超在端到端决策网络的学术积累，恰好对应了AWE模型「感知-决策-动作」一体化的架构需求。而选择线束装配这一「工业自动化哥德巴赫猜想」作为首发场景，既充分利用了团队在精准感知和实时控制上的技术优势，也是务实的市场定位——只要有电就有线束，汽车、3C、家电的海量需求保证了场景天花板足够高。</p>
+      </div>
+
+      <div class="analysis-block" id="a2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>它石智航选择世界模型（AWE）而非VLA路线，与其主攻的工业精密操作场景之间存在深刻的适配逻辑。VLA模型的优势在于语言指令理解和任务泛化，但在工业场景中，用户不需要用自然语言告诉机器人「请把第三根蓝线插到第七个端口」——任务规格是固定的，核心竞争力在于精度、稳定性和对不同物理材质（柔性线束、弹性卡扣）的实时力控适应能力。AWE 3.0对「时间、空间、力」等物理量的深度建模、HTS高密度触觉感知和Failure Recovery自我纠错能力，直接对应了线束装配的三大痛点（柔性形变难建模、亚毫米级精度、长程稳定性）。这种「场景驱动技术选型」的自觉是它石智航的重要差异化优势。</p>
+      </div>
+
+      <div class="analysis-block" id="a3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>它石智航的股东结构呈现出独特的「京沪双城布局+多产业协同」特征。上汽恒旭的入局提供了汽车制造这一核心场景的天然入口，TCL产投则打开了消费电子和家电制造的闸门。美团战投作为连续两轮的联合领投方，除了提供充裕资金外，其本地生活场景（物流、仓储、酒店）为机器人远期泛化埋下了数据采集和场景验证的伏笔。北京机器人产业发展投资基金与上海国投先导的首次联手投资，则赋予了公司跨越京沪两地的政策资源优势。但值得关注的是，超过20家投资方的复杂股东结构可能在战略决策中形成一定的协调成本，尤其在不同产业股东各自有场景诉求的情况下。</p>
+      </div>
+
+      <div class="analysis-block" id="a4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>它石智航成立时间较短（仅14个月），目前尚未表现出明显的场景切换或技术路线转向。但值得关注的是其数据策略的形成过程：公司从创立之初就明确拒绝遥操作（teleoperation）路线，这在行业主流推崇「遥操作+模仿学习」范式的背景下是一种自觉的反共识选择。丁文超提出的「遥操作是给机器人当拐杖」这一判断，本质上是团队从自动驾驶领域迁移过来的认知——自动驾驶行业的经验证明，基于人类驾驶数据的模仿学习存在明显的性能天花板，真正的突破来自端到端的自监督学习。这一认知迁移可能是它石智航在数据路线上最为关键的早期决策。</p>
+      </div>
+
+      <div class="analysis-block" id="a5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>它石智航的竞争定位可以概括为「以大脑定义身体、以世界模型统一感知-决策-行动、以最难工业场景建立技术护城河」。其核心取舍体现在三个维度：第一，选择「世界模型」而非「VLA」，赌的是具身智能的终局属于能够理解物理世界深层规律的系统（而非仅停留在视觉-语言映射层面）。第二，选择「Human-Centric数据采集」而非「遥操作+仿真」，赌的是真实从业者的操作数据（而非实验室遥操数据）才能训练出真正可泛化的工业能力。第三，选择「先攻克最难场景（线束装配）再泛化」而非「先在简单场景铺量」，赌的是在高难度场景中建立的模型能力具有向下兼容性。在行业格局中，它石智航最接近「NVIDIA式的底层平台公司」——以核心模型定义行业技术标准，让合作伙伴（TCL、上汽等）在其平台上构建应用。</p>
+      </div>
+
+      <div class="analysis-block" id="a6">
+        <h4>2.6 其他重要观察、分析</h4>
+        <p>它石智航代表了具身智能赛道中「自动驾驶团队降维切入」这一独特范式。这并非孤例——中国具身智能赛道中，地平线背景的团队、百度Apollo背景的团队也不少见——但陈亦伦+李震宇+丁文超的组合可能是这一范式中豪华度最高的配置。这种范式的核心优势在于：自动驾驶领域积累的「感知-决策-规划-控制」全栈技术能力和系统工程化经验，可以直接迁移到具身智能的架构设计中。但风险同样存在：自动驾驶是一个「感知和决策主导」的问题（基于结构化道路环境），而具身智能还需要面对「精细操作和物理交互」的全新挑战——手比脚更难。它石智航选择线束装配作为首发场景，某种程度上也是对这一认知的回应：用最难的操作场景来验证其技术路线的完整性，而不是回避「手」的问题。</p>
+      </div>
+
+      <h2 id="refs">3 参考资料</h2>
+      <div class="references">
+      <ol>
+        <li><a href="https://www.cls.cn/detail/2080243" target="_blank">1.22亿美元具身智能天使轮！美团投了一群「前华为人」— 财联社</a></li>
+        <li><a href="https://m.jiemian.com/article/14266950.html" target="_blank">产业资本「提前锁局」：它石智航斩获4.55亿美元融资 — 界面新闻</a></li>
+        <li><a href="https://www.forbeschina.com/investment/71411" target="_blank">4.55亿美元！它石智航拿下具身智能单笔最高融资 — 福布斯中国</a></li>
+        <li><a href="https://www.chinastarmarket.cn/detail/1983783" target="_blank">它石智航完成1.2亿美元融资 创国内具身智能天使轮纪录 — 科创板日报</a></li>
+        <li><a href="https://news.caijingmobile.com/article/detail/567247" target="_blank">独家 | 它石智航完成超30亿元融资，估值超200亿元 — 财经</a></li>
+        <li><a href="https://www.21jingji.com/article/20260416/herald/6984d4c8a128edb36dd0d9b6fa00133f.html" target="_blank">4.55亿美金，中国具身最大单笔融资诞生 — 21世纪经济报道</a></li>
+        <li><a href="https://m.36kr.com/p/3617738278519815" target="_blank">天使轮融资17亿元的神秘具身团队，回应11个关键问题 — 36氪</a></li>
+        <li><a href="https://www.jiemian.com/article/12524296.html" target="_blank">上海企业拿下具身智能最大天使轮融资，核心团队为何来自智驾？— 界面新闻</a></li>
+        <li><a href="https://app.xinhuanet.com/news/article.html?articleId=3b05aef1a3ea11cbc6b2f7ab79e329ce" target="_blank">「能干活」的通用具身大模型AWE3.0亮相 — 新华网</a></li>
+        <li><a href="https://www.qimingvc.com/en/node/7599" target="_blank">它石智航CEO陈亦伦GTC首秀：全球首次系统性披露AWE3.0 — 启明创投</a></li>
+        <li><a href="https://www.stdaily.com/web/gdxw/2026-03/16/content_486313.html" target="_blank">创纪录！国产机器人1小时完成超百次亚毫米级线束装配 — 科技日报</a></li>
+        <li><a href="https://www.163.com/dy/article/KNRS2H3P051481US.html" target="_blank">它石A1机器人获吉尼斯世界纪录称号 — 网易</a></li>
+        <li><a href="https://static.cdsb.com/micropub/Articles/202602/28c3b3565be4c25338598400b36defcf.html" target="_blank">中国企业它石智航与阿布扎比TII合作 联合研发具身智能大模型 — 成都商报</a></li>
+        <li><a href="https://www.xhby.net/content/s69b8bf0de4b045d3a5e79460.html" target="_blank">央视对话它石智航丁文超 — 新华报业</a></li>
+        <li><a href="http://www.bjnews.com.cn/detail/1773567580129291.html" target="_blank">它石智航首席科学家丁文超博士揭秘AWE3.0 — 新京报</a></li>
+        <li><a href="https://lieyunpro.com/news/120293" target="_blank">它石智航Pre-A轮融资4.55亿美元破中国具身智能纪录 — 猎云网</a></li>
+        <li><a href="https://hub.baai.ac.cn/view/54052" target="_blank">4.55亿美金！中国具身智能最大单笔融资诞生 — 北京智源研究院</a></li>
+        <li><a href="http://www.news.cn/tech/20260420/0a1c91b9fd4a4cfea7fece7185590eb6/c.html" target="_blank">4.55亿美元刷新中国具身融资纪录背后 — 新华网</a></li>
+        <li><a href="https://www.163.com/dy/article/KQNSUGVF05561FZK.html" target="_blank">4.55亿美金：具身大脑终于等来自己的时刻 — 网易</a></li>
+        <li><a href="https://leaderobot.com/news/6952" target="_blank">1年融资17亿，「华为系」人形企业，如何用「刺绣」解题具身智能？— 中国机器人网</a></li>
+        <li><a href="https://www.tmtpost.com/7510081.html" target="_blank">1.2亿美元，具身智能最大天使轮投资来了 — 钛媒体</a></li>
+        <li><a href="https://www.nbd.com.cn/rss/hexun/articles/3805005.html" target="_blank">百度智驾前高管、华为前「天才少年」联手 — 每日经济新闻</a></li>
+        <li><a href="http://yuanchuang.caijing.com.cn/2025/0327/5079947.shtml" target="_blank">它石智航凭什么成立50天融资8.7亿 — 财经</a></li>
+        <li><a href="https://finance.sina.cn/tech/2026-03-12/detail-inhqtyyf8346050.d.html" target="_blank">直击AWE丨中国机器人装配破世界纪录！— 新浪财经</a></li>
+        <li><a href="https://www.cs.com.cn/ssgs/gsxw/202603/t20260313_6541193.html" target="_blank">它石智航携全栈产品亮相2026年中国家电及消费电子博览会 — 中国证券报</a></li>
+        <li><a href="http://jjckb.xinhuanet.com/20260315/b52d5f3b54984dfa9a487c307d64143b/c.html" target="_blank">它石智航全栈产品亮相2026年AWE — 经济参考报</a></li>
+        <li><a href="https://pandaily.com/tars-robotics-unveils-awe-3-0-as-robot-sets-record-in-precision-assembly" target="_blank">Tars Robotics Unveils AWE 3.0 as Robot Sets Record — Pandaily</a></li>
+        <li><a href="https://equalocean.com/news/2026041621834" target="_blank">TARS raised $455 million in a Pre-A round — EqualOcean</a></li>
+      </ol>
+      </div>
+
+    </article>
+  </div>
+  <div class="page-footer">此页面最后编辑于2026年5月4日 · 内容遵循具身智能Wiki编辑规范 · 所有数据来自公开可查来源</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

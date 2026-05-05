@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>智平方 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a><span class="breadcrumb-sep"> › </span><span>智平方</span></div>
+  <div class="wiki-header"><h1>智平方</h1><div class="subtitle">AI² Robotics · 成立于2023年 · 深圳 · 估值超百亿 · 端到端VLA具身智能独角兽</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#founders">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#technology">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercialization">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financials">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#ana1">2.1 团队背景与场景选择</a></li>
+        <li class="toc-lvl4"><a href="#ana2">2.2 技术路线与场景适配性</a></li>
+        <li class="toc-lvl4"><a href="#ana3">2.3 股东资本与战略影响</a></li>
+        <li class="toc-lvl4"><a href="#ana4">2.4 试错过程与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#ana5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#ana6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#references">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">智平方</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">智平方（深圳）科技股份有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">英文名</div><div class="ib-value">AI² Robotics</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2023年4月</div></div>
+        <div class="ib-row"><div class="ib-label">总部</div><div class="ib-value">深圳·南山</div></div>
+        <div class="ib-row"><div class="ib-label">创始人/CEO</div><div class="ib-value">郭彦东 博士</div></div>
+        <div class="ib-section">估值/市值</div>
+        <div class="ib-row"><div class="ib-label">最新估值</div><div class="ib-value">超100亿元人民币（2026.2 B轮后）</div></div>
+        <div class="ib-section">财务数据（非公开）</div>
+        <div class="ib-row"><div class="ib-label">累计融资</div><div class="ib-value">超20亿元人民币（12轮）</div></div>
+        <div class="ib-row"><div class="ib-label">营收</div><div class="ib-value">未公开披露</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">员工规模</div><div class="ib-value">数百人（研发占比高）</div></div>
+        <div class="ib-row"><div class="ib-label">产能</div><div class="ib-value">千台级→万台级（2026规划）</div></div>
+        <div class="ib-row"><div class="ib-label">最大订单</div><div class="ib-value">惠科3年1000台（近5亿元）</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">领域</div><div class="ib-value"><span class="tag tag-info">具身智能</span><span class="tag tag-info">通用人形机器人</span><span class="tag tag-info">工业自动化</span></div></div>
+        <div class="ib-row"><div class="ib-label">官网</div><div class="ib-value"><a href="https://www.ai2robotics.com" target="_blank">ai2robotics.com</a></div></div>
+      </aside>
+      <p class="article-intro">智平方（AI² Robotics）是一家中国通用智能机器人公司，由前小鹏汽车首席科学家郭彦东博士于2023年创立，总部位于深圳。公司以自研端到端 VLA（视觉-语言-动作）架构为核心技术路线，推出 GOVLA 具身大模型及 AlphaBot 系列机器人，被资本市场称为「中国版特斯拉机器人团队」。截至2026年初，智平方在一年内完成12轮融资，B轮后估值突破百亿元人民币，成为广东省首家估值超百亿的具身智能独角兽，并已于2026年4月完成股份制改造，启动 IPO 进程。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper"><table class="wikitable infotable">
+        <tr><th>项目</th><th>内容</th></tr>
+        <tr><td>公司全称</td><td>智平方（深圳）科技股份有限公司（2026年4月股改后）；原名智平方（深圳）科技有限公司</td></tr>
+        <tr><td>英文名称</td><td>AI² Robotics</td></tr>
+        <tr><td>成立时间</td><td>2023年4月</td></tr>
+        <tr><td>注册地</td><td>广东省深圳市南山区</td></tr>
+        <tr><td>上市状态</td><td>未上市（2026年4月完成股改，筹备IPO）</td></tr>
+        <tr><td>官网</td><td>ai2robotics.com</td></tr>
+        <tr><td>定位</td><td>生产力型通用智能机器人（非表演型），端到端VLA架构先行者</td></tr>
+      </table></div>
+      <h4>发展沿革</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>时间</th><th>事件</th></tr>
+        <tr><td>2023年4月</td><td>智平方（深圳）科技有限公司成立，郭彦东博士任创始人兼CEO</td></tr>
+        <tr><td>2024年6月</td><td>发布全球首个开源VLA模型 RoboMamba（GOVLA 0.0），入选 NeurIPS 2024</td></tr>
+        <tr><td>2024-2025年</td><td>完成Pre-A/A+等7轮融资，引入达晨财智、深创投、南山战新投等机构</td></tr>
+        <tr><td>2025年6月</td><td>发布 GOVLA 0.5（FiS-VLA），业内首个"异构输入+异步频率"双系统VLA</td></tr>
+        <tr><td>2025年9月</td><td>自有产线正式投产；与惠科达成3年1000台机器人战略合作（近5亿元订单）</td></tr>
+        <tr><td>2025年12月</td><td>实现单月百台级真实交付；智魔方进入多城常态化运营</td></tr>
+        <tr><td>2026年2月</td><td>完成B轮系列5轮融资，总额超10亿元，估值突破百亿，投资方含百度战投、中车资本</td></tr>
+        <tr><td>2026年4月</td><td>完成股份制改造，更名为"智平方（深圳）科技股份有限公司"；与西子联合、澳门万国控股达成战略合作；发布AlphaBrain Platform开源平台</td></tr>
+      </table></div>
+
+      <h3 id="founders">1.2 创始人及核心团队</h3>
+      <p>智平方由郭彦东博士创立。郭彦东获美国普渡大学博士学位，曾任微软美国总部核心AI团队成员、小鹏汽车首席科学家、OPPO首席科学家，是国家级创新领军专家。团队中已引入5位斯坦福全球前2%科学家，核心成员来自微软、谷歌、小鹏、OPPO、Momenta、清华大学、北京大学、中科院、哥伦比亚大学等顶尖机构，被业界认为是科学家密度最高的具身智能创业团队之一。</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+        <tr><td>创始人/CEO</td><td>郭彦东</td><td>美国普渡大学博士，前微软美国总部核心AI团队、小鹏汽车首席科学家、OPPO首席科学家，国家级创新领军专家。在小鹏主导自动驾驶AI研发，具备AI大模型+硬件的全栈背景</td></tr>
+        <tr><td>核心科学家</td><td>（多位）</td><td>5位斯坦福全球前2%科学家加盟，覆盖计算机视觉、机器人学、强化学习、具身智能等方向</td></tr>
+        <tr><td>核心工程团队</td><td>—</td><td>来自微软、谷歌、Momenta等，具备AI大模型训练+机器人量产工程双重经验</td></tr>
+      </table></div>
+      <p>团队整体呈现<strong>学术+产业混合型</strong>人才结构，科学家密度在具身智能赛道具身智能赛道名列前茅，在NeurIPS等顶级学术会议2025年收录6篇论文。公司整体研发人员占比较高，具身模型研发与硬件量产团队协同紧密。</p>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <h4>融资历史</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>时间</th><th>轮次</th><th>规模</th><th>重要投资方</th></tr>
+        <tr><td>2025上半年</td><td>Pre-A / Pre-A+ / A+ 等7轮</td><td>数亿级/轮</td><td>达晨财智、敦鸿资产、普华资本等</td></tr>
+        <tr><td>2025下半年</td><td>A系列后续</td><td>数亿级</td><td>深创投、国中资本、南山战新投、华熙生物等</td></tr>
+        <tr><td>2026年2月</td><td>B轮系列（5轮）</td><td>超10亿元</td><td>百度战投、中车资本、特斯拉生态链龙头企业、宇信科技、森麒麟、沄柏资本、国泰海通</td></tr>
+      </table></div>
+      <p>一年累计完成<strong>12轮融资</strong>，为全球融资节奏最快的具身智能企业。B轮后估值突破100亿元人民币，成为深圳2026年首个百亿级具身智能独角兽、广东省首个百亿估值具身智能创企。</p>
+      <h4>股东结构</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>股东类型</th><th>代表机构</th><th>战略意义</th></tr>
+        <tr><td>互联网/AI巨头</td><td>百度战投</td><td>AI大模型协同，云算力生态支持</td></tr>
+        <tr><td>央企产业资本</td><td>中车资本</td><td>高端制造场景协同，互为上下游</td></tr>
+        <tr><td>地方国资</td><td>深创投、南山战新投、国中资本</td><td>深圳本土政策支持</td></tr>
+        <tr><td>财务/券商</td><td>国泰海通、沄柏资本</td><td>券商系基金参与，被视为IPO风向标</td></tr>
+        <tr><td>产业资本</td><td>华熙生物、森麒麟、宇信科技、特斯拉生态链龙头</td><td>生物科技、制造业、金融IT等场景协同</td></tr>
+      </table></div>
+      <p>公司已于2026年4月完成股份制改造，更名为股份有限公司，国泰海通等券商系基金参与B轮，被视为IPO进程加速的信号。</p>
+
+      <h3 id="technology">1.4 技术路线</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>技术维度</th><th>路线选择</th><th>详情</th></tr>
+        <tr><td>AI架构</td><td>端到端VLA（视觉-语言-动作）</td><td>自2023年初即选择端到端VLA架构，早期全球仅特斯拉机器人与智平方走此路线</td></tr>
+        <tr><td>核心模型</td><td>GOVLA系列（自研）</td><td>GOVLA 0.0（RoboMamba，2024.6开源）；GOVLA 0.5（FiS-VLA，2025.6，超Pi0 30%，控制频率117.7Hz）；GOVLA 1.0已研发完成</td></tr>
+        <tr><td>数据方案</td><td>"正反金字塔"战略</td><td>冷启动靠互联网/仿真/真机融合数据→规模部署后靠真实场景高质量数据，"越用越聪明"</td></tr>
+        <tr><td>全栈/专用</td><td>全栈（模型+硬件+场景）</td><td>自研模型+自有产线+真实场景部署，三位一体闭环</td></tr>
+        <tr><td>算力</td><td>千卡级算力集群</td><td>自成立即使用千卡级算力，自建训练加速体系</td></tr>
+        <tr><td>差异化</td><td>开源生态+可插拔架构</td><td>2026年4月发布AlphaBrain Platform，全球首个开源类脑VLA模型NeuroVLA，首款可插拔世界模型架构</td></tr>
+      </table></div>
+      <p>在大型双臂数据集 RoboCOIN 中，智平方在 half-humanoid 领域数据贡献占比超过35%，覆盖50+场景。摩根士丹利机器人产业深度报告将智平方列为具身基础模型代表企业。2025年团队在NeurIPS 2025收录6篇论文。</p>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>产品分类</th><th>子类/型号</th><th>关键参数</th><th>适用场景</th></tr>
+        <tr><td>人形机器人</td><td>AlphaBot 2</td><td>轮式双臂结构；全身34+ DOF；360°×360°感知；0-240cm垂直工作范围；700mm单臂臂展；续航6h+；MTBF>50,000h</td><td>工业柔性制造（分拣/转运/贴标/辅助装配）</td></tr>
+        <tr><td>具身大模型</td><td>GOVLA系列</td><td>GOVLA 0.0（开源，NeurIPS 2024）；GOVLA 0.5（117.7Hz控制频率，超Pi0 30%）；GOVLA 1.0（已研发）</td><td>机器人大脑平台，跨场景通用</td></tr>
+        <tr><td>开源平台</td><td>AlphaBrain Platform</td><td>NeuroVLA（类脑VLA，在线自适应）；RL Token训练架构（单张4090即可训练）；可插拔世界模型架构</td><td>开发者生态，联合港科大（广州）熊辉团队</td></tr>
+        <tr><td>新零售终端</td><td>智魔方</td><td>模块化具身智能服务空间，日均稳定工作>10h，全程自主零失误</td><td>文旅地标、商业综合体、交通枢纽</td></tr>
+      </table></div>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>场景分类</th><th>具体场景</th><th>合作伙伴/落地</th><th>说明</th></tr>
+        <tr><td>工业柔性制造</td><td>半导体显示面板制造</td><td>惠科（HKC）</td><td>3年1000台订单，覆盖仓储物流、上下物料、零部件装配、质检全流程</td></tr>
+        <tr><td>工业柔性制造</td><td>汽车制造</td><td>东风柳汽、吉利晶能微电子、国际车企</td><td>分拣、转运、辅助装配；直接对标特斯拉Optimus场景</td></tr>
+        <tr><td>工业柔性制造</td><td>生物科技/高端制造</td><td>华熙生物、西子联合、中国中车</td><td>原材料处理、精密制造工序</td></tr>
+        <tr><td>公共服务</td><td>城市交通枢纽</td><td>一线城市核心交通枢纽</td><td>为乘客提供服务引导，验证高动态场景安全性与即时决策能力</td></tr>
+        <tr><td>新零售</td><td>智魔方（咖啡/冰淇淋/零售）</td><td>深圳人才公园、北京朝阳公园、上海东方明珠、无锡惠山古镇等</td><td>日均>200杯，累计接待上万人次，零失误</td></tr>
+        <tr><td>海外展示</td><td>国际窗口</td><td>新加坡科学中心、香港InnoEX、澳门旅博会、沙特ITSA</td><td>机器人打鼓、咖啡制作等文化展示</td></tr>
+      </table></div>
+
+      <h3 id="commercialization">1.7 商业化进展</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>指标</th><th>数据</th><th>时间</th></tr>
+        <tr><td>最大单一订单</td><td>惠科3年1000台，近5亿元</td><td>2025年9月签署</td></tr>
+        <tr><td>月交付量</td><td>单月百台级真实交付</td><td>2025年12月</td></tr>
+        <tr><td>年产能力</td><td>千台级→万台级（2026规划扩产）</td><td>2025年9月自有产线投产</td></tr>
+        <tr><td>智魔方部署</td><td>多城常态化运营；三年千店计划</td><td>2025年底启动</td></tr>
+        <tr><td>海外订单</td><td>国际车企订单</td><td>2025-2026年</td></tr>
+      </table></div>
+      <p>智平方从整机研发、核心部件定制到结构件加工、组装验证，全链条均在体系内完成，确保质量、成本与交付节奏自主可控。创始人郭彦东表示，距离消费级"iPhone时刻"仍需5-7年，公司当前强调真实交付与现金流健康，非盲目扩张。</p>
+
+      <h3 id="financials">1.8 财务数据</h3>
+      <p>智平方为非上市公司，尚未公开披露完整财务报表。以下为已知数据：</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>指标</th><th>数据</th><th>来源/时间</th></tr>
+        <tr><td>累计融资总额</td><td>超20亿元人民币（12轮）</td><td>截至2026年2月B轮</td></tr>
+        <tr><td>最新估值</td><td>超100亿元人民币</td><td>2026年2月B轮后</td></tr>
+        <tr><td>最大订单金额</td><td>近5亿元（惠科3年1000台）</td><td>2025年9月</td></tr>
+        <tr><td>营收数据</td><td>未公开披露</td><td>—</td></tr>
+        <tr><td>产能状态</td><td>2025年底千台级年产能，2026年扩至万台</td><td>公司公告</td></tr>
+      </table></div>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>2026年4月完成股份制改造，更名为「智平方（深圳）科技股份有限公司」，被视为IPO前关键一步。</li>
+        <li>在RoboCOIN大型双臂数据集中，half-humanoid领域数据贡献占比超35%，覆盖50+场景。</li>
+        <li>摩根士丹利2025年机器人产业深度报告将智平方列为具身基础模型代表企业。</li>
+        <li>获图灵奖得主 Yann LeCun 关注其开源模型RoboMamba。</li>
+        <li>2026年4月发布AlphaBrain Platform开源平台，被视为对特斯拉硬件开源的高维度回应。</li>
+        <li>英特尔全球高管2026年4月访问深圳时专程体验智平方机器人手冲咖啡。</li>
+        <li>公司与港科大（广州）熊辉教授团队联合推出NeuroVLA类脑VLA模型。</li>
+        <li>智平方在无锡梁溪科技城建设通用智能机器人生产基地，推动长三角产能布局。</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="ana1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>郭彦东博士的履历横跨学术（普渡大学博士）、消费电子AI（OPPO首席科学家）和智能汽车（小鹏汽车首席科学家），这一背景天然将智平方推向「AI大模型+硬件量产+工业场景」的交汇点。小鹏汽车的自动驾驶经验使其深刻理解端到端模型在真实物理世界部署的挑战，微软研究院的经历则赋予了顶级AI研究视野。团队引入5位斯坦福全球前2%科学家，同时配备来自Momenta等自动驾驶企业的工程团队，形成了「学术前沿+工程落地」的双引擎结构。这一配置与智平方选择的「生产力型通用智能机器人」定位高度匹配：学术团队攻克VLA模型前沿问题，工程团队负责从产线到客户现场的落地闭环。相比之下，纯学术团队容易止步于Demo，纯产业团队则可能在模型架构创新上落后，智平方的混合型结构恰好补足了具身智能创业中最常见的短板。</p>
+      </div>
+
+      <div class="analysis-block" id="ana2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>智平方自2023年初即坚定选择端到端VLA架构，这在当时全球仅特斯拉机器人与之同步，属于高风险的先发选择。端到端VLA的优势在于模型可直接从视觉输入映射到动作输出，减少了传统模块化方案中的信息损耗，理论上更适合复杂、非结构化的工业场景。然而端到端路线对数据规模和质量要求极高。智平方的「正反金字塔」数据战略是应对这一挑战的关键设计：冷启动阶段通过互联网数据+仿真数据+少量真机数据快速迭代，进入规模部署后依靠真实场景高质量数据持续优化。目前智平方在3C制造、面板行业等相对结构化场景率先落地是务实之举——这些场景既验证了端到端VLA的可行性，又避免了过早进入高度非结构化场景的风险。2026年4月发布的AlphaBrain Platform将类脑VLA和可插拔世界模型架构开源，表明公司正在将技术路线从「自用」升级为「定义行业标准」。</p>
+      </div>
+
+      <div class="analysis-block" id="ana3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>智平方的股东结构呈现出鲜明的「产业资本绑定场景」特征。百度战投带来AI大模型协同和云算力生态支持；中车资本的进入不仅提供资金，更将中车庞大的高端制造体系转化为智平方机器人的天然试验场和潜在订单来源；华熙生物提供了生物科技领域的场景入口；特斯拉生态链龙头企业的参与暗示了供应链层面的协同可能性。券商系基金国泰海通的参与则是IPO信号。与纯财务投资者主导的具身智能公司相比，智平方的产业资本结构使其在场景获取上具有明显优势，但也意味着公司战略可能受到大股东产业诉求的影响——例如中车和惠科的制造场景可能引导产品路线向工业方向倾斜，而智魔方的零售场景则可能被视为独立的增长曲线而非核心战略。2026年B轮后估值突破百亿，多元化的股东结构也有助于在IPO前建立更广泛的利益共同体。</p>
+      </div>
+
+      <div class="analysis-block" id="ana4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>智平方成立仅3年，公开可见的路径调整相对有限，但已有几个值得关注的转向信号。第一，产品形态从最初的纯工业定位扩展到智魔方零售终端，标志着从单一B端工业场景向B2C服务场景的横向拓展。智魔方的推出时间（2025年底）恰好在工业订单（惠科）落地之后，表明公司在工业场景验证完成后，有意识地开辟第二增长曲线。第二，2026年4月发布AlphaBrain Platform开源平台，意味着从「封闭自研」向「开放生态」的范式转移——这既是对特斯拉硬件开源策略的回应，也是公司从产品公司向平台公司转型的信号。第三，早期以AlphaBot整机为核心，2026年则更多地强调「模型+硬件+场景」三位一体，战略重心从单一产品向体系化能力迁移。这些调整整体呈现出从「做产品」到「建生态」的演进逻辑。</p>
+      </div>
+
+      <div class="analysis-block" id="ana5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>智平方在具身智能赛道做出了几个明确的竞争取舍。第一，选择「生产力型」而非「表演型」机器人——这意味着更长的商业化周期和更高的技术门槛，但也意味着更大的市场空间和更高的壁垒。第二，走「全栈」路线（模型+硬件+场景+产线），而非仅做模型或仅做硬件——这与特斯拉Optimus的垂直整合思路高度一致，但也要求公司在多个维度同时保持竞争力，对资本和管理能力提出极高要求。第三，选择开源生态（AlphaBrain Platform）而非封闭系统——这一定位类似安卓之于手机行业，试图通过开源降低行业门槛来扩大自身技术标准的影响力。在国内对标中，智平方与智元（AgiBot）形成微妙差异：智元更侧重「成本极致+大规模量产」，智平方更侧重「模型原创+全栈闭环」。两者代表了具身智能领域「iPhone路线」和「安卓路线」的不同诠释。</p>
+      </div>
+
+      <div class="analysis-block" id="ana6">
+        <h4>2.6 其他重要观察</h4>
+        <p>首先，智平方在一年内完成12轮融资的节奏在全球具身智能赛道极为罕见。高频融资既反映了资本市场对赛道的热捧，也暗示公司可能在快速扩张中面临现金流压力——每轮融资间隔短意味着缺乏足够时间验证上一轮资金的使用效率。其次，智魔方业务虽然开辟了全新的C端触达渠道，但其商业模式（咖啡/冰淇淋零售）的盈利能力和规模化效率有待验证，可能面临「场景热闹但利润薄」的挑战。第三，2026年4月的股份制改造和AlphaBrain Platform开源发布集中在同一时间段，这种「IPO准备+生态定义」的双线操作显示出公司在资本和技术两个战场同时发力的雄心，但也增加了执行复杂度。最后，郭彦东公开表示消费级"iPhone时刻"仍需5-7年，这一判断设定了合理的预期管理框架，有助于公司在资本市场保持耐心和战略定力。</p>
+      </div>
+
+      <h2 id="references">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://www.geekpark.net/news/360266" target="_blank">「最像特斯拉」智平方在7轮融资后，又完成5轮B轮系列融资，融资规模超10亿，估值超百亿 | 极客公园</a></li>
+          <li><a href="https://lieyunpro.com/archives/500472" target="_blank">智平方完成10亿元B轮融资，一年内连融12轮，估值超百亿 | 猎云网</a></li>
+          <li><a href="https://huacheng.gz-cmc.com/pages/2026/02/23/2311f1454e7d43a0bf645c3bd4aa2d22.html" target="_blank">机器人参考丨"最像特斯拉"的智平方，成为广东首家估值超百亿具身智能独角兽 | 华城</a></li>
+          <li><a href="https://www.iheima.com/article-394307.html" target="_blank">一年12轮融资，智平方B轮再募超10亿元 | i黑马</a></li>
+          <li><a href="https://www.sfccn.com/2026/4-10/xNMDE0NzNfMjEyNzgxNg.html" target="_blank">深圳百亿具身智能独角兽完成股改，或加速IPO进程 | 南方财经</a></li>
+          <li><a href="https://news.ifeng.com/c/8r0WEJcp0NU" target="_blank">估值已超百亿，AI机器人企业智平方完成10亿元B轮融资 | 凤凰网</a></li>
+          <li><a href="https://www.21jingji.com/article/20260224/herald/c6f22d8ca5a80d305ba9e5db7fdf9e0e.html" target="_blank">一年12轮！智平方获超10亿B轮融资，跻身百亿阵营 | 21世纪经济报道</a></li>
+          <li><a href="https://www.21jingji.com/article/20260224/herald/a6cd472deb3fec27bd8a758138088f90.html" target="_blank">深圳马年首家百亿独角兽来了 | 21世纪经济报道</a></li>
+          <li><a href="https://finance.sina.cn/2026-02-28/detail-inhpiryk9359807.d.html" target="_blank">智平方B轮融资破10亿：高频融资背后的百亿估值逻辑 | 新浪财经</a></li>
+          <li><a href="https://finance.eastmoney.com/a/202602243652546030.html" target="_blank">深圳马年首家百亿独角兽来了 | 东方财富网</a></li>
+          <li><a href="https://egs.stcn.com/news/detail/2237536.html" target="_blank">"最像特斯拉"的智平方完成5轮B轮系列融资，估值超百亿元 | 证券时报</a></li>
+          <li><a href="https://jnzstatic.cs.com.cn/zzb/htmlInfo/104267.html" target="_blank">3年1000台！智平方拿下具身智能机器人订单 | 中国证券报</a></li>
+          <li><a href="https://m.nbd.com.cn/articles/2025-09-11/4057350.html" target="_blank">近5亿元，具身智能机器人行业有望再次刷新最大订单额 | 每日经济新闻</a></li>
+          <li><a href="https://www.dutenews.com/n/article/10124673" target="_blank">打造半导体显示智慧工厂新范式！HKC惠科达成全球首个半导体显示具身智能全面战略合作 | 读特新闻</a></li>
+          <li><a href="https://m.jiemian.com/article/14267972.html" target="_blank">从高端制造到多元公共服务，智平方×西子联合开启具身智能"全场景闭环"新纪元 | 界面新闻</a></li>
+          <li><a href="https://www.ithome.com/0/942/185.htm" target="_blank">特斯拉开源硬件，中国公司开源大脑：智平方推出全球首个具身模型"顶配全家桶" | IT之家</a></li>
+          <li><a href="https://36kr.com/newsflashes/3770762105914119" target="_blank">智平方与西子联合达成合作 | 36氪</a></li>
+          <li><a href="https://news.bjd.com.cn/2026/04/22/11704136.shtml" target="_blank">特斯拉开源硬件，中国公司开源大脑：智平方AlphaBrain Platform重新定义具身智能开源范式 | 北京日报</a></li>
+          <li><a href="https://static.nfnews.com/content/202604/21/c12358059.html" target="_blank">英特尔高管中国行，喝上了南山机器人"手冲"咖啡 | 南方+</a></li>
+          <li><a href="http://www.wenweipo.com/a/202604/26/AP69ed28cbe4b0b49ad1b86315.html" target="_blank">智平方机器人功能多，能泡咖啡能打鼓 | 香港文汇网</a></li>
+          <li><a href="http://www.imtaweb.net/xwzx/hydt/202604/20260421_26608789.shtml" target="_blank">澳门万国控股与智平方达成战略合作 | 澳门旅游业</a></li>
+          <li><a href="https://huacheng.gz-cmc.com/pages/2026/02/11/1108d7f45019473993aaef62797f4a58.html" target="_blank">日均数百杯0失误！智平方机器人具身服务空间开启"千店"布局 | 华城</a></li>
+          <li><a href="https://wlaq.gmw.cn/2026-02/12/content_38593487.htm" target="_blank">日供咖啡数百杯！具身智能加速走进日常生活 | 光明网</a></li>
+          <li><a href="https://m.jiemian.com/article/13957003.html" target="_blank">千亿资本加持，2026年人形机器人十强凸显中国技术硬实力 | 界面新闻</a></li>
+          <li><a href="https://m.jiemian.com/article/13711334_sina.html" target="_blank">智平方：自有产线2026年可实现万台规模产能 | 界面新闻</a></li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">本页面最后更新于2026年5月4日 · 数据来源截至2026年4月公开信息 · 具身智能Wiki</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

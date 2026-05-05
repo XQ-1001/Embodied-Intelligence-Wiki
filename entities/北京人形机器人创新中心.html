@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>北京人形 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+:root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+html { scroll-behavior: smooth; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+.page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+.top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+.top-nav a { color: var(--link); text-decoration: none; }
+.top-nav a:hover { text-decoration: underline; }
+.top-nav .breadcrumb-sep { color: #a2a9b1; }
+.wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+.wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+.wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+.wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+.toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+.toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+.toc-nav ul { list-style: none; padding-left: 0; }
+.toc-nav li { margin: 2px 0; }
+.toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+.toc-nav a:hover { text-decoration: underline; }
+.toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+.toc-nav .toc-lvl2 { font-weight: 600; }
+.toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+.toc-nav .toc-lvl4 { padding-left: 28px; font-size: 0.74rem; color: #54595d; }
+.wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+.infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+.infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+.ib-row { display: flex; border-top: 1px solid #ddd; }
+.ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+.ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+.ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+p { margin: 8px 0; }
+.article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+.wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+.wiki-article li { margin: 3px 0; line-height: 1.7; }
+.wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+.wikitable.infotable { width: auto; min-width: 320px; }
+.table-wrapper { overflow-x: auto; }
+.wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+.wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+.wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+.wikitable tr:nth-child(even) { background: var(--table-stripe); }
+.tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+.tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+.tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+.callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+.callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+.analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+.analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+.references { font-size: 0.82rem; margin-top: 24px; }
+.references ol { padding-left: 2.2em; }
+.references li { margin: 3px 0; }
+.references a { color: var(--link); word-break: break-all; }
+.page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+@media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> <span class="breadcrumb-sep">›</span> <span>北京人形</span></div>
+  <div class="wiki-header"><h1>北京人形</h1><div class="subtitle">国家地方共建具身智能机器人创新中心 · 2023年成立 · 首轮融资超7亿元 · 员工近300人</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#founders">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#technology">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercialization">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financials">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#a1">2.1 团队背景与场景选择的匹配度</a></li>
+        <li class="toc-lvl4"><a href="#a2">2.2 技术路线与场景的适配性</a></li>
+        <li class="toc-lvl4"><a href="#a3">2.3 股东/资本结构对战略的影响</a></li>
+        <li class="toc-lvl4"><a href="#a4">2.4 试错过程与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#a5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#a6">2.6 其他重要观察、分析</a></li>
+        <li class="toc-lvl2"><a href="#references">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">北京人形</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">北京人形机器人创新中心有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">英文</div><div class="ib-value">Beijing Humanoid Robot Innovation Center</div></div>
+        <div class="ib-row"><div class="ib-label">别名</div><div class="ib-value">国家地方共建具身智能机器人创新中心</div></div>
+        <div class="ib-row"><div class="ib-label">成立</div><div class="ib-value">2023年11月2日</div></div>
+        <div class="ib-row"><div class="ib-label">注册地</div><div class="ib-value">北京经开区（亦庄）</div></div>
+        <div class="ib-section">财务数据</div>
+        <div class="ib-row"><div class="ib-label">注册资本</div><div class="ib-value">约4.6亿元（2025年6月增资后）</div></div>
+        <div class="ib-row"><div class="ib-label">首轮融资</div><div class="ib-value">超7亿元（2026年2月）</div></div>
+        <div class="ib-section">估值/市值</div>
+        <div class="ib-row"><div class="ib-label">估值</div><div class="ib-value">未公开披露（行业参考数十亿至百亿级）</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">员工</div><div class="ib-value">近300人（2025年），研发占比>70%</div></div>
+        <div class="ib-row"><div class="ib-label">CEO</div><div class="ib-value">熊友军</div></div>
+        <div class="ib-row"><div class="ib-label">核心产品</div><div class="ib-value">具身天工3.0、慧思开物</div></div>
+        <div class="ib-row"><div class="ib-label">中试产能</div><div class="ib-value">5000台套/年</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">类型</div><div class="ib-value"><span class="tag">国家级创新平台</span><span class="tag-info">人形机器人</span><span class="tag-info">具身智能</span></div></div>
+        <div class="ib-section">官网</div>
+        <div class="ib-row"><div class="ib-label">官网</div><div class="ib-value"><a href="https://x-humanoid.com" target="_blank">x-humanoid.com</a></div></div>
+      </aside>
+
+      <p class="article-intro"><strong>北京人形</strong>（全称：北京人形机器人创新中心有限公司，亦称国家地方共建具身智能机器人创新中心），成立于2023年11月，总部位于北京经济技术开发区，由优必选、京城机电、小米机器人、亦庄机器人等10家领军企事业单位联合组建。中心定位为具身智能领域的"安卓生态"——聚焦通用机器人母平台"具身天工"和通用具身智能平台"慧思开物"的研发与开源推广，致力于打造面向全行业的开放技术底座。2024年10月正式升级为国家级创新中心，2026年2月完成首轮超7亿元市场化融资，投资方包括百度、东土科技等产业资本。旗下具身天工Ultra于2025年4月以2小时40分42秒获得全球首个人形机器人半程马拉松冠军。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper">
+      <table class="wikitable infotable">
+        <tr><th>项目</th><th>内容</th></tr>
+        <tr><td>全称</td><td>北京人形机器人创新中心有限公司</td></tr>
+        <tr><td>英文名称</td><td>Beijing Humanoid Robot Innovation Center Co., Ltd.</td></tr>
+        <tr><td>国家级平台名称</td><td>国家地方共建具身智能机器人创新中心</td></tr>
+        <tr><td>成立日期</td><td>2023年11月2日</td></tr>
+        <tr><td>注册地</td><td>北京经济技术开发区（亦庄）</td></tr>
+        <tr><td>国家级挂牌</td><td>2024年10月10日</td></tr>
+        <tr><td>上市状态</td><td>未上市</td></tr>
+        <tr><td>官网</td><td>x-humanoid.com</td></tr>
+        <tr><td>定位</td><td>国内首家聚焦具身智能机器人核心技术、产品研发与应用生态建设的创新中心</td></tr>
+      </table>
+      </div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>时间</th><th>事件</th></tr>
+        <tr><td>2023年11月</td><td>北京人形机器人创新中心有限公司注册成立，初期由优必选、京城机电、小米机器人、亦庄机器人等10家单位联合出资约4.6亿元组建</td></tr>
+        <tr><td>2024年4月</td><td>发布具身天工1.0 LITE——中国首个通用机器人母平台、全球首个纯电驱全尺寸拟人奔跑人形机器人</td></tr>
+        <tr><td>2024年8月</td><td>发布新一代通用人形机器人，搭载自研一体化关节，自由度提升至42个</td></tr>
+        <tr><td>2024年10月</td><td>正式升级挂牌为"国家地方共建具身智能机器人创新中心"</td></tr>
+        <tr><td>2025年3月</td><td>发布全球首个"一脑多能、一脑多机"通用具身智能平台"慧思开物"</td></tr>
+        <tr><td>2025年4月</td><td>具身天工Ultra以2小时40分42秒夺得全球首个人形机器人半程马拉松冠军</td></tr>
+        <tr><td>2025年6月</td><td>注册资本增至约4.6亿元（增幅约31%），小米等参投</td></tr>
+        <tr><td>2025年8月</td><td>世界人形机器人运动会斩获2金6银2铜</td></tr>
+        <tr><td>2025年Q4</td><td>启动首轮市场化融资，投资人意向认购超原定目标3倍以上</td></tr>
+        <tr><td>2025年10月</td><td>"慧思开物"SDK正式对外开放</td></tr>
+        <tr><td>2025年12月</td><td>XR-1 VLA大模型开源——国内首个通过国标EIBench测评的VLA模型</td></tr>
+        <tr><td>2026年1月29日</td><td>中试验证平台正式启动，9,700㎡，下线第1,000台定制化样机</td></tr>
+        <tr><td>2026年2月3日</td><td>官宣完成首轮超7亿元市场化融资，百度、东土科技战略投资</td></tr>
+        <tr><td>2026年2月10日</td><td>发布具身天工3.0——43自由度、首个触物交互式全身高动态运动控制全尺寸人形机器人</td></tr>
+        <tr><td>2026年3月2日</td><td>携具身天工3.0亮相MWC 2026巴塞罗那，完成海外首秀</td></tr>
+        <tr><td>2026年3月26日</td><td>中关村论坛正式启动"具身智能开源开放生态建设计划"</td></tr>
+      </table>
+      </div>
+
+      <h3 id="founders">1.2 创始人及核心团队</h3>
+      <p>北京人形由优必选联合创始人兼CTO熊友军出任CEO，核心团队兼具深厚学术背景与产业经验，人才结构为"学术+产业"混合型。团队近300人（2025年），研发人员占比超过70%，平均年龄约32岁，部分技术部门负责人为海外知名高校归国博士。</p>
+
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+        <tr><td>CEO/总经理</td><td>熊友军</td><td>1978年生，华中科技大学机械设计及理论工学博士（2005年）。2012年加入优必选，历任CTO、执行董事、副总经理，主导开发Walker等多款人形机器人。2023年参与创立北京人形并任CEO。担任工信部人形机器人标准化技术委员会副主任委员，牵头制定《人形机器人智能化分级》团体标准。20余年机器人研发经验。</td></tr>
+        <tr><td>董事长</td><td>许多</td><td>京城机电背景</td></tr>
+        <tr><td>副总经理</td><td>李春枝</td><td>—</td></tr>
+        <tr><td>本体负责人</td><td>刘益彰</td><td>机器人本体原型研发，具身天工系列总工程师</td></tr>
+        <tr><td>运控中心负责人</td><td>郭宜劼</td><td>运动控制算法，主导天工Ultra半马冠军技术方案</td></tr>
+        <tr><td>具身智能负责人</td><td>鞠笑竹</td><td>通用具身大模型研发，慧思开物及XR-1 VLA技术负责人</td></tr>
+      </table>
+      </div>
+
+      <p><strong>专家委员会</strong>：主任乔红院士（中国科学院），副主任朱松纯（通用研究院院长）、黄铁军（智源研究院理事长）、魏然（信通院总工程师），委员含黄强、孙富春、赵杰、吴新宇等9位机器人领域顶尖专家。</p>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+
+      <h4>融资历史</h4>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>轮次</th><th>时间</th><th>金额</th><th>估值</th><th>主要投资方</th></tr>
+        <tr><td>初始出资</td><td>2023年11月</td><td>约4.6亿元</td><td>—</td><td>优必选、京城机电、小米机器人、亦庄机器人、首程资本等10家联合出资</td></tr>
+        <tr><td>增资</td><td>2025年6月</td><td>增幅约31%</td><td>—</td><td>小米等参投，注册资本增至约4.6亿元</td></tr>
+        <tr><td>首轮市场化融资</td><td>2026年2月</td><td>超7亿元</td><td>未公开</td><td>北京市人工智能产业投资基金、亦庄国投、北京高精尖基金、华控基金；产业方百度、东土科技</td></tr>
+      </table>
+      </div>
+
+      <h4>股东结构</h4>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>股东类型</th><th>代表方</th><th>角色/影响</th></tr>
+        <tr><td>国有/政府基金</td><td>京城机电、亦庄国投、北京市人工智能产业投资基金、北京高精尖基金</td><td>政策和资金底盘，提供国家级平台资质和产业园区资源</td></tr>
+        <tr><td>产业资本</td><td>优必选（联合发起）、小米机器人、百度、东土科技</td><td>技术协同、供应链资源和场景入口</td></tr>
+        <tr><td>市场化机构</td><td>首程资本、华控基金</td><td>财务投资，增强市场化运营能力</td></tr>
+      </table>
+      </div>
+
+      <p>首轮融资特点：投资人意向认购规模超原定目标3倍以上，老股"一股难求"；CEO明确表示无任何对赌条款；资金重点投向"具身天工"与"慧思开物"两大核心平台的技术迭代与规模化推广。</p>
+
+      <h3 id="technology">1.4 技术路线</h3>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>维度</th><th>详情</th></tr>
+        <tr><td>AI架构</td><td>"大脑+小脑"双层架构：大脑层——WoW世界模型（常识推理、任务分解）+ Pelican-VL天鹕VLM（场景理解）；小脑层——XR-1 VLA大模型（视觉-语言-动作端到端映射），采用首创UVMC多模态视动统一表征技术</td></tr>
+        <tr><td>数据方案</td><td>仿真数据:真实数据=4:1；数据集RoboMIND 2.0（30万+条操作轨迹，739个任务，129种技能），ArtVIP高保真铰接物体数字资产（26类、1000+种可动物件、6个虚拟训练场）</td></tr>
+        <tr><td>全栈/专用</td><td>全栈开放路线——硬件端开放本体图纸和运控框架；软件端开源世界模型、VLM、VLA及SDK；兼容ROS2、MQTT、TCP/IP等主流协议，支持二次开发</td></tr>
+        <tr><td>自研特色</td><td>UVMC（多模态视动统一表征）——行业首创，类比机器人"拼音系统"，将视觉信息与动作经验压缩为可复用"动作代码"；三段式训练范式（视动统一表征→跨本体数据强化→场景微调）；跨本体控制能力（同一模型适配6种以上不同机器人）</td></tr>
+        <tr><td>标准化</td><td>牵头制定《人形机器人智能化分级》（四维五级框架）、《人形机器人电驱动一体化关节接口规范》、《具身智能数据集质量要求及评价方法》等国家/国际标准</td></tr>
+      </table>
+      </div>
+
+      <p>XR-1 VLA模型性能：覆盖120+项真实世界任务、6种不同机器人本体，平均成功率70.3%（对比：UniVLA 40.2%、RDT 34.2%、GROOT-N1.5 23.2%）。将真机数据与仿真数据比例从1:0提升到1:5后，4个不同任务成功率平均提升超25%。</p>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>产品分类</th><th>子类/型号</th><th>关键参数</th><th>发布时间</th><th>适用场景</th></tr>
+        <tr><td>通用双足人形</td><td>具身天工1.0 LITE</td><td>20自由度，纯电驱全尺寸</td><td>2024年4月</td><td>科研教育、通用研究平台</td></tr>
+        <tr><td>通用双足人形</td><td>具身天工2.0</td><td>双电池快换、工业级负载、永续作业</td><td>2025年</td><td>工业制造、仓储物流</td></tr>
+        <tr><td>通用双足人形</td><td>具身天工3.0</td><td>43自由度、身高约1.69m、体重62kg、毫米级操作精度、触物交互高动态运动</td><td>2026年2月</td><td>多场景通用开发平台</td></tr>
+        <tr><td>极限运动双足</td><td>具身天工Ultra</td><td>百米21.50秒、可完成半马（2h40m42s）</td><td>2025年</td><td>极限运动、高速奔跑测试验证</td></tr>
+        <tr><td>轮式服务机器人</td><td>天轶2.0</td><td>轮臂结构</td><td>2025年</td><td>商业服务、导览、工业料箱搬运</td></tr>
+        <tr><td>科研教育版</td><td>天工行者</td><td>20自由度、身高1.72m，京东售价29.9万-77.9万元</td><td>2025年9月</td><td>高校科研、教育培训</td></tr>
+        <tr><td>软件平台</td><td>慧思开物</td><td>"一脑多能、一脑多机"通用具身智能平台，SDK已开放</td><td>2025年3月</td><td>跨本体机器人智能化赋能</td></tr>
+      </table>
+      </div>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>场景分类</th><th>合作方/客户</th><th>应用内容</th></tr>
+        <tr><td>工业制造</td><td>福田康明斯</td><td>发动机工厂料箱取放搬运（8-12kg），具身天工2.0/天轶2.0自主作业</td></tr>
+        <tr><td>电力作业</td><td>中国电力科学研究院</td><td>全自主电力巡检操作——开门、按按钮、旋拧等连贯工序</td></tr>
+        <tr><td>汽车制造</td><td>蔚来、凯龙高科技</td><td>基于慧思开物平台二次开发，交付天工3.0/Ultra本体</td></tr>
+        <tr><td>船舶制造</td><td>中船集团</td><td>天工3.0本体交付及二次开发</td></tr>
+        <tr><td>生物医药</td><td>拜耳医药</td><td>固体药品制造生产、包装、仓储物流</td></tr>
+        <tr><td>运动科学</td><td>李宁集团</td><td>人形机器人穿跑鞋进行高强度运动装备测试</td></tr>
+        <tr><td>商业服务</td><td>—</td><td>全国首个全自主无人化人形机器人导览解决方案</td></tr>
+        <tr><td>仓储物流</td><td>晓悟智能（中科创达旗下）</td><td>"移动+操作+决策"全栈式方案</td></tr>
+        <tr><td>环保检测</td><td>凯龙高科技</td><td>慧思开物平台垂直领域深度合作</td></tr>
+        <tr><td>教育科研</td><td>北京大学、北理工、北航、华中科大、港科大（广州）、慕尼黑工大等</td><td>联合实验室、机器人本体交付、半马赛事合作</td></tr>
+      </table>
+      </div>
+
+      <h3 id="commercialization">1.7 商业化进展</h3>
+      <p><strong>中试验证平台</strong>：占地9,700㎡，配备500台套试制生产和测试设备，年产能5,000台套具身智能机器人（当前约2,000台）。关节年产能约8万个（10小时生产约300个）。2026年1月29日已下线第1,000台客户定制化样机。中试平台面向产业链上下游提供付费一站式服务。</p>
+      <p><strong>超级工厂</strong>：2026年2月与领益智造合作启动北京具身智能超级工厂，2026年目标1万台套产能，2030年目标50万台套。</p>
+      <p><strong>开源生态</strong>：GitHub累计下载量超200万次，服务企业超100家。已开源天工本体图纸、运控框架、WoW世界模型、Pelican-VL VLM、XR-1 VLA、RoboMIND 2.0数据集、ArtVIP仿真资产、慧思开物SDK。</p>
+      <p><strong>产品直销</strong>：天工行者科研教育版在京东售价29.9万-77.9万元。3.0旗舰版通过B2B合作交付。</p>
+      <p><strong>2026年交付</strong>：人形机器人半马实训营已向合作伙伴交付15台机器人本体（含蔚来、中船集团等）。</p>
+
+      <h3 id="financials">1.8 财务数据</h3>
+      <p>北京人形为非上市创新平台，未公开详细财务数据。以下为已知信息汇总：</p>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>指标</th><th>2023-2024</th><th>2025</th><th>2026（截至2月）</th></tr>
+        <tr><td>注册资本</td><td>约3.5亿元</td><td>增至约4.6亿元</td><td>—</td></tr>
+        <tr><td>融资总额</td><td>初始4.6亿元</td><td>增资约1.1亿元</td><td>首轮市场化融资超7亿元</td></tr>
+        <tr><td>账面资金</td><td>—</td><td>"资金一直相对充裕"（CEO原话）</td><td>超7亿元融资到账</td></tr>
+        <tr><td>政府项目</td><td>—</td><td>承担部委揭榜挂帅9项、北京市级重大项目5项</td><td>—</td></tr>
+        <tr><td>研发投入</td><td colspan="3">90%精力集中于技术创新，单个关节产线投资超千万元</td></tr>
+        <tr><td>专利/论文</td><td colspan="3">已授权发明专利50项，发表高水平论文26篇</td></tr>
+      </table>
+      </div>
+      <p><strong>营收模式</strong>：产品直销（京东）+ 中试平台服务费 + 开源生态间接商业化。CEO明确表示商业化是"nice to have而非must have"。</p>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>北京人形承担《人形机器人智能化分级》团体标准制定，提出"四维五级"评价框架，从感知、认知、决策、执行四个维度将机器人智能分为L1-L5等级</li>
+        <li>CEO熊友军明确将公司定位类比为具身智能领域的"安卓生态"和"华为鸿蒙"，做"卖铲子的人"而非追求短期商业利润</li>
+        <li>北京亦庄已集聚机器人生态企业超300家，产业链规模超百亿元</li>
+        <li>北京市设立总规模1000亿元、存续期15年的政府投资基金，其中8支产业基金重点覆盖人工智能和机器人领域；单个揭榜挂帅项目最高可获3000万元支持，固定资产投资项目最高1亿元</li>
+        <li>2025年北京23家人形机器人企业获得192.4亿元融资，占全国该领域融资总额的41%</li>
+        <li>与上海的国家地方共建人形机器人创新中心形成"北天工、南青龙"的双中心格局</li>
+        <li>计划举办"天工开物"高校机器人创新应用大赛</li>
+        <li>已发布全国首个全自主无人化人形机器人导览解决方案</li>
+        <li>CEO认为人形机器人行业长期市场规模预计达10万亿美元</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="a1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>熊友军的履历——华中科大机械设计博士出身、在优必选主导Walker人形机器人开发近12年——直接塑造了北京人形"全尺寸人形+全栈技术"的定位。团队核心来自优必选本体研发体系（刘益彰）、运动控制（郭宜劼）和具身智能（鞠笑竹）三条技术线，属于典型的"产业老兵+学术新锐"混合型人才结构。这种背景下，中心选择了工业制造（福田康明斯）、电力（中国电科院）、汽车（蔚来）、医药（拜耳）等"重操作、强调可靠性"的场景作为落地首选，而非消费级C端场景。熊友军自身在优必选积累的供应链关系和政府合作经验，也使得中心天然具备获取国家级平台资质和揭榜挂帅项目的能力。</p>
+      </div>
+
+      <div class="analysis-block" id="a2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>北京人形选择的"大脑+小脑"双层架构体现了对当前技术成熟度的务实判断：大脑层（WoW世界模型+VLM）负责高层推理和任务分解，小脑层（XR-1 VLA）负责实时感知到动作的端到端映射。这种分层设计使得系统在面对工业场景中的动态干扰（如遮挡、负载突变）时具备一定的鲁棒性。数据策略上，4:1的虚实比例（仿真80%+真实20%）在XR-1训练中已被验证可提升成功率超25%，但对于更复杂的触觉依赖型操作（如精密装配），真实数据的比例可能仍需提高。UVMC多模态视动统一表征的"拼音系统"类比暗示了团队试图通过抽象表征层实现跨本体迁移——这在理论上是通向通用操作能力的关键路径，但实际泛化效果仍需更多场景验证。</p>
+      </div>
+
+      <div class="analysis-block" id="a3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>北京人形的股东结构呈现典型的"国资底盘+产业资本协同"特征。京城机电和亦庄国投作为国有股东提供了政策合规性和产业园区资源（如亦庄300+机器人企业集群），也意味着中心天然承载了一定的行业公共品使命（开源、标准制定）。百度作为战略投资方可能为VLA大模型提供算力和AI基础设施支持，东土科技的工业通信背景则直接关联工业场景落地。值得注意的是，首轮融资无对赌条款且投资人超额认购3倍——这种宽松的资本环境使中心得以维持"90%精力投入研发"的战略定力，但也意味着未来需要向投资人证明技术开源路线的商业可持续性。</p>
+      </div>
+
+      <div class="analysis-block" id="a4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>从2024年4月天工1.0 LITE（20自由度、以拟人奔跑验证为核心）到2026年2月天工3.0（43自由度、触物交互高动态运动），北京人形在不到两年内完成了从"能跑"到"跑得快"再到"跑着干活"的三级跳。这一快速迭代反映出团队对产品定义的持续校准：1.0验证了纯电驱拟人运动的可行性，Ultra通过半马赛事证明了高速运动的稳定性，3.0则将重心转向"运动+操作"的耦合——即机器人在高动态运动中同时完成精细操作。尤其值得关注的是从"单本体"到"慧思开物一脑多机"的战略扩展：中心从最初只做"天工"本体，逐步转向为多构型机器人（含第三方UR、Franka等）提供通用智能平台，这与安卓从单一设备到多品牌的扩展逻辑高度一致。</p>
+      </div>
+
+      <div class="analysis-block" id="a5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>北京人形做出了一个清晰的战略取舍：不追求成为"最会卖机器人的公司"，而是成为"让别人的机器人变得更聪明的公司"。这一"卖铲子"定位使其避开了与优必选、宇树、Figure等本体厂商的直接竞争，转而与它们形成平台-应用的分工关系。核心取舍包括：走全栈开源路线（而非封闭系统）、以平台赋能而非终端销售为主要商业模式、聚焦"大脑+小脑"软件层而非硬件规模化制造。风险在于：开源路线的商业变现周期较长，如果在关键时间窗口内未能建立起足够强大的生态壁垒，可能被封闭系统厂商（如Figure的专有模型路线）在特定垂直场景中超越。此外，北京人形与上海人形创新中心的"北天工、南青龙"双中心格局也意味着国家层面的人形机器人战略存在一定的区域资源分散。</p>
+      </div>
+
+      <div class="analysis-block" id="a6">
+        <h4>2.6 其他重要观察、分析</h4>
+        <p>其一，北京人形的"国家队"身份是把双刃剑：一方面享受政策红利（揭榜挂帅项目、千亿级政府基金配套）、获取稀缺的国家级标准制定话语权；另一方面需要在技术创新和公共品供给之间寻找平衡——开源策略本身降低了商业变现的紧迫性，但长期来看组织效率和激励机制可能是挑战。其二，中试验证平台的9,700㎡产能基础设施是其被低估的竞争壁垒：将"从实验室到产线"的工程化know-how沉淀为可对外服务的平台能力，类似台积电在芯片行业的角色。其三，MWC 2026海外首秀标志着中国具身智能平台级企业开始主动参与全球标准竞争——在西方厂商多走封闭路线的背景下，北京人形的开源策略可能成为中国方案差异化输出的关键筹码。</p>
+      </div>
+
+      <h2 id="references">3 参考资料</h2>
+      <div class="references">
+      <ol>
+        <li><a href="https://x-humanoid.com" target="_blank">北京人形机器人创新中心官方网站</a></li>
+        <li><a href="https://kw.beijing.gov.cn/xwdt/kcyx/xwdtyqqy/202602/t20260204_4489952.html" target="_blank">北京市科委：北京人形完成超7亿元市场化融资</a></li>
+        <li><a href="https://finance.sina.cn/stock/ggyj/2026-02-03/detail-inhkpkrc3490120.d.html" target="_blank">新浪财经：超7亿元！北京人形完成首轮市场化融资</a></li>
+        <li><a href="http://www.iceo.com.cn/article/68a7e3d8-9a1d-4d48-bd71-0d291d8cae13" target="_blank">《中国企业家》：刚融资超7亿元，这家"卖铲子"的公司想成为"华为鸿蒙"</a></li>
+        <li><a href="https://leaderobot.com/news/7203" target="_blank">Leaderobot：融资超7亿，北京人形亮出"王牌"</a></li>
+        <li><a href="https://news.pedaily.cn/202602/560710.shtml" target="_blank">投资界：北京人形完成首轮超7亿元市场化融资</a></li>
+        <li><a href="https://www.donews.com/news/detail/4/6411341.html" target="_blank">DoNews：北京人形完成超7亿元首轮市场化融资</a></li>
+        <li><a href="https://www.industrysourcing.cn/article/473815" target="_blank">荣格工业：超7亿元融资落地，"北京人形"如何跑出中国具身智能的未来</a></li>
+        <li><a href="https://www.cinn.cn/sz/2026/02-11/ZkmPwqND.html" target="_blank">中国工业新闻网：具身智能新突破！北京发布"天工3.0"人形机器人</a></li>
+        <li><a href="https://www.ncsti.gov.cn/kjdt/kjrd/202602/t20260211_238007.html" target="_blank">国家科技信息中心：新一代通用机器人具身天工3.0发布</a></li>
+        <li><a href="https://www.beijing.gov.cn/ywdt/gzdt/202602/t20260211_4507573.html" target="_blank">北京市政府：北京人形机器人再"迈步"——具身天工3.0发布</a></li>
+        <li><a href="https://leaderobot.com/news/7245" target="_blank">Leaderobot：更开放！更好用！具身天工3.0为中国具身智能落地按下加速键</a></li>
+        <li><a href="https://finance.eastmoney.com/a/202603263685895766.html" target="_blank">东方财富：北京人形加速打造具身智能开放生态 上市公司积极卡位</a></li>
+        <li><a href="https://www.thundersoft.com/knewbots-x-humanoid-innovation-center-established/" target="_blank">中科创达：晓悟智能与北京人形机器人创新中心达成战略合作</a></li>
+        <li><a href="https://www.cs.com.cn/ssgs/gsxw/202602/t20260209_6537413.html" target="_blank">中证网：领益智造北京具身智能超级工厂启动</a></li>
+        <li><a href="http://tech.caijing.com.cn/20260319/5148198.shtml" target="_blank">财经网：北京人形举办机器人半马合作交付仪式</a></li>
+        <li><a href="http://epaper.zqrb.cn/html/2026-03/03/content_1222163.htm" target="_blank">证券日报：MWC 2026启幕 多款中国具身智能终端上演"硬核"首秀</a></li>
+        <li><a href="https://www.chinaz.com/ainews/23866.shtml" target="_blank">站长之家：国内首个国标VLA大模型开源！北京人形XR-1让机器人真正"会干活"</a></li>
+        <li><a href="https://open.zhidx.com/p/522850.html" target="_blank">智东西：首个通过国标的具身VLA开源了，北京人形把机器人拉回"干活现场"</a></li>
+        <li><a href="https://www.stdaily.com/web/gdxw/2025-10/24/content_420206.html" target="_blank">科技日报：通用具身智能平台"慧思开物"SDK正式开放</a></li>
+        <li><a href="https://www.hkcd.com.hk/content_app/2026-03/20/content_8745929.html" target="_blank">香港商报：從「原型驗證」到「批量製造」——北京人形中試驗證平台年產能50</a></li>
+        <li><a href="https://item.btime.com/4679nni3apj98h98lmhs53hijmn" target="_blank">北京时间："天工"的奔跑：对话北京人形机器人创新中心CEO熊友军</a></li>
+        <li><a href="https://baike.baidu.com/item/熊友军/65600950" target="_blank">百度百科：熊友军</a></li>
+        <li><a href="https://kfqgw.beijing.gov.cn/zwgkkfq/ztzl/yzby/ydfbqk/qyydbyrw/202509/t20250908_4194064.html" target="_blank">北京经开区：熊友军月度榜样人物</a></li>
+        <li><a href="https://www.nbd.com.cn/rss/hexun/articles/3521489.html" target="_blank">每日经济新闻：专访熊友军——用于训练具身智能大模型的操作数据很稀缺</a></li>
+        <li><a href="https://finance.jrj.com.cn/2025/03/02153048475169.shtml" target="_blank">金融界：具身智能行业观察——北京千亿基金布局</a></li>
+        <li><a href="https://www.cnr.cn/bj/tt/20250301/t20250301_527084971.shtml" target="_blank">央广网：北京发布具身智能产业支持措施</a></li>
+        <li><a href="https://news.sciencenet.cn/htmlnews/2023/8/506633.shtm" target="_blank">科学网：北京设立100亿元规模的机器人产业基金</a></li>
+        <li><a href="https://mp.ofweek.com/finance/a256714654587" target="_blank">OFweek：小米参投机器人创新中心增资至4.6亿</a></li>
+        <li><a href="http://finance.people.com.cn/n1/2026/0202/c1004-40657716.html" target="_blank">人民网：具身智能产业迈入规模化发展新阶段</a></li>
+      </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">本页面数据截止至2026年5月4日。内容基于公开资料整理，仅供参考，不构成任何投资建议。如有信息更新或更正，请联系维护方。</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>星猿哲 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> <span class="breadcrumb-sep">›</span> <span>星猿哲</span></div>
+  <div class="wiki-header"><h1>星猿哲</h1><div class="subtitle">XYZ Robotics · 非上市 · 2018年成立 · 累计融资约1亿美元 · 估值约7亿美元 · 员工100-499人</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#team">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#finance">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#a1">2.1 团队背景与场景选择的匹配度</a></li>
+        <li class="toc-lvl4"><a href="#a2">2.2 技术路线与场景的适配性</a></li>
+        <li class="toc-lvl4"><a href="#a3">2.3 股东/资本结构对战略的影响</a></li>
+        <li class="toc-lvl4"><a href="#a4">2.4 试错过程与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#a5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#a6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#refs">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">星猿哲</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">星猿哲科技（上海）有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">英文</div><div class="ib-value">XYZ Robotics</div></div>
+        <div class="ib-row"><div class="ib-label">成立</div><div class="ib-value">2018年（波士顿起家，总部迁上海）</div></div>
+        <div class="ib-row"><div class="ib-label">注册地</div><div class="ib-value">上海闵行</div></div>
+        <div class="ib-row"><div class="ib-label">上市状态</div><div class="ib-value">非上市</div></div>
+        <div class="ib-section">财务数据</div>
+        <div class="ib-row"><div class="ib-label">累计融资</div><div class="ib-value">约1亿美元</div></div>
+        <div class="ib-row"><div class="ib-label">估值</div><div class="ib-value">约7亿美元（2023年）</div></div>
+        <div class="ib-section">估值/市值</div>
+        <div class="ib-row"><div class="ib-label">最新轮次</div><div class="ib-value">B+轮（2022.06）</div></div>
+        <div class="ib-row"><div class="ib-label">投资方</div><div class="ib-value">今日资本、高榕创投、五源资本、源码资本、创新工场</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">员工数</div><div class="ib-value">100-499人</div></div>
+        <div class="ib-row"><div class="ib-label">专利数</div><div class="ib-value">110+项</div></div>
+        <div class="ib-row"><div class="ib-label">落地应用</div><div class="ib-value">3,000+</div></div>
+        <div class="ib-row"><div class="ib-label">全球项目</div><div class="ib-value">拆码垛500+</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label"><span class="tag">3D视觉</span><span class="tag">移动操作</span><span class="tag">仓储物流</span></div><div class="ib-value"><span class="tag tag-info">专精特新小巨人</span><span class="tag tag-info">潜在独角兽</span></div></div>
+        <div class="ib-section">官网</div>
+        <div class="ib-row"><div class="ib-label">官网</div><div class="ib-value"><a href="https://www.xyzrobotics.com.cn" target="_blank">xyzrobotics.com.cn</a></div></div>
+      </aside>
+      <p class="article-intro"><strong>星猿哲（XYZ Robotics）</strong>是一家专注于机器人3D视觉与自主运动规划的具身智能企业，2018年由CMU、MIT博士团队创立于波士顿，同年将全球总部迁至上海。公司以「机器人手眼协调」为核心能力，提供3D视觉硬件、运动规划软件平台及移动操作机器人整机方案，在拆码垛这一高变异性仓储场景中建立起中国市场份额第一的竞争壁垒。截至2024年，累计产品落地应用超过3,000个，服务宝马、博世、比亚迪、马士基、京东、宝洁等全球头部客户，海外布局覆盖美国、德国、日本、韩国。公司入选工信部重点"小巨人"企业名录，累计融资约1亿美元，估值约7亿美元。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper">
+        <table class="wikitable infotable">
+          <tr><th>项目</th><th>内容</th></tr>
+          <tr><td>公司全称</td><td>星猿哲科技（上海）有限公司</td></tr>
+          <tr><td>英文名称</td><td>XYZ Robotics Inc.</td></tr>
+          <tr><td>成立时间</td><td>2018年4月（波士顿）；2018年9月全球总部迁至上海</td></tr>
+          <tr><td>注册地</td><td>上海市闵行区莘庄工业区金地威新科创园</td></tr>
+          <tr><td>上市情况</td><td>非上市</td></tr>
+          <tr><td>法定代表人</td><td>周佳骥</td></tr>
+          <tr><td>官网</td><td>www.xyzrobotics.com.cn</td></tr>
+          <tr><td>行业定位</td><td>3D视觉 + 机器人运动规划 + 移动操作机器人</td></tr>
+          <tr><td>全球办公室</td><td>上海（总部）、美国、德国（杜塞尔多夫）、日本（东京）、韩国（首尔）</td></tr>
+        </table>
+      </div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>时间</th><th>事件</th></tr>
+          <tr><td>2018年4月</td><td>公司成立于美国波士顿</td></tr>
+          <tr><td>2018年9月</td><td>全球总部迁至上海</td></tr>
+          <tr><td>2019年1月</td><td>完成天使轮融资，投资方含创新工场</td></tr>
+          <tr><td>2019年8月</td><td>完成约800万美元A轮融资，高榕创投、五源资本领投</td></tr>
+          <tr><td>2020年8月</td><td>完成约2,000万美元A+轮融资，源码资本领投</td></tr>
+          <tr><td>2021年7月</td><td>完成3,500万美元B轮融资，今日资本领投</td></tr>
+          <tr><td>2022年6月</td><td>完成4,000万美元B+轮融资</td></tr>
+          <tr><td>2023年</td><td>入选上海市潜在独角兽企业；参加ICRA 2023获Soft Prize全球前三</td></tr>
+          <tr><td>2023年</td><td>估值达约7亿美元</td></tr>
+          <tr><td>2023年末</td><td>首发Rocky系列移动操作机器人</td></tr>
+          <tr><td>2024年5月</td><td>获上海经信委官方专题报道；发布新一代3D视觉系统</td></tr>
+          <tr><td>2024年9月</td><td>与LG CNS签署合作备忘录，进军韩国电商物流市场</td></tr>
+          <tr><td>2024年12月</td><td>入选工信部重点"小巨人"企业（全国83家）</td></tr>
+          <tr><td>2025年</td><td>与日本Sanwa Supply、SG Systems三方合作；RockyOne在日本实现无人化卸货</td></tr>
+          <tr><td>2025年10月</td><td>启用全新品牌标识；携Rocky亮相CeMAT ASIA 2025</td></tr>
+          <tr><td>2026年4月</td><td>与韩国最大货运物流企业LX Pantos签署战略合作MOU</td></tr>
+        </table>
+      </div>
+
+      <h3 id="team">1.2 创始人及核心团队</h3>
+      <p>星猿哲创始团队是典型的学术派 + 产业派混合结构。三位联合创始人分别来自卡耐基梅隆大学（CMU）、麻省理工学院（MIT）和北京大学，在机器人学、计算机视觉与商务运营领域形成互补。早期核心研发成员主要来自MIT、CMU、Northwestern等美国顶尖高校，后期逐步吸纳来自上海交大、浙大、清华以及FANUC、高通、Google、腾讯、华为等领军企业的人才。公司员工规模100-499人，研发人员占比高，整体人才结构偏重技术研发。</p>
+
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+          <tr><td>CEO / 联合创始人</td><td>周佳骥</td><td>卡耐基梅隆大学（CMU）计算机学院机器人学博士。博士期间以第一作者身份获2016年ICRA最佳论文奖，为ICRA创办30年来第三位以此身份获奖的华人。负责公司整体战略与管理，法定代表人。</td></tr>
+          <tr><td>CTO / 联合创始人</td><td>俞冠廷</td><td>麻省理工学院（MIT）EECS博士（机器人方向）。2015-2017年作为MIT-Princeton联队技术架构总负责人连续三年参加亚马逊拣选机器人挑战赛（Amazon Picking Challenge），均获全球前三。主管技术研发方向。</td></tr>
+          <tr><td>CBO / 联合创始人</td><td>邢梁立博</td><td>北京大学经济学院硕士。曾任职于中国工商银行总行，具备金融与产业双重背景。负责商务与运营，为公司商业化拓展和海外合作的核心推动者。</td></tr>
+        </table>
+      </div>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <h4>融资历史</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>轮次</th><th>时间</th><th>金额</th><th>主要投资方</th></tr>
+          <tr><td>天使轮</td><td>2019.01</td><td>未披露</td><td>创新工场、New Wheel、Drew Bagnell</td></tr>
+          <tr><td>A轮</td><td>2019.08</td><td>约800万美元</td><td>高榕创投、五源资本、创新工场</td></tr>
+          <tr><td>A+轮</td><td>2020.08</td><td>约2,000万美元</td><td>源码资本、高榕创投、五源资本</td></tr>
+          <tr><td>B轮</td><td>2021.07</td><td>3,500万美元</td><td>今日资本（领投）、高榕创投、五源资本、源码资本</td></tr>
+          <tr><td>B+轮</td><td>2022.06</td><td>4,000万美元</td><td>今日资本、高榕创投、五源资本、源码资本</td></tr>
+        </table>
+      </div>
+      <p>累计融资约1亿美元（约合人民币7.31亿元），共完成5轮融资。自2022年6月B+轮后，截至2026年5月公开信息中尚未出现C轮或新一轮融资披露。根据2023年11月《解放日报》报道，公司估值达约7亿美元。</p>
+
+      <h4>股东结构</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>类型</th><th>股东</th><th>特征</th></tr>
+          <tr><td>财务投资机构</td><td>今日资本、高榕创投、五源资本、源码资本、创新工场</td><td>均为顶级VC/PE，无产业资本战略入股记录，资本结构以财务投资者为主导</td></tr>
+          <tr><td>早期支持者</td><td>Drew Bagnell（天使）</td><td>CMU机器人学教授、Uber ATG前自动驾驶负责人，学术背书性早期投资</td></tr>
+        </table>
+      </div>
+      <p>公司尚未上市，无IPO公告。资本结构以顶级财务VC为主导，无明确产业资本入股记录，赋予公司较高的战略独立性和场景选择自由度。</p>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>维度</th><th>内容</th></tr>
+          <tr><td>AI技术架构</td><td>深度学习驱动的3D视觉感知 + 免示教运动规划 + 任务规划；不绑定特定大模型路线，更注重端到端的视觉-规划-执行闭环</td></tr>
+          <tr><td>数据方案</td><td>基于自研3D相机采集的高质量点云数据；10,000+箱型免注册识别依赖大规模预训练；与CrowdWorks等数据服务商探讨训练数据合作</td></tr>
+          <tr><td>全栈/专用路线</td><td>走「软硬一体」全栈路线：自研3D相机（AL-M/ST系列）+ 自研软件平台（Studio Max）+ 自研移动操作机器人（Rocky系列），覆盖从传感器到整机的完整链条</td></tr>
+          <tr><td>差异化技术特色</td><td>散斑双目3D技术（VCSEL激光器，0.23s成像，抗强光/反光/黑色表面）；3D视觉引导拆码垛专项能力全国第一；无需外部标记即可实现多点位高精度定位（±0.5mm）</td></tr>
+        </table>
+      </div>
+      <p>星猿哲的技术路线选择与其创始团队的学术基因高度一致。CTO俞冠廷在亚马逊拣选挑战赛中的积累直接奠定了公司在高变异物品抓取方面的技术基础，CEO周佳骥在CMU的机器人学背景则为全栈系统架构提供了理论支撑。公司走「硬件+软件+整机」全栈路线，核心技术全部自研，在3D视觉感知和运动规划两个关键环节建立起较深的护城河。</p>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>产品分类</th><th>子类/型号</th><th>关键参数</th><th>适用场景</th></tr>
+          <tr><td>3D视觉硬件</td><td>AL-M系列（DLP结构光）</td><td>多点定位精度≤±0.5mm（装配≤±0.1mm），测量范围达数立方米</td><td>高精度装配、检测、深筐上下料</td></tr>
+          <tr><td>3D视觉硬件</td><td>ST系列（散斑双目）</td><td>VCSEL激光器，0.23s成像，10,000+箱型免注册识别，抗强光干扰</td><td>拆码垛、物流分拣、户外仓储</td></tr>
+          <tr><td>软件平台</td><td>Studio Max</td><td>免代码向导式部署，集成视觉识别+运动规划+任务规划+HMI，支持数字孪生仿真</td><td>全场景通用（机器人编程与部署平台）</td></tr>
+          <tr><td>移动操作机器人</td><td>RockyOne（双臂）</td><td>SLAM导航+全向底盘，装车效率可达1,000箱/小时，纸箱与厢壁最小间隙1.5cm</td><td>仓储装卸车、出入库全流程</td></tr>
+          <tr><td>移动操作机器人</td><td>RockyLight SE（单臂）</td><td>紧凑型设计，可在斜坡上停留作业，适应月台高度不一致场景</td><td>中小型仓储、柔性装卸</td></tr>
+        </table>
+      </div>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>场景分类</th><th>具体应用</th><th>标杆客户/合作伙伴</th></tr>
+          <tr><td>工业制造</td><td>深筐无序上下料、高精度装配（轴承圈/汽车零部件）、3D视觉检测（车身间隙与面差）</td><td>宝马（BMW）、博世（Bosch）、比亚迪（BYD）、美的×库卡（KUKA）</td></tr>
+          <tr><td>仓储物流</td><td>装卸车（集装箱/厢式货车）、拆码垛（出入库）</td><td>马士基（Maersk）、京东（JD.com）、LX Pantos、LG CNS</td></tr>
+          <tr><td>电商/零售</td><td>大促分拣、多SKU混合拆垛、全渠道一仓发全国</td><td>珀莱雅（Proya）、老婆大人（华东最大零食连锁）</td></tr>
+          <tr><td>消费品</td><td>日化/食品包装线拆码垛、产线物料流转</td><td>宝洁（P&G）</td></tr>
+          <tr><td>海外物流</td><td>集装箱无人化卸货（高温环境）、大幅提升装卸效率</td><td>日本Sanwa Supply、韩国LX Pantos</td></tr>
+        </table>
+      </div>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>指标</th><th>数据</th></tr>
+          <tr><td>累计落地应用</td><td>3,000+（截至2024年）</td></tr>
+          <tr><td>全球拆码垛项目</td><td>500+</td></tr>
+          <tr><td>市场地位</td><td>3D视觉引导拆码垛机器人细分领域全国市场占有率第一</td></tr>
+          <tr><td>典型项目规模</td><td>华东某电子厂商25台全流程自动化；珀莱雅湖州6台拆垛机器人；零食品牌24套拆码垛机器人</td></tr>
+          <tr><td>海外落地</td><td>日本Sanwa Supply项目：40℃高温70分钟卸完40尺集装箱，效率提升50%；韩国LX Pantos全球仓库规模部署计划中</td></tr>
+          <tr><td>拆垛效率</td><td>730+箱/小时（美的荆州KUKA项目）；大促期间可支持5万箱以上/日出库</td></tr>
+          <tr><td>政府认可</td><td>工信部重点"小巨人"（全国83家）；入围工信部首批符合《工业机器人行业规范条件》企业（全国27家）</td></tr>
+        </table>
+      </div>
+
+      <h3 id="finance">1.8 财务数据</h3>
+      <div class="callout">
+        <div class="callout-title">⚠️ 数据说明</div>
+        <p>星猿哲科技为非上市企业，未公开披露具体营收、净利润、毛利率等财务数据。以下仅为基于公开信息整理的资金储备和估值参考。</p>
+      </div>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>指标</th><th>数据</th><th>来源/时间</th></tr>
+          <tr><td>累计融资总额</td><td>约1亿美元</td><td>公开融资公告（截至2022年6月B+轮）</td></tr>
+          <tr><td>最新估值</td><td>约7亿美元</td><td>《解放日报》2023年11月报道</td></tr>
+          <tr><td>估值/营收</td><td>未公开披露</td><td>—</td></tr>
+          <tr><td>年营收（2023-2025）</td><td>未公开披露</td><td>—</td></tr>
+          <tr><td>毛利率</td><td>未公开披露</td><td>—</td></tr>
+          <tr><td>账面现金</td><td>未公开披露</td><td>—</td></tr>
+        </table>
+      </div>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>2024年12月入选工信部新一轮第一批重点"小巨人"企业，全国仅83家获此资质。</li>
+        <li>2024年12月入围工信部首批符合《工业机器人行业规范条件（2024版）》企业，全国仅27家。</li>
+        <li>截至2024年拥有110+项专利，覆盖3D视觉感知、运动规划、卸载控制、混合垛型规划等核心技术领域。</li>
+        <li>2025年10月正式启用全新品牌标识，标志着国际化战略升级。</li>
+        <li>2023年参加ICRA范德兰德Stacking Challenge，获Soft Prize全球前三。</li>
+        <li>联合创始人兼CEO周佳骥为ICRA创办30年来第三位以第一作者获最佳论文奖的华人。</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="a1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>星猿哲创始团队的学术背景与其核心场景选择之间存在高度匹配。CTO俞冠廷在MIT期间连续三年主导亚马逊拣选挑战赛（Amazon Picking Challenge），这一赛事的核心难点——高变异性物品的视觉识别与柔性抓取——恰好是仓储拆码垛场景的技术本质。CEO周佳骥在CMU机器人学博士期间以3D视觉和运动规划为研究方向，其ICRA最佳论文的技术方向直接映射到公司当前的3D视觉感知核心能力。三位创始人中两位为机器人学博士，这使得公司在技术路线选择上天然倾向于「用视觉+规划解决高变异性操作」这一学术难题的工程化落地。联合创始人邢梁立博的金融与商务背景则补齐了商业化短板。总体而言，这是一个「学术界顶尖技术问题 → 工业界高价值场景」的经典转化范例。</p>
+      </div>
+
+      <div class="analysis-block" id="a2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>星猿哲选择的技术路线——3D视觉+免示教运动规划——与其聚焦的高变异性仓储场景高度适配。传统工业机器人依赖结构化环境和精确示教，而拆码垛场景的核心挑战在于：SKU种类繁多（万级以上）、箱型尺寸不固定、来料姿态随机、光照条件复杂。星猿哲的散斑双目3D相机（0.23s成像，抗强光/反光）和免示教全周期路径规划算法，恰恰解决了这些非结构化环境中的核心痛点。值得注意的是，公司并未选择近年热门的「人形机器人」或「通用大模型」路线，而是走「专用深度」路径——在拆码垛这一个细分场景做到极致（市场占有率全国第一），再横向扩展至深筐上下料、高精度装配等相邻场景。这种「纵向打穿、横向扩展」的策略在工业自动化领域被验证为较务实有效的路径。</p>
+      </div>
+
+      <div class="analysis-block" id="a3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>星猿哲的资本结构以顶级财务VC为主导（今日资本、高榕创投、五源资本、源码资本、创新工场），未见产业资本（如车企、物流公司、制造企业）的战略入股记录。这一结构具有双重含义：积极方面，公司保持较高的战略独立性，可以自由选择场景和客户，而不受单一产业股东的战略绑定——例如既能服务宝马（汽车），也能服务京东（电商）、宝洁（快消）；挑战方面，缺少产业资本意味着缺少自然绑定的场景资源和渠道入口，所有客户关系都需要通过市场竞争获取，对销售能力和产品竞争力要求更高。2026年与LX Pantos的战略合作正是这种独立性下的主动出击——通过技术实力而非股东关系获取全球顶级物流客户的认可。</p>
+      </div>
+
+      <div class="analysis-block" id="a4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>星猿哲的发展路径呈现出从「纯视觉硬件+软件」到「软硬一体整机」的递进式调整。早期（2018-2021），公司定位为3D视觉硬件和软件平台供应商，产品形态以AL-M/ST系列相机和Studio Max软件为主，扮演产业链上游的「手眼协调赋能者」角色。2023年末，公司首发Rocky系列移动操作机器人整机，标志着从「卖铲子」到「卖服务/整机」的战略升级。这一调整的逻辑在于：拆码垛场景的客户（物流仓储企业）往往更偏好交钥匙整机方案，而非自行集成视觉硬件和第三方机械臂。推出整机后，客户获取门槛降低、客单价提升、解决方案的完整度增强。从后续LX Pantos和Sanwa Supply的项目来看，这一转向具有明显的市场合理性。</p>
+      </div>
+
+      <div class="analysis-block" id="a5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>星猿哲的核心取舍在于：选择在拆码垛这一个细分垂类做到全国第一（「iPod专用务实路线」），而非追求人形机器人或通用具身智能平台（「iPhone路线」）。在国内具身智能赛道整体偏向人形机器人的大背景下，星猿哲的定位显得务实而克制。其竞争力建立在三个稀缺能力的叠加——自研3D视觉传感器（硬件壁垒）+ 免示教运动规划算法（软件壁垒）+ 移动操作整机集成能力（系统壁垒）。与纯视觉方案提供商（如梅卡曼德）相比，星猿哲多了整机交付能力；与纯机器人本体公司相比，多了核心视觉传感器自研能力。这种「垂直整合但不过度泛化」的定位在仓储物流自动化这一确定性较强的市场中具有较强的防御性。</p>
+      </div>
+
+      <div class="analysis-block" id="a6">
+        <h4>2.6 其他重要观察</h4>
+        <p>值得关注的是星猿哲的国际化节奏。与其他国内具身智能企业优先国内市场的策略不同，星猿哲从创立之初（波士顿起家）即具备国际化基因，目前已在美、德、日、韩设立办公室，2024-2026年更是密集落地LG CNS、Sanwa Supply、LX Pantos等重量级海外合作。这种「以海外高人力成本市场的自动化刚需驱动增长」的策略，有助于规避国内仓储自动化市场「高技术要求、低预算预期」的定价困境。另外，公司自2022年6月B+轮后已近4年未有新一轮融资公告，在当前资本市场环境下，其现金储备和盈利能力是否足以支撑持续扩张，是值得跟踪的关键变量。公司估值7亿美元的定价基准来自2023年，后续估值变化也将是其商业进展的重要晴雨表。</p>
+      </div>
+
+      <h2 id="refs">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://www.shobserver.com/sgh/detail?id=1316558" target="_blank">上海观察：智造升级！星猿哲新一代3D视觉系统，引领汽车行业自动化变革（2024.05）</a></li>
+          <li><a href="https://www.zidonghua.com.cn/news/newproduct/56880.html" target="_blank">自动化网：引领汽车行业自动化变革 | 星猿哲新一代3D视觉系统</a></li>
+          <li><a href="https://m.jfdaily.com/wx/detail.do?id=673411" target="_blank">解放日报：一个国家级"小巨人"企业的成长：海归博士选择上海，三年参赛估值飙升（2023.11）</a></li>
+          <li><a href="https://www.thepaper.cn/newsDetail_forward_23363849" target="_blank">澎湃新闻：累计融资1亿美元，这家潜在独角兽企业搬入闵行新址</a></li>
+          <li><a href="https://www.ainet.cn/znw/_01-ABC00000000000371601.shtml" target="_blank">智能网：星猿哲科技与LX Pantos正式签署战略合作协议（2026.04）</a></li>
+          <li><a href="https://www.smartloadinghub.com/insights/auto-draft-152/" target="_blank">Smart Loading Hub: XYZ Robotics and LX Pantos - A Partnership Worth Watching</a></li>
+          <li><a href="https://www.thelec.net/news/articleView.html?idxno=6105" target="_blank">The Elec: CrowdWorks, XYZ Partner on Robot Training Data to Advance Physical AI</a></li>
+          <li><a href="https://www.digitaltoday.co.kr/en/view/42859/crowdworks-signs-mou-with-xyz-on-robot-training-data-cooperation" target="_blank">Digital Today: Crowdworks signs MOU with XYZ on robot training data cooperation</a></li>
+          <li><a href="https://www.iianews.com/ca/_01-ABC00000000000355490.shtml" target="_blank">IIANews：入选工信部重点"小巨人"！星猿哲再获多项政府认可</a></li>
+          <li><a href="https://read.cnki.net/web/Journal/Article/WLJY202406020.html" target="_blank">物流技术与应用（2024年06期）：星猿哲以3D视觉技术优势破解仓储SKU复杂性挑战</a></li>
+          <li><a href="https://www.chinaagv.com/shop/2354/news/newsid-2569.html" target="_blank">中国AGV网：LG CNS携手星猿哲推动韩国电商物流自动化</a></li>
+          <li><a href="https://www.chinaagv.com/shop/2354/news/newsid-2570.html" target="_blank">中国AGV网：珀莱雅湖州物流中心全新升级，星猿哲再造标杆</a></li>
+          <li><a href="https://www.geekpark.net/news/246289" target="_blank">极客公园：XYZ Robotics完成A轮融资，利用全球领先的机器人技术赋能物流和工业自动化</a></li>
+          <li><a href="https://paper.people.com.cn/hwbwap/html/2024-08/28/content_26077317.htm" target="_blank">人民日报海外版：让海归团队跑出「加速度」（留创园走过30年）（2024.08）</a></li>
+          <li><a href="https://finance.sina.cn/2023-11-28/detail-imzwcnpy5070933.d.html" target="_blank">新浪财经：一个国家级"小巨人"企业的成长（2023.11）</a></li>
+          <li><a href="https://darwotech.com/2025/02/21/%E3%80%90xyz-robotics%E3%80%91%E9%9D%88%E6%B4%BB%E9%AB%98%E6%95%88%E4%B8%A8%E6%98%9F%E7%8C%BF%E5%93%B2rocky%E7%A7%BB%E5%8B%95%E6%93%8D%E4%BD%9C%E6%A9%9F%E5%99%A8%E4%BA%BA%E8%A3%9D%E5%8D%B8%E8%BB%8A/" target="_blank">DarwoTech：星猿哲Rocky移动操作机器人装卸车解决方案（2025.02）</a></li>
+          <li><a href="https://www.xyzrobotics.com.cn/news/list/1" target="_blank">星猿哲科技官网 - 新闻中心</a></li>
+          <li><a href="https://www.xyzrobotics.com.cn/logistics/electronics" target="_blank">星猿哲科技官网 - 电子行业解决方案</a></li>
+          <li><a href="https://i.gasgoo.com/supplier/35287276/" target="_blank">盖世汽车社区：星猿哲科技供应商档案</a></li>
+          <li><a href="https://k.sina.com.cn/article_1704103183_65928d0f02005p948.html" target="_blank">新浪科技：星猿哲科技申请卸载作业控制系统及机器人专利</a></li>
+          <li><a href="http://www.innohere.com/index.php/ir/100766.html" target="_blank">InnoHere：星猿哲科技公司详情</a></li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">本页面由具身智能Wiki自动分发器生成 · 数据截至2026年5月 · 内容仅供参考，不构成投资建议</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

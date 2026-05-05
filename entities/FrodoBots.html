@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>FrodoBots — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> › <span>FrodoBots</span></div>
+  <div class="wiki-header"><h1>FrodoBots</h1><div class="subtitle">FrodoBots Lab · 2022年成立 · 总部新加坡 · 累计融资800万美元 · DePIN+具身智能</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#founders">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financials">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#a1">2.1 团队背景与场景选择</a></li>
+        <li class="toc-lvl4"><a href="#a2">2.2 技术路线与场景适配</a></li>
+        <li class="toc-lvl4"><a href="#a3">2.3 股东资本对战略的影响</a></li>
+        <li class="toc-lvl4"><a href="#a4">2.4 试错过程与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#a5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#a6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#refs">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">FrodoBots</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">FrodoBots Lab</div></div>
+        <div class="ib-row"><div class="ib-label">成立</div><div class="ib-value">2022年</div></div>
+        <div class="ib-row"><div class="ib-label">总部</div><div class="ib-value">新加坡</div></div>
+        <div class="ib-row"><div class="ib-label">创始人</div><div class="ib-value">Michael Cho、Sam Cho</div></div>
+        <div class="ib-row"><div class="ib-label">行业</div><div class="ib-value">机器人、Web3/DePIN、具身智能</div></div>
+        <div class="ib-section">财务数据</div>
+        <div class="ib-row"><div class="ib-label">累计融资</div><div class="ib-value">800万美元</div></div>
+        <div class="ib-row"><div class="ib-label">收入状态</div><div class="ib-value">已产生收入（未公开）</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">数据集规模</div><div class="ib-value">1TB / 2000+小时</div></div>
+        <div class="ib-row"><div class="ib-label">部署城市</div><div class="ib-value">六大洲10+城市</div></div>
+        <div class="ib-row"><div class="ib-label">产品型号</div><div class="ib-value">EarthRover Zero/Mini/Mini+</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">技术路线</div><div class="ib-value">DePIN·众包数据·开源数据集·Solana</div></div>
+        <div class="ib-section">官网</div>
+        <div class="ib-row"><div class="ib-label">官网</div><div class="ib-value"><a href="https://www.frodobots.ai">frodobots.ai</a></div></div>
+        <div class="ib-row"><div class="ib-label">BitRobot</div><div class="ib-value"><a href="https://bitrobot.ai">bitrobot.ai</a></div></div>
+      </aside>
+
+      <p class="article-intro"><strong>FrodoBots</strong>（FrodoBots Lab）是一家总部位于新加坡的机器人技术与Web3交叉领域初创公司，成立于2022年。公司以"游戏化机器人数据采集"起家，开发了可通过浏览器远程操控的低成本人行道机器人EarthRover系列，并在全球六大洲十余个城市部署。2025年2月完成800万美元累计融资后，FrodoBots与Protocol Labs联合推出基于Solana区块链的<strong>BitRobot具身智能研究网络</strong>，尝试通过DePIN代币激励机制解决机器人领域的数据稀缺和资源分配问题。公司已开源FrodoBots-2K数据集（1TB/2000+小时真实世界驾驶数据），并与Google DeepMind、UC Berkeley等顶级机构合作。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper">
+        <table class="wikitable infotable">
+          <tr><th>项目</th><th>内容</th></tr>
+          <tr><td>公司全称</td><td>FrodoBots Lab</td></tr>
+          <tr><td>英文名称</td><td>FrodoBots（亦称 FrodoBot / Frodobots）</td></tr>
+          <tr><td>成立时间</td><td>2022年</td></tr>
+          <tr><td>注册地</td><td>新加坡</td></tr>
+          <tr><td>上市情况</td><td>未上市（私人公司）</td></tr>
+          <tr><td>官网</td><td><a href="https://www.frodobots.ai">www.frodobots.ai</a></td></tr>
+          <tr><td>关联实体</td><td>BitRobot Foundation、BitRobot Network</td></tr>
+          <tr><td>所属赛道</td><td>机器人硬件、Web3/DePIN、具身智能数据基础设施</td></tr>
+        </table>
+      </div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>时间</th><th>事件</th></tr>
+          <tr><td>2022年</td><td>Michael Cho与Sam Cho兄弟以周末项目形式创立FrodoBots，目标为"游戏化机器人数据采集"</td></tr>
+          <tr><td>~2023-2024年</td><td>完成200万美元Pre-Seed轮融资；推出EarthRover人行道机器人硬件及ET Fugi游戏</td></tr>
+          <tr><td>2024年</td><td>与Google DeepMind、UC Berkeley、NUS、NYU、Princeton等合作开展Earth Rover Challenge研究</td></tr>
+          <tr><td>2024年</td><td>开源FrodoBots-2K数据集（1TB，2000+小时真实世界驾驶数据）至Hugging Face</td></tr>
+          <tr><td>2025年2月13日</td><td>完成600万美元种子轮融资，Protocol VC领投；累计融资达800万美元</td></tr>
+          <tr><td>2025年2月</td><td>宣布与Protocol Labs联合推出BitRobot网络——基于Solana的具身AI研究网络</td></tr>
+          <tr><td>2025年8月</td><td>通过W3GG合作，EarthRover开始在印度尼西亚部署</td></tr>
+          <tr><td>2025年12月</td><td>EarthRover Mini+重新定位为STEM/AI教育平台</td></tr>
+          <tr><td>2026年2月6日</td><td>BitRobot大使计划启动，招募社区贡献者</td></tr>
+          <tr><td>2026年2月11日</td><td>Jonathan Victor在Consensus 2026公布"全球开放式机器人实验室"计划</td></tr>
+        </table>
+      </div>
+
+      <h3 id="founders">1.2 创始人及核心团队</h3>
+      <p>FrodoBots由Cho兄弟以周末项目的形态创立，核心团队兼具机器人工程、AI研究与Web3生态经验，属于典型的<strong>跨界混合型团队</strong>。公司整体规模较小（核心团队约5-10人），依托开源社区和DePIN网络扩大影响力。</p>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+          <tr><td>联合创始人</td><td>Michael Chung Yeung Cho</td><td>FrodoBots Lab联合创始人，DePIN领域活跃人物，曾接受GEODNET访谈讨论Web3与机器人交汇；主导FrodoBots-2K数据集构建及开源发布</td></tr>
+          <tr><td>联合创始人</td><td>Sam Cho</td><td>Michael Cho的兄弟，共同打造FrodoBots初期原型</td></tr>
+          <tr><td>BitRobot总裁</td><td>Jonathan Victor</td><td>前Filecoin生态负责人，Ansa Research联合创始人；Protocol Labs出身，深度参与IPFS/Filecoin生态建设</td></tr>
+          <tr><td>BitRobot联合创始人</td><td>Juan Benet</td><td>Protocol Labs（IPFS、Filecoin）创始人，BitRobot白皮书联合作者</td></tr>
+          <tr><td>核心工程</td><td>Aaron Tung、Niresh Dravin、Santiago Pravisani</td><td>FrodoBots-2K数据集核心贡献者</td></tr>
+        </table>
+      </div>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <h4>融资历史</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>轮次</th><th>时间</th><th>金额</th><th>领投方</th><th>主要参投方</th></tr>
+          <tr><td>Pre-Seed</td><td>~2023-2024</td><td>200万美元</td><td>未披露</td><td>—</td></tr>
+          <tr><td>种子轮</td><td>2025年2月13日</td><td>600万美元</td><td>Protocol VC</td><td>Big Brain Holdings、Fabric Ventures、Zee Prime Capital、Tioga Capital、Sfermion、Solana Ventures、Virtuals Protocol、Permanent Ventures、Aethir；天使投资人包括Solana联合创始人Anatoly Yakovenko和Raj Gokal，以及Aethir、Gensyn等8位DePIN项目创始人</td></tr>
+          <tr><td><strong>累计</strong></td><td></td><td><strong>800万美元</strong></td><td></td><td>共13家机构+多位天使投资人</td></tr>
+        </table>
+      </div>
+      <h4>股东结构特点</h4>
+      <p>FrodoBots的股东结构高度集中于<strong>加密/Web3生态</strong>：领投方Protocol VC是Protocol Labs的风险投资部门；参投方Solana Ventures是Solana公链的官方投资机构；虚拟资产协议Virtuals Protocol和去中心化计算网络Aethir提供生态协同。天使投资人层面，Solana两位联合创始人以及多位DePIN创始人的加入，意味着公司拥有深厚的Solana生态和去中心化基础设施领域的人脉与资源。</p>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>技术维度</th><th>具体方案</th></tr>
+          <tr><td>AI技术路线</td><td>具身智能数据基础设施层：通过众包+游戏化方式采集大规模真实世界机器人操作数据，训练跨具身（cross-embodiment）基础模型；子网架构支持不同机器人类型间技能迁移</td></tr>
+          <tr><td>数据方案</td><td>众包数据采集（EarthRover全球远程操控）+ 游戏化激励（ET Fugi等）+ DePIN代币激励 + 合成数据（子网3：机器人仿真）；已开源FrodoBots-2K数据集（1TB/2000+小时）</td></tr>
+          <tr><td>硬件路线</td><td>自研低成本人行道机器人（EarthRover系列，$149-$399）；开放Remote Access SDK供研究者远程测试AI模型</td></tr>
+          <tr><td>区块链架构</td><td>基于Solana公链的子网（Subnet）架构，每个子网贡献算力、机器人群、数据集或AI模型；DePIN经济模型实现去中心化激励</td></tr>
+          <tr><td>自研程度</td><td>硬件端EarthRover系列完全自研；AI模型端与Protocol Labs联合开发BitRobot网络；SAM AI Agent框架与Virtuals.io联合开发</td></tr>
+          <tr><td>差异化特色</td><td>全球唯一将DePIN+区块链+具身智能三者融合的公司；强调"数据飞轮"效应——用户远程操控产生数据→数据驱动模型训练→模型反哺机器人自主性</td></tr>
+        </table>
+      </div>
+      <p>FrodoBots的技术路线核心逻辑是：<strong>以极低成本硬件铺开全球数据采集网络，用Web3代币经济激励参与者，目标产出可媲美Tesla和DeepMind的具身智能基础模型</strong>。联合创始人Michael Cho曾公开表示："如果我们成功，我们将与Tesla和DeepMind处于同一水平。"</p>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>产品分类</th><th>子类/型号</th><th>关键参数</th><th>价格</th><th>适用场景</th></tr>
+          <tr><td rowspan="3">硬件：EarthRover人行道机器人</td><td>EarthRover Zero</td><td>铝制机身，前后双摄，头灯，麦克风/扬声器，5小时续航，~4.5kg</td><td>$299（促销价，原价$399）</td><td>科研、大范围户外数据采集</td></tr>
+          <tr><td>EarthRover Mini+</td><td>双摄、RTK高精度GPS（~50cm精度）、4小时续航、~1.4kg、195×250×190mm、4G LTE+Wi-Fi、IP34防溅</td><td>$199（促销价，原价$299）</td><td>STEM教育、AI开发、高精度定位场景</td></tr>
+          <tr><td>EarthRover Mini</td><td>单前摄、标准GPS、~1.4kg、4G LTE+Wi-Fi</td><td>$149（促销价，原价$249）</td><td>入门级远程探索、游戏化应用</td></tr>
+          <tr><td rowspan="3">网络平台：BitRobot</td><td>BitRobot Network</td><td>Solana子网架构，DePIN代币激励，跨具身学习</td><td>待发币</td><td>具身AI研究基础设施</td></tr>
+          <tr><td>ET Fugi（子网1）</td><td>DePIN游戏：真人遥控EarthRover"捕捉外星NFT"，生成城市导航数据</td><td>免费玩</td><td>游戏化数据采集</td></tr>
+          <tr><td>Grand Challenge Fund</td><td>$500万基金，单项挑战奖金最高$100万</td><td>—</td><td>Earth Rover、Robotic Origami、IKEA家具组装等</td></tr>
+          <tr><td rowspan="2">软件/AI Agent</td><td>SAM框架</td><td>与Virtuals.io联合开发的AI Agent框架，实现机器人自主操作</td><td>—</td><td>机器人自主导航与决策</td></tr>
+          <tr><td>Robots.Fun</td><td>AI Agent发布平台，所有基于SAM的Agent支付5%佣金</td><td>—</td><td>AI Agent生态</td></tr>
+          <tr><td>数据资产</td><td>FrodoBots-2K</td><td>1TB开源数据集：摄像头、GPS、IMU、音频、人类操控数据</td><td>开源免费</td><td>具身AI学术与工业研究</td></tr>
+        </table>
+      </div>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>场景分类</th><th>具体场景</th><th>产品/方案</th><th>合作方</th></tr>
+          <tr><td>具身AI研究</td><td>大规模真实世界机器人操作数据采集与模型训练基础设施</td><td>BitRobot Network、FrodoBots-2K</td><td>Google DeepMind、UC Berkeley、NUS、NYU、Princeton、Protocol Labs</td></tr>
+          <tr><td>游戏化数据采集</td><td>真人远程操控人行道机器人完成任务的"Drive-to-Earn"游戏</td><td>ET Fugi、EarthRover</td><td>YGG（游戏公会）</td></tr>
+          <tr><td>STEM教育</td><td>学生通过远程操控学习机器人编程、AI模型部署与测试</td><td>EarthRover Mini+</td><td>—</td></tr>
+          <tr><td>远程探索/监控</td><td>全球任一地点通过浏览器远程操控人行道机器人探索城市</td><td>EarthRover全系列</td><td>W3GG（印尼部署）</td></tr>
+          <tr><td>机器人竞技/娱乐</td><td>远端遥控机器人对战、折纸比赛、家具组装挑战</td><td>Ultimate Fighting Bots、Robotic Origami、IKEA Assembly</td><td>BitRobot Foundation</td></tr>
+          <tr><td>DePIN生态</td><td>去中心化物理基础设施：机器人支付协议、空间计算、GPS校正、众包地图</td><td>BitRobot + Peaq + Auki + GEODNET + Hivemapper + RTP</td><td>Circle（USDC支付）、OpenMind</td></tr>
+        </table>
+      </div>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <p>据PitchBook数据，FrodoBots在2025年种子轮后状态标注为"Generating Revenue"（已产生收入）。当前收入来源包括：</p>
+      <ul>
+        <li><strong>硬件销售</strong>：EarthRover系列定价$149-$399/台</li>
+        <li><strong>Drive-to-Earn游戏经济</strong>：FrodoBots Points（FBP）积分体系</li>
+        <li><strong>Robots.Fun平台佣金</strong>：基于SAM框架的AI Agent需支付5%佣金</li>
+        <li><strong>未来代币经济</strong>：BitRobot网络的DePIN代币激励模型（白皮书待发布）</li>
+      </ul>
+      <p>具体营收数字未公开披露。公司目前仍处于早期阶段（累计融资800万美元），核心KPI更多关注数据采集规模（2000+小时）和全球部署覆盖度（六大洲10+城市）而非短期盈利。</p>
+
+      <h3 id="financials">1.8 财务数据</h3>
+      <p>FrodoBots为早期私人公司，未公开详细财务报表。以下为已知信息：</p>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>指标</th><th>数据</th><th>备注</th></tr>
+          <tr><td>累计融资</td><td>800万美元</td><td>Pre-Seed $2M + Seed $6M（2025年2月）</td></tr>
+          <tr><td>收入状态</td><td>已产生收入</td><td>PitchBook标注"Generating Revenue"</td></tr>
+          <tr><td>营收额</td><td>未公开</td><td>—</td></tr>
+          <tr><td>估值</td><td>未公开</td><td>PitchBook有估值数据但需付费查看</td></tr>
+          <tr><td>员工规模</td><td>约5-10人（核心团队）</td><td>依托开源社区和DePIN网络扩展</td></tr>
+          <tr><td>资金储备</td><td>未公开</td><td>BitRobot Foundation另设$500万Grand Challenge基金</td></tr>
+        </table>
+      </div>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>FrodoBots的起源是一个<strong>周末项目</strong>，由Cho兄弟出于"游戏化机器人数据采集"的想法创立，后迅速发展为全球性项目。</li>
+        <li>2026年2月，一只名为"Bits"的机器狗展示了<strong>完全自主的"寻找充电桩→插电→USDC支付电费"闭环</strong>，由OpenMind+Circle联合构建，Circle CEO Jeremy Allaire称其为"机器与AI Agent无需人类干预即可交易的未来一瞥"——这一演示与BitRobot的愿景高度一致。</li>
+        <li>FrodoBots在Solana生态中被称为<strong>"DePIN x 具身智能"</strong>的标杆项目，与Peaq（机器身份）、Auki（空间计算）、GEODNET（GPS校正）、Hivemapper（众包地图）等DePIN项目形成互补生态。</li>
+        <li>公司同时运营多个域名和品牌：frodobots.ai（主站）、bitrobot.ai（BitRobot网络）、robots.fun（AI Agent平台）、shop.frodobots.com（商城）。</li>
+        <li>学术合作方面，与Google DeepMind联合发表的<strong>"Autonomous Mario Kart in the Wild"</strong>论文使用EarthRover作为实验平台。</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="a1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>FrodoBots的创始团队是典型的<strong>"Web3原生+机器人硬件"跨界组合</strong>。Michael Cho和Sam Cho以周末项目起家，具备快速原型能力和游戏化思维，这与他们选择的"通过娱乐化方式采集机器人数据"路径高度匹配。Jonathan Victor（前Filecoin生态负责人）和Juan Benet（Protocol Labs/IPFS创始人）的加入，进一步强化了公司在去中心化基础设施和代币经济设计方面的能力。这种团队构成决定了FrodoBots不会走传统工业机器人公司的道路（如发那科、安川），而是选择了一条"去中心化数据基础设施层"的差异化路线。然而，团队在传统机器人控制、机械设计和硬件量产方面的经验相对薄弱，可能限制其向工业级应用延伸的能力。</p>
+      </div>
+
+      <div class="analysis-block" id="a2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>FrodoBots的DePIN+众包数据路线与"具身智能数据采集"场景高度适配。具身AI面临的最大瓶颈正是<strong>真实世界交互数据的极度稀缺性</strong>——LLM可以训练整个互联网的文本，机器人却只能从实验室的零开始。FrodoBots以$149起的低成本硬件+游戏化远程操控+代币激励，构建了一个理论上可无限扩展的数据飞轮。子网架构允许不同类型机器人（人行道机器人、机械臂、无人机）共享学习成果，实现跨具身技能迁移。但这一路线的关键风险在于：众包数据的质量控制难度大，游戏化产生的数据质量是否能支撑高精度工业级模型的训练尚待验证。此外，对Solana区块链和DePIN代币经济的高度依赖也带来技术和监管不确定性。</p>
+      </div>
+
+      <div class="analysis-block" id="a3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>FrodoBots的资本结构对战略走向有<strong>决定性影响</strong>。领投方Protocol VC和参投方Solana Ventures锁定了公司在Solana生态中的位置，意味着公司天然倾向于以Web3方式解决机器人问题（代币激励、DePIN、子网架构），而非传统B2B硬件销售模式。Solana联合创始人作为天使投资人进一步绑定生态资源。这种资本结构带来了两大战略后果：<strong>正面看</strong>，公司可以快速接入Solana生态的用户、开发者和流动性，在Web3叙事中获得独特估值逻辑；<strong>负面看</strong>，过度依赖代币经济可能使公司在传统机器人客户（工厂、物流企业）面前缺乏可信度，场景拓展受限于加密生态的用户圈层。此外，$500万Grand Challenge基金显示公司试图以"赏金竞赛"方式吸引研究者，这与DARPA挑战赛的模式类似，是一种低成本撬动创新的策略。</p>
+      </div>
+
+      <div class="analysis-block" id="a4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>FrodoBots经历了<strong>从"游戏化消费硬件"到"AI数据基础设施"的显著战略跃迁</strong>。2022-2024年，公司定位更接近一个"机器人版的Pokémon Go"——通过ET Fugi游戏让用户远程操控小机器人在真实城市中"捕捉外星NFT"。这一阶段的本质是消费级娱乐产品。2025年种子轮融资后，公司明确将定位升级为BitRobot——一个"全球开放式具身AI研究网络"，目标是对标Tesla和DeepMind。这一转向反映了团队意识到"纯游戏"天花板有限，而"AI基础设施"赛道有更大的资本叙事和长期价值空间。从$6M种子轮到$5M Grand Challenge基金的资源配置也可看出，公司的重心已从硬件销售转向研究生态建设。这一路径调整逻辑合理，但执行风险在于：BitRobot网络的代币经济和子网架构尚未完全落地，白皮书也未正式发布。</p>
+      </div>
+
+      <div class="analysis-block" id="a5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>FrodoBots在具身智能行业的定位极为独特——它<strong>既不直接制造工业机器人（如发那科），也不专注于AI大脑模型（如Physical Intelligence），也不做人形机器人本体（如Figure AI）</strong>。它的核心定位是"具身智能的<strong>数据基础设施层</strong>"——类似于AI领域的Hugging Face之于模型、Filecoin之于存储。FrodoBots选择了<strong>"iPod路线"而非"iPhone路线"</strong>：用极低成本、功能聚焦的硬件（EarthRover）作为数据入口，真正的价值主张在于网络效应和数据飞轮。这一取舍使其避开了与Figure、Tesla Optimus等重资本玩家的正面竞争，但也意味着它的天花板取决于"去中心化数据采集"这条路线本身能否被具身AI行业主流所认可。如果具身AI行业最终由少数巨头（Tesla、DeepMind）以封闭数据闭环方式主导，FrodoBots的开放网络模式可能被边缘化。</p>
+      </div>
+
+      <div class="analysis-block" id="a6">
+        <h4>2.6 其他重要观察</h4>
+        <p>FrodoBots代表了一类独特的<strong>"Web3 x 具身智能"</strong>实验。从行业宏观视角看，这一模式的核心假设是：具身AI的数据瓶颈可以通过去中心化激励机制解决——这本质上是对"开源社区能否打败封闭实验室"的又一次押注（类似Linux vs Windows的历史）。当前值得关注的风险点包括：（1）<strong>代币经济合规性</strong>：BitRobot的代币发行面临全球加密监管的不确定性，尤其是美国SEC对"实用代币"与"证券"的界定；（2）<strong>数据质量vs数量</strong>：2000+小时游戏化操控数据能否与Tesla从真实车辆采集的数十亿英里数据相提并论；（3）<strong>Solana生态依赖</strong>：单链策略在Solana生态繁荣时是优势，但若Solana遭遇技术或市场挫折，FrodoBots将受直接冲击；（4）<strong>团队规模</strong>：5-10人核心团队在推进硬件、AI、区块链三条战线时资源极为紧张。总体而言，FrodoBots是一个高赔率、高风险的早期实验，其成败将对"Web3能否赋能实体AI产业"的命题提供重要参照。</p>
+      </div>
+
+      <h2 id="refs">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://pitchbook.com/profiles/company/537455-53">PitchBook — FrodoBot 2026 Company Profile: Valuation, Funding & Investors</a></li>
+          <li><a href="https://blockworks.com/news/robotics-startup-fundraise-ai-network">Blockworks — Frodobots raises $6M for Solana-based robotics network</a></li>
+          <li><a href="https://coinmarketcap.com/academy/th/article/408a8333-91c4-4d7e-bcb1-e8d92f302b32">CoinMarketCap — FrodoBots Lab Raises $8M to Launch BitRobot</a></li>
+          <li><a href="https://www.theblockbeats.info/flash/281709">BlockBeats — FrodoBots完成800万美元融资，Protocol VC领投</a></li>
+          <li><a href="https://www.chaincatcher.com/en/article/2167489">ChainCatcher — FrodoBots completed $8 million in financing</a></li>
+          <li><a href="https://www.bitget.com/zh-CN/news/detail/12560605192970">Bitget News — BitRobot总裁：拟建立全球开放式机器人实验室</a></li>
+          <li><a href="https://depinscan.io/news/2025-02-18/frodobots-merging-robotics-and-blockchain-on-solana">DePIN Scan — FrodoBots: Merging Robotics and Blockchain on Solana</a></li>
+          <li><a href="https://www.protocol.ai/blog/bit-robot-and-the-future-of-embodied-ai/">Protocol Labs Blog — BitRobot and the Future of Embodied AI</a></li>
+          <li><a href="https://bitrobot.ai/our-story">BitRobot — Our Story</a></li>
+          <li><a href="https://huggingface.co/datasets/frodobots/FrodoBots-2K">Hugging Face — FrodoBots-2K Dataset (1TB, 2000+ hours)</a></li>
+          <li><a href="https://solanacompass.com/projects/frodobots">Solana Compass — FrodoBots Project Profile</a></li>
+          <li><a href="https://www.bitgetapp.com/news/detail/12560604573743">Bitget News — Frodobots raises $6M for Solana-based robotics network</a></li>
+          <li><a href="https://holder.io/news/frodobots-secures-6m-solana-robotics/">Holder.io — Frodobots Secures $6 Million for Solana-Based Robotics Network</a></li>
+          <li><a href="https://castleplacement.com/top-10-robotics-and-drones-capital-raises-in-the-u-s-february-1st-15th-2025/">Castle Placement — Top 10 Robotics Capital Raises, Feb 2025</a></li>
+          <li><a href="https://jobtorob.com/earthrover-lets-you-explore-the-world-from-your-couch-">JobToRob — EarthRover lets you explore the world from your couch</a></li>
+          <li><a href="https://highways.today/2025/12/27/frodobots-earthrover-mini/">Highways Today — Hands-on STEM Robotics and AI Learning with FrodoBots EarthRover Mini+</a></li>
+          <li><a href="https://bikmantech.com/zh/blogs/blogs/frodobots-earthrover-mini-mini-the-future-of-remote-exploration">BikmanTech — FrodoBots EarthRover Mini与Mini+：远程探索新时代遥控机器人</a></li>
+          <li><a href="https://chainweeks.com/news/95760.html">ChainWeeks — BitRobot全球开放式机器人实验室计划</a></li>
+          <li><a href="https://dev.to/mr_hamlin/a-robot-dog-just-paid-for-its-own-electricity-thats-why-i-built-a-payment-protocol-for-robots-4ip9">Dev.to — A Robot Dog Just Paid for Its Own Electricity: Robot Payment Protocol</a></li>
+          <li><a href="https://www.panewslab.com/en/articles/fe231bd3-36f2-4724-ae66-0be31eeabc78">PANews — From Android to robot combat: A look at the RoboFi robot project ecosystem</a></li>
+          <li><a href="https://crypto-fundraising.info/projects/bitrobot-network-frodobots/">Crypto-Fundraising — BitRobot Network (FrodoBots) Project Profile</a></li>
+          <li><a href="https://web.gate.it/zh/post/status/9230701">Gate — FrodoBots完成800万美元融资</a></li>
+          <li><a href="https://intercom.help/frodobots/en/articles/10440905-how-to-create-an-ai-agent-on-robots-fun">FrodoBots Help Center — How to create an AI agent on Robots.Fun</a></li>
+          <li><a href="https://bitrobot.ai/blog/bitrobot-ambassador-program">BitRobot — Ambassador Program</a></li>
+          <li><a href="https://jobs.protocol.ai/companies/bitrobot-foundation/jobs/52426594-marketing-lead">Protocol Labs Job Board — BitRobot Foundation Job Postings</a></li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">此页面最后编辑于2026年5月4日 · 内容基于公开可用信息编制 · 具身智能Wiki</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body>
+</html>

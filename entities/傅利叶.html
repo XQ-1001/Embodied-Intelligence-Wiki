@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>傅利叶 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> › <span>傅利叶</span></div>
+  <div class="wiki-header"><h1>傅利叶</h1><div class="subtitle">Fourier Intelligence · 拟港股上市 · 2015年成立 · 估值约80亿元 · 累计融资超24亿元</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#founders">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financials">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#an1">2.1 团队背景与场景选择的匹配度</a></li>
+        <li class="toc-lvl4"><a href="#an2">2.2 技术路线与场景的适配性</a></li>
+        <li class="toc-lvl4"><a href="#an3">2.3 股东/资本结构对战略的影响</a></li>
+        <li class="toc-lvl4"><a href="#an4">2.4 试错过程与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#an5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#an6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#references">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">傅利叶</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">上海傅利叶智能科技有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">英文名</div><div class="ib-value">Fourier Intelligence</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2015年</div></div>
+        <div class="ib-row"><div class="ib-label">注册地</div><div class="ib-value">上海浦东张江</div></div>
+        <div class="ib-row"><div class="ib-label">创始人/CEO</div><div class="ib-value">顾捷</div></div>
+        <div class="ib-row"><div class="ib-label">总部</div><div class="ib-value">上海</div></div>
+        <div class="ib-row"><div class="ib-label">上市状态</div><div class="ib-value">拟港股上市（18C章程）</div></div>
+        <div class="ib-section">估值/市值</div>
+        <div class="ib-row"><div class="ib-label">最新估值</div><div class="ib-value">约80亿元（2025年5月投前）</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">累计融资</div><div class="ib-value">超24亿元</div></div>
+        <div class="ib-row"><div class="ib-label">累计出货</div><div class="ib-value">超10,000台</div></div>
+        <div class="ib-row"><div class="ib-label">全球覆盖</div><div class="ib-value">60+国家和地区</div></div>
+        <div class="ib-row"><div class="ib-label">医疗机构</div><div class="ib-value">3,000+家</div></div>
+        <div class="ib-row"><div class="ib-label">员工数</div><div class="ib-value">未公开</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">赛道</div><div class="ib-value">人形机器人 · 康复机器人</div></div>
+        <div class="ib-row"><div class="ib-label">官网</div><div class="ib-value"><a href="https://www.fftai.cn" target="_blank">fftai.cn</a></div></div>
+      </aside>
+
+      <p class="article-intro">傅利叶（Fourier Intelligence）成立于2015年，总部位于上海张江，由上海交通大学校友顾捷创立。公司起家于康复机器人，经过十年发展已转型为具身智能平台型企业，形成了"康复机器人+人形机器人"双轮产品矩阵。截至2026年，傅利叶累计融资超24亿元，投资方包括软银愿景基金、Prosperity7（沙特阿美）、IDG资本、红杉中国等顶级机构，估值约80亿元。公司以"主动式人机交互"为核心差异化，推出GR系列全尺寸人形机器人，并在CES 2026全球首秀GR-3 Care-bot。2026年提出"1+3+X"应用生态战略，正积极筹备港股18C上市。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper">
+      <table class="wikitable infotable">
+        <tr><th>项目</th><th>内容</th></tr>
+        <tr><td>公司全称</td><td>上海傅利叶智能科技有限公司</td></tr>
+        <tr><td>英文名称</td><td>Fourier Intelligence</td></tr>
+        <tr><td>成立时间</td><td>2015年</td></tr>
+        <tr><td>注册地</td><td>上海浦东张江高科技园区</td></tr>
+        <tr><td>创始人/CEO</td><td>顾捷</td></tr>
+        <tr><td>总部</td><td>上海</td></tr>
+        <tr><td>上市状态</td><td>拟港股上市（18C章程），已递交招股书</td></tr>
+        <tr><td>官网</td><td><a href="https://www.fftai.cn">www.fftai.cn</a></td></tr>
+        <tr><td>赛道定位</td><td>康复机器人起家，转型具身智能平台型公司</td></tr>
+        <tr><td>品牌命名</td><td>源于高等数学"傅里叶变换"，寓意通过技术实现人的能力延伸与变化</td></tr>
+      </table>
+      </div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>时间</th><th>事件</th></tr>
+        <tr><td>2015年</td><td>顾捷在上海张江创立傅利叶智能，主攻小型化、智能化、低成本康复机器人</td></tr>
+        <tr><td>2016年</td><td>首款上肢康复机器人Fourier M2面世，可模拟实际生活力学场景</td></tr>
+        <tr><td>2017年</td><td>推出国内首款有"触觉"的下肢外骨骼康复机器人Fourier X1；内部立项脑机接口+外骨骼预研</td></tr>
+        <tr><td>2018年</td><td>Fourier M2出口美国巴洛神经外科研究所，成为首款进入北美市场的国产康复机器人</td></tr>
+        <tr><td>2019年</td><td>内部启动人形机器人预研项目，组建通用机器人团队</td></tr>
+        <tr><td>2023年</td><td>在WAIC发布首款通用人形机器人GR-1（1.65m，55kg），成为国内率先实现量产交付的双足人形机器人</td></tr>
+        <tr><td>2024年9月</td><td>推出第二代GR-2，搭载12自由度自研灵巧手+FSA 2.0执行器，GR-1交付超100台</td></tr>
+        <tr><td>2025年1月</td><td>完成近8亿元E轮融资；推出首款开源人形机器人Fourier N1</td></tr>
+        <tr><td>2025年5月</td><td>润阳科技（300920）3亿元战略投资，投前估值80亿元</td></tr>
+        <tr><td>2025年8月</td><td>发布GR-3"Care-bot"全尺寸人形机器人</td></tr>
+        <tr><td>2026年1月</td><td>CES 2026全球首秀GR-3；第二届傅利叶具身智能生态大会发布"1+3+X"战略；联合7家机构发起"脑机具身·数据引擎联合创新计划"</td></tr>
+      </table>
+      </div>
+
+      <h3 id="founders">1.2 创始人及核心团队</h3>
+      <p>傅利叶创始人兼CEO顾捷出生于1981年，上海人，2003年毕业于上海交通大学机械与动力工程学院。在校期间参加全国首届机器人创新大赛，用废旧零件做出投球机器人获最佳创意奖。毕业后加入美国国家仪器公司（NI），从事底层控制器研发，5年内晋升为广州区域经理。2012年创办璟和机器人公司，推出下肢康复训练系统Flexbot（后被钱璟康复收购）。2015年在张江创立傅利叶智能。顾捷曾获2018年上海市优秀青年企业家、2023上海城市数字化转型"领军先锋"等荣誉，任上海市政协委员。核心团队技术背景深厚，兼具康复医疗器械研发和机器人本体制造经验，整体呈现"产业连续创业+工科技术"混合型人才结构。</p>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+        <tr><td>创始人/CEO</td><td>顾捷</td><td>上海交大机械系2003届；前NI公司底层控制器研发及区域经理；2012年创办璟和机器人（Flexbot）；2015年创办傅利叶；上海市政协委员</td></tr>
+        <tr><td>首席科学家</td><td>未公开</td><td>团队涵盖康复医学、人形机器人双领域的研发人员</td></tr>
+      </table>
+      </div>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <h4>融资历史</h4>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>时间</th><th>轮次</th><th>金额</th><th>主要投资方</th></tr>
+        <tr><td>2015–2020</td><td>天使–B+轮</td><td>累计数千万元/轮</td><td>IDG资本、火山石投资、前海母基金、张江科投等</td></tr>
+        <tr><td>2021.07</td><td>C++轮</td><td>数千万美元</td><td>Prosperity7 Ventures（沙特阿美旗下）</td></tr>
+        <tr><td>2022.01</td><td>D轮</td><td>4亿元</td><td>软银愿景基金2期领投，Prosperity7、元璟资本跟投</td></tr>
+        <tr><td>2025.01</td><td>E轮</td><td>近8亿元</td><td>国鑫投资、浦东创投、张江科投、Prosperity7、钧山资本等</td></tr>
+        <tr><td>2025.05</td><td>战略融资</td><td>3亿元</td><td>润阳科技（300920）独家投资，投前估值80亿元</td></tr>
+      </table>
+      </div>
+
+      <h4>股东结构（关键股东）</h4>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>类别</th><th>股东</th><th>性质</th></tr>
+        <tr><td>创始人</td><td>顾捷及创始团队</td><td>创始人/管理层持股</td></tr>
+        <tr><td>战略产业资本</td><td>润阳科技（300920）</td><td>A股上市公司，战投绑定</td></tr>
+        <tr><td>国际战略资本</td><td>软银愿景基金2期、Prosperity7（沙特阿美）</td><td>国际顶级VC/产业资本</td></tr>
+        <tr><td>顶级财务VC</td><td>红杉中国、IDG资本、启明创投、元璟资本</td><td>头部VC背书</td></tr>
+        <tr><td>国资/政府引导</td><td>国鑫投资、浦东创投、张江科投</td><td>上海地方国资深度绑定</td></tr>
+      </table>
+      </div>
+      <p>公司累计完成11轮融资，总额超24亿元。投资方阵容覆盖国际战略资本、头部VC和上海地方国资。2026年已递交港股18C章程招股书，正在冲刺IPO。</p>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>技术维度</th><th>详情</th></tr>
+        <tr><td>AI架构</td><td>"全感交互系统"：集成视觉识别+声源定位+触觉反馈三大模块；"双路径响应机制"：硬编程"快思考"+大模型推理"慢思考"，模拟人类条件反射与逻辑思考</td></tr>
+        <tr><td>数据方案</td><td>开源ActionNet数据集，累计超百万条视频clips，全球最大规模全尺寸双足人形全身数据集之一</td></tr>
+        <tr><td>自研程度</td><td>全栈自研：12自由度灵巧手、六维力传感器、FSA 2.0执行器、注意力管理机制；"Made for AI"——为市面主流大模型打造最佳具身本体</td></tr>
+        <tr><td>技术特色</td><td>"主动式交互"理念——机器人从"被动执行"向"主动交互"跃迁；躯体及头部布置31个阵列式触觉传感器；适配英伟达、商汤、苹果等主流AI基础模型</td></tr>
+        <tr><td>路线上限</td><td>2026年提出"以人为本的具身智能"十年战略；开源Fourier N1平台降低开发者准入门槛</td></tr>
+      </table>
+      </div>
+      <p>傅利叶的技术路径呈现"康复机器人底层积累→人形机器人全栈自研→开源平台化"的递进逻辑。GR-3是首款基于"主动式交互"功能导向的产品，通过注意力管理机制统一调度各交互模组，动态判定感知优先级，实现快速闭环响应。技术差异化在于将"触觉"深度嵌入交互闭环，而非仅视觉语言路线。</p>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>产品分类</th><th>子类</th><th>型号</th><th>发布时间</th><th>关键参数</th><th>主要适用场景</th></tr>
+        <tr><td rowspan="4">人形机器人</td><td>第一代</td><td>GR-1</td><td>2023年WAIC</td><td>身高1.65m，体重55kg，44-54自由度；已量产交付100+台</td><td>科研教育、导览交互</td></tr>
+        <tr><td>第二代</td><td>GR-2</td><td>2024年9月</td><td>12自由度自研灵巧手+FSA 2.0执行器</td><td>工业赋能、导览交互</td></tr>
+        <tr><td>第三代</td><td>GR-3</td><td>2025年8月</td><td>身高165cm，体重71kg，55自由度，31个触觉传感器</td><td>康养陪伴（Care-bot）</td></tr>
+        <tr><td>开源平台</td><td>Fourier N1</td><td>2025年4月</td><td>开放物料清单/设计图纸/装配指南</td><td>科研开发</td></tr>
+        <tr><td rowspan="2">康复机器人</td><td>上肢康复</td><td>Fourier M2</td><td>2016年</td><td>模拟实际生活力学场景，游戏化康复训练</td><td>医疗机构/康复科室</td></tr>
+        <tr><td>下肢外骨骼</td><td>Fourier X1</td><td>2017年</td><td>多维力传感器实时捕捉运动意图；国内首款有"触觉"的下肢外骨骼</td><td>医疗机构/康复科室</td></tr>
+        <tr><td>核心零部件</td><td>对外开放</td><td>灵巧手/六维力传感器/FSA 2.0</td><td>2024-2025</td><td>12自由度灵巧手+六维力传感器+第二代执行器</td><td>产业链供应</td></tr>
+      </table>
+      </div>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>场景分类</th><th>具体场景</th><th>对应产品</th><th>合作方/客户</th></tr>
+        <tr><td>康养陪伴（战略自营）</td><td>社交陪伴、辅助陪护、养老社区、康复医院</td><td>GR-3、Fourier M2/X1</td><td>瑞金医院、养志康复医院、全国300+康复科室</td></tr>
+        <tr><td>导览交互（生态共建）</td><td>展馆导览、商业接待、标准化流程服务</td><td>GR-2、GR-3</td><td>已推出标准化导览解决方案</td></tr>
+        <tr><td>工业赋能（生态共建）</td><td>3C制造、汽车零部件、物流仓储</td><td>GR-2、GR-3</td><td>与生态伙伴开放共建</td></tr>
+        <tr><td>科研创新（生态共建）</td><td>高校实验室、AI训练平台、开源社区</td><td>Fourier N1、GR-1</td><td>英伟达、商汤、苹果（技术验证）</td></tr>
+      </table>
+      </div>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <p>康复机器人已实现规模化应用，产品进入全球60+国家和地区、3,000+医疗机构，覆盖患者超百万人。人形机器人处于早期商业化阶段：GR-1交付超100台；2025年整体出货目标数千台，其中双足人形机器人目标300台。导览咨询场景已推出标准化解决方案。"智能康复港"已在全国建设300多家康复科室，覆盖省市县乡镇各级医疗机构。2026年被公司定义为"人形机器人商业化应用关键之年"。</p>
+
+      <h3 id="financials">1.8 财务数据</h3>
+      <p>公司尚未上市，未披露完整财务数据。以下为公开渠道可获取信息：</p>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>指标</th><th>详情</th></tr>
+        <tr><td>营收数据</td><td>未公开披露；康复机器人为主营收入来源，人形机器人处于早期收入阶段</td></tr>
+        <tr><td>估值</td><td>约80亿元（2025年5月润阳科技战投时投前估值）</td></tr>
+        <tr><td>累计融资</td><td>超24亿元（截至2025年5月）</td></tr>
+        <tr><td>累计出货</td><td>超10,000台（含康复机器人+人形机器人）</td></tr>
+        <tr><td>上市状态</td><td>已递交港股18C招股书（2025-2026年筹备）</td></tr>
+      </table>
+      </div>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>公司命名源自高等数学中的"傅里叶变换"，寓意通过技术实现人的能力延伸与变化。</li>
+        <li>2026年1月发起"脑机具身·数据引擎联合创新计划"，联合瑞金医院、复旦大学、天桥脑科学研究院等7家机构。</li>
+        <li>开源ActionNet为全球最大规模全尺寸双足人形全身数据集之一（超百万条视频clips）。</li>
+        <li>GR-3在CES 2026通过"井字棋"人机对弈、舞蹈表演等互动展示"有温度的科技陪伴"。</li>
+        <li>已有英伟达首个人形机器人开放基础模型部署在傅利叶机器人上；苹果基于GR-1验证视觉语言大模型在手势生成中的适应性。</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <h4 id="an1">2.1 团队背景与场景选择的匹配度</h4>
+      <div class="analysis-block">
+        <h4>团队背景与场景选择的匹配度</h4>
+        <p>顾捷的康复医疗连续创业背景（璟和机器人→傅利叶）直接决定了傅利叶"康复→康养陪伴"的场景延伸逻辑。顾捷自2009年即进入康复机器人领域，2012年Flexbot已获产业验证，这使傅利叶在切入"康养陪伴"场景时具备深厚的医疗渠道积累（300+康复科室）和临床场景认知，与纯AI/学术出身的团队相比具有显著先发优势。GR-3 Care-bot锚定"社交陪伴+辅助陪护"正是康复医疗场景向消费康养的自然延伸，匹配度极高。不过团队在人形机器人大模型研发方面需要外部合作（如商汤、英伟达），体现了从硬件驱动向软硬一体转型过程中的团队能力缺口。</p>
+      </div>
+
+      <h4 id="an2">2.2 技术路线与场景的适配性</h4>
+      <div class="analysis-block">
+        <h4>技术路线与场景的适配性</h4>
+        <p>傅利叶的"全感交互+双路径响应"技术路线与康养陪伴场景高度适配。在养老和康复场景中，触觉反馈（31个阵列式触觉传感器）和声源定位比纯视觉理解更为关键——老人和病患需要的是"被感知到"的体验。双路径响应机制（硬编程快思考+大模型慢思考）在安全攸关的康养场景中尤为重要，避免了纯端到端模型在边缘场景下的不确定性。"主动式交互"理念定位准确抓住了当前具身智能从"被动工具"向"主动伙伴"转型的行业趋势。但该路线对数据积累要求极高（百万条clips），长期数据飞轮能否建立取决于商业化落地速度。</p>
+      </div>
+
+      <h4 id="an3">2.3 股东/资本结构对战略的影响</h4>
+      <div class="analysis-block">
+        <h4>股东/资本结构对战略的影响</h4>
+        <p>Prosperity7（沙特阿美）的战略入股具有双重意义：一方面带来中东市场想象空间（沙特Vision 2030对医疗康养机器人有明确需求）；另一方面软银愿景基金与Prosperity7在同一股东结构中形成了"国际资本+中东主权基金"组合，为港股IPO提供了国际化背书。上海国资（浦东创投、张江科投）的深度参与则可能在"智能康复港"等B端/G端场景落地时提供政策和采购支持。2025年润阳科技（300920）3亿元战投不仅提供了估值锚定（80亿元），其上市公司身份也为后续可能的A股双重上市或产业协同埋下伏笔。相比纯财务投资驱动的人形机器人公司，傅利叶的资本结构更偏向稳健和场景绑定。</p>
+      </div>
+
+      <h4 id="an4">2.4 试错过程与路径调整</h4>
+      <div class="analysis-block">
+        <h4>试错过程与路径调整</h4>
+        <p>傅利叶经历了"康复医疗器械→人形机器人→全感交互平台"的三级跳。最关键的试错发生在2019年：当康复机器人已实现规模化（2000+机构覆盖），公司面临"继续深耕医疗"还是"跳入通用人形"的战略抉择。GR-1在2023年的推出是一次重大风险押注——从康复医疗的确定场景进入当时尚未验证的人形机器人赛道。2024-2025年的路径调整体现为：从GR-2的"工业通用"定位收敛至GR-3的"康养陪伴"垂直场景，标志着公司认识到通用人形机器人商业化需要找到第一个可规模化的利基市场。2025年推出开源Fourier N1则是一个聪明的生态杠杆策略——通过开源降低行业门槛的同时建立技术标准影响力。</p>
+      </div>
+
+      <h4 id="an5">2.5 竞争定位与取舍</h4>
+      <div class="analysis-block">
+        <h4>竞争定位与取舍</h4>
+        <p>傅利叶在行业中的核心取舍是：<strong>走"iPhone式全栈"而非"iPod式单品"</strong>——既做人形机器人本体、也做核心零部件（灵巧手、传感器）、还做康复机器人存量业务、并开源数据集。这种"全栈+开放"策略的优势在于不依赖单一场景的突破，劣势在于资源分散。与宇树科技（硬件极致性价比）、智元机器人（大脑模型为核心）形成差异化：傅利叶以"康复医疗场景"为护城河，以"主动交互"为技术标签，在康养陪伴赛道建立先发壁垒。核心风险在于——如果纯人形机器人公司在未来2-3年内将价格打到10万以内，傅利叶的康复渠道溢价能否维持。</p>
+      </div>
+
+      <h4 id="an6">2.6 其他重要观察</h4>
+      <div class="analysis-block">
+        <h4>其他重要观察</h4>
+        <p>傅利叶的港股18C IPO进程值得密切关注。18C章程允许未盈利特专科技公司上市，但要求市值超80亿港元且"第三方投资"达到一定比例。傅利叶2025年5月投前估值80亿元已跨过门槛，投资人阵容（软银、红杉、Prosperity7等）符合18C对"资深独立投资者"的定义。另一个关键观察点是"脑机接口+具身智能"——2017年立项脑机接口预研的时机早于Neuralink等公司获得公众关注，表明团队对前沿技术的嗅觉敏锐，但脑机接口从实验室到商业化路径极长（10年以上），短期内对估值的贡献有限。2026年第二届生态大会的"1+3+X"战略如果执行得当，"3个生态共建场景"中任一场景（导览/工业/科研）取得突破性订单都将显著改变公司的收入结构。</p>
+      </div>
+
+      <h2 id="references">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://news.ifeng.com/c/8qRvXJJxRu4">凤凰网 - 傅利叶用10年时间押中具身智能"主动交互"命门</a></li>
+          <li><a href="https://cd.nbd.com.cn/articles/2026-02-02/4245991.html">每日经济新闻 - 对话未来商业：傅利叶创始人顾捷专访</a></li>
+          <li><a href="https://m.lieyunpro.com/archives/495831">猎云网 - 近8亿！通用机器人公司傅利叶官宣E轮系列融资</a></li>
+          <li><a href="https://stcn.com/article/detail/1485390.html">证券时报 - 机器人赛道再现大额融资！上海国资、中东资本出手</a></li>
+          <li><a href="https://www.fftai.cn/about-medium-company/52">傅利叶官网 - GR-3首秀CES 2026</a></li>
+          <li><a href="https://news.dayoo.com/finance/202601/07/171077_54914131.htm">大洋网 - 傅利叶首秀CES 2026</a></li>
+          <li><a href="https://ces.vporoom.com/2026-01-06-Fourier-Makes-CES-Debut-With-GR-3">CES官方 - Fourier Makes CES Debut With GR-3</a></li>
+          <li><a href="https://interestingengineering.com/ai-robotics/fouriers-gr-3-humanoid-at-ces-2026">Interesting Engineering - Fourier's GR-3 at CES 2026</a></li>
+          <li><a href="https://autonews.gasgoo.com/articles/market-industry/ces-2026-fourier-intelligence-unveils-full-size-humanoid-robot-gr-3">Gasgoo - Fourier at CES 2026</a></li>
+          <li><a href="https://www.pudong.gov.cn/rmt_pdxw/20260129/821246.html">浦东发布 - "脑机具身·数据引擎联合创新计划"发布</a></li>
+          <li><a href="https://www.semi.org.cn/site/semi/article/c45beea497624134a6591ad870900f0c.html">SEMI中国 - 傅利叶诠释"交互为王"</a></li>
+          <li><a href="https://www.edigest.hk/">edigest - 放棄百萬年薪創業 80後顧捷勇闖機械人賽道</a></li>
+          <li><a href="https://www.pd-italent.com/Article/201903/201903130010.shtml">浦东人才 - 傅利叶智能顾捷：用机器为人类赋能</a></li>
+          <li><a href="https://forbeschina.com/leadership/69351">福布斯中国 - 资本持续加注具身智能赛道，傅利叶获8亿元融资</a></li>
+          <li><a href="https://news.qq.com/rain/a/20260502A03CMP00">腾讯新闻 - 顾捷：做中国人自己的机器人</a></li>
+          <li><a href="http://sh.people.com.cn/BIG5/n2/2026/0502/c134768-41570026.html">人民网 - 顾捷：让技术真正服务于民</a></li>
+          <li><a href="https://www.donews.com/article/detail/6397/84952.html">DoNews - 从傅利叶的战略升级，看具身智能的风向变化</a></li>
+          <li><a href="https://baijiahao.baidu.com/s?id=1839183296496425060">百度百家 - 傅利叶智能：康复机器人与人形机器人领域的创新先锋</a></li>
+          <li><a href="https://finance.sina.cn/2025-05-27/detail-inexznxr9893588.d.html">新浪财经 - 为人形机器人穿上"新衣"，润阳科技3亿元投向傅利叶</a></li>
+          <li><a href="https://www.ofweek.com/ai/2025-05/ART-201717-8120-30663957.html">OFweek - 上海跑出80亿超级独角兽：傅利叶</a></li>
+          <li><a href="https://dzb.whb.cn/2024-04-28/2/detail-849173.html">文汇报 - 探寻通用人形机器人的星辰大海</a></li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">本页面由具身智能Wiki自动分发器于2026年5月4日生成。数据来源截至当日公开信息。如有更新或纠错，请提交至维护团队。</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

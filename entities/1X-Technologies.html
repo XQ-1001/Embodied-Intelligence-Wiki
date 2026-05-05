@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>1X Technologies — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> <span class="breadcrumb-sep">›</span> <span>1X Technologies</span></div>
+  <div class="wiki-header"><h1>1X Technologies</h1><div class="subtitle">1X Technologies AS · 前称 Halodi Robotics · 2014年成立 · 消费级人形机器人先驱 · 累计融资超1.36亿美元</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#founders">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#technology">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financials">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#ana1">2.1 团队背景与场景匹配度</a></li>
+        <li class="toc-lvl4"><a href="#ana2">2.2 技术路线与场景适配性</a></li>
+        <li class="toc-lvl4"><a href="#ana3">2.3 股东/资本结构对战略的影响</a></li>
+        <li class="toc-lvl4"><a href="#ana4">2.4 试错过程与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#ana5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#ana6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#references">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">1X Technologies</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">1X Technologies AS</div></div>
+        <div class="ib-row"><div class="ib-label">前称</div><div class="ib-value">Halodi Robotics</div></div>
+        <div class="ib-row"><div class="ib-label">成立</div><div class="ib-value">2014年（挪威莫斯）</div></div>
+        <div class="ib-row"><div class="ib-label">总部</div><div class="ib-value">美国加州帕罗奥图</div></div>
+        <div class="ib-row"><div class="ib-label">CEO</div><div class="ib-value">Bernt Øivind Børnich</div></div>
+        <div class="ib-row"><div class="ib-label">员工</div><div class="ib-value">~965人（2026年初）</div></div>
+        <div class="ib-row"><div class="ib-label">官网</div><div class="ib-value"><a href="https://www.1x.tech">1x.tech</a></div></div>
+        <div class="ib-section">财务数据</div>
+        <div class="ib-row"><div class="ib-label">累计融资</div><div class="ib-value">超1.36亿美元</div></div>
+        <div class="ib-row"><div class="ib-label">最新估值</div><div class="ib-value">约8.2亿美元（B轮后）</div></div>
+        <div class="ib-row"><div class="ib-label">2025营收</div><div class="ib-value">未公开（私有公司）</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">主力产品</div><div class="ib-value">NEO（双足家用）· EVE（轮式工业）</div></div>
+        <div class="ib-row"><div class="ib-label">NEO售价</div><div class="ib-value">$20,000买断 / $499/月</div></div>
+        <div class="ib-row"><div class="ib-label">年产能</div><div class="ib-value">首年10,000台（海沃德工厂）</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">类型</div><div class="ib-value"><span class="tag tag-info">人形机器人</span><span class="tag tag-info">消费级</span><span class="tag">全栈</span></div></div>
+        <div class="ib-row"><div class="ib-label">地区</div><div class="ib-value"><span class="tag">美国</span><span class="tag">挪威</span></div></div>
+        <div class="ib-row"><div class="ib-label">阶段</div><div class="ib-value"><span class="tag tag-warn">商业化早期</span></div></div>
+      </aside>
+
+      <p class="article-intro"><strong>1X Technologies</strong>（前称 Halodi Robotics）是一家由挪威连续创业者 Bernt Øivind Børnich 于2014年创立的人形机器人公司，总部位于美国加州帕罗奥图。公司以"安全、有能力、负担得起"为设计哲学，先后推出轮式工业机器人 EVE 和双足家用机器人 NEO。2025年10月，NEO 以 $20,000 定价开放预订，成为全球首款面向消费者的量产人形机器人。公司累计融资超1.36亿美元，核心投资方包括 OpenAI Startup Fund、EQT Ventures、Tiger Global 和 Samsung NEXT，并已与全球第二大私募股权巨头 EQT 达成10,000台级别的战略部署协议。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper">
+        <table class="wikitable infotable">
+          <tr><th>项目</th><th>内容</th></tr>
+          <tr><td>公司全称</td><td>1X Technologies AS</td></tr>
+          <tr><td>英文名称</td><td>1X Technologies</td></tr>
+          <tr><td>前身名称</td><td>Halodi Robotics（2014–2022）</td></tr>
+          <tr><td>成立时间</td><td>2014年5月</td></tr>
+          <tr><td>注册地</td><td>挪威莫斯（Moss, Norway）</td></tr>
+          <tr><td>全球总部</td><td>美国加州帕罗奥图（Palo Alto, CA）</td></tr>
+          <tr><td>制造基地</td><td>加州海沃德（Hayward）+ 挪威莫斯</td></tr>
+          <tr><td>上市状态</td><td>未上市（私有公司）</td></tr>
+          <tr><td>官方网站</td><td><a href="https://www.1x.tech">www.1x.tech</a></td></tr>
+        </table>
+      </div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>时间</th><th>事件</th></tr>
+          <tr><td>2014年</td><td>Bernt Øivind Børnich 在挪威莫斯创立 Halodi Robotics</td></tr>
+          <tr><td>2018年</td><td>研发出 Revo1 高扭矩伺服电机，发布首款轮式人形机器人 EVE</td></tr>
+          <tr><td>2019年</td><td>在美国旧金山设立第二总部；获 $290万 企业融资</td></tr>
+          <tr><td>2020年</td><td>与 ADT Commercial 签订150–250台安防机器人部署合同</td></tr>
+          <tr><td>2021年5月</td><td>完成 $1,010万 A轮融资（Valinor 领投）</td></tr>
+          <tr><td>2022年</td><td>公司更名为 1X Technologies，标志向消费级机器人战略转型；与 OpenAI 开展具身学习合作</td></tr>
+          <tr><td>2023年3月</td><td>完成 $2,350万 A2轮融资，OpenAI Startup Fund 领投</td></tr>
+          <tr><td>2024年1月</td><td>完成 $1亿 B轮融资（EQT Ventures 领投），估值约8.2亿美元</td></tr>
+          <tr><td>2024年8月</td><td>发布双足家庭机器人 NEO Beta</td></tr>
+          <tr><td>2025年1月</td><td>收购美国人形机器人公司 Kind Humanoid</td></tr>
+          <tr><td>2025年7月</td><td>全球总部从挪威迁至加州帕罗奥图</td></tr>
+          <tr><td>2025年10月</td><td>NEO 正式开放预订，定价 $20,000 / $499月订阅；5天内首年产能售罄</td></tr>
+          <tr><td>2025年12月</td><td>与 EQT 达成战略合作，计划2026–2030年在 EQT 300+ 被投企业部署最多10,000台 NEO</td></tr>
+          <tr><td>2026年1月</td><td>发布 1X World Model 世界模型</td></tr>
+          <tr><td>2026年4月</td><td>海沃德工厂正式投产，首年产能10,000台</td></tr>
+        </table>
+      </div>
+
+      <h3 id="founders">1.2 创始人及核心团队</h3>
+      <p>1X Technologies 由挪威籍连续创业者 Bernt Øivind Børnich 创立，核心团队兼具机器人硬件设计、仿生驱动和 AI 软件的综合能力。公司现有员工约965人（2026年初），团队结构为产业派与学术派混合型，制造负责人来自 SpaceX。</p>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+          <tr><td>创始人 & CEO</td><td>Bernt Øivind Børnich</td><td>奥斯陆大学机器人学与纳米电子学学士；早年在 Data Response 从事机器人驱动系统研发；11岁立志制造人形机器人</td></tr>
+          <tr><td>联合创始人（原CTO）</td><td>Phuong Nguyen</td><td>韩国蔚山大学机器人学博士，专注高扭矩密度电机与仿生驱动系统；2024年5月离职创立 Physical Robotics</td></tr>
+          <tr><td>联合创始人</td><td>Jørgen Sundell</td><td>资深机械设计师，主导 EVE 和 NEO 系列机械结构设计</td></tr>
+          <tr><td>联合创始人</td><td>Pål Løken</td><td>早期创始团队成员</td></tr>
+          <tr><td>制造负责人</td><td>Vikram Kothari</td><td>前 SpaceX 工程师，曾参与 Dragon、Starship 等项目</td></tr>
+        </table>
+      </div>
+      <p>团队人才结构特点：核心创始层以挪威本土工程背景为主，强调从电机、肌腱驱动到整机设计的垂直整合能力；制造端引入 SpaceX 经验强化规模化量产能力；AI 软件层面依靠 OpenAI 合作补充。</p>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <h4>融资历史</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>轮次</th><th>时间</th><th>金额</th><th>领投方</th><th>主要参投方</th></tr>
+          <tr><td>企业融资</td><td>2019年12月</td><td>$290万</td><td>—</td><td>—</td></tr>
+          <tr><td>A轮</td><td>2021年5月</td><td>$1,010万</td><td>Valinor</td><td>ADT Commercial、Hatteland</td></tr>
+          <tr><td>A2轮</td><td>2023年3月</td><td>$2,350万</td><td>OpenAI Startup Fund</td><td>Tiger Global、Sandwater</td></tr>
+          <tr><td>B轮</td><td>2024年1月</td><td>$1亿</td><td>EQT Ventures</td><td>Samsung NEXT、OpenAI、Tiger Global、Nistad Group</td></tr>
+        </table>
+      </div>
+      <h4>股东结构</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>股东类型</th><th>代表机构</th><th>战略角色</th></tr>
+          <tr><td>战略投资者（AI）</td><td>OpenAI Startup Fund</td><td>AI 模型合作，提供大语言模型与具身学习能力</td></tr>
+          <tr><td>战略投资者（半导体）</td><td>Samsung NEXT、NVIDIA（NVentures）</td><td>芯片供应（Jetson Thor）、仿真平台（Isaac Lab）</td></tr>
+          <tr><td>财务投资者</td><td>EQT Ventures、Tiger Global</td><td>资本支持 + EQT 被投企业部署通道</td></tr>
+          <tr><td>早期投资者</td><td>Valinor、Sandwater、ADT Commercial</td><td>早期资本与首批商业客户</td></tr>
+        </table>
+      </div>
+      <p>公司当前未上市。据报道，1X 正寻求以约100亿美元估值进行新一轮融资，目标筹集高达10亿美元。2025年4月曾收到并购要约，详情未披露。</p>
+
+      <h3 id="technology">1.4 技术路线</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>技术维度</th><th>路线选择</th><th>说明</th></tr>
+          <tr><td>总体 AI 架构</td><td>1X World Model + 1Xgpt 中间件</td><td>自研世界模型实现环境理解与任务规划；1Xgpt 为开源中间件，供第三方开发机器人应用</td></tr>
+          <tr><td>大模型集成</td><td>OpenAI 定制化大模型</td><td>NEO 集成 OpenAI 模型实现任务分解、持续学习与跨场景泛化</td></tr>
+          <tr><td>数据方案</td><td>人类辅助学习 + 远程操作 + 仿真</td><td>通过人类远程操作采集真实数据，在家庭环境中渐进式学习</td></tr>
+          <tr><td>仿真平台</td><td>NVIDIA Isaac Sim / Isaac Lab</td><td>使用 Isaac 平台进行强化学习训练</td></tr>
+          <tr><td>计算平台</td><td>NVIDIA Jetson Thor（NEO Cortex）</td><td>端侧实时 AI 推理</td></tr>
+          <tr><td>驱动系统</td><td>仿生肌腱驱动 + 串联弹性驱动器（SEA）</td><td>自研 Revo1 准直驱电机，仿人体肌腱力学；低传动比线缆驱动，高安全性与柔顺性</td></tr>
+          <tr><td>全栈/专用</td><td>全栈（垂直整合）</td><td>自主生产电机、电池、结构件、传动系统、传感器、软性材料等核心部件</td></tr>
+          <tr><td>差异化特色</td><td>软性外饰 + 极低噪音</td><td>NEO 运行噪音约22分贝（低于冰箱），软性外壳设计实现安全人机共处</td></tr>
+        </table>
+      </div>
+      <p>1X 技术路线的核心哲学是"让机器人在非结构化家庭环境中与人类共同生活学习"。驱动技术灵感来源于人体肌腱力学，采用线缆驱动而非传统齿轮箱，兼顾力控精度与安全性。AI 方面，公司走"大模型 + 世界模型"结合的路径，2026年1月发布的 1X World Model 旨在让 NEO 建立对物理环境的深层理解。</p>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>产品</th><th>类型</th><th>发布时间</th><th>关键参数</th><th>主要场景</th></tr>
+          <tr><td><strong>NEO</strong></td><td>双足人形（消费级）</td><td>2025年10月</td><td>身高1.67m，体重~30kg，灵巧手20自由度，续航~4h，噪音~22dB，功耗~100W，可选Tan/Gray/Dark Brown配色</td><td>家庭服务（叠衣、洗碗、煮咖啡）、工业（物流、仓储、制造）</td></tr>
+          <tr><td><strong>NEO Beta</strong></td><td>双足人形（测试版）</td><td>2024年8月</td><td>同 NEO 基础架构，预生产版本</td><td>内部测试与早期客户验证</td></tr>
+          <tr><td><strong>NEO Gamma</strong></td><td>双足人形（改进版）</td><td>2025年2月</td><td>硬件迭代优化版本</td><td>预生产验证</td></tr>
+          <tr><td><strong>EVE</strong></td><td>轮式人形（工业级）</td><td>2018年</td><td>身高188cm，体重87kg，25自由度，载荷15kg，速度14.5km/h，续航6h，Revo1准直驱电机</td><td>安防巡逻、物流搬运、医疗辅助</td></tr>
+        </table>
+      </div>
+      <p>NEO 为1X当前核心产品，定位"可负担的家用人形机器人"，定价策略对标高端家电而非工业设备。EVE 为公司早期工业产品，已在安防和物流领域完成商业化验证。</p>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>场景分类</th><th>具体场景</th><th>对应产品</th><th>关键合作方/客户</th></tr>
+          <tr><td>家庭消费</td><td>叠衣、洗碗、煮咖啡、银发照护、日常家务</td><td>NEO</td><td>消费者直接购买（$20,000买断或$499/月订阅）</td></tr>
+          <tr><td>工业制造</td><td>3D质检、设备巡检、钣金上料、装配辅助</td><td>NEO（EQT合作）</td><td>EQT 旗下300+被投企业</td></tr>
+          <tr><td>物流仓储</td><td>拣选、搬运、分拣、设施运营</td><td>NEO</td><td>EQT 被投企业</td></tr>
+          <tr><td>安防巡逻</td><td>夜间巡逻、入侵检测、安全监控</td><td>EVE</td><td>ADT Commercial（150–250台合同）</td></tr>
+          <tr><td>医疗健康</td><td>医院辅助、物资运输</td><td>EVE</td><td>医疗机构（验证中）</td></tr>
+        </table>
+      </div>
+      <p>公司最显著的场景策略转变是2025年底通过 EQT 合作将 NEO 从纯家用定位扩展至工业场景。EQT 作为全球第二大私募股权机构（管理资产 €2,670亿），旗下涵盖物流、制造、医疗等行业的大量被投企业，为 NEO 提供了规模化 B 端部署通道。</p>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>指标</th><th>数据</th><th>说明</th></tr>
+          <tr><td>NEO 预订量</td><td>首年产能（10,000+台）5天内售罄</td><td>2025年10月开放预订后</td></tr>
+          <tr><td>NEO 产能</td><td>首年10,000台；目标2027年100,000+台/年</td><td>海沃德工厂58,000平方英尺</td></tr>
+          <tr><td>EQT 部署协议</td><td>最多10,000台（2026–2030）</td><td>覆盖EQT 300+被投企业</td></tr>
+          <tr><td>EVE 安保合同</td><td>150–250台</td><td>ADT Commercial（2020年签署）</td></tr>
+          <tr><td>NEO 价格</td><td>$20,000买断 / $499月订阅</td><td>含1Xgpt软件和内置蓝牙音箱</td></tr>
+          <tr><td>交货时间</td><td>美国2026年首批；国际2027年起</td><td>按预订顺序交付</td></tr>
+          <tr><td>员工规模</td><td>海沃德工厂200+人（持续扩招）</td><td>公司总员工~965人</td></tr>
+        </table>
+      </div>
+
+      <h3 id="financials">1.8 财务数据</h3>
+      <p>1X Technologies 为私有公司，未公开披露详细财务报表。以下为基于公开报道的汇总数据：</p>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>指标</th><th>2024年</th><th>2025年</th><th>备注</th></tr>
+          <tr><td>累计融资</td><td>~$1.36亿</td><td>~$1.36亿</td><td>B轮完成后至今无新增公开融资</td></tr>
+          <tr><td>估值</td><td>~$8.2亿（B轮后）</td><td>寻求$100亿+（新一轮）</td><td>B轮后估值来自PitchBook估算</td></tr>
+          <tr><td>收入</td><td>未公开</td><td>未公开（第三方称$2.225亿，未验证）</td><td>私有公司，PitchBook标注"Generating Revenue"</td></tr>
+          <tr><td>员工</td><td>~500人</td><td>~965人</td><td>快速增长期</td></tr>
+        </table>
+      </div>
+      <div class="callout"><div class="callout-title">⚠ 数据说明</div>第三方数据平台（如 Latka）曾列出1X 2025年营收$2.225亿，但该数据与公司融资额、员工规模等其他指标存在矛盾，且 Latka 同时标注$0融资额（与所有公开信息冲突），可信度较低。PitchBook 仅标注公司"Generating Revenue"而未给出具体数字。所有财务数据应以公司官方披露或上市文件为准。</div>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>公司原名 Halodi Robotics，2022年更名为 1X Technologies，寓意"指数级增长"的愿景</li>
+        <li>2025年1月收购美国初创公司 Kind Humanoid，加强人形机器人软硬件整合能力</li>
+        <li>1Xgpt 中间件已开源，允许第三方开发者为 NEO 编写应用，类似"机器人 App Store"生态策略</li>
+        <li>NEO 内置蓝牙音箱，可播放音乐和语音交互</li>
+        <li>CEO Børnich 在11岁时就立志制造人形机器人，受科幻作品启发</li>
+        <li>制造负责人 Vikram Kothari 的 SpaceX 背景为量产带来航天级制造流程经验</li>
+        <li>NEO 的"隐私模式"支持人类远程操作介入，确保复杂场景下任务完成</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="ana1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>1X的核心创始团队以挪威工程背景为主，擅长电机设计、仿生驱动与机械结构——这直接支撑了公司"从硬件底层做起"的全栈策略。CEO Børnich 的机器人学与纳米电子学背景、联合创始人 Nguyen 的高扭矩密度电机专长，使公司在执行器层面有深厚积累，这是 NEO 实现极低噪音（22dB）和软性安全交互的工程基础。然而，团队明显缺少消费电子/互联网产品化经验，这可能是公司从B端安防场景转向C端家用市场后面临的挑战之一。引入前 SpaceX 制造负责人 Vikram Kothari 是明智之举——将航天级量产流程导入机器人制造，直接服务于海沃德工厂的规模化目标。团队整体偏向"硬件+工程"主导型，AI能力目前较多依赖 OpenAI 外部合作，1X World Model 的发布表明公司正试图补强自有AI能力。</p>
+      </div>
+
+      <div class="analysis-block" id="ana2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>1X选择"仿生肌腱驱动+串联弹性驱动器"而非传统高刚性齿轮箱，这一技术路线与家用场景高度适配——家庭环境要求机器人与人、家具、宠物安全共处，柔性驱动天然具备力控安全性。线缆驱动（而非液压或高减速比电机）在碰撞时能量吸收能力更强，符合消费级安全标准。但该路线在工业场景中可能面临精度和刚度不足的限制——这正是2025年底EQT合作将其推向工厂时的一个潜在张力：为家用设计的"柔和"硬件能否满足工业场景的重复精度和耐久性要求？公司似乎通过分层策略来解决：NEO 本体保持消费级设计，通过1Xgpt软件层适配不同场景需求。AI方面，1X World Model + OpenAI大模型的路径偏向"通用智能"思路，这与家庭场景的高度多样性和非结构化特征匹配，但也意味着对数据质量和数量的极高要求。</p>
+      </div>
+
+      <div class="analysis-block" id="ana3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>1X的股东结构呈现"AI战略投资者+产业资本+财务投资者"的三角格局。OpenAI的早期投资将1X深度绑定到GPT生态——NEO的核心任务理解与规划能力依赖OpenAI模型，这既是技术护城河，也构成对单一AI供应商的依赖。EQT的双重角色（既是B轮领投方，又是10,000台部署的客户方）是最具特色的资本安排：EQT作为投资者推动估值增长，同时作为"渠道方"为NEO提供B端落地场景，形成了资本与业务的闭环。Samsung NEXT和NVIDIA的投资则锁定芯片与传感器供应链。值得关注的是，公司正寻求$100亿估值的新一轮融资，较B轮的$8.2亿跃升逾10倍，这一估值预期能否兑现取决于2026年NEO的实际交付表现和EQT合作的落地进度。</p>
+      </div>
+
+      <div class="analysis-block" id="ana4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>1X的发展历程呈现出清晰的"三次转向"。第一次：从Halodi Robotics时期的安全驱动器和轮式机器人EVE起步，验证了自研电机和安防/物流场景的可行性。第二次：2022年更名为1X，战略重心从B端工业安防转向C端家用消费级——这一转向背后是对市场规模的重新判断：家庭场景的潜在市场远大于安防。第三次（最关键的调整）：2025年底通过与EQT合作，将NEO从"纯家用"重新拉回工业场景，形成了"家用+工业"双线并行的格局。这一调整逻辑合理：家庭场景虽然想象空间大，但商业化周期长（用户教育、安全认证、隐私法规），而工业场景的劳动力短缺提供了即期的付费需求。这种"家用品牌+工业变现"的组合策略，类似于特斯拉从Roadster到Model 3的路径——用高端消费品牌建立认知，用规模化场景实现营收。</p>
+      </div>
+
+      <div class="analysis-block" id="ana5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>在人形机器人赛道的竞争版图中，1X做出了几个明确取舍。第一，选择走消费级"iPhone路线"——NEO定价$20,000，对标高端家电而非工业设备（特斯拉Optimus预估$20,000-$30,000但定位工业；Figure AI定位工业全栈）。这一价格策略使1X成为目前唯一敢于直接面向C端消费者的人形机器人公司。第二，走"全栈硬件+开放软件"路线——自主生产核心零部件以确保成本和质量控制，同时开源1Xgpt构建第三方开发者生态。第三，将"安全性"和"亲和力"作为品牌核心差异点——22dB运行噪音、软性外壳、仿生肌腱驱动，这些设计决策使NEO更像"家庭成员"而非"工业工具"。对比同行：Figure 和 Apptronik 聚焦工业场景，Boston Dynamics 侧重动态性能，1X在"消费级亲和力"这个维度上目前没有直接竞争对手。</p>
+      </div>
+
+      <div class="analysis-block" id="ana6">
+        <h4>2.6 其他重要观察</h4>
+        <p>1X的"挪威基因+硅谷运营"双总部模式值得关注。挪威提供了早期研发的低成本环境和政府支持，而硅谷则提供了资本、人才和供应链密度。2025年将全球总部迁至帕罗奥图，标志着公司从"欧洲技术型创业公司"向"美国市场驱动型规模化企业"的转变。另一个关键观察是时间窗口：2026年是1X的"证明之年"——海沃德工厂需要实现10,000台年产能目标，NEO需要按时向消费者交付，EQT合作的试点工厂需要验证实际ROI。如果这三条线同时达标，1X有可能在人形机器人领域建立起"先发+规模"的双重壁垒。风险方面，最大的不确定性来自消费级市场的接受度：$20,000的机器人室友概念在多大程度上是真实需求而非技术想象，需要2026年的实际用户反馈来验证。</p>
+      </div>
+
+      <h2 id="references">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://en.wikipedia.org/wiki/1X_Technologies">Wikipedia — 1X Technologies</a></li>
+          <li><a href="https://pitchbook.com/profiles/company/318913-03">PitchBook — 1X 2026 Company Profile: Valuation, Funding & Investors</a></li>
+          <li><a href="https://sifted.eu/articles/1x-humanoid-robot-launch">Sifted — OpenAI-backed startup aims to deliver in-home humanoid robots in 2026</a></li>
+          <li><a href="https://finance.yahoo.com/news/1x-struck-deal-send-home-220336409.html">Yahoo Finance — 1X struck a deal to send its 'home' humanoids to factories and warehouses</a></li>
+          <li><a href="https://www.businesswire.com/news/home/20251211360340/en/">BusinessWire — 1X Announces Strategic Partnership to Make up to 10,000 Humanoid Robots Available to EQT's Global Portfolio</a></li>
+          <li><a href="https://www.globenewswire.com/de/news-release/2026/04/30/3285118/0/en/1x-opens-neo-factory-in-hayward-ca.html">GlobeNewswire — 1X Opens NEO Factory in Hayward, CA</a></li>
+          <li><a href="https://www.eweek.com/news/news-1x-california-factory-neo-humanoid-robot/">eWeek — 1X Opens US Factory, Targets 10,000 Humanoid Robots in First Year</a></li>
+          <li><a href="https://www.therobotreport.com/1x-partners-with-eqt-to-roll-out-humanoids-across-its-portfolio-companies/">The Robot Report — 1X partners with EQT to roll out humanoids</a></li>
+          <li><a href="https://interestingengineering.com/ai-robotics/1x-to-deploy-humanoid-robots-for-warehouses">Interesting Engineering — European firm 1X to deploy 10,000 'home' humanoid robots in factories</a></li>
+          <li><a href="https://www.chinaz.com/ainews/24272.shtml">站长之家 — OpenAI投资！1X Technologies携家务人形机器人Neo亮相CES 2026</a></li>
+          <li><a href="https://www.163.com/dy/article/KRMRG73A05561FZR.html">网易 — 两万美金买机器人室友：1X的2026豪赌</a></li>
+          <li><a href="https://jobtorob.com/1x-technologies-advance-neo-humanoid-robot-1">JobToRob — 1X Technologies raises $100M Series B to advance NEO humanoid robot</a></li>
+          <li><a href="https://aiwiki.ai/wiki/1x_technologies_neo">AI Wiki — 1X NEO</a></li>
+          <li><a href="https://baike.baidu.com/item/1X/65295746">百度百科 — 1X</a></li>
+          <li><a href="https://www.baike.com/wikiid/7474409831589789746">快懂百科 — 1X Technologies</a></li>
+          <li><a href="https://tracxn.com/d/companies/1x/">Tracxn — 1X 2026 Company Profile & Team</a></li>
+          <li><a href="https://www.aparobot.com/companies/1x-technologies">Aparobot — 1X Technologies Robotics Company Profile</a></li>
+          <li><a href="https://www.tipranks.com/news/private-companies/1x-weekly-recap-2">TipRanks — 1X Weekly Recap</a></li>
+          <li><a href="https://www.leaderobot.com/news/6893">Leaderobot — 2.21万亿资本的豪赌：10000台人形机器人将5年落地</a></li>
+          <li><a href="https://www.chinaz.com/ainews/23633.shtml">站长之家 — 1X 与 EQT 达成战略合作</a></li>
+          <li><a href="https://dzh.com.cn/index/detail?mod=txs&url=/wap/data/news/txs/2025/12/509168.json">大智慧 — 全球第二大私募股权巨头宣布推动部署1万台人形机器人</a></li>
+          <li><a href="https://mp.ofweek.com/robot/a256714728537">OFweek机器人 — 人形机器人进军家用市场</a></li>
+        </ol>
+      </div>
+
+      <div class="page-footer">此页面由具身智能Wiki自动分发器生成 · 数据截至2026年5月 · 来源均为公开信息</div>
+    </article>
+  </div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

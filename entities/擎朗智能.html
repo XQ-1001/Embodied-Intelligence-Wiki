@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>擎朗智能 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> <span class="breadcrumb-sep">›</span> <span>擎朗智能</span></div>
+  <div class="wiki-header"><h1>擎朗智能</h1><div class="subtitle">Keenon Robotics · 未上市（筹备港股IPO） · 成立于2010年 · 全球商用服务机器人出货量第一（市占率22.7%） · 累计交付超10万台</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#team">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financials">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#a-team">2.1 团队背景与场景匹配度</a></li>
+        <li class="toc-lvl4"><a href="#a-tech">2.2 技术路线与场景适配性</a></li>
+        <li class="toc-lvl4"><a href="#a-capital">2.3 股东/资本结构对战略影响</a></li>
+        <li class="toc-lvl4"><a href="#a-pivot">2.4 试错过程与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#a-position">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#a-other">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#references">3 参考来源</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">擎朗智能</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">上海擎朗智能科技有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">英文名</div><div class="ib-value">Keenon Robotics Co., Ltd.</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2010年</div></div>
+        <div class="ib-row"><div class="ib-label">创始人/CEO</div><div class="ib-value">李通（华中科技大学）</div></div>
+        <div class="ib-row"><div class="ib-label">总部</div><div class="ib-value">上海浦东金桥开发区</div></div>
+        <div class="ib-row"><div class="ib-label">员工规模</div><div class="ib-value">约1,001–5,000人</div></div>
+        <div class="ib-section">财务数据</div>
+        <div class="ib-row"><div class="ib-label">累计融资</div><div class="ib-value">约2.64亿美元</div></div>
+        <div class="ib-row"><div class="ib-label">最新轮次</div><div class="ib-value">D1轮（2025年4月），Prosperity7、软银等</div></div>
+        <div class="ib-row"><div class="ib-label">海外营收占比</div><div class="ib-value">超50%</div></div>
+        <div class="ib-row"><div class="ib-label">IPO计划</div><div class="ib-value">港股，目标募资约2亿美元（2026年）</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">累计出货</div><div class="ib-value">超10万台</div></div>
+        <div class="ib-row"><div class="ib-label">全球市占率</div><div class="ib-value">22.7%（IDC 2024，第一）</div></div>
+        <div class="ib-row"><div class="ib-label">覆盖范围</div><div class="ib-value">60+个国家、600+座城市</div></div>
+        <div class="ib-row"><div class="ib-label">运行总里程</div><div class="ib-value">400亿米（≈绕赤道999圈）</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">赛道</div><div class="ib-value"><span class="tag">商用服务机器人</span><span class="tag">配送机器人</span><span class="tag">人形机器人</span><span class="tag">具身智能</span></div></div>
+        <div class="ib-row"><div class="ib-label">官网</div><div class="ib-value"><a href="https://www.keenon.com/cn/" target="_blank" rel="noopener">keenon.com</a></div></div>
+      </aside>
+
+      <p class="article-intro"><strong>擎朗智能</strong>（Keenon Robotics）是一家全球领先的商用服务机器人公司，由华中科技大学校友李通于2010年在上海创立。公司以"让服务工作更简单"为使命，核心产品覆盖配送机器人（T系列）、清洁机器人（C系列）、酒店机器人（W3）以及人形具身服务机器人（XMAN系列），累计出货超10万台，覆盖全球60余个国家和地区。根据IDC 2024年报告，擎朗在全球商用服务机器人市场以22.7%的份额排名第一，配送细分市场市占率高达40.4%。海外营收占比超50%，制造成本仅为美国同行1/5。2025年发布人形服务机器人XMAN-R1，2026年启动"通用+专用"机器人协同战略并筹备港股IPO（目标募资约2亿美元）。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper"><table class="wikitable infotable">
+        <tr><th style="width:120px">项目</th><th>内容</th></tr>
+        <tr><td>公司全称</td><td>上海擎朗智能科技有限公司</td></tr>
+        <tr><td>英文名称</td><td>Keenon Robotics Co., Ltd.</td></tr>
+        <tr><td>成立时间</td><td>2010年</td></tr>
+        <tr><td>注册地</td><td>中国上海</td></tr>
+        <tr><td>总部</td><td>上海浦东金桥开发区</td></tr>
+        <tr><td>海外子公司</td><td>美国、日本、韩国、荷兰、德国、加拿大、迪拜、香港等</td></tr>
+        <tr><td>全球运营中心</td><td>80余个</td></tr>
+        <tr><td>上市状态</td><td>未上市（筹备港股IPO，目标2026年内，募资约2亿美元/15亿港元）</td></tr>
+        <tr><td>官方网站</td><td>keenon.com/cn/</td></tr>
+        <tr><td>员工规模</td><td>约1,001–5,000人</td></tr>
+        <tr><td>资质</td><td>国家级专精特新"小巨人"企业</td></tr>
+      </table></div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th style="width:80px">时间</th><th>事件</th></tr>
+        <tr><td>2010年</td><td>李通与三位大学合伙人凑资20万元，在上海闸北区创立擎朗智能</td></tr>
+        <tr><td>2010–2013年</td><td>探索期：尝试教育机器人、家用机器人、高仿人形机器人等多个方向，靠定制化项目维持生存</td></tr>
+        <tr><td>2013年</td><td>正式选定商用服务机器人赛道，专注室内配送</td></tr>
+        <tr><td>2015年</td><td>获得微软时期mentor的天使轮投资</td></tr>
+        <tr><td>2016年</td><td>第三代机器人"花生Peanut"诞生；获云启资本、松禾远望A轮融资数千万元</td></tr>
+        <tr><td>2018年</td><td>首批配送机器人量产下线，建立全球第一条餐饮服务机器人量产产线；成为海底捞智慧餐厅供应商</td></tr>
+        <tr><td>2019年</td><td>完成B轮约2亿元融资（源码资本领投）</td></tr>
+        <tr><td>2020年</td><td>机器人投放到火神山、雷神山等抗疫一线；加速出海</td></tr>
+        <tr><td>2020–2021年</td><td>C轮系列融资超15亿元，软银亚洲、软银愿景入局</td></tr>
+        <tr><td>2021年9月</td><td>D轮融资2亿美元，软银愿景基金领投，阿里巴巴、源码资本等跟投</td></tr>
+        <tr><td>2023年</td><td>推出清洁机器人，进入保洁市场</td></tr>
+        <tr><td>2024年</td><td>发布首款双臂具身服务机器人；IDC报告确认全球商用服务机器人出货量第一</td></tr>
+        <tr><td>2025年3月</td><td>发布全球首款"为服务而生"的人形具身服务机器人XMAN-R1</td></tr>
+        <tr><td>2025年4月</td><td>完成D1轮融资，Prosperity7 Ventures、软银等参投</td></tr>
+        <tr><td>2025年7月</td><td>WAIC发布双足人形机器人XMAN-F1</td></tr>
+        <tr><td>2026年1月</td><td>CES 2026美国首秀；港媒报道港股IPO计划（募资2亿美元）</td></tr>
+        <tr><td>2026年4月</td><td>与挪瓦咖啡联名打造全球首个人形机器人咖啡馆</td></tr>
+      </table></div>
+
+      <h3 id="team">1.2 创始人及核心团队</h3>
+      <p>创始团队源于华中科技大学机器人科创小组，核心成员持续共事超15年（自大学起）。团队呈现"工程师创业+长期主义"的典型特征，与多数AI/机器人公司不同，擎朗经历了8年从零到量产的漫长积累期，团队韧性是其核心竞争力之一。</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th style="width:80px">角色</th><th style="width:70px">姓名</th><th>背景/履历</th></tr>
+        <tr><td>创始人 & CEO</td><td>李通</td><td>华中科技大学电气学院本科（2002–2006）、硕士（2006–2009，师从程时杰院士）。在校期间任启明学院机器人团队队长，获微软Embedded Challenge全球前五、全国挑战杯一等奖。毕业后在微软亚洲工程院Incubation Team参与Robotic Studio机器人操作系统开发，后任上海广茂达伙伴机器人公司研发部经理。2010年联合三位大学同学创立擎朗智能。2020年入选《财富》中国40位40岁以下商界精英。以第一发明人申请专利8项（发明5项、实用新型3项）。</td></tr>
+        <tr><td>COO</td><td>万彬</td><td>负责公司运营与海外市场。2025年提出海外"三步走"和"一国一策"策略框架。</td></tr>
+        <tr><td>CTO</td><td>唐旋来</td><td>负责技术研发。2026年主导XMAN系列人形机器人的技术迭代与VLA模型KOM 2.0研发。</td></tr>
+        <tr><td>联合创始人（3人）</td><td>—</td><td>均为华中科技大学同窗，2010年与李通一起凑资20万元起家，构成了擎朗"从车库到独角兽"的核心班底。</td></tr>
+      </table></div>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <p>擎朗智能累计融资约2.64亿美元（PitchBook数据），投资方覆盖全球顶级科技与产业资本。2025年D1轮引入沙特阿美旗下Prosperity7 Ventures，标志着资本层面的"中东通道"打通。公司正在筹备2026年港股IPO。</p>
+      <h4>融资历史</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th style="width:70px">时间</th><th style="width:70px">轮次</th><th>金额</th><th>主要投资方</th></tr>
+        <tr><td>2015年</td><td>天使轮</td><td>未披露</td><td>微软时期mentor个人投资</td></tr>
+        <tr><td>2016年</td><td>A轮</td><td>数千万元</td><td>云启资本（领投）、松禾远望基金</td></tr>
+        <tr><td>2019年</td><td>B轮</td><td>约2亿元</td><td>源码资本（领投）</td></tr>
+        <tr><td>2020–2021年</td><td>C轮系列</td><td>超15亿元（约2亿+美元）</td><td>软银亚洲、软银愿景基金</td></tr>
+        <tr><td>2021年9月</td><td>D轮</td><td>2亿美元</td><td>软银愿景基金（领投），阿里巴巴、源码资本、中金甲子、华登国际等跟投</td></tr>
+        <tr><td>2025年4月</td><td>D1轮</td><td>未公开</td><td>Ennovation Ventures、Aramco Ventures（Prosperity7）、CICC ALPHA、SoftBank Investment Advisers等</td></tr>
+      </table></div>
+      <h4>股东结构特征</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th style="width:100px">股东类型</th><th>代表机构</th><th>战略意义</th></tr>
+        <tr><td>全球科技投资</td><td>软银愿景基金</td><td>全球顶级背书，日韩/中东市场渠道</td></tr>
+        <tr><td>主权/能源资本</td><td>Prosperity7 Ventures（沙特阿美）</td><td>中东市场通道，长期资本属性</td></tr>
+        <tr><td>互联网平台</td><td>阿里巴巴</td><td>新零售/本地生活场景协同</td></tr>
+        <tr><td>头部VC</td><td>源码资本、云启资本、华登国际</td><td>创业生态与资金支持</td></tr>
+        <tr><td>国有资本</td><td>中金甲子（CICC ALPHA）、上海科创基金</td><td>国资背书，国内产业化资源</td></tr>
+      </table></div>
+      <div class="callout"><div class="callout-title">港股IPO计划（2026年）</div>据港媒2026年1月报道，擎朗智能拟赴香港联交所上市，目标募资约2亿美元（约15.6亿港元）。创始人李通表示正与股东讨论最佳上市时机，投资方认为当前为"第二类机器人公司"（2010–2020年成立）的最佳上市窗口。公司累计融资约2.64亿美元，D1轮后估值未公开但市场普遍归入独角兽行列。</div>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <p>擎朗智能的技术路线聚焦"真实场景驱动+数据飞轮积累+垂域深度优化"。与多数从AI大模型出发的机器人公司不同，擎朗从2018年第一条量产产线起就开始积累真实商业场景的运行数据，形成了"场景-数据-算法"的正向循环。</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th style="width:120px">维度</th><th>详情</th></tr>
+        <tr><td>AI技术路线</td><td>全栈自研VLA模型KOM 2.0 + 垂域专用模型KEENON ProS。结合GPT/DeepSeek等通用大模型提升"大脑"交互能力。提出"岗位化"具身智能——将服务场景拆解为标准岗位，精准匹配机器人能力。</td></tr>
+        <tr><td>导航定位</td><td>自主研发SLAM算法，实现室内"无人驾驶"级定位导航。多机协同调度算法应对复杂场景（如防空洞火锅店15台机器人同时运行）。</td></tr>
+        <tr><td>动态避障</td><td>突发障碍物、跑动儿童等纳入系统响应，遵循"阿西莫夫第一法则"设计安全准则。</td></tr>
+        <tr><td>数据方案</td><td>数据集K-Infinity，来源于超10万台设备、8.3亿+次真实场景服务的物理交互数据，结合高保真仿真+多模态数据。数据飞轮效应随部署量持续增强。</td></tr>
+        <tr><td>关键零部件</td><td>控制器、轮毂电机自研，兼顾成本与性能。自研主动悬挂系统与减震机构，适应地毯、坡道、碎石路等复杂地面。</td></tr>
+        <tr><td>本体形态路线</td><td>"通用+专用"双轨——专用机器人（T/W/C系列）覆盖标准化高频任务，通用机器人（XMAN人形系列）覆盖交互/制作/迎宾等复杂任务。创始人认为人形大规模商用至少还需5年，当前以轮式配送底盘为绝对主力。</td></tr>
+        <tr><td>制造能力</td><td>自建智能制造工厂，关键工序自动化。制造成本仅为美国同行Bear Robotics的1/5。服务机器人单价已降至10万元以内。</td></tr>
+      </table></div>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <p>擎朗产品矩阵分为"专用机器人"（配送/清洁/酒店）和"通用机器人"（XMAN人形系列）两大板块，覆盖从标准化高频任务到复杂交互任务的完整光谱。</p>
+      <h4>专用机器人系列</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th style="width:80px">产品线</th><th style="width:100px">代表型号</th><th>关键特性</th><th>主要场景</th></tr>
+        <tr><td rowspan="4">配送机器人（T系列）</td><td>T3</td><td>轻便型，窄机身</td><td>小型餐厅、咖啡厅</td></tr>
+        <tr><td>T8/T9</td><td>标准型，多层托盘</td><td>中大型餐厅、食堂</td></tr>
+        <tr><td>T10</td><td>旗舰型，大载重</td><td>宴会厅、大型餐厅</td></tr>
+        <tr><td>T11</td><td>超窄机身（<50cm，日本专属）</td><td>日式居酒屋等窄通道场景</td></tr>
+        <tr><td>酒店机器人</td><td>W3 ButlerBot</td><td>行李配送、客房服务</td><td>酒店</td></tr>
+        <tr><td rowspan="3">清洁机器人（C系列）</td><td>C30</td><td>小型清洁</td><td>办公室、小型商铺</td></tr>
+        <tr><td>C40</td><td>中型清洁</td><td>商场、酒店大堂</td></tr>
+        <tr><td>C55</td><td>大型清洁</td><td>机场、大型商场</td></tr>
+        <tr><td>大载重机器人</td><td>S100</td><td>工业级配送</td><td>工厂、仓库</td></tr>
+      </table></div>
+      <h4>通用机器人系列（XMAN人形）</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th style="width:80px">型号</th><th style="width:80px">发布时间</th><th>形态</th><th>关键能力</th><th>典型应用</th></tr>
+        <tr><td>XMAN-R1</td><td>2025年3月</td><td>轮式人形（上半身人形+轮式底盘）</td><td>双臂灵巧操作、倒酒、取餐、清理桌面、医院分拣药品/试剂</td><td>餐饮前厅、医院药房</td></tr>
+        <tr><td>XMAN-F1</td><td>2025年7月（WAIC）</td><td>双足人形</td><td>双足行走、制作爆米花、制作冰镇饮料</td><td>POC验证中</td></tr>
+      </table></div>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <p>擎朗从餐饮配送起步，每1–2年开拓一个新垂直场景，已覆盖餐饮、酒店、医疗、清洁、商超、工厂等领域。</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th style="width:80px">场景大类</th><th style="width:100px">进入时间</th><th>典型应用</th><th>代表客户/伙伴</th></tr>
+        <tr><td>餐饮配送</td><td>2016年</td><td>送餐、收盘、后厨传送</td><td>海底捞（首个大客户）、挪瓦咖啡（人形联名）</td></tr>
+        <tr><td>酒店服务</td><td>2021年</td><td>行李配送、客房配送、清洁+配送+智能货柜组合</td><td>上海虹桥香格里拉盛贸酒店（全球首个"通用+专用"协作酒店）</td></tr>
+        <tr><td>医疗配送</td><td>2022年</td><td>药品配送、标本转运、无菌包运输、污物回收；2020年投入火神山/雷神山抗疫</td><td>国妇婴等医院</td></tr>
+        <tr><td>商业清洁</td><td>2023年</td><td>商场/办公室/机场地面清洁</td><td>Interclean Amsterdam 2026展会推广</td></tr>
+        <tr><td>商超/工厂</td><td>2024–2025年</td><td>S100大载重工业配送</td><td>—</td></tr>
+        <tr><td>人形交互服务</td><td>2025–2026年</td><td>人形机器人咖啡师、调酒师、药房分拣</td><td>挪瓦咖啡联名咖啡馆（全球首个人形咖啡馆）</td></tr>
+      </table></div>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th style="width:130px">指标</th><th>数据</th><th>时间/来源</th></tr>
+        <tr><td>累计出货量</td><td>超10万台</td><td>2025年新华社等报道</td></tr>
+        <tr><td>全球市占率</td><td>22.7%（商用服务机器人第一），配送细分40.4%</td><td>IDC 2024报告</td></tr>
+        <tr><td>覆盖范围</td><td>60+个国家、600+座城市、80+运营中心</td><td>2025–2026年公开数据</td></tr>
+        <tr><td>运行总里程</td><td>400亿米（≈绕赤道999圈）</td><td>2025年科技日报</td></tr>
+        <tr><td>累计服务次数</td><td>8.3亿+次</td><td>2026年公开报道</td></tr>
+        <tr><td>海外营收占比</td><td>超50%（已超过国内）</td><td>CEO李通2025年确认</td></tr>
+        <tr><td>2025年海外增长</td><td>至少50%以上同比增长</td><td>CEO李通WRC 2025采访</td></tr>
+        <tr><td>美国市场</td><td>年销售额千万元级，2025年预计同比翻番</td><td>2025年报道</td></tr>
+        <tr><td>商业模式</td><td>销售 + RaaS租赁（按"雇佣制"收费，为当地人力成本1/3–1/2）</td><td>创始人提出"劳动外包公司"愿景</td></tr>
+        <tr><td>制造成本优势</td><td>为美国同行Bear Robotics的1/5</td><td>软银投前尽调结论</td></tr>
+        <tr><td>产品单价</td><td>已降至10万元以内</td><td>2025年公开信息</td></tr>
+      </table></div>
+
+      <h3 id="financials">1.8 财务数据</h3>
+      <p>擎朗智能为非上市公司，尚未公开精确营收与利润数据。以下为基于公开信息整理：</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th style="width:100px">指标</th><th>估算/公开信息</th></tr>
+        <tr><td>累计融资总额</td><td>约2.64亿美元（PitchBook）</td></tr>
+        <tr><td>估值</td><td>未公开，市场普遍归入独角兽行列（D轮2亿美元融资+全球市场份额第一）</td></tr>
+        <tr><td>营收规模</td><td>未公开精确数字；海外占比超50%，若海外50%+增长延续，2025年总营收估计在数亿至十亿人民币级别</td></tr>
+        <tr><td>盈亏状态</td><td>未公开；累计出货10万台+、自建工厂+全球80+运营中心，处于规模化扩张期</td></tr>
+        <tr><td>现金储备</td><td>D1轮（2025年4月）后再融资，加上Prosperity7入局，现金储备较充裕</td></tr>
+        <tr><td>IPO募资目标</td><td>约2亿美元（约15.6亿港元），港股（2026年）</td></tr>
+      </table></div>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li><strong>三次穿越行业周期：</strong>创始人李通将公司15年历史概括为"三临绝境，三度翻盘"——2010–2013年方向迷茫期靠定制化项目维生，2016年首次融资前资金几乎耗尽，2020年疫情期间逆势扩张。这段历史被《中国企业家》封面报道称为"极限求生"。</li>
+        <li><strong>海底捞的第一台机器人：</strong>2018年成为海底捞智慧餐厅的供应商是擎朗商业化的转折点。擎朗为海底捞开发了传送机器人和回收机器人，这一标杆案例加速了行业对服务机器人的接受度。</li>
+        <li><strong>"劳动外包公司"愿景：</strong>李通提出擎朗的终极定位是全球最大的"智能劳动力解决方案"公司——不卖机器，卖服务。RaaS模式下机器租赁费为当地人工的1/3–1/2，从根本上解构了服务业劳动力成本结构。</li>
+        <li><strong>"一国一策"出海方法论：</strong>针对日本推窄机身T8/T11（<50cm适配居酒屋窄通道），针对韩国提升载重适配烤肉店，针对欧美注重安全合规（2022年完成60多种产品认证），中东/东南亚各有定制方案。</li>
+        <li><strong>人形机器人"岗位化"策略：</strong>与多数人形机器人公司强调"通用性"不同，李通明确提出"先岗位化、再通用化"——XMAN系列不是炫技而是真实干活。2026年4月与挪瓦咖啡的联名咖啡馆是全球首个商业化运营的人形机器人咖啡馆。</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="a-team">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>李通在华中科技大学的电气工程背景和微软机器人操作系统的开发经历，赋予了他"从底层硬件到上层系统"的全栈视角，这对于机器人这种软硬件高度耦合的产品尤为重要。他在校期间带领机器人团队获得挑战杯一等奖的经历，也表明他具备将技术团队组织起来解决实际问题的早期能力。但与DLR/斯坦福出身的创始人不同，李通的学术背景并非全球顶级机器人实验室——这一"劣势"反而使擎朗避开了"技术炫技"陷阱，从一开始就选择了一条更务实、更贴近真实商业需求的路径。创始团队全部来自华中科技大学同窗，核心班子共事超15年，这种"超长待机稳定性"在快速迭代的硬科技创业中极为罕见——当大多数机器人公司还在磨合团队时，擎朗已经穿越了三次行业寒冬。</p>
+      </div>
+
+      <div class="analysis-block" id="a-tech">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>擎朗的技术路线选择与"劳动外包"商业模式高度自洽。公司没有追求最前沿的通用大模型或双足行走技术，而是将资源集中在"能低成本量产、能真实替代人工"的轮式配送机器人上。KOM 2.0 VLA模型和KEENON ProS垂域模型的组合策略，反映了公司对"通用智能vs专用效率"的务实认识：通用模型负责交互和泛化，专用模型负责具体岗位的高效执行。10万台设备积累的真实场景数据是擎朗最核心的竞争壁垒——这些数据不是仿真生成的，而是在真实餐厅、酒店、医院的动态环境中跑出来的，包含了数亿次真实的避障、交互、调度的经验。XMAN人形系列的推出标志着公司从"专用深度"向"通用广度"的延伸，但创始人保持了罕见的克制——明确表示人形大规模商用还需5年以上，这一判断在行业狂热中显得格外珍贵。</p>
+      </div>
+
+      <div class="analysis-block" id="a-capital">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>软银愿景基金作为D轮领投方在擎朗的资本结构中占据支配地位，这带来了双面影响：一方面软银的全球品牌和日韩/中东渠道为擎朗出海提供了强大推力（日本市场的软银机器人合作、中东的Prosperity7入局均有软银串联的影子）；另一方面软银历史上对被投公司IPO时间线和估值的强势诉求，可能正在推动擎朗2026年港股IPO的时间表。阿里巴巴的参投为"新零售+机器人"场景带来想象空间，但目前尚未看到具体的协同案例。Prosperity7（沙特阿美）的入局标志着擎朗正在战略性布局中东市场——这是一个服务机器人渗透率极低但购买力极强的蓝海市场。值得注意的是，擎朗的股东中缺乏大型餐饮集团或酒店集团等直接产业资本，意味着公司通过产品力而非股东关系获取客户，这既是独立性的证明，也可能在竞争加剧时缺乏场景绑定的防御纵深。</p>
+      </div>
+
+      <div class="analysis-block" id="a-pivot">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>擎朗的发展史本质上是一部"方向收敛"史。2010–2013年，团队尝试了教育机器人、家用机器人甚至高仿人形机器人——本质上是在"寻找PMF"。2013年选定商用服务机器人是一个关键分水岭：这一方向避开了当时技术不成熟的家用市场，也避开了巨头林立的工业机器人市场，找到了一个"技术可达、市场存在、巨头不关注"的甜蜜点。2018年从"卖产品"到"锚定海底捞"是第二个关键转折——大客户标杆效应远超预期，海底捞的成功案例直接撬动了整个餐饮行业的采购需求。2023年进入清洁机器人市场是"品类延伸"的开始，2025年XMAN人形系列则是"能力跃迁"的尝试。整体来看，擎朗的调整逻辑是"每1-2年在一个已被验证的场景旁边新增一个相邻场景"，而非跳跃式转型，这种稳健节奏与创始人的工程思维高度一致。</p>
+      </div>
+
+      <div class="analysis-block" id="a-position">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>擎朗在全球服务机器人行业中的定位是清晰的"成本领先+规模效应"策略。制造成本为美国同行1/5、产品单价降至10万元以内、累计10万台出货量——这三个数字构成了擎朗的核心竞争公式：用中国制造的成本优势打全球市场，用规模效应进一步拉低成本，形成飞轮。这与"技术领先"策略（如非夕的力控技术、波士顿动力的运动能力）形成鲜明对比。在"形体之争"中，擎朗选择"轮式优先"——不做昂贵的双足人形，而是在已被验证的商业场景中先做到极致，再逐步向人形延伸。这一选择反映了对公司基因的清醒认知：擎朗不是从AI实验室或运动控制实验室走出来的"高科技派"，而是一个"量产工程师团队"——优势在成本和规模化，而非前沿技术突破。XMAN系列更多是面向未来的占位而非当前主战场。</p>
+      </div>
+
+      <div class="analysis-block" id="a-other">
+        <h4>2.6 其他重要观察</h4>
+        <p>擎朗智能最值得关注的价值主张是其"劳动外包公司"的终极愿景——这不仅仅是商业模式的创新，更是对全球服务业劳动力市场结构性短缺的长期押注。如果全球老龄化趋势延续（日本、韩国、中国、欧洲均已面临），服务机器人的需求曲线将是长期向上的。擎朗10万台出货量如果放在"替代10万名服务员"的视角下，其社会影响力远超其财务数据所体现的价值。另一个关键观察是港股IPO的时间窗口选择——2026年正值AI/机器人行业资本热潮，擎朗如果成功上市，将成为全球"商用服务机器人第一股"的有力竞争者，这对整个赛道的估值体系具有标杆意义。但需要警惕的风险包括：海外市场政策不确定性（尤其是欧美对中国机器人企业的数据安全审查）、人形机器人路线是否最终取代轮式配送机器人、以及竞争对手（如普渡机器人、优地科技等）在价格和场景上的贴身追赶。</p>
+      </div>
+
+      <h2 id="references">3 参考来源</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://www.keenon.com/cn/news/" target="_blank" rel="noopener">擎朗智能官方网站·新闻中心</a></li>
+          <li><a href="https://www.stdaily.com/web/gdxw/2025-09/15/content_401123.html" target="_blank" rel="noopener">科技日报·活力中国调研行：擎朗智能从上海走向全球的服务机器人领军者（2025.09）</a></li>
+          <li><a href="https://www.thepaper.cn/newsDetail_forward_31653899" target="_blank" rel="noopener">澎湃新闻·三次穿越行业周期：一家机器人公司的15年生存与进化（2025）</a></li>
+          <li><a href="http://www.iceo.com.cn/article/65671718-d92c-4a1b-b623-8546f4a83b03" target="_blank" rel="noopener">中国企业家·三临绝境，三度翻盘：一家机器人公司的15年"极限求生"（2025.09封面）</a></li>
+          <li><a href="https://m.cnfin.com/hg-lb//zixun/20250528/4241260_1.html" target="_blank" rel="noopener">中国金融新闻网·"智造"10万台服务机器人，"小巨人"擎朗有大梦想（2025.05）</a></li>
+          <li><a href="https://app.bbtnews.com.cn/print.php?contentid=565799" target="_blank" rel="noopener">北京商报·对话擎朗智能创始人兼CEO李通：海外市场至少50%以上增长（2025.08）</a></li>
+          <li><a href="https://www.bjnews.com.cn/detail/1754924319168744.html" target="_blank" rel="noopener">新京报·擎朗智能李通：人形机器人先岗位化逐渐实现完全通用化（2025.08）</a></li>
+          <li><a href="https://wallstreetcn.com/articles/3762718" target="_blank" rel="noopener">华尔街见闻·擎朗智能携"通用+专用"机器人矩阵亮相CES 2026（2026.01）</a></li>
+          <li><a href="https://news.pedaily.cn/20260420/128056.shtml" target="_blank" rel="noopener">投资界·全球首次！人形机器人与咖啡品牌联名（2026.04）</a></li>
+          <li><a href="https://www.163.com/dy/article/KJL21ANG05198UNI.html" target="_blank" rel="noopener">智通财经·传擎朗智能拟赴香港上市计划募资2亿美元（2026.01）</a></li>
+          <li><a href="https://www.stheadline.com/stock-market/3536342/" target="_blank" rel="noopener">星岛头条·擎朗智能拟来港筹15亿港元（2026.01）</a></li>
+          <li><a href="https://kcb.sh.gov.cn/html/1/168/151/155/3234.html" target="_blank" rel="noopener">上海科创办·张江访谈录：擎朗智能李通——"中国智造"正被世界看见</a></li>
+          <li><a href="https://www.nbd.com.cn/rss/sohu/articles/3832104.html" target="_blank" rel="noopener">每日经济新闻·对话未来商业：擎朗智能李通——人形机器人大规模商业化落地仍需5年以上（2025.04）</a></li>
+          <li><a href="https://www.jiemian.com/article/11974580.html" target="_blank" rel="noopener">界面新闻·擎朗智能CEO李通：中国在服务机器人领域领先全球</a></li>
+          <li><a href="https://www.sohu.com/a/934467925_121286085" target="_blank" rel="noopener">搜狐/科技日报·机器人出海"打工"，运行里程等于绕赤道999圈（2025.09）</a></li>
+          <li><a href="https://news.qq.com/rain/a/20251208A039PX00" target="_blank" rel="noopener">腾讯新闻·擎朗智能COO万彬：中国机器人出海要"因地制宜"（2025.12）</a></li>
+          <li><a href="https://pitchbook.com/profiles/company/266056-39" target="_blank" rel="noopener">PitchBook·Keenon Robotics Company Profile（2026）</a></li>
+          <li><a href="https://c.parsers.vc/startup/keenonrobot.com/" target="_blank" rel="noopener">Parsers VC·Keenon Funding, Valuation, Investors</a></li>
+          <li><a href="https://www.globenewswire.com/news-release/2026/01/23/3224704/0/en/Israeli-Cannibble-Food-Tech-and-AIBotics-Enter-Israel-with-Global-Partner-KEENON-Robotics.html" target="_blank" rel="noopener">GlobeNewswire·Cannibble and AIBotics Enter Israel with KEENON Robotics（2026.01）</a></li>
+          <li><a href="http://news.10jqka.com.cn/20260121/c674193451.shtml" target="_blank" rel="noopener">同花顺·擎朗智能：全球首个"通用+专用"机器人智慧酒店落地（2026.01）</a></li>
+          <li><a href="https://finance.sina.cn/2026-02-07/detail-inhkxymp4400151.d.html" target="_blank" rel="noopener">新浪财经·擎朗智能入选《2026年具身智能产业发展研究报告》（2026.02）</a></li>
+          <li><a href="https://www.sohu.com/a/980176857_546816" target="_blank" rel="noopener">张通社·张江机器人独角兽拟赴港上市（2026.01）</a></li>
+          <li><a href="http://g.pconline.com.cn/x/2118/21187892.html" target="_blank" rel="noopener">太平洋电脑网·具身智能时代的中国样本：对话擎朗智能（2026.01）</a></li>
+          <li><a href="https://ex.chinadaily.com.cn/exchange/partners/82/rss/channel/cn/columns/snl9a7/stories/WS695f724da310942cc499a97e.html" target="_blank" rel="noopener">中国日报·擎朗智能亮相CES 2026，机器人服务吸睛全球（2026.01）</a></li>
+          <li><a href="https://www.shobserver.com/wx/detail.do?id=896523" target="_blank" rel="noopener">上海观察·擎朗智能送10万台服务机器人全球"打工"（2025.04）</a></li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">本页面最后更新于2026年5月4日 · 信息来源于公开报道与官方资料 · 具身智能Wiki</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>云深处科技 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> <span class="breadcrumb-sep">›</span> <span>云深处科技</span></div>
+  <div class="wiki-header"><h1>云深处科技</h1><div class="subtitle">DEEP Robotics · 成立于2017年11月 · Pre-IPO估值超100亿元 · 四足机器人全球行业出货量第一</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#founders">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financial">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#a1">2.1 团队背景与场景选择的匹配度</a></li>
+        <li class="toc-lvl4"><a href="#a2">2.2 技术路线与场景的适配性</a></li>
+        <li class="toc-lvl4"><a href="#a3">2.3 股东/资本结构对战略的影响</a></li>
+        <li class="toc-lvl4"><a href="#a4">2.4 试错过程与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#a5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#a6">2.6 其他重要观察、分析</a></li>
+        <li class="toc-lvl2"><a href="#refs">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">云深处科技</div>
+        <div class="ib-row"><div class="ib-label">公司全称</div><div class="ib-value">杭州云深处科技股份有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">英文品牌</div><div class="ib-value">DEEP Robotics</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2017年11月29日</div></div>
+        <div class="ib-row"><div class="ib-label">注册地</div><div class="ib-value">浙江杭州</div></div>
+        <div class="ib-row"><div class="ib-label">创始人/CEO</div><div class="ib-value">朱秋国（浙大副教授）</div></div>
+        <div class="ib-row"><div class="ib-label">联合创始人/CTO</div><div class="ib-value">李超（浙大博士）</div></div>
+        <div class="ib-section">财务数据</div>
+        <div class="ib-row"><div class="ib-label">2025年营收</div><div class="ib-value">约5-6亿元（市场估算）</div></div>
+        <div class="ib-row"><div class="ib-label">2025年营收增速</div><div class="ib-value">200%-300%</div></div>
+        <div class="ib-row"><div class="ib-label">2025年底融资</div><div class="ib-value">Pre-IPO轮数亿元（国家AI基金+京东）</div></div>
+        <div class="ib-row"><div class="ib-label">2025年盈利</div><div class="ib-value">实现盈利（公司确认）</div></div>
+        <div class="ib-section">估值/市值</div>
+        <div class="ib-row"><div class="ib-label">最新估值</div><div class="ib-value">超100亿元（Pre-IPO投后）</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">全球四足市占</div><div class="ib-value">18.9%（2024年IDC，第二）</div></div>
+        <div class="ib-row"><div class="ib-label">行业端出货</div><div class="ib-value">B端全球第一（公司宣称）</div></div>
+        <div class="ib-row"><div class="ib-label">全球覆盖</div><div class="ib-value">50+国家和地区</div></div>
+        <div class="ib-row"><div class="ib-label">累计项目</div><div class="ib-value">600+行业应用项目</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">赛道</div><div class="ib-value"><span class="tag">四足机器人</span><span class="tag-info">人形机器人</span></div></div>
+        <div class="ib-row"><div class="ib-label">形态</div><div class="ib-value">四足/轮足/人形多形态</div></div>
+        <div class="ib-row"><div class="ib-label">IPO进展</div><div class="ib-value"><span class="tag-info">辅导完成（2026年5月）</span></div></div>
+        <div class="ib-section">官网</div>
+        <div class="ib-row"><div class="ib-label">官方网址</div><div class="ib-value"><a href="https://www.deeprobotics.cn/" target="_blank">deeprobotics.cn</a></div></div>
+      </aside>
+
+      <p class="article-intro"><strong>云深处科技</strong>（英文品牌：DEEP Robotics），全称杭州云深处科技股份有限公司，成立于2017年11月，总部位于浙江杭州，是"杭州六小龙"之一（其余五家为宇树科技、深度求索DeepSeek、强脑科技、游戏科学和群核科技）。公司由浙江大学副教授朱秋国与李超博士联合创办，专注于四足机器人、轮足机器人、人形机器人及核心零部件的研发与行业应用，以"绝影"系列四足机器狗起家，在全球四足机器人市场销量份额位居第二（18.9%），B端行业出货量自称为全球第一。2025年全年营收实现200%-300%高速增长并首次盈利，累计完成11轮融资，Pre-IPO轮获国家人工智能产业投资基金与京东加持，估值突破100亿元。2026年5月IPO辅导完成，由中信建投保荐，正冲刺科创板上市。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper">
+        <table class="wikitable infotable">
+          <tr><th>项目</th><th>内容</th></tr>
+          <tr><td>公司全称</td><td>杭州云深处科技股份有限公司</td></tr>
+          <tr><td>英文品牌</td><td>DEEP Robotics</td></tr>
+          <tr><td>曾用名</td><td>杭州云深处科技有限公司（2025年11月股改前）</td></tr>
+          <tr><td>成立时间</td><td>2017年11月29日</td></tr>
+          <tr><td>注册地</td><td>浙江省杭州市西湖区</td></tr>
+          <tr><td>法定代表人</td><td>朱秋国</td></tr>
+          <tr><td>上市状态</td><td>未上市，科创板IPO辅导已完成（2026年5月），保荐机构为中信建投</td></tr>
+          <tr><td>官网</td><td><a href="https://www.deeprobotics.cn/" target="_blank">https://www.deeprobotics.cn/</a></td></tr>
+          <tr><td>主营业务</td><td>四足机器人、轮足机器人、人形机器人及核心零部件的研发、制造与行业解决方案</td></tr>
+        </table>
+      </div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>时间</th><th>事件</th></tr>
+          <tr><td>2017年11月</td><td>杭州云深处科技有限公司成立，朱秋国与李超联合创办</td></tr>
+          <tr><td>2018-2021年</td><td>完成天使轮至A+轮融资，发布绝影系列四足机器人早期产品</td></tr>
+          <tr><td>2022年</td><td>绝影X20实现国家电网、南方电网变电站常态化巡检应用；发布全球首个四足机器人应急消防整体解决方案；B轮融资</td></tr>
+          <tr><td>2023年</td><td>入选国家级专精特新"小巨人"企业；在新加坡国家电网（SPPG）实现国产四足机器人首次海外行业级应用</td></tr>
+          <tr><td>2024年</td><td>发布首款人形机器人DR01；B+轮融资（高瓴创投、中金资本），估值约50亿元；Q4获国新基金等近10亿元战略融资</td></tr>
+          <tr><td>2025年4月</td><td>发布全球首款行业应用轮足机器人山猫M20</td></tr>
+          <tr><td>2025年7月</td><td>完成Pre-C轮近5亿元融资（达晨财智、国新基金）；康迪科技战略合作，切入北美安防巡检与高尔夫智能装备</td></tr>
+          <tr><td>2025年9月</td><td>发布视觉语言具身导航系统DeepVLA 1.0</td></tr>
+          <tr><td>2025年10月</td><td>发布全球首款行业级全天候人形机器人DR02；完成股份制改造</td></tr>
+          <tr><td>2025年12月</td><td>C轮超5亿元（招银国际、华夏基金，中国电信、中国联通旗下基金首投）；Pre-IPO轮数亿元（国家人工智能产业投资基金+京东）；提交IPO辅导备案</td></tr>
+          <tr><td>2026年3月</td><td>联合京东亮相AWE 2026，机器马"云驹"独家首发；联合华电电科院发布火力发电全场景巡检方案</td></tr>
+          <tr><td>2026年4月</td><td>亮相德国汉诺威工博会，展示欧洲本地化方案；发布山猫M20S全新一代轮足机器人</td></tr>
+          <tr><td>2026年5月</td><td>IPO辅导完成，提交辅导工作完成报告，拟冲刺科创板</td></tr>
+        </table>
+      </div>
+
+      <h3 id="founders">1.2 创始人及核心团队</h3>
+      <p>云深处的创始团队根植于浙江大学的学术土壤，属于典型的"教授创业"模式。</p>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+          <tr><td>创始人/CEO</td><td>朱秋国</td><td>1982年生于浙江海宁，浙江大学机械电子工程本科、控制科学与工程研究生，现任浙大控制科学与工程学院副教授、博士生导师。长期从事仿人机器人、仿生机器人、机器智能研究，承担国家重点研发计划、国家自然科学基金等项目10余项，发表学术论文50余篇，授权发明专利50余项。直接持股16.39%，通过员工持股平台控制10.74%，合计控制32.60%。入选"2025浙商独角兽之星"，杭州市西湖区人大代表</td></tr>
+          <tr><td>联合创始人/CTO</td><td>李超</td><td>天津工业大学本科，浙江大学博士。拥有15年以上机器人技术与产品研发经验，主要研究方向为人形机器人规划与控制。直接持股5.46%，与朱秋国签有一致行动协议</td></tr>
+        </table>
+      </div>
+      <p>公司核心团队以浙大系为主，整体呈现"学术派主导+产业经验积累"的人才结构。依托浙江大学控制学院的技术积淀，在仿生运动控制、多传感器融合感知等方向拥有学术前沿优势。截至2025年末，公司拥有多项核心技术专利，累计专利申请150+项、授权100+项，参与8项国家标准制定。</p>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <h4>融资历史</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>轮次</th><th>时间</th><th>金额</th><th>核心投资方</th></tr>
+          <tr><td>天使轮</td><td>2018年7月</td><td>—</td><td>银杏谷资本、道生资本</td></tr>
+          <tr><td>A轮/A+轮</td><td>2019-2021年</td><td>—</td><td>英诺天使基金、元禾原点、赛智伯乐等</td></tr>
+          <tr><td>B轮</td><td>2022年10月</td><td>—</td><td>方广资本领投，西湖科创投、联想创投、红杉中国种子基金跟投</td></tr>
+          <tr><td>B+轮</td><td>2024年</td><td>—</td><td>高瓴创投、中金资本；估值约50亿元</td></tr>
+          <tr><td>战略融资</td><td>2024年Q4</td><td>近10亿元</td><td>国新基金、北京机器人产业发展投资基金、中国移动旗下基金</td></tr>
+          <tr><td>Pre-C轮</td><td>2025年7月</td><td>近5亿元</td><td>达晨财智、国新基金联合领投，前海母基金等</td></tr>
+          <tr><td>C轮</td><td>2025年12月9日</td><td>超5亿元</td><td>招银国际、华夏基金领投，中国电信、中国联通旗下基金首次战略入股</td></tr>
+          <tr><td>Pre-IPO轮</td><td>2025年12月25日</td><td>数亿元</td><td>国家人工智能产业投资基金（大基金三期背景）领投，京东跟投</td></tr>
+        </table>
+      </div>
+      <p>云深处累计完成11轮融资，2025年全年融资超10亿元。股东约45位，呈现"国家队基金+产业资本+运营商资本+VC/PE"多线并进格局。国家人工智能产业投资基金的领投标志着云深处被纳入国家AI战略布局。京东、中国电信、中国联通等产业资本的进入，为后续场景协同和渠道拓展提供了基础设施支撑。</p>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>维度</th><th>详情</th></tr>
+          <tr><td>总体技术战略</td><td>"感知-决策-执行"全链路闭环。以四足/轮足运动控制为底座，逐步向上构建VLA具身智能能力，同时向人形机器人形态延伸</td></tr>
+          <tr><td>AI技术架构</td><td>DeepVLA 1.0（2025年9月发布）——视觉语言具身导航系统。融合开放词汇语义点云与大语言模型，支持自然语言路径规划，实现"门牌到门牌"跨楼层精准导航</td></tr>
+          <tr><td>运动控制</td><td>MELA多专家学习体系结构，研究成果荣登Science Robotics封面。AI感控融合，毫秒级响应，可完成45°斜坡攀爬、25cm障碍跨越</td></tr>
+          <tr><td>环境感知</td><td>多传感器融合（激光雷达、红外热像仪等），宁夏戈壁滩风电场巡检识别准确率达96.5%</td></tr>
+          <tr><td>自主导航</td><td>自研"智巡系统"，VLA大模型与运动控制深度耦合，断网也能自主巡检返航，识别准确率稳定在95%以上</td></tr>
+          <tr><td>自研程度</td><td>核心零部件自研J60高性能关节，扭矩密度达国际顶尖水平。软件系统（智巡/DeepVLA/MELA）全面自研</td></tr>
+          <tr><td>学术成果</td><td>研究成果荣登Science Robotics封面；参与8项国家标准制定；专利申请150+项，授权100+项</td></tr>
+          <tr><td>差异化特色</td><td>"行业级全天候"定位——IP66/IP67防护、-20℃至55℃宽温运行，是唯一在电力、消防、安防等高危/恶劣环境下长期稳定运行的人形/四足机器人方案</td></tr>
+        </table>
+      </div>
+      <p>云深处的技术路线以工业级可靠性为核心卖点。与消费级/科研级产品不同，绝影和DR系列的设计要求是在戈壁、变电站、火灾现场等极端环境下持续运行。DeepVLA 1.0标志着公司从纯运动控制向"感知+认知+行动"一体化升级。人形机器人DR02的发布则标志着从四足向双足的技术迁移。</p>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>产品系列</th><th>代表产品</th><th>定位</th><th>参数/特点</th><th>定价</th></tr>
+          <tr><td>绝影系列（四足）</td><td>X30</td><td>工业级防水四足机器人</td><td>IP67防护，专为电力巡检、应急救援户外作业设计</td><td>裸机十余万元，方案百万级</td></tr>
+          <tr><td>绝影系列</td><td>X20</td><td>首款工业级防水四足</td><td>已在国家电网、南方电网多个变电站常态化应用</td><td>同上</td></tr>
+          <tr><td>绝影系列</td><td>Lite3</td><td>轻量级科研/教育</td><td>面向高校与科研机构，降低入门门槛</td><td>低于X系列</td></tr>
+          <tr><td>山猫系列（轮足）</td><td>M20 / M20S</td><td>全球首款行业级轮足机器人</td><td>自重33kg，IP66防护，-20℃至55℃，可攀爬80cm高台；M20S为2026年全新升级</td><td>未公开</td></tr>
+          <tr><td>DR系列（人形）</td><td>DR01</td><td>首款人形机器人</td><td>2024年面世，面向研究验证</td><td>未公开</td></tr>
+          <tr><td>DR系列（人形）</td><td>DR02</td><td>全球首款行业级全天候人形</td><td>IP66防护，-20℃至55℃，行走速度1.5m/s（极限4m/s），可跨越25cm楼梯</td><td>未公开</td></tr>
+          <tr><td>云驹（机器马）</td><td>云驹</td><td>消费级/娱乐型机器马</td><td>京东独家首发预售，面向消费市场试水</td><td>未公开</td></tr>
+        </table>
+      </div>
+      <p>产品矩阵覆盖四足（绝影）、轮足（山猫）、人形（DR）和机器马（云驹）四条线，从科研教育到工业巡检再到全天候高危场景，形成梯度化布局。核心差异化在于"工业级可靠"——IP66/IP67防护和宽温运行是多数竞品不具备的能力。</p>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>场景大类</th><th>具体场景</th><th>典型产品</th><th>合作方/客户</th></tr>
+          <tr><td>电力巡检</td><td>变电站、风电场、火电厂常态化巡检</td><td>绝影X20/X30</td><td>国家电网、南方电网、华电电科院（200+项目）</td></tr>
+          <tr><td>应急消防</td><td>火灾现场侦察、危化品区域探测</td><td>绝影X30</td><td>多地消防部门（2022年全球首个四足消防方案）</td></tr>
+          <tr><td>安防巡逻</td><td>园区安防、会展安保、公安巡防</td><td>绝影X30、山猫M20</td><td>新加坡策安集团Certis、南昌公安、全运会安保</td></tr>
+          <tr><td>工业运维</td><td>钢铁厂高温区域、隧道管廊巡检</td><td>绝影X30、DR02</td><td>宝钢、宁波钢铁、中国移动</td></tr>
+          <tr><td>海外应用</td><td>欧洲工业园巡检、北美安防、中东能源</td><td>绝影X30、山猫M20</td><td>新加坡SPPG、瑞士/德国客户、康迪科技（北美）</td></tr>
+          <tr><td>科研教育</td><td>高校机器人研究、教学实验</td><td>绝影Lite3</td><td>浙江大学、UC Berkeley等10余所高校</td></tr>
+          <tr><td>文娱消费</td><td>舞台表演、消费体验</td><td>机器马云驹</td><td>京东首发、央视/北京卫视春晚</td></tr>
+        </table>
+      </div>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <p>云深处在四足机器人B端市场的商业化处于国内领先水平：</p>
+      <ul>
+        <li><strong>累计项目：</strong>已完成超600个行业应用项目（公司2025年底披露口径，2026年更新为1200+），覆盖全国34个省级行政区及全球50+国家和地区</li>
+        <li><strong>电力巡检：</strong>核心收入来源，已完成200+变电站项目。中国变电站总量超1万个，渗透率仅约2%，市场远未饱和</li>
+        <li><strong>海外收入占比：</strong>约20%（2025年），以欧洲和东南亚为重点拓展方向</li>
+        <li><strong>新加坡SPPG：</strong>国产四足机器人首次实现海外行业级应用</li>
+        <li><strong>汉诺威工博会2026：</strong>展示欧洲本地化巡检与安防方案，比利时副首相专程参访</li>
+        <li><strong>RaaS模式：</strong>联合华电电科院推出"机器人即服务"（RaaS），降低客户初始采购门槛</li>
+        <li><strong>京东平台：</strong>机器马"云驹"京东独家首发，消费级试水</li>
+        <li><strong>康迪科技：</strong>战略合作切入北美安防巡检及高尔夫智能装备市场</li>
+      </ul>
+
+      <h3 id="financial">1.8 财务数据</h3>
+      <p>云深处作为未上市公司，未公开披露经审计的完整财务报表。以下数据来源于公司公开表态及市场分析：</p>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>指标</th><th>2023年</th><th>2024年</th><th>2025年</th></tr>
+          <tr><td>营收规模</td><td>未公开</td><td>同比翻倍以上增长（市场估算约2-3亿元）</td><td>200%-300%增长（市场估算约5-6亿元）</td></tr>
+          <tr><td>营收增速</td><td>未公开</td><td>翻倍</td><td>200%-300%</td></tr>
+          <tr><td>盈利状态</td><td>未公开</td><td>未公开</td><td>实现盈利（公司确认）</td></tr>
+          <tr><td>海外收入占比</td><td>—</td><td>—</td><td>约20%</td></tr>
+          <tr><td>四足全球市占</td><td>—</td><td>18.9%（IDC，第二）</td><td>未更新</td></tr>
+          <tr><td>四足B端出货</td><td>—</td><td>—</td><td>行业端全球第一（公司宣称）</td></tr>
+        </table>
+      </div>
+      <p>注：以上营收数据为市场估算值，公司未披露精确营收数字。2025年实现的盈利为首次转正，但盈利规模与利润率均未公开。与主要竞品宇树科技（2024年营收超10亿元）相比，云深处营收规模仍较小，但增速更高。</p>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li><strong>"杭州六小龙"：</strong>云深处与宇树科技、深度求索（DeepSeek）、强脑科技、游戏科学、群核科技并称杭州六小龙。群核科技已于2026年4月在港股上市成为第一家，宇树科技科创板IPO已受理，云深处辅导已验收</li>
+        <li><strong>科创板冲刺：</strong>与宇树科技争夺"A股人形机器人第一股"。若审核顺利，有望2026年内挂牌</li>
+        <li><strong>核心客户结构：</strong>前五大客户收入占比超60%（公司辅导文件披露），客户集中度偏高，主要集中于电力与安防行业</li>
+        <li><strong>比利时副首相参访：</strong>2026年4月29日比利时副首相普雷沃专程参访云深处，强调深化合作意愿，被视为欧洲市场拓展的重要政治信号</li>
+        <li><strong>产能布局：</strong>在湖州和杭州拥有两大生产基地</li>
+        <li><strong>中国电信/联通入局：</strong>C轮中两家运营商首次战略入股，运营商渠道有望成为云深处拓展政企巡检市场的重要助力</li>
+        <li><span class="tag-warn">风险提示</span> 场景集中度过高（B端电力/安防/消防），消费级几乎空白；海外收入仅20%，全球化仍处早期；人形机器人DR系列商业化尚未验证；与宇树科技在科创板形成直接竞争；四足机器人行业仍在"创新场景体验阶段"，大规模批量化产仍待验证</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="a1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>朱秋国作为浙大控制学院副教授，其学术方向（仿人机器人、仿生机器人、运动控制）与云深处选择的四足/人形机器人赛道高度吻合。浙大控制学院在机器人运动规划领域有深厚的学术积累，这直接支撑了绝影系列在复杂地形（45度斜坡、25cm障碍）上的运动能力。但"教授创业"也带来天然的短板：浙大系的学术基因使团队在基础研发上具有优势，但大规模商业化运营、全球渠道建设、供应链管理等方面经验相对薄弱。公司选择以电力巡检为核心场景，恰恰是学术基因适配的结果——巡检场景对技术可靠性的要求远高于对营销/渠道的要求，适合学者型团队稳扎稳打。但IPO之后面对资本市场对增长和利润的双重压力，需要补充商业化背景的高管。</p>
+      </div>
+
+      <div class="analysis-block" id="a2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>云深处的"工业级全天候"技术路线（IP66/IP67防护、-20~55℃宽温）与电力巡检、应急消防、工业运维三大核心场景高度适配——这些场景的刚需恰恰是竞品普遍缺乏的恶劣环境适应能力。但反过来，高性能防护也带来了高成本：裸机十余万元、整套方案百万级的定价，限制了其向消费级和轻工业场景渗透的可能性。DeepVLA 1.0的发布标志着云深处意识到纯硬件路线的天花板——巡检场景中"知道去哪儿、看得懂设备、读得懂仪表"的语义理解能力比"跑得快"更具商业价值。VLA技术的注入是否能与现有的工业级硬件形成"1+1>2"的合力，而非两套平行系统，是技术路线成败的关键。</p>
+      </div>
+
+      <div class="analysis-block" id="a3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>云深处的股东结构呈现独特的"国家队+运营商+互联网"三方格局。国家人工智能产业投资基金的Pre-IPO领投将云深处纳入国家AI战略视野，可能在未来的政府订单、标准制定、产业政策上获得优先权，但也可能约束公司的出海节奏（尤其是涉及敏感基础设施的巡检数据）。中国电信和中国联通两大运营商入股后，基站巡检、数据中心巡检、智慧城市安防等运营商资产场景将成为天然的增长通道。京东的进入则为消费级试水（机器马云驹首发）提供了渠道基础设施——但京东的投资比例和话语权有限，消费级路线能否获得足够资源仍存疑。总体看，云深处的股东结构为其B端巡检基本盘提供了强大的战略支撑，但对消费端的拉动有限。</p>
+      </div>
+
+      <div class="analysis-block" id="a4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>云深处的战略演进逻辑清晰但偏保守。2017-2022年的前五年几乎全部聚焦于四足机器狗在电力巡检场景的产品打磨（绝影X20/X30迭代），这在当时国内人形机器人尚未起步的背景下是务实选择。2024年才开始向人形机器人延伸（DR01/DR02）和向轮足形态拓展（山猫M20），进入节奏晚于宇树科技（宇树2023年已发布H1人形）。这种"慢半拍"策略的好处是避免了人形机器人早期的技术试错成本，坏处是在资本市场叙事中给人"跟随者"的印象。2025年下半年融资加速（3轮超10亿）、IPO辅导启动、人形产品密集发布，有明显的"临IPO冲叙事"特征。机器马"云驹"的推出是一次有趣的消费级试水，但更像品牌营销行为而非严肃的商业化转向。</p>
+      </div>
+
+      <div class="analysis-block" id="a5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>云深处与宇树科技的竞争是四足/人形赛道最具看点的一对。云深处的核心取舍是：走"专业化iPod路线"（聚焦B端工业高价场景，做深做透巡检），而非宇树的"iPod+iPod nano+iPod shuffle全场景覆盖"（从万元消费级到工业级通吃）。这种取舍的优势是毛利率更高（百万级方案vs万元级裸机）、客户粘性更强（系统集成+运维绑定）、技术壁垒更明确（IP67防护和宽温控制）。劣势也显而易见：市场规模天花板较低（中国变电站总量1万个，即使全部渗透也仅几百亿营收空间）、增长叙事不够性感、消费级品牌认知度远低于宇树。DR02人形机器人如果能在B端巡检场景实现规模化替代（替代人类巡检员在高危环境作业），则两者差异化将更加清晰；如果人形最终只能降维到消费级/科研级，则与宇树的正面冲突不可避免。</p>
+      </div>
+
+      <div class="analysis-block" id="a6">
+        <h4>2.6 其他重要观察、分析</h4>
+        <p>第一，云深处最大的资本故事是"四足B端全球第一"的市场地位——尽管这一宣称（"行业端出货量全球第一"）与IDC的第三方数据（整体销量18.9%，第二）存在口径差异，但IPO招股书中需要更清晰的界定。第二，IPO时间窗口极为关键：宇树科技科创板申请已于2026年3月获受理，云深处辅导5月才完成，如果宇树先挂牌，云深处的定价将受锚定效应影响。第三，"杭州六小龙"的集体品牌对云深处是双刃剑——群核科技港股破发在先，宇树融资规模更大，DeepSeek估值更高，云深处需要在叙事中确立独立于"六小龙"标签的投资价值。第四，2025年首次盈利是重要里程碑，但盈利规模未公开，需关注上市后能否维持盈利状态。第五，中国电信和中国联通的新股东关系可能催生一个被低估的增量市场——运营商在全国拥有数百万个基站和机房，巡检需求远大于变电站，如果云深处能将四足/轮足巡检方案标准化嵌入运营商运维体系，其TAM（可触达市场）将大幅扩展。</p>
+      </div>
+
+      <h2 id="refs">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://www.deeprobotics.cn/" target="_blank">云深处科技官方网站（DEEP Robotics）</a></li>
+          <li><a href="https://finance.sina.com.cn/jjxw/2026-05-02/doc-inhwnssi5733695.shtml" target="_blank">新浪财经：云深处IPO辅导完成，四足机器人行业端出货量保持全球第一</a></li>
+          <li><a href="https://finance.eastmoney.com/a/202605023727548859.html" target="_blank">东方财富：云深处IPO辅导完成</a></li>
+          <li><a href="https://www.nbd.com.cn/articles/2026-05-02/4377886.html" target="_blank">每日经济新闻：云深处IPO辅导完成</a></li>
+          <li><a href="https://finance.sina.com.cn/jjxw/2026-05-01/doc-inhwkyic0509203.shtml" target="_blank">新浪财经：云深处完成上市辅导，"杭州六小龙"或再迎IPO</a></li>
+          <li><a href="https://www.36kr.com/p/3626237762700295" target="_blank">36氪：杭州六小龙又要IPO了</a></li>
+          <li><a href="https://m.jiemian.com/article/13847771.html" target="_blank">界面新闻："仅次于"宇树科技的云深处也要IPO了</a></li>
+          <li><a href="https://finance.eastmoney.com/a/202512313607148919.html" target="_blank">东方财富：具身智能"中场战事"启幕，云深处科技吹响IPO冲锋号</a></li>
+          <li><a href="https://m.163.com/dy/article/KIMK324P05568W0A.html" target="_blank">网易：云深处年内融资超10亿急闯IPO</a></li>
+          <li><a href="https://www.stcn.com/article/detail/3359450.html" target="_blank">证券时报：云深处正式发布视觉语言具身导航系统DeepVLA 1.0</a></li>
+          <li><a href="https://ai.zol.com.cn/1173/11738875.html" target="_blank">中关村在线：云深处科技完成IPO辅导</a></li>
+          <li><a href="https://m.thepaper.cn/newsDetail_forward_32318107" target="_blank">澎湃新闻：宇树对手，云深处要去IPO了</a></li>
+          <li><a href="https://api3.cls.cn/share/article/2238530" target="_blank">财联社："杭州六小龙"云深处启动IPO</a></li>
+          <li><a href="https://m.cnfin.com/gs-lb//zixun/20251225/4356395_1.html" target="_blank">中国金融新闻网：云深处科技完成Pre-IPO轮融资</a></li>
+          <li><a href="https://www.bianews.com/news/details?id=228281" target="_blank">鞭牛士："杭州六小龙"又上岸一条！云深处启动上市辅导</a></li>
+          <li><a href="https://www.forbeschina.com/articles/70849" target="_blank">福布斯中国：刚完成超5亿C轮融资，云深处火线启动上市辅导</a></li>
+          <li><a href="https://www.cinn.cn/hz/2026/04-22/XkJqBeXD.html" target="_blank">中国工业新闻网：德国汉诺威工博会2026——云深处科技展示中国具身智能硬实力</a></li>
+          <li><a href="https://ctdsb.net/c1666_202605/2730593.html" target="_blank">楚天都市报：比利时副首相参访云深处科技</a></li>
+          <li><a href="https://www.awe.com.cn/contents/30/19742.html" target="_blank">AWE官网：云深处科技亮相AWE 2026东方枢纽展区</a></li>
+          <li><a href="https://hznews.hangzhou.com.cn/chengshi/content/2025-10/28/content_9111441.htm" target="_blank">杭州网：第七届中美友城大会——云深处分享创新经验</a></li>
+          <li><a href="https://www.chinastarmarket.cn/detail/2097928" target="_blank">科创板日报：康迪科技与云深处达成战略合作</a></li>
+          <li><a href="https://www.bjnews.com.cn/detail/1777112267129055.html" target="_blank">新京报：云深处技术好吗？五大维度鉴证技术硬实力</a></li>
+          <li><a href="https://m.ithome.com/html/939830.htm" target="_blank">IT之家：2026年具身智能机器人公司哪家好？云深处科技全方位解析</a></li>
+          <li><a href="https://szaicx.com/page142?article_id=20304" target="_blank">深圳人工智能创新中心：深圳具身智能商业化提速</a></li>
+          <li><a href="https://www.sensorexpert.com.cn/article/445437.html" target="_blank">传感器专家网：云深处科技加速具身智能技术研发与行业应用布局</a></li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">本页面由具身智能Wiki项目自动生成 · 数据截止2026年5月 · 仅供信息参考，不构成投资建议</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

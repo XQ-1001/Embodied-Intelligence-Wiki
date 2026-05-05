@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>思灵机器人 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> <span class="breadcrumb-sep">›</span> <span>思灵机器人</span></div>
+  <div class="wiki-header"><h1>思灵机器人</h1><div class="subtitle">Agile Robots · 未上市 · 成立于2018年 · 全球智能机器人独角兽 · 连续7年营收翻倍 · DLR太空机器人传承</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#team">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financials">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#a-team">2.1 团队背景与场景匹配度</a></li>
+        <li class="toc-lvl4"><a href="#a-tech">2.2 技术路线与场景适配性</a></li>
+        <li class="toc-lvl4"><a href="#a-capital">2.3 股东/资本结构对战略影响</a></li>
+        <li class="toc-lvl4"><a href="#a-pivot">2.4 试错过程与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#a-position">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#a-other">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#references">3 参考来源</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">思灵机器人</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">北京思灵机器人科技有限责任公司</div></div>
+        <div class="ib-row"><div class="ib-label">英文名</div><div class="ib-value">Agile Robots SE</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2018年</div></div>
+        <div class="ib-row"><div class="ib-label">创始人/CEO</div><div class="ib-value">陈兆芃博士</div></div>
+        <div class="ib-row"><div class="ib-label">总部</div><div class="ib-value">德国慕尼黑（国际总部）+ 中国北京（中国总部）</div></div>
+        <div class="ib-row"><div class="ib-label">员工规模</div><div class="ib-value">约3,200人（2026年）</div></div>
+        <div class="ib-section">财务数据</div>
+        <div class="ib-row"><div class="ib-label">累计融资</div><div class="ib-value">超3.5亿美元</div></div>
+        <div class="ib-row"><div class="ib-label">最新轮次</div><div class="ib-value">C轮2.2亿美元（2021.09），软银愿景基金领投</div></div>
+        <div class="ib-row"><div class="ib-label">2024年营收</div><div class="ib-value">约2亿欧元</div></div>
+        <div class="ib-row"><div class="ib-label">营收增速</div><div class="ib-value">连续7年营收翻倍</div></div>
+        <div class="ib-section">估值</div>
+        <div class="ib-row"><div class="ib-label">估值区间</div><div class="ib-value">独角兽级别（超10亿美元）</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">累计交付</div><div class="ib-value">超20,000套（部分来源称超30,000台）</div></div>
+        <div class="ib-row"><div class="ib-label">覆盖行业</div><div class="ib-value">汽车、3C电子、医疗、物流、能源、加工</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">赛道</div><div class="ib-value"><span class="tag">力控机器人</span><span class="tag">人形机器人</span><span class="tag">物理AI</span><span class="tag">灵巧手</span></div></div>
+        <div class="ib-row"><div class="ib-label">官网</div><div class="ib-value"><a href="https://www.agile-robots.cn" target="_blank" rel="noopener">agile-robots.cn</a> / <a href="https://www.agile-robots.com" target="_blank" rel="noopener">agile-robots.com</a></div></div>
+      </aside>
+
+      <p class="article-intro"><strong>思灵机器人</strong>（Agile Robots）是一家全球化的智能机器人独角兽企业，由前德国宇航中心（DLR）实验室副主任陈兆芃博士于2018年创立，在德国慕尼黑和中国北京设立双总部。公司以"物理人工智能（Physical AI）"为核心理念，构建了覆盖力控机械臂、灵巧手、人形机器人、AMR及全栈软件的完整产品矩阵。2021年完成软银愿景基金领投的2.2亿美元C轮融资后估值突破10亿美元。截至2025年底累计交付超20,000套机器人解决方案，2024年营收约2亿欧元，连续7年保持营收翻倍增长。2025年发布全尺寸工业人形机器人Agile ONE，2026年完成对蒂森克虏伯自动化工程公司的收购并更名为Krause Automation，并与Google DeepMind达成战略合作。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper"><table class="wikitable infotable">
+        <tr><th style="width:120px">项目</th><th>内容</th></tr>
+        <tr><td>公司全称</td><td>北京思灵机器人科技有限责任公司</td></tr>
+        <tr><td>英文名称</td><td>Agile Robots SE</td></tr>
+        <tr><td>成立时间</td><td>2018年</td></tr>
+        <tr><td>注册地</td><td>中国北京</td></tr>
+        <tr><td>国际总部</td><td>德国慕尼黑</td></tr>
+        <tr><td>中国总部</td><td>中国北京</td></tr>
+        <tr><td>分支机构</td><td>欧美十大业务站点（含收购Krause Automation后新增站点）、重庆西南总部</td></tr>
+        <tr><td>上市状态</td><td>未上市（曾计划2024年IPO，尚未实现）</td></tr>
+        <tr><td>官方网站</td><td>agile-robots.cn / agile-robots.com</td></tr>
+        <tr><td>员工规模</td><td>约3,200人（2026年），来自约60个国家</td></tr>
+        <tr><td>旗下品牌</td><td>Krause Automation、Franka Robotics、idealworks、BÄR Automation、audEERING</td></tr>
+      </table></div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th style="width:80px">时间</th><th>事件</th></tr>
+        <tr><td>2018年</td><td>陈兆芃率9位德国宇航中心（DLR）同事辞职创业，在慕尼黑和北京成立思灵机器人</td></tr>
+        <tr><td>2019–2020年</td><td>完成天使轮至A轮融资，高瓴资本、红杉中国、线性资本等入局；营收从约50万欧元增长至约300万欧元</td></tr>
+        <tr><td>2021年</td><td>完成B轮1.3亿美元融资；9月完成C轮2.2亿美元融资（软银愿景基金领投），估值突破10亿美元</td></tr>
+        <tr><td>2022年</td><td>获工业富联（富士康）3,000万美元独家战略投资</td></tr>
+        <tr><td>2023年</td><td>以2,850万欧元收购德国协作机器人公司Franka Emika；战略控股宝马旗下物流智能化子公司idealworks；收购BÄR Automation</td></tr>
+        <tr><td>2024年</td><td>营收约2亿欧元；西南总部基地落户重庆两江新区（投资1亿元），与比亚迪、睿博光电等展开合作</td></tr>
+        <tr><td>2025年11月</td><td>发布全尺寸工业级人形机器人Agile ONE；签约收购蒂森克虏伯自动化工程公司（近80年历史）</td></tr>
+        <tr><td>2026年2月</td><td>与如身机器人达成战略合作，共拓全球康养机器人市场</td></tr>
+        <tr><td>2026年3月</td><td>与Google DeepMind达成重磅战略合作，整合Gemini Robotics模型</td></tr>
+        <tr><td>2026年4月</td><td>正式完成蒂森克虏伯自动化工程公司收购交割，品牌更名为Krause Automation</td></tr>
+      </table></div>
+
+      <h3 id="team">1.2 创始人及核心团队</h3>
+      <p>思灵机器人核心团队源于德国宇航中心（DLR）机器人与机电一体化研究所，创始团队共10人（陈兆芃+9位前DLR同事），团队呈现典型的"学术-产业融合型"特征——DLR的太空级工程技术底蕴与工业场景量产能力的深度结合。公司全球员工约3,200人，来自约60个国家。</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th style="width:80px">角色</th><th style="width:80px">姓名</th><th>背景/履历</th></tr>
+        <tr><td>创始人 & CEO</td><td>陈兆芃</td><td>哈尔滨工业大学本科/硕士（师从刘宏院士，中国空间机器人领域泰斗，主持天宫二号空间灵巧机械手项目），哈工大-德国宇航中心联合培养博士（师从Gerd Hirzinger院士，DLR力控轻型机械臂LWR项目领导者）。在DLR学习工作超10年，曾任DLR/RMC实验室副主任——至今为华人在德国宇航中心担任的最高职位。参与国际空间站灵巧手、天宫二号机械手等太空机器人项目。发表论文30余篇（SCI 7篇、EI 20篇），专利40余项。2020年入选《财富》中国40位40岁以下商界精英。</td></tr>
+        <tr><td>联合创始人</td><td>Peter Meusel</td><td>德国宇航中心前同事，力矩传感器核心发明者。思灵机器人力控技术的源头人物。</td></tr>
+        <tr><td>联合创始人</td><td>李杨</td><td>DLR出身，负责公司运营与战略板块。</td></tr>
+        <tr><td>联合创始人（其余7人）</td><td>—</td><td>均为前DLR机器人与机电一体化研究所资深工程师/研究员，在力控、机电一体化、空间机器人等领域拥有深厚积累。</td></tr>
+      </table></div>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <p>思灵机器人在成立后3年内完成密集多轮融资，C轮2.2亿美元为软银当时在中国智能机器人领域最大单笔投资。股东阵容覆盖全球顶级财务与产业资本。</p>
+      <h4>融资历史</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th style="width:70px">时间</th><th style="width:70px">轮次</th><th>金额</th><th>主要投资方</th></tr>
+        <tr><td>2018–2019年</td><td>天使轮/A轮</td><td>未披露</td><td>线性资本、高瓴资本、红杉中国、C资本</td></tr>
+        <tr><td>2020–2021年</td><td>B轮</td><td>1.3亿美元</td><td>交银国际控股、新希望集团、招银国际等</td></tr>
+        <tr><td>2021年9月</td><td>C轮</td><td>2.2亿美元</td><td>软银愿景基金2期（领投），阿布扎比皇室集团Chimera、高瓴创投、红杉中国、线性资本、小米集团、工业富联（富士康）、满得投资等跟投</td></tr>
+        <tr><td>2022年</td><td>战略融资</td><td>3,000万美元</td><td>工业富联（富士康）独家战略投资</td></tr>
+        <tr><td>后续</td><td>C+等</td><td>未公开</td><td>淡马锡控股（Temasek）、Lunate等后续入局</td></tr>
+      </table></div>
+      <h4>股东结构特征</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th style="width:100px">股东类型</th><th>代表机构</th><th>战略意义</th></tr>
+        <tr><td>全球科技基金</td><td>软银愿景基金</td><td>顶级品牌背书，全球资源对接（尤其日本、中东市场）</td></tr>
+        <tr><td>头部VC</td><td>红杉中国、高瓴创投、线性资本</td><td>创业生态资源，人才和业务对接</td></tr>
+        <tr><td>主权/皇室资本</td><td>Chimera（阿布扎比）、淡马锡、Lunate</td><td>中东/东南亚市场通道，长期资本属性</td></tr>
+        <tr><td>产业资本（3C电子）</td><td>工业富联（富士康）、小米集团</td><td>深度绑定3C电子制造场景，提供真实工业落地场景</td></tr>
+        <tr><td>产业资本（其他）</td><td>新希望集团、天智航、新世界（周大福）</td><td>农牧食品、医疗、珠宝加工等场景协同</td></tr>
+      </table></div>
+      <div class="callout"><div class="callout-title">上市相关</div>创始人陈兆芃曾表示目标在2024年左右进行IPO，具体取决于估值和营收来源地。截至2026年5月尚未上市。2026年收购Krause Automation后业务复杂度显著增加，可能影响IPO时间线。</div>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <p>思灵机器人的核心技术路线可概括为"DLR力控基因+Physical AI大脑+并购驱动的全栈能力"。公司从DLR继承的力控与灵巧操作技术是核心差异化基础，通过战略并购补全了整厂集成（Krause）、协作机械臂（Franka）、物流AMR（idealworks）等环节，形成了从核心零部件到整线交付的闭环能力。</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th style="width:120px">维度</th><th>详情</th></tr>
+        <tr><td>AI技术路线</td><td>Physical AI（物理人工智能）——三层架构：决策层（"慢思考"，理解复杂指令进行动作决策）、规划层（"快思考"，分步拆解任务为关节运动指令）、精细操作层（高频微调，基于实时传感器数据的微闭环控制）。2026年3月集成Google DeepMind Gemini Robotics基础模型。</td></tr>
+        <tr><td>力控技术</td><td>源自DLR的力控基因——联合创始人Peter Meusel为力矩传感器核心发明者。全系机械臂/灵巧手所有关节搭载扭矩传感器，实现毫秒级碰撞检测。"针触气球""刀尖触皮肤"场景下"一触即停"。</td></tr>
+        <tr><td>灵巧手技术</td><td>20年技术积淀，21自由度五指灵巧手（尺寸略小于成年男性手掌），直驱方案兼顾灵活度与成本。每根手指搭载轨迹控制器模拟人类手指运动轨迹。指尖视触觉传感器同时采集触觉力度+物体形状与形变信息。</td></tr>
+        <tr><td>数据方案</td><td>数据来源于全球30,000+套已部署机器人采集的真实工业场景物理交互数据，结合高保真物理仿真+互联网多模态数据+数字孪生技术。与DeepMind合作构建AI飞轮：真实工业数据反哺模型训练。</td></tr>
+        <tr><td>本体形态路线</td><td>"双轨并行"——力控机械臂（Diana/Thor/Franka）+人形机器人（Agile ONE），力控机械臂作为当前主力量产产品，人形作为物理AI战略的终极载体。</td></tr>
+        <tr><td>全栈软件平台</td><td>Agile Core——AI驱动全栈软件平台/机器人操作系统，实现全系产品（机械臂、人形、AMR）互联协同，兼容第三方设备。客户无需为单一任务单独训练。</td></tr>
+      </table></div>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <p>思灵机器人已形成"机械臂+灵巧手+人形+AMR+软件平台"的五维产品矩阵，并通过收购整合形成多品牌独立运营的产品架构。</p>
+      <h4>核心硬件产品</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th style="width:80px">产品线</th><th style="width:80px">代表型号</th><th>关键参数</th><th>定位</th></tr>
+        <tr><td rowspan="2">力控机械臂</td><td>Diana7</td><td>7自由度，力控精度达0.1 N级；含Diana7 Med医疗版</td><td>通用智能力控机械臂</td></tr>
+        <tr><td>Thor20</td><td>负载20 kg（2025年7月发布）</td><td>工业级重载机械臂</td></tr>
+        <tr><td>协作机器人（Franka）</td><td>Franka FR3</td><td>7自由度力控协作臂，源自Franka Emika（2023年收购）</td><td>教育与轻工业协作机械臂</td></tr>
+        <tr><td>灵巧手</td><td>Agile Hand</td><td>21自由度，五指仿生，指尖视触觉传感器，直驱方案</td><td>精细操作末端执行器</td></tr>
+        <tr><td>人形机器人</td><td>Agile ONE</td><td>全尺寸工业级，搭载灵巧手+三层AI架构+"定向环形眼"响应系统，2025年11月发布</td><td>工业级通用人形操作平台</td></tr>
+        <tr><td>AMR/物流机器人</td><td>idealworks系列</td><td>宝马集团物流场景验证的自主移动机器人</td><td>工厂/仓库物流自动化</td></tr>
+      </table></div>
+      <h4>品牌矩阵（收购整合后的多品牌架构）</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th style="width:120px">品牌</th><th>来源</th><th>核心业务</th></tr>
+        <tr><td>Agile Robots（本体品牌）</td><td>2018年创立</td><td>Agile ONE人形、Diana/Thor力控臂、灵巧手、Agile Core平台</td></tr>
+        <tr><td>Krause Automation</td><td>2026年收购蒂森克虏伯自动化</td><td>汽车/新能源自动化产线、整厂集成；新增欧美10个站点+650名专家</td></tr>
+        <tr><td>Franka Robotics</td><td>2023年收购Franka Emika</td><td>力控协作机器人FR3</td></tr>
+        <tr><td>idealworks</td><td>2023年战略控股宝马旗下子公司</td><td>AMR自主移动机器人、物流智能化</td></tr>
+        <tr><td>BÄR Automation</td><td>2023年收购</td><td>工业自动化解决方案</td></tr>
+        <tr><td>audEERING</td><td>收购</td><td>音频AI技术</td></tr>
+      </table></div>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <p>思灵机器人的应用场景横跨工业制造、医疗健康、物流仓储、能源电力等行业，核心客户包括宝马、小米、比亚迪、富士康、大众等全球头部企业。</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th style="width:80px">场景大类</th><th style="width:120px">细分场景</th><th>典型应用</th><th>代表客户/伙伴</th></tr>
+        <tr><td rowspan="3">汽车制造</td><td>电子域控制器装配</td><td>小米汽车域控制器柔性组装线，UPH提升30%</td><td>小米汽车</td></tr>
+        <tr><td>物流收货</td><td>与宝马联合开发移动式自动收货机器人</td><td>宝马</td></tr>
+        <tr><td>新能源产线</td><td>电动汽车驱动系统、电池组装线（Krause）</td><td>全球头部OEM</td></tr>
+        <tr><td rowspan="2">3C电子</td><td>手机包装</td><td>小米手机全自动无人包装线</td><td>小米</td></tr>
+        <tr><td>精密装配</td><td>消费电子精密零部件力控装配</td><td>富士康</td></tr>
+        <tr><td rowspan="3">医疗健康</td><td>手术辅助</td><td>骨科、神经外科、腔镜手术机器人</td><td>天智航、多家三甲医院</td></tr>
+        <tr><td>超声/康复</td><td>超声遥操作、中医按摩、康复理疗</td><td>—</td></tr>
+        <tr><td>康养机器人</td><td>康复、理疗、养老（与如身机器人合作2026年进入欧洲）</td><td>如身机器人</td></tr>
+        <tr><td>能源电力</td><td>高压配电</td><td>高压配电间无人值守（智慧高压带电操作+智能巡检）</td><td>—</td></tr>
+        <tr><td>物流仓储</td><td>工厂物流</td><td>idealworks AMR部署于宝马等工厂</td><td>宝马</td></tr>
+        <tr><td>珠宝加工</td><td>打磨抛光</td><td>首饰打磨、压光、抛光、立体分拣库</td><td>周大福（新世界集团）</td></tr>
+      </table></div>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th style="width:130px">指标</th><th>数据</th><th>时间/来源</th></tr>
+        <tr><td>产品累计交付量</td><td>超20,000套（部分来源称超30,000台）</td><td>2025年钛媒体等报道</td></tr>
+        <tr><td>营收增长</td><td>连续7年营收翻倍增长（自2018年成立起）</td><td>创始人/公开报道</td></tr>
+        <tr><td>2024年营收</td><td>约2亿欧元</td><td>2025年收购蒂森克虏伯公告中披露</td></tr>
+        <tr><td>2021年营收</td><td>约2,000–2,500万欧元（预期值）</td><td>C轮融资报道</td></tr>
+        <tr><td>全球客户覆盖</td><td>宝马、小米、比亚迪、富士康、大众、康明斯、天智航等</td><td>持续公开报道</td></tr>
+        <tr><td>海外布局</td><td>德国慕尼黑总部+欧美十大业务站点（含Krause Automation）</td><td>2026年收购后</td></tr>
+        <tr><td>战略并购</td><td>4家以上（Franka、idealworks、BÄR Automation、Krause Automation、audEERING）</td><td>2023–2026年</td></tr>
+        <tr><td>重庆西南总部</td><td>落户两江新区，投资1亿元</td><td>2024年</td></tr>
+      </table></div>
+
+      <h3 id="financials">1.8 财务数据</h3>
+      <p>思灵机器人为非上市公司，未披露精确利润数据。以下基于公开信息整理：</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th style="width:100px">年份</th><th>营收（估算）</th><th>备注</th></tr>
+        <tr><td>2019年</td><td>约50万欧元</td><td>创立第二年，早期商业化阶段</td></tr>
+        <tr><td>2020年</td><td>约300万欧元</td><td>约10倍增长</td></tr>
+        <tr><td>2021年</td><td>约2,000–2,500万欧元</td><td>约7–8倍增长（C轮融资时预期值）</td></tr>
+        <tr><td>2024年</td><td>约2亿欧元</td><td>收购蒂森克虏伯公告中明确披露</td></tr>
+      </table></div>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th style="width:100px">指标</th><th>估算/公开信息</th></tr>
+        <tr><td>累计融资总额</td><td>超3.5亿美元</td></tr>
+        <tr><td>估值</td><td>独角兽级别（超10亿美元），具体最新估值未公开</td></tr>
+        <tr><td>盈亏状态</td><td>尚未公布盈利数据；处于高速扩张期，持续进行战略并购</td></tr>
+        <tr><td>现金储备</td><td>未公开；C轮2.2亿美元融资+后续战略融资+业务营收提供较充裕现金</td></tr>
+        <tr><td>收购支出</td><td>Franka约2,850万欧元；Krause Automation金额未披露（标的2024年营收约亿欧元级）</td></tr>
+      </table></div>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li><strong>DLR基因：</strong>思灵机器人是德国宇航中心（DLR）机器人技术产业化的标志性案例。DLR在力控轻型机械臂（LWR）和太空灵巧手领域拥有30年以上技术积累，陈兆芃团队将这一技术从太空应用转向工业场景。联合创始人Peter Meusel为力矩传感器核心发明者。</li>
+        <li><strong>中国企业"反向整合"德国工业：</strong>思灵机器人是少数由华人创立、在德国深度扎根并反向收购德国百年工业资产（蒂森克虏伯自动化）的企业，体现了中国机器人企业在全球化中的独特路径。</li>
+        <li><strong>Google DeepMind合作意义：</strong>2026年3月的合作是Google DeepMind首次将其Gemini Robotics基础模型部署到第三方工业机器人平台上运行的真实工业场景，标志着思灵的硬件平台能力获得全球顶级AI研究机构的认可。</li>
+        <li><strong>人才密度：</strong>全球3,200名员工来自约60个国家，研发团队涵盖DLR系、德国汽车工业系、中国互联网/AI系，人才结构极为多元。</li>
+        <li><strong>从研发到整厂：</strong>Krause Automation的加入使思灵从"卖机器人"升级为"整厂端到端解决方案供应商"，这一转变与BBA（宝马、奔驰、奥迪）等德系车企的供应商体系天然契合。</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="a-team">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>陈兆芃在DLR的10年经历涵盖了空间灵巧手、力控机械臂、国际空间站在轨服务等场景——这些场景的共同特征是"高精度力控""非结构化环境""零容错操作"。从太空机器人转向工业机器人的逻辑链条是清晰的：太空环境的严苛要求（无法维护、通信延迟、非结构化）催生的力控自主技术天然适合从太空"降维"至汽车装配、3C精密制造、医疗手术等对力控要求极高的场景。与多数从视觉AI或运动控制起步的机器人公司不同，思灵从"力量感知"切入——这一选择与创始团队的DLR力控基因高度自洽。Peter Meusel作为力矩传感器发明者的加入确保了核心零部件的话语权。团队中DLR出身的工程师群体在机电一体化、精密传感器、实时控制软件领域的复合能力构成了思灵的技术护城河。</p>
+      </div>
+
+      <div class="analysis-block" id="a-tech">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>思灵的"Physical AI"三层架构在理论上是完整的，但其真正的差异化在于最底层的"精细操作层"——源自DLR的毫秒级力控闭环。这一层的可靠性不依赖于大模型的推理能力，而是基于物理模型的确定性控制，这使得思灵在汽车装配、手术辅助等高安全性要求场景中具有天然优势。中层规划层和上层决策层引入大模型（如DeepMind Gemini Robotics）是2026年的重要变量——如果大模型能有效提升任务泛化能力而不损害底层力控的确定性，思灵将获得"力控确定性+大模型智能"的双重优势。但大模型在工业场景中的延迟和可靠性仍存在争议，DeepMind的合作本质上是双方对"大模型能否进入确定性要求极高的工业场景"的联合实验。数据层面，30,000+台真实部署积累的力觉交互数据是思灵最重要的资产之一，这类数据的稀缺性远高于视觉数据。</p>
+      </div>
+
+      <div class="analysis-block" id="a-capital">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>思灵的股东结构是全球机器人公司中最"多元化"的之一：软银（日本/全球科技投资）、Chimera（阿布扎比皇室）、淡马锡（新加坡主权）、工业富联（富士康/3C制造）、小米（手机+汽车）、新希望（农牧）、天智航（医疗）——几乎每个产业股东都对应一个垂直应用场景。这种"产业股东矩阵"的优势在于场景资源的自然绑定（如富士康提供3C制造场景、小米提供手机包装线），但潜在风险是多方产业诉求的协调难度。软银作为C轮领投方的强势地位可能影响公司的IPO节奏和退出策略。2024年未实现的IPO可能反映了资本市场对机器人公司估值逻辑的变化，也可能与并购整合的复杂性有关。引入Google DeepMind作为技术合作伙伴而非股东，保持了技术合作关系的独立性。</p>
+      </div>
+
+      <div class="analysis-block" id="a-pivot">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>思灵的发展路径中有几次显著的"非典型"调整：2023年密集收购Franka、idealworks、BÄR Automation三家德国机器人/自动化公司，这在机器人创业公司中极为罕见——通常创业公司会在更晚阶段才进行并购。这一决策的逻辑是：思灵需要尽快补全"从核心零部件到系统集成"的能力拼图，以应对德国汽车工业客户对"一站式解决方案"的需求。2025–2026年收购蒂森克虏伯自动化并将其更名为Krause Automation则是这一策略的升级版——从"补短板"到"建护城河"，标志着思灵正式进入百亿级系统集成市场。2025年发布的Agile ONE人形机器人是另一条能力曲线的延伸——从机械臂到人形是巨大的技术跨度，但思灵借助已有的力控+灵巧手+AI三层架构进行了"能力复用"，避免了从零开始。</p>
+      </div>
+
+      <div class="analysis-block" id="a-position">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>思灵机器人在行业中的定位是罕见的"德式工程技术+中式商业化速度+全球资本驱动"的复合体。与纯中国本土的机器人公司（如埃斯顿、新松）相比，思灵拥有德国的技术品牌溢价和高端客户基础；与纯德国的机器人公司（如KUKA已被美的收购后偏保守）相比，思灵保持了更激进的创业节奏和更强的融资能力。在"硬件vs大脑"的取舍上，思灵选择"全都要"——通过自研+并购覆盖了从传感器到整厂集成的全链路，同时通过DeepMind合作获取前沿AI能力。这一策略的风险在于：资源分散可能导致各环节都难以做到极致。但与仅做"大脑"或仅做"本体"的公司相比，思灵的"全栈整厂"定位在汽车等需要端到端交付的行业中具有更强的客户粘性和更高的客单价。</p>
+      </div>
+
+      <div class="analysis-block" id="a-other">
+        <h4>2.6 其他重要观察</h4>
+        <p>思灵机器人最值得关注的独特价值在于其"中国企业+德国资产"的全球化架构。2026年Krause Automation的独立品牌运营策略表明思灵充分意识到了德系工业品牌在欧美市场的文化价值——保留品牌而非将其归入"思灵"名下，体现了对德国制造传统的尊重和商业智慧。但这一"联邦式"品牌架构也带来管理复杂度：6个独立品牌的文化融合、技术栈统一、交叉销售协同都需要高超的组织能力。另一个关键观察是思灵的营收增速（连续7年翻倍）如果保持，2025–2026年营收有望达到4–10亿欧元级别，使其具备独立IPO或成为并购标的的体量。Google DeepMind的深度合作如果成功落地，可能使思灵成为"具身智能时代的台积电"——全球AI公司的模型部署到思灵的硬件平台上运行，形成一种新的"模型-本体"生态分工模式。</p>
+      </div>
+
+      <h2 id="references">3 参考来源</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://www.agile-robots.cn/news/51" target="_blank" rel="noopener">思灵机器人官方·资讯中心</a></li>
+          <li><a href="https://www.36kr.com/p/3565605729343875" target="_blank" rel="noopener">36氪·思灵机器人发布Agile ONE：迈向人形机器人工业规模化应用（2025.11）</a></li>
+          <li><a href="https://www.tmtpost.com/7789629.html" target="_blank" rel="noopener">钛媒体·蛰伏后的爆发：思灵机器人从工业场景迈向物理AI（2025.12）</a></li>
+          <li><a href="https://m.bjnews.com.cn/detail/1764222983129629.html" target="_blank" rel="noopener">新京报·思灵机器人发布全尺寸工业级人形机器人Agile ONE（2025.11）</a></li>
+          <li><a href="https://m.jiemian.com/article/13683897.html" target="_blank" rel="noopener">界面新闻·思灵机器人发布全尺寸工业级人形机器人Agile ONE（2025.11）</a></li>
+          <li><a href="https://36kr.com/p/1387130466237828" target="_blank" rel="noopener">36氪·思灵机器人完成2.2亿美元C轮融资，估值突破10亿美元（2021.09）</a></li>
+          <li><a href="https://m.jiemian.com/article/14200610.html" target="_blank" rel="noopener">界面新闻·思灵机器人完成对百年企业蒂森克虏伯自动化工程公司的收购（2026.04）</a></li>
+          <li><a href="https://biz.haiwainet.cn/n/2026/0403/c3545083-32942851.html" target="_blank" rel="noopener">海外网·思灵机器人完成对百年企业蒂森克虏伯自动化工程公司的收购（2026.04）</a></li>
+          <li><a href="https://36kr.com/p/3740860442079747" target="_blank" rel="noopener">36氪·思灵机器人与Google DeepMind达成重磅合作（2026.03）</a></li>
+          <li><a href="http://m.caijing.com.cn/article/202602/397560" target="_blank" rel="noopener">财经网·如身机器人与思灵机器人达成战略合作，共拓全球康养机器人（2026.02）</a></li>
+          <li><a href="https://www.tmtpost.com/6791165.html" target="_blank" rel="noopener">钛媒体·哈工大学霸，买了宝马"亲儿子"（思灵收购系列）</a></li>
+          <li><a href="https://m.36kr.com/p/1705353891010050" target="_blank" rel="noopener">36氪·再获富士康3000万美金，思灵机器人加速落地（2022）</a></li>
+          <li><a href="https://www.liangjiang.gov.cn/mixmedia/a/202511/25/WS69250b67e4b01c2087713743.html" target="_blank" rel="noopener">重庆两江新区·思灵机器人发布全尺寸工业级人形机器人Agile ONE（2025.11）</a></li>
+          <li><a href="https://www.zaoche168.com/detail/_01-ABC00000000000356325.shtml" target="_blank" rel="noopener">造车网·思灵机器人与宝马携手推出移动式自动收货机器人</a></li>
+          <li><a href="https://www.shanghaiahte.com.cn/press/exhibition-news/2239.html" target="_blank" rel="noopener">上海工博会·思灵机器人为小米汽车打造域控制器柔性组装线</a></li>
+          <li><a href="http://www.robotsci.com.cn/detail/1993209392027275264" target="_blank" rel="noopener">机器人网·思灵机器人收购蒂森克虏伯自动化工程公司（2025.11）</a></li>
+          <li><a href="https://www.pingwest.com/a/309316" target="_blank" rel="noopener">品玩·万亿人形机器人市场加速启幕，思灵机器人Agile ONE抢占工业落地先发机遇（2025.11）</a></li>
+          <li><a href="https://news.qq.com/rain/a/20260403A01LQJ00" target="_blank" rel="noopener">腾讯新闻·工业具身智能怎么走？思灵机器人交出实战答卷（2026.04）</a></li>
+          <li><a href="https://www.agvline.com/news/show-11551.html" target="_blank" rel="noopener">AGV在线·Agile Robots收购机器人专业公司Franka Emika</a></li>
+          <li><a href="https://m.thepaper.cn/newsDetail_forward_14450163" target="_blank" rel="noopener">澎湃新闻·思灵机器人C轮融资2.2亿美元，可用于精密装配、手术等（2021.09）</a></li>
+          <li><a href="https://www.industrysourcing.cn/article/475230" target="_blank" rel="noopener">工业资源网·思灵机器人完成对百年企业蒂森克虏伯自动化工程公司的收购</a></li>
+          <li><a href="https://www.agile-robots.cn/news/59" target="_blank" rel="noopener">思灵机器人官方·最新动态</a></li>
+          <li><a href="https://www.ebrun.com/businessnews/20251125/624196.shtml" target="_blank" rel="noopener">亿邦动力·思灵机器人陈兆芃：下一次工业革命是物理人工智能（2025.11）</a></li>
+          <li><a href="https://www.cq.chinanews.com.cn/news/2025/0723/39-49371.html" target="_blank" rel="noopener">欧洲新侨网·思灵机器人"手眼脑"协同，智能生产力赋能百业（2025.07）</a></li>
+          <li><a href="https://www.linqto.com/market-insights/agile-robots/" target="_blank" rel="noopener">Linqto·Agile Robots Market Insights</a></li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">本页面最后更新于2026年5月4日 · 信息来源于公开报道与官方资料 · 具身智能Wiki</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

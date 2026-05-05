@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>众擎机器人 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> <span class="breadcrumb-sep">›</span> <span>众擎机器人</span></div>
+  <div class="wiki-header"><h1>众擎机器人</h1><div class="subtitle">ENGINEAI · 成立于2023年10月 · B轮估值超100亿元人民币 · 全栈自研人形机器人</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#founders">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financial">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#a1">2.1 团队背景与场景选择的匹配度</a></li>
+        <li class="toc-lvl4"><a href="#a2">2.2 技术路线与场景的适配性</a></li>
+        <li class="toc-lvl4"><a href="#a3">2.3 股东/资本结构对战略的影响</a></li>
+        <li class="toc-lvl4"><a href="#a4">2.4 试错过程与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#a5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#a6">2.6 其他重要观察、分析</a></li>
+        <li class="toc-lvl2"><a href="#refs">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">众擎机器人</div>
+        <div class="ib-row"><div class="ib-label">公司全称</div><div class="ib-value">深圳众擎机器人科技股份有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">英文品牌</div><div class="ib-value">ENGINEAI</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2023年10月7日</div></div>
+        <div class="ib-row"><div class="ib-label">注册地</div><div class="ib-value">广东深圳</div></div>
+        <div class="ib-row"><div class="ib-label">创始人/CEO</div><div class="ib-value">赵同阳</div></div>
+        <div class="ib-row"><div class="ib-label">CTO</div><div class="ib-value">李力耘（2026年4月加入）</div></div>
+        <div class="ib-section">财务数据</div>
+        <div class="ib-row"><div class="ib-label">最新融资</div><div class="ib-value">B轮2亿美元（2026年4月）</div></div>
+        <div class="ib-row"><div class="ib-label">融资总额</div><div class="ib-value">累计约4亿美元（共9轮）</div></div>
+        <div class="ib-row"><div class="ib-label">2026年框架订单</div><div class="ib-value">超5亿元人民币</div></div>
+        <div class="ib-section">估值/市值</div>
+        <div class="ib-row"><div class="ib-label">最新估值</div><div class="ib-value">超100亿元人民币（B轮投后）</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">员工规模</div><div class="ib-value">约170人（2025年末）</div></div>
+        <div class="ib-row"><div class="ib-label">累计订单</div><div class="ib-value">6000+台（含框架意向）</div></div>
+        <div class="ib-row"><div class="ib-label">郑州基地产能</div><div class="ib-value">一期5000台/年（2026年H1投产）</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">赛道</div><div class="ib-value"><span class="tag">人形机器人</span><span class="tag-info">具身智能</span></div></div>
+        <div class="ib-row"><div class="ib-label">形态</div><div class="ib-value">双足/全人形/四足多形态</div></div>
+        <div class="ib-section">官网</div>
+        <div class="ib-row"><div class="ib-label">官方网址</div><div class="ib-value"><a href="https://www.engineai.com.cn/" target="_blank">engineai.com.cn</a></div></div>
+      </aside>
+
+      <p class="article-intro"><strong>众擎机器人</strong>（英文品牌：ENGINEAI），全称深圳众擎机器人科技股份有限公司，是一家总部位于深圳的通用型人形机器人研发企业，由连续创业者赵同阳于2023年10月创立。公司以"将有灵魂的人形机器人带进千家万户"为愿景，采取"先体能、后智能"的渐进式技术路线，凭借全球首例自然拟人直膝步态行走（SE01）和全球首例人形机器人前空翻（PM01）实现全网"出圈"。成立仅两年半即完成9轮融资，B轮投后估值突破100亿元人民币，是深圳第4家跻身"百亿独角兽"行列的具身智能公司。2026年4月，前小鹏汽车副总裁兼自动驾驶一号位李力耘出任CTO，标志公司进入"大脑注入"新阶段。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper">
+        <table class="wikitable infotable">
+          <tr><th>项目</th><th>内容</th></tr>
+          <tr><td>公司全称</td><td>深圳众擎机器人科技股份有限公司</td></tr>
+          <tr><td>英文品牌</td><td>ENGINEAI</td></tr>
+          <tr><td>曾用名</td><td>深圳市众擎机器人科技有限公司（2026年1月股改前）</td></tr>
+          <tr><td>成立时间</td><td>2023年10月7日</td></tr>
+          <tr><td>注册地</td><td>广东省深圳市南山区</td></tr>
+          <tr><td>法定代表人</td><td>赵同阳</td></tr>
+          <tr><td>上市状态</td><td>未上市（已完成股份制改造）</td></tr>
+          <tr><td>官网</td><td><a href="https://www.engineai.com.cn/" target="_blank">https://www.engineai.com.cn/</a></td></tr>
+          <tr><td>主营业务</td><td>通用型人形机器人研发、制造与销售</td></tr>
+        </table>
+      </div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>时间</th><th>事件</th></tr>
+          <tr><td>2023年10月</td><td>赵同阳在深圳注册成立深圳市众擎机器人科技有限公司，"众擎"取"众志成城、擎起未来"之意</td></tr>
+          <tr><td>2024年7月</td><td>完成天使轮融资近亿元，发布首款产品——全开源双足机器人SA01</td></tr>
+          <tr><td>2024年10月</td><td>发布SE01全尺寸人形机器人，实现全球首例自然拟人直膝步态行走，引发广泛关注</td></tr>
+          <tr><td>2024年12月</td><td>发布轻量化人形机器人PM01，完成全球首例人形机器人前空翻特技</td></tr>
+          <tr><td>2025年7月</td><td>完成Pre-A++与A1轮融资（累计近10亿元），京东领投，宁德时代溥泉资本等参投</td></tr>
+          <tr><td>2025年9月</td><td>与多伦科技签署三年不低于2000台采购订单；CEO赵同阳在河南投洽会宣布郑州基地计划</td></tr>
+          <tr><td>2025年11月</td><td>深圳6000㎡生产场地竣工，月产能达500台</td></tr>
+          <tr><td>2025年12月</td><td>完成A2轮融资，河南投资集团汇融基金领投；河南众擎机器人有限公司落地郑州高新区</td></tr>
+          <tr><td>2026年1月</td><td>完成股份制改造，变更为"深圳众擎机器人科技股份有限公司"；年度框架订单突破5亿元；T800亮相CES 2026</td></tr>
+          <tr><td>2026年2月</td><td>发起全球首个人形机器人格斗联赛URKL，发布价值千万纯金冠军腰带</td></tr>
+          <tr><td>2026年4月</td><td>完成B轮2亿美元融资，估值突破百亿；前小鹏自动驾驶一号位李力耘加盟出任CTO</td></tr>
+        </table>
+      </div>
+
+      <h3 id="founders">1.2 创始人及核心团队</h3>
+      <p>众擎机器人的创始团队兼备草根创业者的韧性与顶级技术人才的深度。</p>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+          <tr><td>创始人/CEO</td><td>赵同阳</td><td>株洲师范学院大专学历。2012年创办物联网公司安信可科技，4年营收破亿后转让。2016年进入机器人赛道，先后创办终极进化科技、多够机器人（Dogotix）。2020年多够被小鹏汽车收购后出任鹏行智能总经理，主导研发双足机器人PX5。2023年10月再次创业成立众擎。被称为"机器人界的唐僧"——擅聚人才，经历多次失败仍坚持人形机器人方向</td></tr>
+          <tr><td>CTO</td><td>李力耘</td><td>清华大学电子工程系本科、纽约大学计算机博士。曾任LinkedIn美国总部技术架构师、百度美国Apollo团队高级专家、京东JDX智慧物流实验室高级专家，后任小鹏汽车副总裁兼自动驾驶一号位（6年4个月）。主导小鹏智驾从规则驱动到"数据+算力+模型"全链路AI化转型，管理超1000人团队。2026年4月加盟众擎，负责VLA大模型与具身大脑建设</td></tr>
+          <tr><td>联合创始人/VP</td><td>姚淇元</td><td>前优必选市场负责人，负责众擎的市场与商业化拓展</td></tr>
+          <tr><td>结构负责人</td><td>李海雷</td><td>前优必选北研所结构负责人，负责众擎机器人本体结构与关节设计</td></tr>
+        </table>
+      </div>
+      <p>团队核心成员来自UC Berkeley、清华、普渡大学、港中文、北京理工等顶尖高校，以及优必选、鹏行智能等头部机器人企业。整体呈现"产业老兵+学术新锐"的混合型人才结构，平均年龄约30岁。2025年末员工约170人，其中研发人员占比超过60%。李力耘加盟后，团队正在扩充AI与具身大脑方向的高端人才。</p>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <h4>融资历史</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>轮次</th><th>时间</th><th>金额</th><th>领投/核心投资方</th></tr>
+          <tr><td>天使轮</td><td>2024年7月</td><td>近1亿元</td><td>商汤国香资本、弘晖基金</td></tr>
+          <tr><td>天使+</td><td>2024年8月</td><td>近亿元</td><td>弘晖基金、浔商创投、合肥滨湖金融投资</td></tr>
+          <tr><td>Pre-A轮</td><td>2025年2月</td><td>约2亿元</td><td>Stone Venture（中东资本）领投，商汤国香等跟投</td></tr>
+          <tr><td>Pre-A+轮</td><td>2025年4月</td><td>未披露</td><td>Samsung Ventures等</td></tr>
+          <tr><td>Pre-A++轮</td><td>2025年7月</td><td>—</td><td>星航资本（小鹏汽车关联）</td></tr>
+          <tr><td>A1轮</td><td>2025年7月</td><td>近10亿元（两轮合计）</td><td>京东领投，宁德时代溥泉资本、银泰集团、华控基金、达晨财智等</td></tr>
+          <tr><td>A1+轮</td><td>2025年12月</td><td>—</td><td>黄浦江资本等</td></tr>
+          <tr><td>A2轮</td><td>2025年12月</td><td>约10亿元</td><td>河南投资集团汇融基金领投，黄浦江资本、华控基金跟投</td></tr>
+          <tr><td>B轮</td><td>2026年4月</td><td>2亿美元（≈13.6亿元）</td><td>河南投资集团汇融基金+立讯精密联合领投；跟投：中创智领、基石资本、龙岗金控、金谷资本、财通资本、多伦科技战投、能量守恒资本、硬核坚果资本、北京昌发展基金；老股东黄浦江资本、星航资本等持续加码</td></tr>
+        </table>
+      </div>
+
+      <h4>股东结构特点</h4>
+      <p>众擎的股东结构呈现"产业资本+地方国资+财务投资者"多线并进的格局。产业资本方面，立讯精密（精密制造龙头）、京东（电商与物流场景）、宁德时代（新能源产业）、小鹏系星航资本分别在B轮、A1轮、天使+轮进入，形成硬件制造、电商物流、新能源三大产业场景的绑定。地方国资方面，河南投资集团汇融基金从A2轮进入并在B轮联合领投，配套设立1.6亿元专项基金并落地郑州高新区；深圳龙岗金控、北京昌发展基金在B轮进入，反映多地政府对具身智能产业的争夺。财务投资者如基石资本、黄浦江资本等提供市场化的估值定价参考。A股上市公司多伦科技间接持股1.57%，为A股持有众擎占比最高的上市公司。公司已完成股份制改造，具备走向IPO的制度基础。</p>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>维度</th><th>详情</th></tr>
+          <tr><td>总体技术战略</td><td>"先体能、后智能"渐进式路线：2023-2025年重点打磨本体硬件与运动控制（"小脑"），2026年起注入具身智能（"大脑"），构建"本体→小脑→大脑"三层架构</td></tr>
+          <tr><td>AI技术架构</td><td>VLA（Vision-Language-Action）架构，由新任CTO李力耘主导建设。目标实现视觉理解→语言推理→任务规划→动作执行的端到端闭环</td></tr>
+          <tr><td>运动控制（小脑）</td><td>WBC全身控制算法、Sim2Real迁移、强化学习、多级PID实时反馈。已建立行业领先优势：自然拟人步态、前空翻、格斗级爆发力</td></tr>
+          <tr><td>数据方案</td><td>借鉴自动驾驶"数据飞轮"模式：量产部署→多模态数据采集→仿真环境构建→模型训练→OTA升级→更多部署。在郑州南阳建设"机器人驾校"——具身智能数据采集中心</td></tr>
+          <tr><td>世界模型</td><td>李力耘核心能力之一。双重功能：(a)作为交互式仿真器生成合成训练数据；(b)通过预测物理交互过程优化动作策略。目标打造"原生多模态驱动、大小脑与神经末梢协同"的全集成架构</td></tr>
+          <tr><td>自研程度</td><td>全栈自研一体化关节模组（电机、减速机、控制器、传感器、关节），T800峰值扭矩450N·m、瞬时功率14000W。除电池外多数关键零部件实现自研</td></tr>
+          <tr><td>开源策略</td><td>SA01/SA02双足机器人全开源模式，面向科研教育社区，降低腿足机器人研究门槛</td></tr>
+          <tr><td>差异化特色</td><td>"Body for AI, AI for Body"——本体与AI联合设计、共同进化，非单纯软件或硬件驱动</td></tr>
+        </table>
+      </div>
+      <p>赵同阳将众擎的技术路线明确拆解为"体能"与"智能"两大方向，其核心逻辑是：在机器人体能（本体硬件和运动控制）不足时，智能灵魂无法有效安放。因此前两年聚焦于将本体打磨到极致——450N·m峰值扭矩超越95%男性体能——为后续注入VLA大模型打下坚实基础。李力耘加盟后，众擎的技术栈从"能走能打"向"能干能思考"跃迁，预计2026年下半年将推出首批搭载VLA大脑的试验机型。</p>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>产品</th><th>定位</th><th>参数</th><th>售价</th><th>特点</th></tr>
+          <tr><td>SA01/SA02</td><td>科研教育双足机器人</td><td>膝关节扭矩160N·m</td><td>3.85万元起</td><td>全开源模式，大幅降低科研门槛；面向高校与科研机构</td></tr>
+          <tr><td>SE01</td><td>全尺寸通用人形机器人（首款）</td><td>身高170cm/体重55kg/32自由度</td><td>未公开</td><td>2024年10月发布；全球首例自然拟人直膝步态行走；端到端神经网络驱动</td></tr>
+          <tr><td>PM01</td><td>轻量化交互型人形机器人</td><td>身高138cm/体重40kg/24自由度</td><td>8.8万元起</td><td>全球首例人形机器人前空翻特技；端到端神经网络步态控制；已登陆京东平台；面向导览导购/科研教育</td></tr>
+          <tr><td>T800</td><td>旗舰全尺寸大负载工业人形机器人</td><td>身高173cm/体重75kg/29个关节模组</td><td>18万元起（目标中端<10万元）</td><td>450N·m峰值扭矩/14000W瞬时功率；续航4-5小时；可格斗/奔跑；定位工业协作、巡逻巡检、消防救援</td></tr>
+          <tr><td>JS01</td><td>四足机器狗</td><td>—</td><td>未公开</td><td>补充四足产品线，拓展户外巡检场景</td></tr>
+        </table>
+      </div>
+      <p>产品矩阵覆盖从3.85万元科研级到18万元工业级的完整梯度，形成"双足→全人形→四足"多形态覆盖。T800是公司的旗舰工业级产品，定位下一代"打工机器人"，CEO赵同阳表示其体能参数（450N·m扭矩/14000W功率）已超越95%男性成年人。</p>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>场景大类</th><th>具体场景</th><th>对应产品</th><th>合作方/客户</th></tr>
+          <tr><td>工业制造</td><td>工厂巡检、物料搬运、设备维护</td><td>T800</td><td>立讯精密制造产线（战略协同）</td></tr>
+          <tr><td>安防巡检</td><td>社区安防、交通疏导、公安执法、消防救援</td><td>T800、PM01</td><td>多伦科技（2000台采购）、锋物科技（合资公司）</td></tr>
+          <tr><td>商业服务</td><td>导览导购、商业零售、智能移动零售</td><td>PM01</td><td>京东（电商渠道）、商场零售场景</td></tr>
+          <tr><td>智慧交通</td><td>车管所导办、机动车查验、交通指挥</td><td>PM01</td><td>多伦科技（江苏擎安机器人合资公司）</td></tr>
+          <tr><td>养老社区</td><td>社区-居家-养老全链条智能服务</td><td>PM01、T800</td><td>锋物科技合资公司</td></tr>
+          <tr><td>科研教育</td><td>高校机器人研究、教学实验</td><td>SA01/SA02</td><td>国内外高校与科研机构</td></tr>
+          <tr><td>体育竞技</td><td>人形机器人格斗联赛URKL</td><td>T800</td><td>拳明星机器人科技（联赛协办方）</td></tr>
+        </table>
+      </div>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <p>众擎机器人的商业化正在从早期验证走向规模交付阶段：</p>
+      <ul>
+        <li><strong>2025年销量：</strong>较2024年实现近10倍增长。2024年为产品起步年，2025年有实际交付落地（PM01在南京协助交警执勤）</li>
+        <li><strong>2026年1月框架订单：</strong>年度框架订单突破5亿元人民币，覆盖巡逻巡检、导览导购、工业制造三大核心场景</li>
+        <li><strong>多伦科技大单：</strong>2025年9月签署三年不低于2000台PM01采购协议，总金额超亿元；双方合资设立江苏擎安机器人有限公司</li>
+        <li><strong>其他意向订单：</strong>CEO赵同阳透露，除多伦科技2000台外，还获得来自香港、中东的约4000台订单，合计6000+台</li>
+        <li><strong>锋物科技合资：</strong>2026年1月成立合资公司，以"AI大脑+具身智能机器人"切入安防4.0赛道，计划拓展至北美、中东</li>
+        <li><strong>CES 2026出海：</strong>T800和PM01首次亮相CES，对接欧洲、北美、东南亚海外需求，多位海外客户寻求定制合作</li>
+        <li><strong>郑州生产基地：</strong>占地200亩，一期年产5000台产线预计2026年6月投产，二期扩至万台；南阳同步建设数据采集中心</li>
+        <li><strong>深圳工厂：</strong>2026年3月开业，与郑州、合肥、赣州并行推进量产，2026年目标年产能近万台</li>
+        <li><strong>产能储备：</strong>已储备4000-5000台产能；中长期目标（2027-2028年）量产3万-5万台</li>
+      </ul>
+
+      <h3 id="financial">1.8 财务数据</h3>
+      <p>众擎机器人作为未上市私人公司，未公开披露完整财务数据。以下为可获取的有限财务信息：</p>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>指标</th><th>2024年</th><th>2025年</th><th>2026年（截至Q1）</th></tr>
+          <tr><td>营收</td><td>未公开披露（产品化起步年，7月首发SA01）</td><td>未公开披露（销量同比增长近10倍，有PM01实际交付）</td><td>框架订单突破5亿元</td></tr>
+          <tr><td>融资总额</td><td>约2-3亿元（天使+Pre-A系列）</td><td>约20亿元（A轮系列近10亿元+A2轮10亿元）</td><td>2亿美元B轮（≈13.6亿元）</td></tr>
+          <tr><td>估值</td><td>未公开</td><td>未公开（A2轮后推测数十亿元）</td><td>超100亿元（B轮投后）</td></tr>
+          <tr><td>账面资金</td><td colspan="3">B轮融资后现金储备充裕（累计融资约4亿美元），支撑郑州基地建设与万台级量产爬坡</td></tr>
+          <tr><td>员工人数</td><td>约50人</td><td>约170人</td><td>持续扩张中（CTO加盟后加速AI团队建设）</td></tr>
+        </table>
+      </div>
+      <p>注：以上数据来源于公开新闻报道及融资公告，公司未独立发布经审计的财务报表。作为2023年成立的初创公司，2024-2025年主要处于研发投入和产品打磨阶段，营收规模预计仍较小。B轮融资后资金面充裕，支持2026-2028年的万台级量产扩张。</p>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li><strong>股改进展：</strong>2026年1月完成股份制改造，由"深圳市众擎机器人科技有限公司"变更为"深圳众擎机器人科技股份有限公司"，为未来IPO做好准备</li>
+        <li><strong>URKL格斗联赛：</strong>2026年2月发起全球首个人形机器人格斗联赛URKL，冠军获10公斤纯金金腰带（价值约1000万元），定位为集"技术协同、资源整合、人才孵化、资本联动"于一体的全链条生态聚合平台，计划拓展至香港、纽约、伦敦</li>
+        <li><strong>总理关注：</strong>2026年1月，李强总理在深圳考察时现场观看了众擎PM01演示，多伦科技战略合作获总理肯定</li>
+        <li><strong>京东AWE 2026：</strong>联合京东、宇树科技等亮相AWE，参与京东"智能机器人产业加速2.0计划"，目标2026年助力合作伙伴实现百亿规模营收</li>
+        <li><strong>立讯精密协同：</strong>立讯精密已斥资50亿元在常熟建设机器人总部基地，2026年预计出货3000台人形机器人，具备全产业链核心能力（除电池与部分关节模组），将为众擎打通量产关键链路</li>
+        <li><strong>河南深度布局：</strong>2026年写入河南省政府工作报告——"推进众擎机器人全球生产制造中心等项目建设"，郑州高新区配套1.6亿元专项基金</li>
+        <li><span class="tag-warn">风险提示</span> 行业仍处早期：2025年全球人形机器人出货量预计仅1.8万台；产品在复杂地形下表现有待优化；部分投资者（如马克·库班）公开唱衰行业短期前景；交付迟滞仍是行业普遍问题</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="a1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>赵同阳的连续创业经历——从物联网硬件到四足机器狗再到人形机器人——塑造了众擎"硬件基因优先"的底色。他在鹏行智能主导PX5的经历，使团队在人形机器人关节、步态和全身控制上积累了实操经验。新任CTO李力耘的智驾背景（小鹏XNGP全链路AI化），则为安防巡检、交通管理等场景提供了天然的认知迁移——智驾本质上是在开放道路环境下的感知-决策-执行闭环，与巡逻巡检机器人面临的核心问题高度同构。姚淇元（前优必选市场负责人）带来的商业服务场景经验，与PM01的导览导购定位契合。整体看，团队背景与三大核心场景（工业制造、安防巡检、商业服务）的匹配度较高，但缺少家庭消费级产品的操盘经验，这与其"千家万户"的终极愿景之间尚存gap。</p>
+      </div>
+
+      <div class="analysis-block" id="a2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>众擎的"先体能后智能"路线逻辑清晰：工业巡检、消防救援、格斗竞技等场景首先要求机器人具备"不倒下、能干活"的物理能力，450N·m扭矩和14000W功率的参数确实远超多数竞品。但安防导购类场景对"体力"的要求远低于"智力"——理解人类指令、灵活应对非结构化环境。VLA大模型建设刚刚起步（李力耘2026年4月才加入），当前产品在语义理解、任务规划上仍依赖相对简单的控制逻辑。路线选择本身不存在错配，但"体能→智能"的切换节奏是关键风险：如果量产先行于智能成熟，可能出现"能打不能干"的尴尬；如果智能建设过慢，则可能被同时推进本体和大脑的竞品（如智元、宇树）拉开差距。好在李力耘在小鹏的工业化AI落地经验，可能比纯学术派更快填补这一缺口。</p>
+      </div>
+
+      <div class="analysis-block" id="a3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>众擎的股东结构呈现清晰的三维驱动。产业资本维度：立讯精密（B轮联合领投）直接绑定精密制造与消费电子供应链的降本能力——这对机器人大规模量产至关重要；京东（A1轮领投）带来电商零售场景和C端渠道资源，PM01已登陆京东平台；宁德时代提供能源技术支持。这种产业资本为主的结构，意味着众擎的场景选择一定程度上被股东"锚定"——安防（多伦+锋物）、工业制造（立讯）、零售（京东），但同时也赋予其比纯财务投资驱动的竞品更强的落地确定性。地方国资维度：河南投资集团深度参与（A2轮+B轮连续领投+1.6亿专项基金），直接推动郑州200亩制造基地落地。这种"国资建厂+产业出场景+企业出技术"的三方模式，在全国具身智能版图中较为独特。但多地方政府同时参与（深圳、河南、北京、合肥），也可能带来资源配置的分散风险。</p>
+      </div>
+
+      <div class="analysis-block" id="a4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>赵同阳的个人创业史是众擎最重要的"试错基因"：2016-2018年间两次因押注双足人形机器人导致资金链断裂，2019年被迫转向四足机器狗（Dogotix）才实现商业可行性。这段经历解释了众擎为何在产品策略上采取"全形态覆盖"——SA/SE/PM/T/JS五条产品线同时推进，既有人形也有四足，既有高端工业也有低价科研——本质是分散风险，不把所有赌注压在单一形态上。2024年7月率先发布开源SA01（而非高端人形），也是一种务实的"先跑通商业模式再冲刺旗舰"的策略。李力耘的加盟本身则构成一次重大的战略调整：从"纯本体公司"向"本体+AI双轮驱动"转型，CEO赵同阳明确表示"不愿被定义为专注做'本体'的公司"。这一转型的时机选择（B轮融资后、量产前夕）较为合理。</p>
+      </div>
+
+      <div class="analysis-block" id="a5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>众擎的核心取舍非常鲜明：走"Android式全栈硬件+iOS式生态聚合"路线。在硬件层，全栈自研关节模组意味着不做单纯的集成商，从电机到控制器全部自主研发——这与宇树科技（专注关节模组+BOM极致降本）形成差异化。在应用层，通过URKL格斗联赛构建"技术-人才-资本-场景"生态聚合平台，这种赛事驱动的生态模式在机器人行业尚属首创，试图复刻电子竞技对芯片/游戏产业的催化效应。但这也意味着众擎同时在硬件深度（自研关节）、软件高度（VLA大模型）、生态广度（URKL联赛）三条线上投入，资源分散风险不容忽视。相比之下，智元选择了"专攻具身大脑+开放本体生态"的相反路径（更像Android之于手机），宇树则聚焦关节模组的极致性价比。众擎的全栈+生态路线如果成功，壁垒将极高；如果资源不足，则可能样样涉及但样样不精。</p>
+      </div>
+
+      <div class="analysis-block" id="a6">
+        <h4>2.6 其他重要观察、分析</h4>
+        <p>第一，赵同阳的"大专生逆袭"叙事具有很强的品牌传播力（36氪专题报道："清北天才扎堆的机器人赛道，杀出一个大专生"），在人形机器人需要公众认知和资本关注度的早期阶段，这是独特的软实力。第二，众擎的出海节奏早于多数国内同行——CES 2026首秀即对接欧美东南亚需求，锋物合资计划直指北美中东，URKL规划香港/纽约/伦敦三站——反映了深圳企业天然的全球化基因。第三，多伦科技2025年亏损近3000万（由盈转亏），其2000台采购为"三年框架协议"而非确定性交付合同，实际落地节奏需持续跟踪。第四，立讯精密的入局标志着精密制造产业链对人形机器人的重视达到新高度——立讯2026年自身也规划出货3000台，与众擎之间既是投资关系也可能存在竞合张力。第五，综合看，众擎是目前国内具身智能赛道中，极少数同时在硬件性能（450N·m扭矩）、场景订单（5亿+框架订单）、生态运营（URKL联赛）、顶级AI人才（李力耘）四个维度都有实质筹码的公司，但能否在2026-2027年的量产关键期兑现这些筹码，仍待验证。</p>
+      </div>
+
+      <h2 id="refs">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="http://www.chinahightech.com/yuanqu/2026-04/15/content_502403.html" target="_blank">中国高新网：2亿美元B轮融资落地，郑州高新区1.6亿元专项基金投资众擎机器人</a></li>
+          <li><a href="https://news.softunis.com/55769.html" target="_blank">软盟资讯：众擎机器人B轮融资2亿美元估值破百亿，立讯精密入局</a></li>
+          <li><a href="https://www.stdaily.com/web/gdxw/2026-04/15/content_502551.html" target="_blank">科技日报：众擎机器人完成2亿美元B轮融资</a></li>
+          <li><a href="https://finance.sina.cn/2026-04-10/detail-inhtyfhi5342199.d.html" target="_blank">新浪财经：002475（立讯精密）投中百亿估值机器人独角兽</a></li>
+          <li><a href="http://auto.stockstar.com/IG2026041000000439.shtml" target="_blank">证券之星：河南国资+立讯精密，联手投出一家百亿机器人</a></li>
+          <li><a href="https://www.163.com/dy/article/KQ52MCNQ05561FZQ.html" target="_blank">网易：2亿美元砸进机器人赛道，投资人图个啥</a></li>
+          <li><a href="https://www.qbitai.com/2026/04/404124.html" target="_blank">量子位：前小鹏汽车自动驾驶一号位李力耘出任众擎CTO</a></li>
+          <li><a href="https://www.leiphone.com/category/robot/EbmFRcvpt7TBjb3P.html" target="_blank">雷锋网：李力耘加入众擎，全栈智驾大脑与顶级人形本体的双向奔赴</a></li>
+          <li><a href="https://www.thepaper.cn/newsDetail_forward_33027639" target="_blank">澎湃新闻：估值百亿，众擎迎来一位AI大牛</a></li>
+          <li><a href="https://news.pedaily.cn/202604/563055.shtml" target="_blank">投资界：估值百亿，众擎迎来一位AI大牛</a></li>
+          <li><a href="https://www.engineai.com.cn/about-us.html" target="_blank">众擎机器人官方网站（ENGINEAI）</a></li>
+          <li><a href="https://sznews.com/news/content/2025-03/03/content_31477747.htm" target="_blank">深圳新闻网：众擎机器人创始人兼CEO赵同阳——将有灵魂的人形机器人带进千家万户</a></li>
+          <li><a href="https://m.36kr.com/p/3241373599491334" target="_blank">36氪：清北天才扎堆的机器人赛道，杀出一个大专生</a></li>
+          <li><a href="https://www.sfccn.com/2025/12-25/5NMDE0NzNfMjA5MTQ5Ng.html" target="_blank">南方财经：21专访｜"被踹飞"后，众擎CEO赵同阳对具身智能有了新思考</a></li>
+          <li><a href="https://news.sina.cn/2025-09-25/detail-infrsnhr0892379.d.html" target="_blank">新浪：机智谈｜众擎机器人赵同阳：不愿被定义为专注做"本体"的公司</a></li>
+          <li><a href="https://www.duoluntech.com/index.php/news/detail/320.html" target="_blank">多伦科技官网：战略投资赋能众擎机器人，协同创新成果获李强总理肯定</a></li>
+          <li><a href="https://www.duoluntech.com/index.php/news/detail/321.html" target="_blank">多伦科技官网：众擎机器人T800首次亮相CES 2026</a></li>
+          <li><a href="https://www.mrjjxw.com/articles/2025-09-16/4062425.html" target="_blank">每日经济新闻："机器人交警"要来了——三年采购不低于2000台的人形机器人</a></li>
+          <li><a href="https://www.jiemian.com/article/13962299.html" target="_blank">界面新闻：锋物科技×众擎机器人官宣合作</a></li>
+          <li><a href="https://m.36kr.com/newsflashes/3661703874241158" target="_blank">36氪：锋物科技与众擎机器人达成战略合作，成立合资公司</a></li>
+          <li><a href="https://tech.chinadaily.com.cn/a/202601/30/WS697c7269a310942cc499d8f1.html" target="_blank">中国日报：锋物科技×众擎机器人——"AI大脑+具身智能机器人"开启安防4.0时代</a></li>
+          <li><a href="https://m.bjnews.com.cn/detail/1771983665129602.html" target="_blank">新京报：全球首个人形机器人格斗联赛URKL重磅启幕</a></li>
+          <li><a href="https://www.iimedia.cn/c1088/109647.html" target="_blank">艾媒网：千万纯金腰带亮相，众擎机器人发URKL联赛</a></li>
+          <li><a href="https://www.sznews.com/news/content/2026-03/11/content_31972351.htm" target="_blank">深圳新闻网：2025年众擎机器人销量较2024年实现近10倍增长</a></li>
+          <li><a href="http://www.nbd.com.cn/articles/2026-01-28/4238650.html" target="_blank">每日经济新闻：深圳人形机器人公司众擎机器人完成股改</a></li>
+          <li><a href="https://www.cyzone.cn/article/818097.html" target="_blank">创业邦：融资丨众擎机器人完成A1+轮&A2轮融资</a></li>
+          <li><a href="https://m.lieyunpro.com/archives/498045" target="_blank">猎云网：众擎机器人连续完成Pre-A++与A1轮近10亿元融资，京东领投</a></li>
+          <li><a href="https://app.dahecube.com/nweb/pc/article.html?artid=270906" target="_blank">大河财立方：众擎机器人赵同阳——让"河南造"人形机器人走向世界</a></li>
+          <li><a href="https://newpaper.dahe.cn/hnrb/html/2025-12/13/content_11_1771667.htm" target="_blank">河南日报：人形机器人头部企业争相布局河南</a></li>
+          <li><a href="https://www.comnews.cn/content/2026-04/19/content_63219.html" target="_blank">中国商报网：豫商访谈｜来看豫商交出的"机器人"答卷</a></li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">本页面由具身智能Wiki项目自动生成 · 数据截止2026年5月 · 仅供信息参考，不构成投资建议</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

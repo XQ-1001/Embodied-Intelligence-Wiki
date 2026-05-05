@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>安川电机 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> <span class="breadcrumb-sep">›</span> <span>安川电机</span></div>
+  <div class="wiki-header"><h1>安川电机</h1><div class="subtitle">YASKAWA Electric Corporation · TYO:6506 · 1915年创立 · 全球工业机器人四大家族之一 · 累计出货超60万台</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#founders">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#finance">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#analysis1">2.1 团队背景与场景选择的匹配度</a></li>
+        <li class="toc-lvl4"><a href="#analysis2">2.2 技术路线与场景的适配性</a></li>
+        <li class="toc-lvl4"><a href="#analysis3">2.3 股东/资本结构对战略的影响</a></li>
+        <li class="toc-lvl4"><a href="#analysis4">2.4 试错过程与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#analysis5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#analysis6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#refs">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+
+      <aside class="infobox">
+        <div class="infobox-title">安川电机</div>
+        <div class="ib-row"><div class="ib-label">英文名称</div><div class="ib-value">YASKAWA Electric Corporation</div></div>
+        <div class="ib-row"><div class="ib-label">股票代码</div><div class="ib-value">TYO: 6506</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">1915年7月16日</div></div>
+        <div class="ib-row"><div class="ib-label">创始人</div><div class="ib-value">安川第五郎</div></div>
+        <div class="ib-row"><div class="ib-label">总部</div><div class="ib-value">日本福冈县北九州市八幡西区</div></div>
+        <div class="ib-row"><div class="ib-label">上市</div><div class="ib-value">1949年（东京/大阪/福冈）</div></div>
+        <div class="ib-row"><div class="ib-label">员工人数</div><div class="ib-value">约15,000人（2025年）</div></div>
+        <div class="ib-section">财务数据</div>
+        <div class="ib-row"><div class="ib-label">FY2024营收</div><div class="ib-value">5,376.8亿日元（约36亿美元）</div></div>
+        <div class="ib-row"><div class="ib-label">FY2024营业利润</div><div class="ib-value">496.7亿日元</div></div>
+        <div class="ib-row"><div class="ib-label">FY2025营收</div><div class="ib-value">5,421亿日元</div></div>
+        <div class="ib-row"><div class="ib-label">FY2026E营收</div><div class="ib-value">5,800亿日元</div></div>
+        <div class="ib-section">估值/市值</div>
+        <div class="ib-row"><div class="ib-label">市值</div><div class="ib-value">约1.28万亿日元（约82亿美元）</div></div>
+        <div class="ib-row"><div class="ib-label">股价</div><div class="ib-value">4,894日元（2026.4）</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">机器人累计出货</div><div class="ib-value">&gt;60万台</div></div>
+        <div class="ib-row"><div class="ib-label">AC伺服累计出货</div><div class="ib-value">&gt;2,000万台</div></div>
+        <div class="ib-row"><div class="ib-label">变频器累计出货</div><div class="ib-value">&gt;3,000万台</div></div>
+        <div class="ib-row"><div class="ib-label">首台机器人</div><div class="ib-value">MOTOMAN-L10（1977年）</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">行业</div><div class="ib-value"><span class="tag tag-info">工业机器人</span><span class="tag tag-info">伺服驱动</span><span class="tag tag-info">工厂自动化</span></div></div>
+        <div class="ib-row"><div class="ib-label">官网</div><div class="ib-value"><a href="https://www.yaskawa.co.jp/" target="_blank">yaskawa.co.jp</a></div></div>
+      </aside>
+
+      <p class="article-intro"><strong>安川电机</strong>（YASKAWA Electric Corporation，TYO:6506）是日本工业自动化和机器人领域的百年巨头，与发那科、ABB、库卡并称全球工业机器人「四大家族」。公司1915年由安川第五郎创立于日本北九州，以电机制造起家，逐步发展为全球领先的工业机器人、伺服驱动和变频器制造商。其MOTOMAN品牌累计出货超60万台，AC伺服和变频器分别突破2,000万和3,000万台。2023年推出AI机器人平台MOTOMAN NEXT，与NVIDIA深度绑定，向物理AI时代转型。FY2024财年营收5,376.8亿日元，市值的1.28万亿日元。</p>
+
+      <!-- 1 事实层 -->
+      <h2 id="facts">1 事实层</h2>
+
+      <!-- 1.1 基本信息 -->
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper"><table class="wikitable infotable">
+        <tr><th>项目</th><th>内容</th></tr>
+        <tr><td>公司全称</td><td>株式会社安川電機（YASKAWA Electric Corporation）</td></tr>
+        <tr><td>英文名称</td><td>YASKAWA Electric Corporation</td></tr>
+        <tr><td>成立时间</td><td>1915年7月16日（合资公司安川電機製作所）</td></tr>
+        <tr><td>注册地</td><td>日本福冈县北九州市八幡西区黒崎城石2番1号</td></tr>
+        <tr><td>上市</td><td>东京证券交易所Prime（TYO:6506）、福冈证券交易所（1949年上市）</td></tr>
+        <tr><td>法定代表人</td><td>代表取缔役社长 小川昌宽（2026年5月底转任副会长）；现任会长小笠原浩将兼任社长</td></tr>
+        <tr><td>官网</td><td>https://www.yaskawa.co.jp/</td></tr>
+        <tr><td>员工人数</td><td>约15,000人（2025年）</td></tr>
+        <tr><td>行业</td><td>工业自动化、机器人、伺服驱动、变频器</td></tr>
+      </table></div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>时间</th><th>事件</th></tr>
+        <tr><td>1915年</td><td>安川第五郎在父亲安川敬一郎资助下创办合资公司安川電機製作所</td></tr>
+        <tr><td>1917年</td><td>改制为株式会社安川電機製作所</td></tr>
+        <tr><td>1931年</td><td>战略转型专攻电机产品，公司首次实现盈利</td></tr>
+        <tr><td>1949年</td><td>在东京、大阪、福冈证券市场上市，成为战后日本首批上市公司</td></tr>
+        <tr><td>1958年</td><td>发明DC伺服电机（Minertia电机）；在名古屋证券市场上市</td></tr>
+        <tr><td>1977年</td><td>制造首台全电气式垂直多关节工业机器人MOTOMAN-L10</td></tr>
+        <tr><td>1991年</td><td>公司名称从「安川電機製作所」更改为「株式会社安川電機」</td></tr>
+        <tr><td>2003年</td><td>MOTOMAN机器人累计生产突破10万台</td></tr>
+        <tr><td>2015年</td><td>创立100周年，机器人村、新总部大楼、安川电机未来馆竣工</td></tr>
+        <tr><td>2021年</td><td>MOTOMAN累计出货突破50万台；AC伺服累计2,000万台；变频器累计3,000万台</td></tr>
+        <tr><td>2022年</td><td>中国常州新工厂（机电一体化系统）投产，投资约1.5亿美元</td></tr>
+        <tr><td>2023年</td><td>推出新一代AI机器人平台MOTOMAN NEXT；小川昌宽就任第11代社长</td></tr>
+        <tr><td>2025年</td><td>宣布在美国威斯康星州投资约1.8亿美元建设北美总部及机器人工厂；累计机器人出货突破60万台</td></tr>
+        <tr><td>2026年</td><td>与NVIDIA在GTC 2026正式确立物理AI战略合作；社长小川昌宽因健康原因宣布转任副会长</td></tr>
+      </table></div>
+
+      <!-- 1.2 创始人及核心团队 -->
+      <h3 id="founders">1.2 创始人及核心团队</h3>
+      <p>创始人<strong>安川第五郎</strong>（1886–1976），东京帝国大学电气工学科毕业，1915年在父亲安川敬一郎资助下创办安川电机。安川敬一郎（1849–1934）是明治时代著名实业家、贵族院议员、安川财阀创始人，曾资助孙中山革命。安川第五郎本人历任第2代社长（1936–1942），奠定了公司电机与自动化技术根基。</p>
+      <p>安川电机的历代社长多出身于电机工程领域，公司保持了技术驱动型管理传统。现任核心管理层为：社长小川昌宽（2023年就任，2026年5月底因健康原因转任副会长），会长小笠原浩（1979年九州工业大学毕业后即入社，2016–2023年任第10代社长，将兼任社长）。高管团队以内部晋升为主，管理层稳定性强。</p>
+
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+        <tr><td>创始人</td><td>安川第五郎</td><td>东京帝国大学电气工学科毕业，1915年29岁时创办安川电机，1936–1942年任社长</td></tr>
+        <tr><td>现任社长（第11代）</td><td>小川昌宽</td><td>2023年就任代表取缔役社长；推动AI机器人MOTOMAN NEXT战略；2026年5月底因健康原因转任副会长，未来专注AI机器人业务</td></tr>
+        <tr><td>现任会长</td><td>小笠原浩</td><td>1979年九州工业大学毕业即入社；曾担任台湾安川电机总经理；2016–2023年任第10代社长；2022年起兼任会长；2026年5月底起兼任社长</td></tr>
+        <tr><td>安川欧洲总裁兼CEO</td><td>Pär Tornemo</td><td>2026年3月1日起出任安川电机欧洲有限公司总裁兼CEO，负责欧洲市场扩张</td></tr>
+        <tr><td>DACH地区机器人负责人</td><td>Jörg Rommelfanger</td><td>负责德国、奥地利、瑞士地区机器人业务拓展</td></tr>
+      </table></div>
+      <p>人才结构特点：属于<strong>传统产业派+内部晋升型</strong>，高管以工科技术背景和长期公司内晋升为主。全球约15,000名员工，以日本和中国为两大生产研发基地。研发体系以日本北九州为核心，在中国（上海、沈阳、常州）及美国（Franklin、Lawrence）设有本地化开发团队。</p>
+
+      <!-- 1.3 融资与股东 -->
+      <h3 id="funding">1.3 融资与股东</h3>
+      <p>安川电机为东京证券交易所Prime市场上市公司（TYO:6506），自1949年上市以来主要依赖自有资金和银行融资进行资本投资，未发生过大规模股权融资稀释事件。近年重大资本支出包括：美国威斯康星州新工厂约1.8亿美元（约260亿日元）、日本北九州市新工厂约200亿日元、中国常州工厂约1.5亿美元。</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>融资/投资事件</th><th>金额</th><th>时间</th><th>用途</th></tr>
+        <tr><td>中国常州机电一体化工厂</td><td>约1.5亿美元</td><td>2022年6月投产</td><td>伺服放大器、变频器主板、机器人控制器电控单元生产</td></tr>
+        <tr><td>美国威斯康星州Franklin新基地</td><td>约1.8亿美元（260亿日元）</td><td>2025年宣布，8-10年分期建设</td><td>北美总部+机器人制造+R&D中心</td></tr>
+        <tr><td>日本北九州市八幡西区新工厂</td><td>约200亿日元</td><td>规划中</td><td>推动电机与机器人一体化生产</td></tr>
+      </table></div>
+      <p>作为上市超75年的蓝筹股，安川电机的股东结构以机构投资者为主，无单一控股股东。公司每年稳定派息，FY2025每股股息72日元（上期68日元）。安川电机被视为全球制造业设备投资动向的先行指标，因其在日本制造业中通常最早发布财报。</p>
+
+      <!-- 1.4 技术路线 -->
+      <h3 id="tech">1.4 技术路线</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>维度</th><th>详情</th></tr>
+        <tr><td>AI技术架构</td><td>MOTOMAN NEXT平台：RCU（机器人控制单元）+ ACU（自主控制单元）双核架构，标配NVIDIA Jetson Orin GPU，支持边缘AI实时推理；Wind River Linux操作系统 + Docker容器化部署</td></tr>
+        <tr><td>机器人控制</td><td>MOVAUTO无碰撞自动路径规划（基于3D环境模型实时避障）；任务/技能级编程替代传统逐点示教；支持Python/C++、ROS2桥接</td></tr>
+        <tr><td>数字孪生</td><td>YNX Robot Simulator仿真工具，集成NVIDIA Isaac Sim；支持Sim2Real虚拟训练与验证</td></tr>
+        <tr><td>机器视觉</td><td>2D/3D视觉系统，支持对可变物品的识别、接近、抓取、放置</td></tr>
+        <tr><td>IT/OT融合</td><td>MotoLogix支持IEC 61131-3标准功能块编程，直接集成到PLC（Siemens/Beckhoff/B&R/Rockwell/Codesys等主流平台）</td></tr>
+        <tr><td>物理AI合作</td><td>2026年GTC大会与NVIDIA正式确立物理AI战略合作，整合Omniverse库+Isaac仿真框架+Jetson边缘推理+Cosmos 3世界模型</td></tr>
+        <tr><td>自研程度</td><td>高度垂直整合：自研电机→伺服驱动→控制器→机器人本体→系统集成全链条；AI平台核心软件自研，GPU/仿真等与NVIDIA深度合作</td></tr>
+        <tr><td>差异化特色</td><td>i³-Mechatronics概念（集成化、智能化、创新化机电一体化）；在伺服电机精度、响应速度方面处于全球第一梯队；开放式AI平台支持第三方开发</td></tr>
+      </table></div>
+      <p>安川电机的技术路线体现了<strong>从精密电机到智能机器人的自然演进</strong>。公司拥有从底层电机、伺服驱动、控制器到上层AI软件的全栈能力，其i³-Mechatronics理念将IT数据与OT工厂自动化深度融合。2026年与NVIDIA的战略合作意味着安川正在从传统工业自动化公司向物理AI基础设施提供商转型。MOTOMAN NEXT平台累计销售已超200台，预计2026财年起开始产生利润贡献。</p>
+
+      <!-- 1.5 产品形态 -->
+      <h3 id="products">1.5 产品形态</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>产品分类</th><th>子类</th><th>代表型号/系列</th><th>关键参数</th><th>主要场景</th></tr>
+        <tr><td rowspan="3">工业机器人（MOTOMAN）</td><td>AI自主机器人</td><td>MOTOMAN NEXT（NEX4/7/10/20/35）</td><td>标配NVIDIA GPU，自适应路径规划，YNX1000控制器</td><td>医疗、隧道、农业、电子制造、物流分拣</td></tr>
+        <tr><td>标准工业机器人</td><td>MOTOMAN系列（焊接/搬运/涂装/组装等）</td><td>多轴垂直/水平关节型，覆盖各类负载</td><td>汽车焊接、搬运码垛、涂装、组装</td></tr>
+        <tr><td>协作机器人（HC系列）</td><td>HC10/20/30</td><td>10-30kg载荷，1200-1700mm臂展，人机安全协作</td><td>码垛、焊接、拣选、食品包装</td></tr>
+        <tr><td>运动控制</td><td>AC伺服电机、伺服驱动器</td><td>Σ系列</td><td>累计出货超2,000万台</td><td>半导体设备、数控机床、工业自动化</td></tr>
+        <tr><td>变频器</td><td>通用/专用变频器</td><td>A1000/V1000/U1000系列</td><td>累计出货超3,000万台</td><td>数据中心、HVAC、电梯、泵类</td></tr>
+        <tr><td>系统集成</td><td>交钥匙自动化方案</td><td>PackMaster码垛/拆垛系统</td><td>混合SKU层拣和码垛</td><td>仓储物流、电商履约中心</td></tr>
+      </table></div>
+
+      <!-- 1.6 应用场景 -->
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>场景分类</th><th>具体场景</th><th>代表方案</th><th>合作方/客户</th></tr>
+        <tr><td>工业制造</td><td>汽车焊接、涂装、组装</td><td>MOTOMAN焊接/搬运系列</td><td>全球主流车企</td></tr>
+        <tr><td>半导体/电子</td><td>晶圆搬运、精密组装</td><td>Σ系列伺服电机+专用机器人</td><td>半导体设备制造商</td></tr>
+        <tr><td>商业服务</td><td>物流分拣、码垛拆垛</td><td>PackMaster、HC协作机器人</td><td>电商、3PL物流企业</td></tr>
+        <tr><td>医疗</td><td>医疗器械分拣清洗</td><td>MOTOMAN NEXT + 机器视觉</td><td>医疗机构（实证试验阶段）</td></tr>
+        <tr><td>基建/隧道</td><td>爆破作业自动化</td><td>MOTOMAN NEXT</td><td>隧道工程公司</td></tr>
+        <tr><td>农业</td><td>果实采收</td><td>MOTOMAN NEXT + AI视觉</td><td>农业企业（实证阶段）</td></tr>
+        <tr><td>新能源</td><td>太阳能逆变器、储能</td><td>Solectria逆变器（美国子公司）</td><td>光伏电站开发商</td></tr>
+      </table></div>
+      <p>终端市场分布：汽车行业约36%，科技相关（半导体/FPD）约30%，机械行业约16%，其他约18%。安川电机的收入结构与全球制造业资本支出高度相关，周期性特征明显。</p>
+
+      <!-- 1.7 商业化进展 -->
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>指标</th><th>数据</th><th>时间</th></tr>
+        <tr><td>MOTOMAN机器人累计出货</td><td>超60万台</td><td>截至2025年</td></tr>
+        <tr><td>AC伺服电机累计出货</td><td>超2,000万台</td><td>截至2021年</td></tr>
+        <tr><td>变频器累计出货</td><td>超3,000万台</td><td>截至2021年</td></tr>
+        <tr><td>MOTOMAN NEXT累计销量</td><td>超200台</td><td>截至2026年4月</td></tr>
+        <tr><td>美国新工厂投资</td><td>约1.8亿美元（260亿日元）</td><td>2025年宣布</td></tr>
+        <tr><td>美国新工厂预计新增就业</td><td>700+个岗位</td><td>2027年起分阶段</td></tr>
+        <tr><td>中国常州工厂投资</td><td>约1.5亿美元</td><td>2022年已投产</td></tr>
+        <tr><td>FY2025 Q4整体订单额</td><td>1,524亿日元（同比+20%，13季度新高）</td><td>2025.12–2026.2</td></tr>
+        <tr><td>FY2025 Q4美洲订单额</td><td>452亿日元（同比+48%）</td><td>2025.12–2026.2</td></tr>
+      </table></div>
+
+      <!-- 1.8 财务数据 -->
+      <h3 id="finance">1.8 财务数据</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>财务指标（亿日元）</th><th>FY2023<br>(截至2024.2)</th><th>FY2024<br>(截至2025.2)</th><th>FY2025<br>(截至2026.2)</th><th>FY2026E<br>(截至2027.2)</th></tr>
+        <tr><td>合并营收</td><td>5,756.6</td><td>5,376.8</td><td>5,421</td><td>5,800</td></tr>
+        <tr><td>营业利润</td><td>652.2</td><td>496.7</td><td>473</td><td>600</td></tr>
+        <tr><td>净利润</td><td>506.9</td><td>569.9</td><td>352</td><td>470</td></tr>
+        <tr><td>营收同比</td><td>—</td><td>-6.6%</td><td>+0.8%</td><td>+7.0%</td></tr>
+        <tr><td>营业利润率</td><td>11.3%</td><td>9.2%</td><td>8.7%</td><td>10.3%</td></tr>
+        <tr><td>每股股息（日元）</td><td>—</td><td>68</td><td>72</td><td>—</td></tr>
+      </table></div>
+      <p>部门别营收（FY2025）：运动控制（伺服+变频器）2,550亿日元（47.4%），机器人2,401.8亿日元（44.7%），系统工程391.6亿日元（7.3%）。FY2026展望：运动控制部门预计营收2,800亿日元（+18.6%）、营益420亿日元（+72.2%），机器人部门预计营收2,400亿日元（-2.8%）、营益210亿日元（+2.8%）。FY2024末账面资金充裕，公司现金储备足以覆盖美国新工厂等重大资本支出。</p>
+
+      <!-- 1.9 其他信息 -->
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>安川电机2025年庆祝创立<strong>110周年</strong>，是全球最悠久的工业机器人制造商之一。</li>
+        <li>公司奉行<strong>"地产地销"</strong>战略：日本、中国、美国三大生产基地各自服务区域市场。中国市场通过在上海、沈阳、常州共4座工厂实现本地化研发-生产-销售一体化。</li>
+        <li>2026年5月底管理层重大调整：社长<strong>小川昌宽</strong>因健康原因转任副会长，专注于AI机器人业务发展；会长<strong>小笠原浩</strong>将兼任社长。这一人事变动引发市场对AI业务战略优先级的关注。</li>
+        <li>FY2025 Q4运动控制部门订单同比暴增47%，主要受<strong>半导体设备需求和AI数据中心建设</strong>驱动；美洲市场订单同比+48%创纪录。但机器人部门Q4订单-7%，呈短期走弱。</li>
+        <li>2026年3月NVIDIA GTC大会上，黄仁勋宣布ABB、发那科、库卡、安川<strong>四大机器人巨头</strong>共同加入NVIDIA物理AI生态平台，标志着安川正式从传统工业自动化向<strong>AI驱动自动化</strong>转型。</li>
+        <li>安川电机的美国子公司Solectria专注于<strong>太阳能逆变器</strong>，叠加数据中心驱动变频器需求，在新能源和数字化双重驱动下获得增长。</li>
+        <li>全球已安装超<strong>60万台</strong>MOTOMAN机器人（截至2024年），仅次于发那科和ABB。</li>
+        <li>欧洲市场FY2025 Q4订单同比-7%（连续7季萎缩），表明欧洲制造业投资疲弱拖累增长。</li>
+      </ul>
+
+      <!-- 2 分析层 -->
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="analysis1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>安川电机的核心团队呈现出典型的<strong>产业派+内部晋升型</strong>特征。从创始人安川第五郎（东京帝大电气工学）到历任社长，高管全部具有电机工程或自动化技术背景，且多数终身服务于公司。这种团队结构使其对工业制造场景有天然深刻的理解——公司的产品线（伺服→变频器→工业机器人→AI机器人）沿着制造业需求链自然生长，而非脱胎于学术实验或消费场景。小川昌宽在2026年因健康原因转任副会长后"专注AI机器人业务"的表态，也印证了管理层对技术路线的坚定。</p>
+        <p>然而，这种内部晋升为主的文化也带来一定局限：团队对汽车、半导体等传统工业场景掌握深厚，但对医疗、农业、物流等MOTOMAN NEXT正在拓展的新场景，缺乏本领域出身的领军人才。安川在美国新建基地时引入本地管理层（如Pär Tornemo负责欧洲），表明公司正在尝试在全球化扩张中补充多样性。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>安川选择的技术路线——从底层电机到上层AI的<strong>全栈垂直整合</strong>——与其主要目标场景高度适配。在工业制造场景（汽车、半导体），精度、可靠性和实时性比灵活性更重要，安川自研的伺服电机（Σ系列）和控制器能够实现微米级精度，这是纯AI创业公司难以匹敌的壁垒。MOTOMAN NEXT引入NVIDIA Jetson和AI自适应能力，是在传统强项上的叠加而非置换。</p>
+        <p>但向医疗、农业等非结构化场景扩展时，对通用AI能力的要求远高于工业场景。安川选择与NVIDIA深度绑定（Omniverse + Isaac + Cosmos），本质上是将通用AI底座外包给平台方，自己聚焦「AI + 工业know-how」的最后一公里适配——这在当前阶段是合理的取舍，但长期可能面临NVIDIA生态内其他机器人厂商的同质化竞争。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>作为东证Prime上市超75年的蓝筹公司，安川电机的股东以<strong>机构投资者为主</strong>，无控股股东。这种分散化的股权结构使得管理层在战略决策上拥有较大自主权——无论是投资1.8亿美元在美国建厂、押注NVIDIA生态，还是社长因健康原因换帅，都未出现过股东层面的阻力。</p>
+        <p>与发那科（同样上市、无控股方）的对标：两家都是日本制造业「独立巨头」，不依赖产业资本绑定场景。这一独立性使安川可以同时服务汽车、半导体、医疗等多个行业而不受客户冲突约束，但也意味着<strong>缺乏场景端的天然需求拉动</strong>——不像被车企收购的库卡（绑定汽车制造需求），安川的增长更多依赖自身对宏观资本支出周期的判断。独立性的代价是在顺周期时增长弹性往往小于有产业资本绑定的对手。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>安川110年的历史中有几次关键路径调整值得关注：（1）1931年从多元化收缩到专注电机产品，首次实现盈利——这次试错奠定了「专注核心、纵向深耕」的基因；（2）1977年从电机跨界到工业机器人MOTOMAN，是全球首批将伺服电机技术外溢到机器人领域的公司之一，这次「电机→机器人」的跳跃被证明是战略性成功；（3）2023年推出MOTOMAN NEXT，从传统示教机器人转向AI自适应平台——这是应对人口老龄化和劳动力短缺的主动调整。</p>
+        <p>FY2025的运动控制部门Q4订单暴增47%而机器人部门订单-7%的数据表明，当前仍存在「AI叙事强但传统机器人需求弱」的结构性矛盾。小川社长在2026年4月坦言"藉由AI机器人开拓新客户，自今年度起开始贡献获利"——这暗示MOTOMAN NEXT的前200台销量更多地是技术验证而非大规模商业化，真正的放量仍需时间。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>安川在四大家族中的定位可类比为<strong>「iPod式的精专务实路线」</strong>：发那科在数控系统和机器人部署量上领先，ABB在电力与自动化综合能力上更强，库卡有美的/汽车制造的场景绑定。安川的核心取舍是——不追求部署量第一，而是以<strong>伺服电机精度</strong>为根基的差异化竞争。其运动控制部门（伺服+变频器）的营收甚至超过机器人部门，这在四大家族中独一无二。这一取舍的优势是：无论机器人市场如何波动，伺服电机的需求始终存在（半导体设备、数控机床等）；风险是：伺服下游受宏观资本支出周期影响更直接，FY2023-FY2025的营收波动即体现了这一周期性弱点。</p>
+        <p>在AI时代，安川选择做<strong>NVIDIA生态内的应用层玩家</strong>而非自建通用AI底座——这与其"专注核心"的传统一致，但代价是品牌被纳入NVIDIA叙事之后，独立AI品牌溢价有限。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis6">
+        <h4>2.6 其他重要观察</h4>
+        <p>（1）<strong>地缘政治风险管理</strong>：安川在美国建厂（减少关税风险）、在中国坚持"地产地销"（本地化生产和采购，2025年加强中国本土零部件采购）、在日本扩产（强化QCD竞争力）——三条腿走路的策略在当前贸易环境下显示出较强韧性。（2）<strong>管理层交接风险</strong>：小川昌宽2023年就任社长不到三年即因健康原因换帅，且明确表示将专注AI业务，这可能意味着公司内部分歧或AI转型压力超出预期。（3）<strong>估值锚点</strong>：安川8,200亿日元（约82亿美元）的市值，PS约1.5倍，在四大家族中偏低——市场对其周期性暴露和AI转型落地速度仍持谨慎态度。（4）<strong>MOTOMAN NEXT的真实放量节点</strong>是2026-2027年的关键观察指标：如果年销量从200台跃升至千台级别，将验证AI机器人的市场真实需求。（5）FY2026的600亿日元营业利润指引（+26.8%）很大程度上依赖运动控制部门的半导体/数据中心需求——如果AI基建投资周期退潮，可能存在下行风险。</p>
+      </div>
+
+      <!-- 3 参考资料 -->
+      <h2 id="refs">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://zh.wikipedia.org/zh-hans/%E5%AE%89%E5%B7%9D%E9%9B%BB%E6%A9%9F" target="_blank">安川电机 — 维基百科</a></li>
+          <li><a href="https://www.yaskawa.co.jp/" target="_blank">安川电机官方网站</a></li>
+          <li><a href="https://www.yaskawa.com.tw/about/profile/" target="_blank">台湾安川电机 — 公司介绍</a></li>
+          <li><a href="https://china.kyodonews.net/articles/-/5181" target="_blank">日本机器人巨头借助AI推动产品性能升级 — 共同社 (2026.01.14)</a></li>
+          <li><a href="http://www.gkong.com/news/120042.html" target="_blank">安川电机社长展望2025：聚焦AI机器人、自主生产一体化 — 工控网</a></li>
+          <li><a href="https://icspec.com/news/article-details/2517693" target="_blank">安川电机2026财年营益预期增长，AI机器人成亮点 — icspec</a></li>
+          <li><a href="https://control.com/news/yaskawa-does-the-heavy-lifting-at-modex-2026/" target="_blank">Yaskawa Does the Heavy Lifting at MODEX 2026 — Control.com</a></li>
+          <li><a href="https://investor.nvidia.com/news/press-release-details/2026/NVIDIA-and-Global-Robotics-Leaders-Take-Physical-AI-to-the-Real-World/default.aspx" target="_blank">NVIDIA and Global Robotics Leaders Take Physical AI to the Real World — NVIDIA Investor (GTC 2026)</a></li>
+          <li><a href="https://www.manufacturingdive.com/news/industrial-robotics-companies-everywhere-says-nvidia-ceo-gtc-2026-abb-fanuc-ai/815042/" target="_blank">Nvidia CEO says 'every industrial company will become a robotics company' — Manufacturing Dive</a></li>
+          <li><a href="https://www.therobotreport.com/nvidia-collaborates-global-robotics-leaders-make-physical-ai-reality/" target="_blank">NVIDIA works with global robotics leaders to make physical AI a reality — The Robot Report</a></li>
+          <li><a href="https://stockanalysis.com/quote/tyo/6506/financials/" target="_blank">YASKAWA Electric (TYO:6506) Financials — StockAnalysis</a></li>
+          <li><a href="https://longportapp.cn/zh-CN/news/234541993" target="_blank">安川电机公布2025财年喜忧参半的财务业绩 — LongPort</a></li>
+          <li><a href="https://uanalyze.com.tw/articles/8620623906" target="_blank">安川電機下調2026會計年度財測 將於美國設立第一個機器人工廠 — UAnalyze</a></li>
+          <li><a href="https://seisanzai-japan.com/article/p5649/" target="_blank">Yaskawa to establish new U.S. base in Wisconsin — SEISANZAI Japan</a></li>
+          <li><a href="https://www.assemblymag.com/articles/99449-yaskawa-to-build-robot-factory-in-wisconsin" target="_blank">Yaskawa to Build Robot Factory in Wisconsin — Assembly Magazine</a></li>
+          <li><a href="https://www.yaskawa.dk/header-meta/news-events/article/motoman-next---a-new-platform-from-yaskawa-for-intelligent-adaptive-robotic-automation-and-ai_n22119" target="_blank">MOTOMAN NEXT — A new platform from Yaskawa for intelligent adaptive robotic automation and AI</a></li>
+          <li><a href="https://www.automation.com/article/yaskawa-next-generation-motoman-next-platform" target="_blank">Yaskawa Announces Next-Generation Motoman NEXT Platform — Automation.com</a></li>
+          <li><a href="https://www.controlglobal.com/industry-news/news/55088606/yaskawa-robot-uses-wind-river-linux-for-ai-and-autonomy" target="_blank">Yaskawa robot uses Wind River Linux for AI and autonomy — Control Global</a></li>
+          <li><a href="https://www.macrotrends.net/stocks/charts/YASKY/yaskawa-electric/number-of-employees" target="_blank">Yaskawa Electric: Number of Employees 2013-2025 — Macrotrends</a></li>
+          <li><a href="https://www.jiemian.com/article/7623629.html" target="_blank">安川电机常州新工厂投产，总投资约1.5亿美元 — 界面新闻</a></li>
+          <li><a href="https://www.asahi.com/ajw/articles/15850585" target="_blank">Yaskawa to invest $180 million in U.S. robotics hub — The Asahi Shimbun</a></li>
+          <li><a href="https://www.marketscreener.com/quote/stock/YASKAWA-ELECTRIC-CORPORAT-6492333/consensus/" target="_blank">YASKAWA Electric Corporation: Target Price Consensus — MarketScreener</a></li>
+          <li><a href="https://www.futunn.com/stock/6506-JP/financials-revenue" target="_blank">安川电机(6506)收入构成 — 富途牛牛</a></li>
+          <li><a href="https://gongkong.ofweek.com/2020-01/ART-310000-8500-30424516.html" target="_blank">105岁的安川电机，在专注中激流勇进 — OFweek工控网</a></li>
+          <li><a href="https://m.jiemian.com/article/11318025.html" target="_blank">安川电机推行"地产地销"战略，加强中国本土零部件采购 — 界面新闻</a></li>
+        </ol>
+      </div>
+
+    </article>
+  </div>
+  <div class="page-footer">页面生成于2026年5月4日 · 数据截至2026年4月 · 具身智能Wiki项目</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

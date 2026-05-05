@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>Cartwheel Robotics — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .callout-danger { border-left-color: #c0392b; background: #fdf2f2; }
+  .callout-danger .callout-title { color: #c0392b; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> › <span>Cartwheel Robotics</span></div>
+  <div class="wiki-header"><h1>Cartwheel Robotics</h1><div class="subtitle">Cartwheel Robotics Inc. · 2021/2022年成立 · 总部美国内华达州里诺 · 已关闭（2026年2月）</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#founders">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financials">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#a1">2.1 团队背景与场景选择</a></li>
+        <li class="toc-lvl4"><a href="#a2">2.2 技术路线与场景适配</a></li>
+        <li class="toc-lvl4"><a href="#a3">2.3 股东资本对战略的影响</a></li>
+        <li class="toc-lvl4"><a href="#a4">2.4 试错过程与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#a5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#a6">2.6 倒闭原因深度分析</a></li>
+        <li class="toc-lvl2"><a href="#refs">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">Cartwheel Robotics</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">Cartwheel Robotics Inc.</div></div>
+        <div class="ib-row"><div class="ib-label">成立</div><div class="ib-value">2021/2022年</div></div>
+        <div class="ib-row"><div class="ib-label">总部</div><div class="ib-value">美国内华达州里诺</div></div>
+        <div class="ib-row"><div class="ib-label">创始人/CEO</div><div class="ib-value">Scott LaValley</div></div>
+        <div class="ib-row"><div class="ib-label">COO</div><div class="ib-value">Samantha Conway</div></div>
+        <div class="ib-row"><div class="ib-label">状态</div><div class="ib-value"><span style="color:#c0392b;font-weight:700;">已关闭</span>（2026年2月）</div></div>
+        <div class="ib-section">财务数据</div>
+        <div class="ib-row"><div class="ib-label">累计融资</div><div class="ib-value">约30万-300万美元（公开数据不一）</div></div>
+        <div class="ib-row"><div class="ib-label">主要投资方</div><div class="ib-value">New Wave Holdings、Humanoid Global (CSE:ROBO)</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">员工规模</div><div class="ib-value">~7人</div></div>
+        <div class="ib-row"><div class="ib-label">旗舰产品</div><div class="ib-value">Yogi人形机器人</div></div>
+        <div class="ib-row"><div class="ib-label">关闭原因</div><div class="ib-value">种子轮融资失败，资金链断裂</div></div>
+        <div class="ib-section">官网</div>
+        <div class="ib-row"><div class="ib-label">原官网</div><div class="ib-value">cartwheelrobotics.com（已下线）</div></div>
+      </aside>
+
+      <div class="callout callout-danger"><div class="callout-title">⚠ 公司状态：已关闭</div>Cartwheel Robotics已于<strong>2026年2月</strong>因未能完成种子轮融资而终止运营，成为2026年全球人形机器人行业首例倒闭案例。创始人Scott LaValley在LinkedIn发布告别声明，称"在硬件行业，资金就像氧气"（"In hardware, funding is like oxygen"）。</div>
+
+      <p class="article-intro"><strong>Cartwheel Robotics</strong>是一家曾位于美国内华达州的家庭人形机器人初创公司，由前Boston Dynamics Atlas项目硬件负责人、前迪士尼首席幻想工程师Scott LaValley于2021/2022年创立。公司以打造"人类真正愿意与之生活的人形机器人"为使命，旗舰产品Yogi定位为具有情感连接能力的家用伴侣机器人。尽管创始人拥有顶尖行业履历且技术路线明确，公司因仅募集到极少量资金（约30万-300万美元）而于2026年2月倒闭。其陨落被视为<strong>中美具身智能融资环境"冰火两重天"的缩影</strong>——同期中国同类公司往往完成数亿至数十亿元人民币融资。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper">
+        <table class="wikitable infotable">
+          <tr><th>项目</th><th>内容</th></tr>
+          <tr><td>公司全称</td><td>Cartwheel Robotics Inc.</td></tr>
+          <tr><td>英文名称</td><td>Cartwheel Robotics</td></tr>
+          <tr><td>成立时间</td><td>2021或2022年（不同来源有差异）</td></tr>
+          <tr><td>注册地</td><td>美国内华达州法伦（Fallon），后迁至里诺（Reno）</td></tr>
+          <tr><td>上市情况</td><td>未上市（私人公司）</td></tr>
+          <tr><td>原官网</td><td>cartwheelrobotics.com（2026年2月下线）</td></tr>
+          <tr><td>当前状态</td><td><span style="color:#c0392b;">已停止运营（2026年2月）</span></td></tr>
+          <tr><td>所属赛道</td><td>家用/消费级人形机器人、情感陪伴机器人</td></tr>
+        </table>
+      </div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>时间</th><th>事件</th></tr>
+          <tr><td>2021/2022年</td><td>Scott LaValley辞去迪士尼幻想工程师职位，拒绝Figure AI工作邀请，创立Cartwheel Robotics</td></tr>
+          <tr><td>2025年1月</td><td>完成首轮早期VC融资（金额未详细披露）</td></tr>
+          <tr><td>2025年6月</td><td>New Wave Holdings（CSE:NWAI）战略投资15万美元，为公司唯一公开金额的投资</td></tr>
+          <tr><td>2025年10月</td><td>关联上市实体Humanoid Global Holdings（CSE:ROBO）发布Yogi进展报告，宣布启动新一轮种子融资</td></tr>
+          <tr><td>2025年10月</td><td>Scott LaValley接受The Register等媒体采访，透露与美国最大医疗机构进行合作讨论</td></tr>
+          <tr><td>2025年12月（计划）</td><td>原计划Yogi全尺寸行走原型在硅谷Humanoid Summit首次亮相</td></tr>
+          <tr><td>2026年1月（预计）</td><td>里诺Oddie新工厂原计划建设完工</td></tr>
+          <tr><td>2026年2月</td><td><strong>因种子轮融资失败，资金链断裂，公司正式关闭</strong>；官网下线，LaValley在LinkedIn发布告别声明</td></tr>
+        </table>
+      </div>
+
+      <h3 id="founders">1.2 创始人及核心团队</h3>
+      <p>Cartwheel Robotics的团队规模极小（仅约7人），但创始人履历在行业中属于顶尖。Scott LaValley兼具<strong>工业机器人（Boston Dynamics）与娱乐机器人（迪士尼）双重背景</strong>，这种跨界经验直接塑造了公司的产品定位——既不追求工业场景的效率，也不追求纯娱乐的噱头，而是走"有灵魂的家用机器人"路线。</p>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+          <tr><td>创始人/CEO/CTO</td><td>Scott LaValley</td><td>前Boston Dynamics硬件负责人，约10年经验，主导Atlas（PETMAN、Atlas One、Atlas Two）开发，参与DARPA机器人挑战赛；前迪士尼首席幻想工程师（Principal Imagineer），约5年经验，领导Baby Groot（小格鲁特）步行机器人团队；也曾任职Google/Alphabet、QinetiQ；参加BattleBots机器人格斗大赛</td></tr>
+          <tr><td>联合创始人/COO</td><td>Samantha Conway</td><td>与LaValley共同创立公司，负责运营管理</td></tr>
+        </table>
+      </div>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <h4>融资历史</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>轮次</th><th>时间</th><th>金额</th><th>投资方</th></tr>
+          <tr><td>早期VC（首轮）</td><td>2025年1月</td><td>未公开</td><td>Battle Born Venture、ALM Ventures、Reno Seed Advisors等</td></tr>
+          <tr><td>早期VC（次轮）</td><td>2025年6月</td><td>15万美元</td><td>New Wave Holdings Corp.（CSE:NWAI）</td></tr>
+          <tr><td>关联投资</td><td>2025年</td><td>未公开</td><td>Humanoid Global Holdings Corp.（CSE:ROBO）</td></tr>
+          <tr><td>种子轮</td><td>2025年10月启动</td><td><strong>融资失败</strong></td><td>未关闭即倒闭</td></tr>
+        </table>
+      </div>
+      <p>公司累计融资额在不同报道中数据不一致，PitchBook记录显示约15万美元（仅New Wave Holdings一轮公开），但部分中文媒体引述"总计约300万美元"。考虑到公司7人团队一年内完成全栈平台开发的事实，大概率前期有额外天使资金或服务收入支撑。</p>
+      <h4>股东结构特点</h4>
+      <p>主要投资方Humanoid Global Holdings（CSE:ROBO）是一家专注于人形机器人赛道的加拿大上市投资公司，其CEO Shahab Samimi将Cartwheel定位为家庭与医疗场景的布局。但Humanoid Global本身市值有限，对Cartwheel的实质资金支持可能远低于其对外宣传。</p>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>技术维度</th><th>具体方案</th></tr>
+          <tr><td>AI技术路线</td><td>自研全栈平台（非ROS）：专有"运动语言模型"（Motion Language Model, MLM），可根据文本/语音输入生成自然的、仿生物学的全身动作；集成LLM用于自然语言交互；强调"表达能力>任务能力"</td></tr>
+          <tr><td>硬件路线</td><td>全自研硬件：精密高扭矩无刷伺服电机+谐波减速器（Harmonic Drive）；医用级硅胶皮肤+铝合金框架+聚合物外壳；模块化可更换电池系统（3分钟快拆）</td></tr>
+          <tr><td>计算平台</td><td>NVIDIA Jetson级GPU边缘AI模块；Linux (ROS2兼容)底层</td></tr>
+          <tr><td>感知系统</td><td>4K深度+立体摄像头；Wi-Fi/蓝牙/5G连接</td></tr>
+          <tr><td>自研程度</td><td>极高——定制硬件、固件、运动系统、行为逻辑、交互AI全部自研，7人团队一年内完成</td></tr>
+          <tr><td>差异化特色</td><td>行业唯一从"情感连接"而非"生产效率"切入的人形机器人公司；LaValley明确表示"我看到Yogi时看到的不是一个机器人，而是一个角色"</td></tr>
+        </table>
+      </div>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>产品</th><th>型号/版本</th><th>关键参数</th><th>定位</th></tr>
+          <tr><td rowspan="2"><strong>Yogi</strong>（旗舰）</td><td>原型机</td><td>身高~150cm（量产型约1m+），体重47kg，36自由度（每手10自由度/5指），步行速度4km/h（最大6km/h），举重15kg，续航3小时（3分钟快换电池），延迟~350ms，IP42防护</td><td>家用伴侣/轻任务助手</td></tr>
+          <tr><td>计划定价</td><td>家用租赁模式目标约1万美元；企业RaaS月费约$2,000-3,000</td><td>对标高端家电而非工业设备</td></tr>
+          <tr><td><strong>Speedy</strong>（商用）</td><td>原型机</td><td>全白外骨骼设计，可定制外观/角色，专用躯干可适配不同服装</td><td>博物馆、科学中心、迎宾等商用场景</td></tr>
+        </table>
+      </div>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>场景分类</th><th>具体场景</th><th>状态</th></tr>
+          <tr><td>家庭陪伴</td><td>情感陪伴、儿童互动、轻量家务（扫地等）</td><td>核心定位，未交付</td></tr>
+          <tr><td>医疗健康</td><td>与美国最大医疗机构进行合作探讨——候诊引导、非临床陪护、医院大堂接待</td><td>初步讨论阶段，未签约</td></tr>
+          <tr><td>教育/科研</td><td>多所北美大学表达合作意向</td><td>意向阶段，未签约</td></tr>
+          <tr><td>文旅/场馆</td><td>博物馆、科学中心——Speedy计划12个月内交付数十台</td><td>未交付</td></tr>
+        </table>
+      </div>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <p><strong>零。</strong>Cartwheel Robotics在关闭前未实现任何商业交付或收入。公司早期通过为外部企业客户提供机器人工程服务来维持运营（bootstrapping），但始终未能将其旗舰产品Yogi推向市场。原计划在2025年12月Humanoid Summit展示Yogi全尺寸行走原型，但因后续资金断裂，该演示是否实际发生尚不明确。Speedy虽计划向博物馆客户交付，但同样未实现。</p>
+
+      <h3 id="financials">1.8 财务数据</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>指标</th><th>数据</th><th>备注</th></tr>
+          <tr><td>累计公开融资金额</td><td>约15万-300万美元</td><td>来源数据不一，PitchBook记录为~$150K</td></tr>
+          <tr><td>收入</td><td>少量工程服务收入</td><td>无产品销售收入</td></tr>
+          <tr><td>员工规模</td><td>约7人</td><td>—</td></tr>
+          <tr><td>估值</td><td>未公开</td><td>—</td></tr>
+          <tr><td>资金储备</td><td>2026年2月耗尽</td><td>种子轮融资失败直接导致关闭</td></tr>
+        </table>
+      </div>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>Scott LaValley创立Cartwheel的灵感来源于其子女对机器人的反应——孩子看到Atlas时说"好可怕"，但看到Baby Groot时却说"我可以抱抱它吗？"这一对比促使他决定打造<strong>让人们愿意拥抱而非恐惧的机器人</strong>。</li>
+        <li>LaValley曾<strong>拒绝Figure AI的工作邀请</strong>，因为他认为行业主流方向（冷冰冰的工业工具）无法发挥人形机器人的真正潜力。</li>
+        <li>公司关闭后，LaValley在LinkedIn发布告别视频，展示Speedy原型机在金门大桥附近行走的画面。他留下两句箴言："在硬件行业，资金就像氧气"和"没有钱比拿错钱更好"（"No money is better than the wrong money"）。</li>
+        <li>Cartwheel Robotics的倒闭与同时期中国人形机器人公司的融资盛况形成<strong>鲜明对比</strong>：千寻智能、智平方、星海图等中国同期人形机器人公司各自获得数亿至数十亿元人民币融资。这一反差被多家中国媒体引用为"中美具身智能融资环境冰火两重天"。</li>
+        <li>公司7人团队在一年内完成了<strong>全栈人形机器人平台</strong>的开发——包括自研硬件、固件、运动系统、AI模型和软件，技术执行力在同等规模团队中极为罕见。</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="a1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>Scott LaValley的履历堪称家庭情感机器人赛道的"天选之人"——Boston Dynamics十年赋予他顶级的机器人运动控制工程能力，迪士尼五年赋予他"让机器人拥有灵魂"的设计哲学。Cartwheel选择以"情感连接"切入家庭场景而非工业场景，与其创始人的双重背景高度匹配。然而，<strong>团队过于精英化而规模过小</strong>（仅7人）导致在商业落地、供应链管理、市场开拓等环节严重薄弱。LaValley自己也承认："我们可以造出世界上最棒的机器人，但如果没有人愿意为此买单，那又有什么用？"这反映出技术背景的创始人往往低估了商业化的复杂性。</p>
+      </div>
+
+      <div class="analysis-block" id="a2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>Cartwheel的技术路线核心是"运动语言模型"（MLM）+全自研硬件，这与家庭陪伴场景较为适配——家庭环境不需要工业级精度，但需要安全、柔软、可预测的动作。采用医用级硅胶皮肤和幼儿体型设计也是正确的安全选择。然而，<strong>技术路线与商业可行性的错配</strong>是致命问题：全自研意味着极高的研发投入，而家用机器人市场的付费意愿和价格敏感度远未成熟。即使Yogi最终定价降至1万美元，在家庭场景中的"刚需性"仍然存疑——扫地机器人$300就能完成清扫，一台$10,000的人形机器人的额外价值是什么？这个问题Cartwheel从未给出足够有说服力的答案。</p>
+      </div>
+
+      <div class="analysis-block" id="a3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>Cartwheel的股东结构存在<strong>严重的资本质量缺陷</strong>。主要投资方Humanoid Global Holdings是加拿大CSE上市的小市值投资公司（而非产业巨头或顶级VC），New Wave Holdings同样是小型上市投资机构。这类投资者缺乏持续跟投能力和产业资源导入能力，无法为Cartwheel提供融资品牌背书以撬动更大规模的后续融资。与Figure AI获得Microsoft、OpenAI、NVIDIA等巨头支持，或中国公司获得BAT、国资基金青睐相比，Cartwheel的资本结构几乎注定了其在需要重资本的硬件赛道中难以为继。创始人LaValley的"没有钱比拿错钱更好"的临终箴言，或许正是对这种资本质量困境的总结。</p>
+      </div>
+
+      <div class="analysis-block" id="a4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>Cartwheel的发展史极短（约3-4年），可观察的路径调整有限。值得注意的一个细节是：公司同时开发了Yogi（旗舰家用机器人）和Speedy（商用场馆机器人）两条产品线，这在仅7人的团队中是一种<strong>资源分散</strong>。Speedy的定位更接近"可以快速产生收入的B2B产品"，而Yogi是"远期愿景产品"。如果公司在2025年中期优先集中资源推动Speedy的商业落地（哪怕只是小批量交付博物馆），可能能在种子轮融资中获得更有利的谈判位置。但公司在资源极度紧张的情况下仍然坚持"双线作战"，这可能是压垮骆驼的最后一根稻草。</p>
+      </div>
+
+      <div class="analysis-block" id="a5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>Cartwheel的核心取舍是<strong>"灵魂 vs 效率"</strong>。在整个人形机器人行业集体涌向工厂仓库的时候（Tesla Optimus、Figure 02、Agility Digit），Cartwheel是极少数坚定走"情感连接"路线的公司。这一选择如果成功，将开辟一个全新的消费级人形机器人市场。但这一取舍的代价是：它<strong>完全抛弃了当下人形机器人唯一有明确付费意愿的B2B工业场景</strong>。在行业早期阶段，投资人更关注"谁能先在工厂里替代人类工人"而非"谁能先成为你的家庭伙伴"。Cartwheel的差异化选择在哲学上值得尊敬，但在资本寒冬中缺乏生存空间。</p>
+      </div>
+
+      <div class="analysis-block" id="a6">
+        <h4>2.6 倒闭原因深度分析</h4>
+        <p>Cartwheel Robotics的倒闭是<strong>多重因素叠加的必然结果</strong>：其一，融资环境的结构性错配——美国早期硬件投资在2025-2026年显著收紧，人形机器人融资向头部集中（Figure AI独揽数十亿美元），边缘项目被系统性淘汰。反观中国，各级政府引导基金和产业资本对人形机器人的投入力度远超美国市场化VC，形成了"中国热、美国冷"的剪刀差。其二，商业模式验证不足——在没有任何商业化落地的情况下寻求种子轮融资，对于一家已经成立3-4年的硬件公司而言，投资人缺乏判断其产品-市场匹配度的锚点。其三，战略投资者的"伪支持"——Humanoid Global和New Wave Holdings的投资更多是蹭人形机器人概念炒作自身股价，而非真正愿意为公司长期发展提供资金后盾。其四，行业节奏误判——LaValley可能在2025年初基于行业风口判断融资环境会持续宽松，但实际上2025下半年至2026年初全球早期硬件融资急剧降温。Cartwheel Robotics的案例为所有硬件创业者提供了沉痛一课：<strong>技术能力不等于生存能力，融资能力和时机选择同样至关重要</strong>。</p>
+      </div>
+
+      <h2 id="refs">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://pitchbook.com/profiles/company/533484-19">PitchBook — Cartwheel Robotics 2026 Company Profile</a></li>
+          <li><a href="https://www.donews.com/news/detail/4/6443424.html">DoNews — 美国人形机器人公司Cartwheel Robotics因融资失败倒闭</a></li>
+          <li><a href="https://www.21jingji.com/article/20260226/herald/52f60033ca5033d9d251e00eb074d126.html">21世纪经济报道 — Cartwheel Robotics，开年第一家人形机器人倒闭了</a></li>
+          <li><a href="https://www.jiemian.com/article/14036601.html">界面新闻 — Cartwheel Robotics，开年第一家人形机器人倒闭了</a></li>
+          <li><a href="https://www.yemacaijing.com/Index/view/id/91391.html">野马财经 — 开年第一家人形机器人倒闭了</a></li>
+          <li><a href="https://m.lieyunpro.com/archives/500499">猎云网 — 开年第一家人形机器人倒闭了</a></li>
+          <li><a href="https://leaderobot.com/news/7226">机器人大讲堂 — 突发！美国一家人形机器人企业倒闭</a></li>
+          <li><a href="https://www.nasdaq.com/press-release/humanoid-global-reports-progress-cartwheel-robotics-flagship-humanoid-yogi-2025-10-16">Nasdaq — Humanoid Global Reports Progress on Cartwheel Robotics' Yogi</a></li>
+          <li><a href="https://interestingengineering.com/innovation/cartwheel-robotics-humanoid-robot-yogi">Interesting Engineering — Upcoming 'Yogi' humanoid robot to focus on human connections</a></li>
+          <li><a href="https://www.heise.de/en/news/Cartwheel-Robotics-develops-cuddly-humanoid-robots-10381779.html">Heise — Cartwheel Robotics develops cuddly humanoid robots</a></li>
+          <li><a href="https://www.theregister.com/2025/09/13/to_make_a_humanoid_robot/">The Register — Cartwheel Robotics' Scott LaValley: Today's robots too scary</a></li>
+          <li><a href="https://www.automate.org/robotics/industry-insights/ex-disney-imagineer-makes-big-bet-on-home-humanoids">Automate.org — Cartwheel Robotics is Building a Humanoid That Grows With You</a></li>
+          <li><a href="https://www.ieee-ras.org/news/cartwheel-robotics-wants-to-build-humanoids-that-people-love">IEEE RAS — Cartwheel Robotics Wants to Build Humanoids That People Love</a></li>
+          <li><a href="https://www.nasdaq.com/press-release/new-wave-announces-investment-cartwheel-robotics-advanced-robotics-company-seeking">Nasdaq — New Wave Announces Investment in Cartwheel Robotics</a></li>
+          <li><a href="https://www.azorobotics.com/News.aspx?newsID=16036">AZO Robotics — New Wave Invests in Cartwheel Robotics to Advance Humanoid Products</a></li>
+          <li><a href="https://www.rockingrobots.com/cartwheel-robotics-prepares-for-debut-of-humanoid-robot-yogi/">Rocking Robots — Cartwheel Robotics prepares for debut of humanoid robot Yogi</a></li>
+          <li><a href="https://www.donews.com/news/detail/8/5426723.html">DoNews — 家用人形机器人研发商Cartwheel Robotics获15万美元战略投资</a></li>
+          <li><a href="https://baike.baidu.com/item/Scott%20LaValley/67423405">百度百科 — Scott LaValley</a></li>
+          <li><a href="https://tracxn.com/d/companies/cartwheel/__JVp_lLqbaSxEYGWij9ZMGSwqrXt4aU1yG-ILzT5kOnM">Tracxn — Cartwheel Robotics Company Profile & Team</a></li>
+          <li><a href="https://www.chipsilicon.com/humanoid/yogi-humanoid-robot">ChipSilicon — Yogi Humanoid Robot Profile</a></li>
+          <li><a href="https://www.donews.com/news/detail/4/6442407.html">DoNews — 2026年初全球人形机器人行业呈现中美冰火两重天格局</a></li>
+          <li><a href="https://roboticsbusinessnews.com/news/2/1853/humanoid-global-updates-on-cartwheel-robotics-development-of-yogi-a-next-generation-embodied-ai-platform.html">Robotics Business News — Humanoid Global Updates on Cartwheel Robotics' Yogi Development</a></li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">此页面最后编辑于2026年5月4日 · 内容基于公开可用信息编制 · 具身智能Wiki</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>库卡 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> <span class="breadcrumb-sep">›</span> <span>库卡</span></div>
+  <div class="wiki-header"><h1>库卡</h1><div class="subtitle">KUKA AG · 1898年创立 · 工业机器人"四大家族"之一 · 美的集团控股 · 拟2026年独立上市</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#founders">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#technology">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financials">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#ana1">2.1 团队背景与场景匹配度</a></li>
+        <li class="toc-lvl4"><a href="#ana2">2.2 技术路线与场景适配性</a></li>
+        <li class="toc-lvl4"><a href="#ana3">2.3 股东/资本结构对战略的影响</a></li>
+        <li class="toc-lvl4"><a href="#ana4">2.4 试错过程与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#ana5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#ana6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#references">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">库卡（KUKA）</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">KUKA AG</div></div>
+        <div class="ib-row"><div class="ib-label">成立</div><div class="ib-value">1898年（德国奥格斯堡）</div></div>
+        <div class="ib-row"><div class="ib-label">总部</div><div class="ib-value">德国巴伐利亚州奥格斯堡</div></div>
+        <div class="ib-row"><div class="ib-label">创始人</div><div class="ib-value">Johann Josef Keller、Jakob Knappich</div></div>
+        <div class="ib-row"><div class="ib-label">控股股东</div><div class="ib-value">美的集团（100%）</div></div>
+        <div class="ib-row"><div class="ib-label">员工</div><div class="ib-value">~15,000人（全球）</div></div>
+        <div class="ib-row"><div class="ib-label">官网</div><div class="ib-value"><a href="https://www.kuka.com">kuka.com</a></div></div>
+        <div class="ib-section">财务数据（2025年）</div>
+        <div class="ib-row"><div class="ib-label">机器人及自动化收入</div><div class="ib-value">¥310.11亿（+8.05%）</div></div>
+        <div class="ib-row"><div class="ib-label">中国出货量</div><div class="ib-value">3.2万台（+30%+）</div></div>
+        <div class="ib-row"><div class="ib-label">中国市场份额</div><div class="ib-value">9.6%（第三）</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">知名产品</div><div class="ib-value">FAMULUS、KR TITAN、LBR iiwa、美罗</div></div>
+        <div class="ib-row"><div class="ib-label">人形机器人</div><div class="ib-value">美罗、美罗U、美拉系列</div></div>
+        <div class="ib-row"><div class="ib-label">顺德基地</div><div class="ib-value">28.86万㎡，累计投资¥27亿</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">类型</div><div class="ib-value"><span class="tag tag-info">工业机器人</span><span class="tag tag-info">人形机器人</span></div></div>
+        <div class="ib-row"><div class="ib-label">地区</div><div class="ib-value"><span class="tag">德国</span><span class="tag">中国</span></div></div>
+        <div class="ib-row"><div class="ib-label">阶段</div><div class="ib-value"><span class="tag tag-info">成熟上市(母公司)</span></div></div>
+      </aside>
+
+      <p class="article-intro"><strong>库卡</strong>（KUKA AG）是全球工业机器人"四大家族"之一，1898年创立于德国奥格斯堡，由 Johann Josef Keller 和 Jakob Knappich 创办。公司名称 KUKA 取自"Keller und Knappich Augsburg"首字母。库卡以1973年推出全球首台六轴电驱工业机器人 FAMULUS 闻名，旗下 KR TITAN 曾入选吉尼斯世界纪录。2016年被中国家电巨头美的集团以约€45亿收购，此后加速中国本土化。2025年库卡中国出货3.2万台，市场份额9.6%排名第三；在母公司美的"Automation 2.0"战略下，正从传统工业机器人向AI+人形机器人全面转型，已开发"美罗""美拉"等人形机器人系列，并计划2026年推动独立上市。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper">
+        <table class="wikitable infotable">
+          <tr><th>项目</th><th>内容</th></tr>
+          <tr><td>公司全称</td><td>KUKA AG（库卡股份公司）</td></tr>
+          <tr><td>英文名称</td><td>KUKA</td></tr>
+          <tr><td>公司名称来源</td><td>Keller und Knappich Augsburg 首字母缩写</td></tr>
+          <tr><td>成立时间</td><td>1898年</td></tr>
+          <tr><td>注册地/总部</td><td>德国巴伐利亚州奥格斯堡（Augsburg）</td></tr>
+          <tr><td>上市状态</td><td>曾为德国法兰克福交易所上市公司；2022年后美的完成全面私有化</td></tr>
+          <tr><td>控股股东</td><td>美的集团股份有限公司（000333.SZ），持股约100%</td></tr>
+          <tr><td>官方网站</td><td><a href="https://www.kuka.com">www.kuka.com</a></td></tr>
+        </table>
+      </div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>时间</th><th>事件</th></tr>
+          <tr><td>1898年</td><td>Johann Josef Keller 和 Jakob Knappich 在奥格斯堡创立乙炔气灯厂（Keller und Knappich GmbH）</td></tr>
+          <tr><td>1905年</td><td>拓展至氧乙炔焊接设备</td></tr>
+          <tr><td>1920年代</td><td>开始制造大型容器和市政车辆（街道清扫车、垃圾车）</td></tr>
+          <tr><td>1936年</td><td>制造德国首台电动点焊枪</td></tr>
+          <tr><td>1956年</td><td>向大众汽车交付首条多工位焊接自动线</td></tr>
+          <tr><td>1971年</td><td>为戴姆勒-奔驰（S级）建造欧洲首条机器人焊接线</td></tr>
+          <tr><td>1973年</td><td>推出 FAMULUS——世界首台六轴电驱工业机器人，标志库卡正式进入机器人领域</td></tr>
+          <tr><td>1980年</td><td>Quandt 家族退出，库卡成为公开上市公司</td></tr>
+          <tr><td>1995–1996年</td><td>拆分为库卡机器人公司和库卡焊接设备公司（现库卡系统）</td></tr>
+          <tr><td>2007年</td><td>KR TITAN 以世界最大最强六轴工业机器人入选吉尼斯世界纪录</td></tr>
+          <tr><td>2013年</td><td>推出 LBR iiwa——世界首款量产敏感型轻量协作机器人</td></tr>
+          <tr><td>2014年</td><td>合并 Swisslog，拓展物流与医疗自动化</td></tr>
+          <tr><td>2016年</td><td>美的集团以约€45亿收购库卡94.55%股权</td></tr>
+          <tr><td>2022–2023年</td><td>美的完成剩余股份收购，库卡成为美的全资子公司；庆祝125周年</td></tr>
+          <tr><td>2025年</td><td>库卡中国出货3.2万台（+30%），人形机器人"美罗"进入美的荆州工厂</td></tr>
+          <tr><td>2026年4月</td><td>发布 Automation 2.0 战略；美的明确库卡"瞄准中国市场第一"并计划独立上市</td></tr>
+        </table>
+      </div>
+
+      <h3 id="founders">1.2 创始人及核心团队</h3>
+      <p>库卡由 Johann Josef Keller 和 Jakob Knappich 于1898年创立。经过120余年发展，当前核心管理层受美的集团深度影响，呈现"德国技术血统+中国战略驱动"的混合治理结构。</p>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+          <tr><td>创始人</td><td>Johann Josef Keller</td><td>德国工程师，1898年与 Knappich 共同创立乙炔气灯厂</td></tr>
+          <tr><td>创始人</td><td>Jakob Knappich</td><td>德国实业家，公司名称中的"K"之一</td></tr>
+          <tr><td>美的董事长（战略制定者）</td><td>方洪波</td><td>美的集团董事长兼总裁，直接制定库卡"中国市场第一"及人形机器人战略</td></tr>
+          <tr><td>库卡中国团队</td><td>—</td><td>约3,600人，分布于顺德（制造/研发）和上海（研发）两大基地</td></tr>
+        </table>
+      </div>
+      <p>团队结构特点：库卡当前呈现"德国总部+中国双核"的跨国运营格局。德国总部保留传统工业机器人的深厚技术积累和高端制造能力；中国团队则在美的资源赋能下，主导本土化研发、供应链国产化和人形机器人新赛道。全球员工约15,000人，其中中国团队约3,600人，研发人员占比因公司未单列库卡数据而未公开。</p>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <h4>并购与股权变更历史</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>时间</th><th>事件</th><th>金额/比例</th></tr>
+          <tr><td>1980年</td><td>Quandt 家族退出，库卡上市</td><td>—</td></tr>
+          <tr><td>2016年</td><td>美的集团要约收购库卡</td><td>约€45亿，取得94.55%股权</td></tr>
+          <tr><td>2022–2023年</td><td>美的收购剩余股份，库卡从法兰克福交易所退市</td><td>成为美的100%全资子公司</td></tr>
+          <tr><td>2026年（计划）</td><td>库卡拟推动独立上市（IPO）</td><td>"2026是关键一年"（内部人士透露）</td></tr>
+        </table>
+      </div>
+      <h4>股东结构</h4>
+      <p>目前库卡为美的集团（000333.SZ）100%全资子公司。美的集团2025年总营收¥4,585亿，归母净利润¥439.5亿，是中国最大的家电集团之一。美的将机器人与自动化列为三大战略方向之一，宣布未来三年投入超¥600亿用于具身智能、AI等前沿科研。</p>
+
+      <h3 id="technology">1.4 技术路线</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>技术维度</th><th>路线选择</th><th>说明</th></tr>
+          <tr><td>总体 AI 架构</td><td>Automation 2.0（AI大模型+工业控制）</td><td>2026年4月发布，将AI大模型整合进工业机器人控制系统，覆盖汽车、3C、金属加工</td></tr>
+          <tr><td>人形机器人 AI</td><td>"工厂大脑"调度 + 具身操作</td><td>美罗通过"工厂大脑"集中调度实现多机器人协同，支持3D质检、设备巡检、钣金上料</td></tr>
+          <tr><td>数据方案</td><td>工厂真实场景采集 + 模拟训练</td><td>依托美的旗下大量工厂作为真实数据源和测试场</td></tr>
+          <tr><td>驱动系统</td><td>全品类覆盖：伺服电机、控制器（自研）、减速机</td><td>控制器完全自主化设计；中国零部件本土化率近95%</td></tr>
+          <tr><td>协作技术</td><td>力矩传感器集成 + LBR iiwa 敏感型技术</td><td>2013年首创的LBR iiwa七轴力矩传感技术为行业标杆</td></tr>
+          <tr><td>全栈/专用</td><td>全栈（硬件+软件+系统集成）</td><td>覆盖机器人本体、控制器、软件平台、系统集成全链条</td></tr>
+          <tr><td>人形机器人路线</td><td>三代递进：类人形→全人形→超人形</td><td>美罗（工业人形）→ 美罗U（超人形）→ 美拉（商用/家庭）</td></tr>
+          <tr><td>差异化特色</td><td>125年工业积累 + 美的家电/工厂场景闭环</td><td>拥有全球最深厚的工业机器人应用积累和美的自有工厂作为试验场</td></tr>
+        </table>
+      </div>
+      <p>库卡的技术路线以"德国精工+中国速度"为特征。在传统工业机器人领域，库卡拥有从控制器、伺服驱动到系统集成的全栈自研能力；在人形机器人新赛道，库卡依托美的的工厂场景（洗衣机、空调等生产线）实现快速迭代——"美罗"已进入荆州洗衣机工厂执行实际生产任务，这是全球人形机器人进入真实工厂产线的先行案例之一。</p>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>产品类别</th><th>代表型号</th><th>关键参数</th><th>应用领域</th></tr>
+          <tr><td><strong>重载工业机器人</strong></td><td>KR TITAN、KR QUANTEC</td><td>KR TITAN：6轴最大载荷1,300kg，臂展3.2m；KR QUANTEC：90–300kg载荷系列</td><td>汽车制造（焊接、搬运、装配）</td></tr>
+          <tr><td><strong>小型工业机器人</strong></td><td>KR AGILUS</td><td>高速小型六轴，适用紧凑空间</td><td>3C电子、食品、医药</td></tr>
+          <tr><td><strong>协作机器人</strong></td><td>LBR iiwa、iico</td><td>LBR iiwa：7轴力矩传感，±0.1mm精度；iico：±0.03mm重复定位精度</td><td>精密装配、人机协作、3C电子</td></tr>
+          <tr><td><strong>移动机器人</strong></td><td>KMP 250P</td><td>载荷250kg，双模充电，通过ESD认证</td><td>工厂物流、半导体车间</td></tr>
+          <tr><td><strong>复合机器人</strong></td><td>移动+机械臂集成</td><td>自主导航+精密操作</td><td>柔性制造、实验室自动化</td></tr>
+          <tr><td><strong>人形机器人—美罗</strong></td><td>美罗（工业人形）</td><td>双足/轮式，工厂大脑调度，3D质检、设备巡检、钣金上料</td><td>家电制造（美的荆州工厂）</td></tr>
+          <tr><td><strong>人形机器人—美罗U</strong></td><td>美罗U（超人形）</td><td>换线效率提升30%，设备占用减少40%</td><td>柔性产线（美的无锡工厂试点）</td></tr>
+          <tr><td><strong>人形机器人—美拉</strong></td><td>美拉系列（商用/家庭）</td><td>冰箱取物、微波炉加热、咖啡冲泡</td><td>2026年进驻美的线下体验门店</td></tr>
+        </table>
+      </div>
+      <p>2025年库卡共开发三代5款人形机器人产品，是全行业从传统工业机器人向人形机器人延伸最积极的企业之一。</p>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>场景分类</th><th>具体场景</th><th>对应产品</th><th>关键合作方/客户</th></tr>
+          <tr><td>汽车制造</td><td>焊接、搬运、涂装、总装</td><td>KR TITAN、KR QUANTEC 等全系列</td><td>蔚来、比亚迪、大众、戴姆勒等全球车企</td></tr>
+          <tr><td>3C电子</td><td>精密装配、检测、搬运</td><td>KR AGILUS、iico协作</td><td>电子制造企业</td></tr>
+          <tr><td>家电制造（内部）</td><td>3D质检、设备巡检、钣金上料</td><td>美罗人形机器人</td><td>美的集团自有工厂（荆州洗衣机、无锡工厂）</td></tr>
+          <tr><td>物流仓储</td><td>自动搬运、分拣</td><td>KMP 250P、Swisslog系统</td><td>物流企业</td></tr>
+          <tr><td>医疗健康</td><td>放射手术机器人定位</td><td>库卡机器人+CYBERKNIFE系统</td><td>医疗机构（2001年起）</td></tr>
+          <tr><td>消费/商用</td><td>家庭助理、门店服务</td><td>美拉系列</td><td>美的线下体验门店（2026年计划）</td></tr>
+          <tr><td>高校/科研</td><td>机器人研究与教学</td><td>LBR iiwa、KR系列</td><td>南方科技大学等（2025年签署合作框架）</td></tr>
+        </table>
+      </div>
+      <p>库卡拥有全球最丰富的工业场景积累，尤其在汽车制造领域深耕超过50年。被美的收购后，家电制造场景成为人形机器人落地的独特试验场。</p>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>指标</th><th>数据</th><th>说明</th></tr>
+          <tr><td>中国年出货量</td><td>3.2万台（2025年）</td><td>同比增长超30%，行业大盘仅14%</td></tr>
+          <tr><td>中国市场份额</td><td>9.6%（2025年）</td><td>排名第三（MIR睿工业数据）</td></tr>
+          <tr><td>重载机器人份额（中国）</td><td>47.4%（300kg+负载）</td><td>绝对领先</td></tr>
+          <tr><td>库卡中国收入占比</td><td>接近库卡集团总收入的30%</td><td>中国市场已成为全球最重要增长引擎</td></tr>
+          <tr><td>顺德基地产能</td><td>华南最大机器人本体生产基地</td><td>占地28.86万㎡，累计投资超¥27亿</td></tr>
+          <tr><td>零部件国产化率</td><td>近95%</td><td>控制器完全自主设计</td></tr>
+          <tr><td>美的机器人使用密度</td><td>670台/万人</td><td>远超制造业平均水平</td></tr>
+          <tr><td>人形机器人部署</td><td>美的荆州工厂+无锡工厂试点</td><td>2025年起进入实际产线</td></tr>
+        </table>
+      </div>
+
+      <h3 id="financials">1.8 财务数据</h3>
+      <p>库卡财务数据合并于美的集团机器人及自动化业务板块，不单独披露。以下为基于美的财报的相关数据：</p>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>指标</th><th>2023年</th><th>2024年</th><th>2025年</th><th>同比</th></tr>
+          <tr><td>美的集团总营收</td><td>—</td><td>—</td><td>¥4,585亿</td><td>+12.1%</td></tr>
+          <tr><td>美的归母净利润</td><td>—</td><td>—</td><td>¥439.5亿</td><td>+14.0%</td></tr>
+          <tr><td>机器人与自动化收入</td><td>—</td><td>¥287亿</td><td>¥310.11亿</td><td>+8.05%</td></tr>
+          <tr><td>美的 ToB 业务总收入</td><td>—</td><td>¥1,045亿</td><td>¥1,228亿</td><td>+17.5%</td></tr>
+          <tr><td>美的海外营收</td><td>—</td><td>—</td><td>¥1,959亿</td><td>+15.9%</td></tr>
+          <tr><td>美的研发投入</td><td>—</td><td>—</td><td>¥178亿</td><td>+9.6%</td></tr>
+          <tr><td>库卡中国出货</td><td>—</td><td>—</td><td>3.2万台</td><td>+30%+</td></tr>
+        </table>
+      </div>
+      <div class="callout"><div class="callout-title">⚠ 数据说明</div>机器人与自动化收入（¥310.11亿）涵盖库卡、Swisslog及美的内部机器人相关业务，并非库卡单体收入。库卡自退市后不再单独披露财报，具体单体财务数据需待IPO招股书发布。</div>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>库卡名称源自创始人姓氏首字母"Keller und Knappich Augsburg"</li>
+        <li>1973年推出的 FAMULUS 是全球首台六轴电驱工业机器人，现陈列于德国博物馆</li>
+        <li>2007年 KR TITAN 作为世界最大最强六轴工业机器人入选吉尼斯世界纪录</li>
+        <li>2001年库卡机器人在全球首台机器人控制放射手术系统 CYBERKNIFE 中应用</li>
+        <li>2013年 LBR iiwa 为全球首款量产敏感型轻量协作机器人（七轴力矩传感）</li>
+        <li>库卡中国顺德基地是华南地区最大的机器人本体生产基地</li>
+        <li>方洪波在2025年报中提出机器人发展三大维度：工业机器人智能化、家电产品机器人化、人形机器人价值化</li>
+        <li>2025年4月方洪波率队访问南方科技大学，签署战略合作框架协议，探索重载工业机器人与具身智能前沿方向</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="ana1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>库卡125年的工业基因决定了其在制造场景的深厚积累——从焊接设备到汽车产线，再到如今的智能制造，场景演进具有高度连续性。美的入主后，团队呈现"德国技术+中国运营"的混合结构：德国团队保持高端工业机器人的精工传统，中国团队则在美的赋能下快速切入家电制造、3C电子等中端市场。这种双核结构使库卡既能保持高端品牌溢价（如重载机器人47.4%的份额），又能通过本土化获得规模增长（中国出货+30%）。人形机器人团队的核心优势在于拥有美的自有工厂作为"零距离试验场"——美罗在洗衣机产线上直接迭代，这比任何实验室测试都更具商业化说服力。但挑战在于：家电制造背景的工程团队能否胜任人形机器人的通用AI和灵巧操作等全新技术挑战，这是一个开放性命题。</p>
+      </div>
+
+      <div class="analysis-block" id="ana2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>库卡的Automation 2.0战略将AI大模型整合进传统工业控制系统，这一路线的适配性在于：工业场景具有高度结构化的特点，标准作业程序（SOP）明确，AI大模型的价值更多体现在"柔性调度"和"异常处理"而非"创造性推理"——这正是工业场景与消费场景的本质区别。美罗在荆州工厂的应用（3D质检、设备巡检、钣金上料）属于结构相对明确的任务，适合"工厂大脑集中调度+本体执行"的架构。但当场景从工厂延伸至家庭（美拉系列），技术要求将发生质变——非结构化环境中的物体识别、力控精细度、安全合规都需要全新的技术栈。库卡目前"从工厂出发、向家庭延伸"的人形机器人路线是务实的渐进策略，但需要警惕工业思维对消费级产品设计的潜在限制。</p>
+      </div>
+
+      <div class="analysis-block" id="ana3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>美的100%控股是库卡当前最重要的资本特征。正面来看，美的为库卡提供了三个关键资源：（1）场景资源——美的旗下大量工厂成为人形机器人试验场；（2）资金保障——美的宣布三年投入超¥600亿研发，机器人是核心方向之一；（3）中国市场渠道——美的的政企关系、供应链管理和本土化运营经验直接赋能库卡中国。潜在制约在于：作为全资子公司，库卡的独立性和国际化色彩可能受到限制——部分欧美客户可能因为"中国控股"而对供应链安全产生顾虑。这也解释了为何美的推动库卡独立上市：IPO不仅是融资行为，更是品牌独立性的一次"再认证"。</p>
+      </div>
+
+      <div class="analysis-block" id="ana4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>库卡近年最显著的路径调整是从"纯工业机器人制造商"转向"全品类AI+机器人解决方案商"。这一转向体现在三个层面：（1）产品线拓展——从传统六轴工业机器人延伸至协作机器人（iico）、移动机器人（KMP系列）和人形机器人（美罗/美拉）；（2）技术路线升级——从PC-based控制器到AI大模型驱动的Automation 2.0；（3）市场重心迁移——从以欧美高端制造为主，转向以中国市场为增长引擎（中国收入占比近30%）。这一调整的逻辑清晰：全球工业机器人市场增速放缓（2025年大盘仅14%），而库卡中国+30%的增速表明，被美的收购后的本土化策略是成功的。人形机器人则是面向未来10年的战略投注，目前处于早期验证阶段。</p>
+      </div>
+
+      <div class="analysis-block" id="ana5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>在全球工业机器人"四大家族"中，库卡做出了几个明确的竞争取舍。第一，选择"中国市场第一"作为首要目标——这是在发那科、ABB两强面前争夺全球份额的最现实路径。第二，走"从工业到人形"的渐进路线，而非像Figure AI那样直接瞄准通用人形——这使库卡能够利用现有工业客户基础和收入流支撑人形研发，降低技术风险。第三，在美的体系内走"全栈硬件+场景闭环"路线——制造机器人、使用机器人（美的工厂）、销售机器人，形成"自产自用自销"的正向循环。与1X、Figure等"纯人形"创业公司相比，库卡的核心优势是125年的工业积累和美的的年¥4,585亿营收底座；与发那科、ABB相比，库卡在中国市场和AI+人形布局上更为激进。</p>
+      </div>
+
+      <div class="analysis-block" id="ana6">
+        <h4>2.6 其他重要观察</h4>
+        <p>库卡的IPO计划是本页面最重要的前瞻性信息。2026年被内部视为"关键的一年"，如果成功上市，库卡将成为少有的"德中双重基因"的机器人上市公司。上市地点选择（A股/港股/法兰克福）将直接影响其估值体系和投资者结构。另一个关键观察是"美的机器人化"的更大图景：方洪波提出的"家电产品机器人化"暗示美的可能将库卡技术反向注入家电产品线——例如将协作机器人技术用于智能厨房、将移动机器人技术用于家庭清洁，这会使库卡的技术影响力远超传统B端机器人市场。风险方面，库卡在欧洲面临的地缘政治阻力（技术出口管制、数据安全审查）值得持续关注。</p>
+      </div>
+
+      <h2 id="references">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://zh.wikipedia.org/zh-cn/%E5%BA%93%E5%8D%A1">维基百科 — 库卡</a></li>
+          <li><a href="https://www.kuka.com">KUKA 官方网站</a></li>
+          <li><a href="https://www.kuka.cn/en-cn/company/about-kuka/kuka120">KUKA China — 120 years anniversary</a></li>
+          <li><a href="https://www.kuka.com/sv-se/f%C3%B6retag/iimagazine/2023/01/125-years-of-kuka">KUKA — 125 years of KUKA</a></li>
+          <li><a href="https://www.21jingji.com/article/20260416/herald/f3f6a66ebb4cca178f7e43bd007bc75d.html">21世纪经济报道 — 5800亿顺德家电巨头，猛攻机器人</a></li>
+          <li><a href="https://inews.hket.com/article/4107653/">香港经济日报 — 美的末期息3.8元 库卡中国出货增3成至3.2万台</a></li>
+          <li><a href="https://m.ebrun.com/660305.html">亿邦动力 — 美的集团2025年营收突破4500亿元</a></li>
+          <li><a href="https://www.donews.com/news/detail/4/6490322.html">DoNews — 美的集团2025年净利润全额分红，ToB业务营收超1228亿元</a></li>
+          <li><a href="http://www.zqrb.cn/gscy/gongsi/2026-03-30/A1774861913441.html">证券日报 — 美的集团2025年营收净利实现双位数增长</a></li>
+          <li><a href="https://news.futunn.com/post/67973857/midea-group-000333-midea-series-report-i-robotics-and-automation">富途牛牛 — 美的系列报告一：机器人与自动化业务</a></li>
+          <li><a href="https://www.163.com/dy/article/KRG9EKL105568W0A.html">网易 — 当德国精工遇见中国创新：库卡机器人构建本土化叙事</a></li>
+          <li><a href="https://fund.eastmoney.com/a/202604163706677391.html">东方财富 — 5800亿顺德家电巨头猛攻机器人</a></li>
+          <li><a href="http://csjrw.cn/2026/0331/584304.html">城市金融网 — 美的集团2025年营收净利创新高</a></li>
+          <li><a href="https://gg.cfi.cn/ybdata.aspx?id=20260402000128">CFI.CN — 美的集团2025年年报点评</a></li>
+          <li><a href="https://finance.mingpao.com/fin/columnist1463481138946/20260402/1775120894563">明报 — 美的集团扩张海外业务具增长动力</a></li>
+          <li><a href="https://news.10jqka.com.cn/20260324/c675514237.shtml">同花顺 — 协作机器人龙头，赴港补血</a></li>
+          <li><a href="https://wap.stockstar.com/detail/IG2026041600007966">证券之星 — 5800亿顺德家电巨头猛攻机器人</a></li>
+          <li><a href="http://news.ca168.com/201805/98911.html">CA168 — 回望橙色传奇，连接智能未来</a></li>
+          <li><a href="https://staging.bccresearch.com/company-index/profile/kuka-ag/history">BCC Research — KUKA AG History</a></li>
+          <li><a href="https://www.are-expo.com/cn/show.php?itemid=1930">深圳国际工业自动化及机器人展览会 — 5800亿顺德家电巨头猛攻机器人</a></li>
+          <li><a href="http://3g.cnfol.com/news/chanyejingji/20260330/32112734.shtml">中金在线 — 美的集团2025年营收净利创新高</a></li>
+        </ol>
+      </div>
+
+      <div class="page-footer">此页面由具身智能Wiki自动分发器生成 · 数据截至2026年5月 · 来源均为公开信息</div>
+    </article>
+  </div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

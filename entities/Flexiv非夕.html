@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>非夕 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> <span class="breadcrumb-sep">›</span> <span>非夕</span></div>
+  <div class="wiki-header"><h1>非夕</h1><div class="subtitle">Flexiv · 未上市 · 成立于2016年 · 通用智能机器人基座平台 · 累计融资超3.2亿美元</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#team">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financials">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#a-team">2.1 团队背景与场景匹配度</a></li>
+        <li class="toc-lvl4"><a href="#a-tech">2.2 技术路线与场景适配性</a></li>
+        <li class="toc-lvl4"><a href="#a-capital">2.3 股东/资本结构对战略影响</a></li>
+        <li class="toc-lvl4"><a href="#a-pivot">2.4 试错过程与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#a-position">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#a-other">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#references">3 参考来源</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">非夕</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">上海非夕机器人科技有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">英文名</div><div class="ib-value">Flexiv Ltd. / Flexiv Robotics Inc.</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2016年</div></div>
+        <div class="ib-row"><div class="ib-label">创始人</div><div class="ib-value">王世全（CEO）、卢策吾（首席科学家）、叶熙阳、钟书耘</div></div>
+        <div class="ib-row"><div class="ib-label">总部</div><div class="ib-value">中国上海（全球总部）；美国加州Santa Clara（北美总部）</div></div>
+        <div class="ib-row"><div class="ib-label">注册地</div><div class="ib-value">中国上海</div></div>
+        <div class="ib-section">财务数据</div>
+        <div class="ib-row"><div class="ib-label">累计融资</div><div class="ib-value">超3.2亿美元</div></div>
+        <div class="ib-row"><div class="ib-label">最新轮次</div><div class="ib-value">C+轮（2026年3月），Invus领投</div></div>
+        <div class="ib-row"><div class="ib-label">营收增速</div><div class="ib-value">年均200%–300%</div></div>
+        <div class="ib-row"><div class="ib-label">海外营收占比</div><div class="ib-value">约20%</div></div>
+        <div class="ib-section">估值</div>
+        <div class="ib-row"><div class="ib-label">估值区间</div><div class="ib-value">独角兽级别（超10亿美元）</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">部署量</div><div class="ib-value">数千台</div></div>
+        <div class="ib-row"><div class="ib-label">客户复购率</div><div class="ib-value">超60%</div></div>
+        <div class="ib-row"><div class="ib-label">生态伙伴</div><div class="ib-value">69家</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">赛道</div><div class="ib-value"><span class="tag">自适应机器人</span><span class="tag">力控机械臂</span><span class="tag">具身智能</span></div></div>
+        <div class="ib-row"><div class="ib-label">官网</div><div class="ib-value"><a href="https://www.flexiv.cn" target="_blank" rel="noopener">flexiv.cn</a> / <a href="https://www.flexiv.com" target="_blank" rel="noopener">flexiv.com</a></div></div>
+      </aside>
+
+      <p class="article-intro"><strong>非夕</strong>（Flexiv）是一家专注于研发和生产自适应机器人的全球化科技公司，由4位斯坦福大学博士于2016年联合创立，总部位于上海，在硅谷设有北美研发中心。公司以"极致力控+层级式智能"为核心技术路线，开创了自适应机器人新品类，产品已覆盖3C电子、汽车制造、家电、医疗、食品加工等多个行业。2023年战略孵化具身智能大脑公司穹彻智能（Noematrix）。截至2026年，累计融资超3.2亿美元，估值达独角兽级别，产品部署量达数千台，是全球力控机器人赛道的头部企业。创始人王世全明确提出"人形并非工业机器人唯一解"，坚持力控优先的技术路线。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper"><table class="wikitable infotable">
+        <tr><th style="width:120px">项目</th><th>内容</th></tr>
+        <tr><td>公司全称</td><td>上海非夕机器人科技有限公司</td></tr>
+        <tr><td>英文名称</td><td>Flexiv Ltd. / Flexiv Robotics Inc.</td></tr>
+        <tr><td>成立时间</td><td>2016年</td></tr>
+        <tr><td>注册地</td><td>中国上海</td></tr>
+        <tr><td>全球总部</td><td>中国上海闵行区</td></tr>
+        <tr><td>北美总部</td><td>美国加利福尼亚州Santa Clara</td></tr>
+        <tr><td>分支机构</td><td>上海、北京、深圳、佛山、新加坡、台湾</td></tr>
+        <tr><td>上市状态</td><td>未上市</td></tr>
+        <tr><td>官方网站</td><td>flexiv.cn（中文） / flexiv.com（英文）</td></tr>
+        <tr><td>员工规模</td><td>数百人，研发人员占比超60%</td></tr>
+        <tr><td>核心子公司</td><td>穹彻智能（Noematrix，2023年战略孵化）</td></tr>
+      </table></div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th style="width:80px">时间</th><th>事件</th></tr>
+        <tr><td>2016年</td><td>王世全、卢策吾、叶熙阳、钟书耘四位斯坦福博士联合创立非夕科技，定位自适应机器人</td></tr>
+        <tr><td>2019年</td><td>在德国汉诺威工博会发布全球首台自适应机器人Rizon拂晓，获红点奖最高荣誉Best of the Best</td></tr>
+        <tr><td>2020年</td><td>完成B轮融资，红杉中国等参投；Rizon拂晓实现首批产业化落地</td></tr>
+        <tr><td>2022年</td><td>完成B+轮融资，估值突破10亿美元，正式跻身独角兽行列</td></tr>
+        <tr><td>2023年</td><td>战略孵化穹彻智能（Noematrix），专注"具身智能大脑"基础模型研发</td></tr>
+        <tr><td>2025年1月</td><td>与日本百年企业KURABO达成战略合作，加速日本市场布局</td></tr>
+        <tr><td>2025年6月</td><td>完成亿级美元C轮融资，咏归基金、广发信德、洪泰基金等参投</td></tr>
+        <tr><td>2025年</td><td>具身智能订单额同比增长8倍；北美前十大市值企业中6家采用非夕机器人</td></tr>
+        <tr><td>2026年3月</td><td>FLEXIVERSE 2026战略发布会：发布Enlight初昕、Orion天枢、MICO平台、Grav Enhanced夹爪、AEGIS安全体系五大新品；与Fortuntech签约2000台采购；完成C+轮融资（Invus领投）</td></tr>
+      </table></div>
+
+      <h3 id="team">1.2 创始人及核心团队</h3>
+      <p>非夕由斯坦福大学机器人与人工智能实验室（BDML/SAIL）的4位博士联合创立，创始团队兼具顶级学术背景和深厚产业经验。核心科学家卢策吾同时担任上海交通大学教授，形成"前沿研究+产品落地"的产学研闭环。团队整体呈现学术-产业混合型特征，研发人员占比超60%。</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th style="width:80px">角色</th><th style="width:80px">姓名</th><th>背景/履历</th></tr>
+        <tr><td>创始人 & CEO</td><td>王世全</td><td>1988年生于广东汕头。浙江大学竺可桢学院工高班本科（机械工程），斯坦福大学仿生与灵巧操作实验室（BDML）博士，师从Mark Cutkosky教授。研究方向涵盖柔性灵巧手、传感器融合、深度学习在机器人中的应用，发表顶级论文20余篇、专利20余项。人形攀岩机器人研究获IROS最佳论文奖。同时担任穹彻智能董事长、上海交通大学客座教授、全国机器人技术标准委员会委员。</td></tr>
+        <tr><td>联合创始人 & 首席科学家</td><td>卢策吾</td><td>1982年生于广东汕头。重庆邮电大学本科，中国科学院大学硕士，香港中文大学博士。2015年在斯坦福大学人工智能实验室（SAIL）开展博士后研究，师从李飞飞教授。现任上海交通大学计算机科学与工程系教授、博导，上海交大AI研究院副院长，长江学者。发表论文100+篇（含Nature、Nature Machine Intelligence等），2018年获MIT TR35中国科技精英，2024年获得科学探索奖（具身智能领域唯一获奖者）。</td></tr>
+        <tr><td>联合创始人</td><td>叶熙阳</td><td>斯坦福大学机器人实验室博士，机器人软硬件研发15年以上经验。</td></tr>
+        <tr><td>联合创始人</td><td>钟书耘</td><td>斯坦福大学机器人实验室博士/博士后，机器人软硬件研发15年以上经验。</td></tr>
+        <tr><td>副总裁</td><td>胡晓平</td><td>负责商务与市场，2025年11月公开表示预计2026年公司实现业务层面盈利。</td></tr>
+      </table></div>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <p>非夕自成立以来已完成多轮融资，累计融资额超3.2亿美元。2022年B+轮后估值突破10亿美元，跻身独角兽。2026年3月引入全球顶级长线资本Invus，标志着资本市场对公司长期价值的认可。</p>
+      <h4>融资历史</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th style="width:70px">时间</th><th style="width:70px">轮次</th><th>金额</th><th>主要投资方</th></tr>
+        <tr><td>2016–2019年</td><td>天使轮/A轮</td><td>未披露</td><td>早期VC</td></tr>
+        <tr><td>2020年</td><td>B轮</td><td>未披露</td><td>红杉中国等</td></tr>
+        <tr><td>2022年</td><td>B+轮</td><td>未披露（估值超$1B）</td><td>多家机构（估值进入独角兽级别）</td></tr>
+        <tr><td>2025年6月</td><td>C轮</td><td>近亿美元</td><td>咏归基金、广发信德、洪泰基金、华控基金、高榕创投、毅园投资、MFund魔量资本等</td></tr>
+        <tr><td>2026年3月</td><td>C+轮</td><td>未披露</td><td>Invus Group（领投，纽约全球长线资本，AUM超$120亿），Atma Capital、奥飞集团跟投，老股东继续跟投；投中资本任长期财务顾问</td></tr>
+      </table></div>
+      <h4>股东结构特征</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th style="width:100px">股东类型</th><th>代表机构</th><th>战略意义</th></tr>
+        <tr><td>全球长线资本</td><td>Invus Group（纽约）</td><td>长青资本结构，不看短期退出，支撑公司长期技术投入</td></tr>
+        <tr><td>头部VC</td><td>红杉中国、高榕创投、洪泰基金</td><td>提升品牌背书，对接创业生态资源</td></tr>
+        <tr><td>产业资本</td><td>奥飞集团（奥飞娱乐）</td><td>消费/娱乐场景潜在协同</td></tr>
+        <tr><td>国资/政府背景</td><td>广发信德、华控基金</td><td>对接国内制造业产业化资源</td></tr>
+        <tr><td>跨境资本</td><td>Atma Capital</td><td>支持国际化战略，尤其欧洲和中东市场</td></tr>
+      </table></div>
+      <div class="callout"><div class="callout-title">上市相关</div>公司尚未公开披露IPO计划。2026年3月Invus领投后管理层表示"持续关注IPO动态，但目前重点是通用智能基座平台建设与全球化部署"。预计2026年实现业务层面盈亏平衡，具备上市基础条件。</div>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <p>非夕的技术路线核心为"极致力控+层级式智能"，以多维力觉感知为中心、融合计算机视觉与AI，使机器人在非结构化环境中具备类似人类的柔顺操作能力。公司将其定位为"通用智能时代的物理基座"，不盲目追逐人形形态，而是聚焦本体物理能力的极致追求。</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th style="width:120px">维度</th><th>详情</th></tr>
+        <tr><td>AI技术路线</td><td>层级式智能架构：底层力控（实时力觉闭环）+ 中层技能库（力控原语组合）+ 上层任务规划（AI推理）。以力觉信号为第一性原理数据源，"手感为主、视觉为辅"。</td></tr>
+        <tr><td>力控技术</td><td>自研全关节高精度多维力/力矩传感器，Rizon系列末端力感知精度达0.03N，Enlight系列全身0.5N级触控感知。关节运动范围可达720°。支持同时7点接触。</td></tr>
+        <tr><td>控制架构</td><td>Orion天枢控制器，支持多机械臂底层系统级原生协同，图形化编程界面，模块化设计适配各类具身智能载体。</td></tr>
+        <tr><td>AI模型与数据</td><td>通过子公司穹彻智能研发Noematrix Brain具身大模型（以力为中心的多模态模型），实现力觉-视觉-语义融合；数据来源于真实物理部署中的力控交互数据。</td></tr>
+        <tr><td>本体形态路线</td><td>不做人形追随者，以7轴自适应机械臂为核心执行单元，通过MICO/AICO平台拓展双臂/多臂/移动+操作等形态。创始人明确"工业场景最优解未必是人形"。</td></tr>
+        <tr><td>安全技术</td><td>AEGIS翌界安全体系，对标ISO 10218-1:2025和IEC 61508 SIL2，内置28项主动安全功能，从被动停止升级为主动预判。19项安全功能通过EN ISO 13849-1 Cat.3 PL d认证。</td></tr>
+        <tr><td>末端执行器</td><td>自研Grav Enhanced夹爪，基于仿生"壁虎材料"实现"刚柔双模式"切换——刚性模式抓取工业零件，柔性模式抓取易碎/异形物体。</td></tr>
+        <tr><td>开发工具链</td><td>提供图形化编程、力控原语库、RDK开发套件，降低应用开发门槛。30个联合解决方案覆盖16个细分行业。</td></tr>
+      </table></div>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <p>非夕产品矩阵覆盖"本体—控制—系统—安全—执行末端"全链路，核心产品分为Rizon拂晓系列（成熟工业级）、Enlight初昕系列（2026年新一代轻量化平台），以及平台化的MICO/AICO双臂系统。</p>
+      <h4>核心产品系列对比</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th style="width:60px">系列</th><th style="width:80px">型号</th><th>自由度</th><th>负载</th><th>臂展</th><th>力感知精度</th><th>重复定位精度</th><th>自重</th><th>发布年份</th></tr>
+        <tr><td rowspan="2">Rizon 拂晓</td><td>Rizon 4</td><td>7</td><td>4 kg</td><td>876 mm</td><td>0.03–0.1 N</td><td>±0.05 mm</td><td>20 kg</td><td>2019</td></tr>
+        <tr><td>Rizon 10</td><td>7</td><td>10 kg</td><td>941 mm</td><td>0.1–0.2 N</td><td>±0.05 mm</td><td>38 kg</td><td>2019</td></tr>
+        <tr><td rowspan="1">Enlight 初昕</td><td>Enlight L</td><td>7</td><td>5 kg</td><td>752 mm</td><td>0.1 N（触控0.5 N）</td><td>±0.05 mm</td><td>15 kg</td><td>2026.03</td></tr>
+      </table></div>
+      <h4>系统平台</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th style="width:100px">平台</th><th>配置</th><th>核心特性</th></tr>
+        <tr><td>MICO Core</td><td>双Enlight臂</td><td>轻量化双臂协作，自重53 kg；适配移动底盘，面向中小型工件操作场景</td></tr>
+        <tr><td>MICO Armor</td><td>双Enlight臂+防护</td><td>增强防护版本，自重55 kg；适用于环境较恶劣的工业场景</td></tr>
+        <tr><td>MICO Plus</td><td>双Enlight臂+腰部+视觉</td><td>更大工作空间（腰部+双臂+视觉头部+移动底盘），自重79 kg；可处理超长/易变形大型构件</td></tr>
+        <tr><td>AICO 2-4</td><td>双Rizon 4臂</td><td>移动操作平台，双臂4 kg×2，自重281 kg，激光SLAM导航</td></tr>
+        <tr><td>AICO 2-10</td><td>双Rizon 10臂</td><td>重载双臂移动操作，双臂10 kg×2，自重395 kg，激光SLAM导航</td></tr>
+      </table></div>
+      <h4>其他产品</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th style="width:100px">产品</th><th>定位</th><th>关键规格</th></tr>
+        <tr><td>Orion 天枢控制器</td><td>多臂"小脑"级控制器</td><td>系统级多臂协同；图形化编程；模块化；135×330×132 mm / 10.5 kg</td></tr>
+        <tr><td>Grav Enhanced 夹爪</td><td>仿生末端执行器</td><td>自研壁虎材料；刚柔双模切换</td></tr>
+        <tr><td>AEGIS 翌界安全体系</td><td>安全架构</td><td>ISO 10218-1:2025 + IEC 61508 SIL2；28项主动安全功能</td></tr>
+        <tr><td>穹彻Noematrix Brain</td><td>具身智能大脑（子公司）</td><td>以力为中心的多模态大模型，适配轮式/人形多种本体</td></tr>
+      </table></div>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <p>非夕的力控自适应机器人在需要"手感"和柔顺操作的场景中具有独特优势，覆盖工业制造、商业服务、医疗健康、现代农业等领域。截至2026年3月，已积累69家正式生态伙伴，联合开发30个解决方案。</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th style="width:80px">场景大类</th><th style="width:100px">细分场景</th><th>典型应用</th><th>代表客户/合作伙伴</th></tr>
+        <tr><td rowspan="4">工业制造</td><td>3C电子</td><td>精密装配、柔性打磨、贴合</td><td>某头部手机品牌（数百台订单）、EMS头部厂商Fortuntech（2000台采购）</td></tr>
+        <tr><td>汽车制造</td><td>柔性装配、曲面抛光、线束插接</td><td>Tesla等</td></tr>
+        <tr><td>家电</td><td>打磨、装配、检测</td><td>TCL等</td></tr>
+        <tr><td>通用制造</td><td>上下料、CNC机床看护、质量检测</td><td>SMC（合作协议）</td></tr>
+        <tr><td rowspan="2">商业服务</td><td>零售/药房</td><td>药品分拣、打包</td><td>穹彻智能落地的零售药房场景</td></tr>
+        <tr><td>酒店/洗衣</td><td>布草分拣、折叠</td><td>穹彻智能落地的酒店洗衣房场景</td></tr>
+        <tr><td>医疗健康</td><td>实验室/检测</td><td>核酸采样（2021年WAIC展示）、按摩理疗</td><td>—</td></tr>
+        <tr><td>食品加工</td><td>柔性分拣/包装</td><td>生鲜食品抓取、包装</td><td>—</td></tr>
+        <tr><td>研发平台</td><td>具身智能研发</td><td>作为本体平台供AI模型研发</td><td>10+家具身智能头部独角兽、北美前十大市值企业中6家</td></tr>
+      </table></div>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th style="width:120px">指标</th><th>数据</th><th>时间/来源</th></tr>
+        <tr><td>产品累计部署量</td><td>数千台</td><td>2025–2026年公开披露</td></tr>
+        <tr><td>营收年增速</td><td>200%–300%（年均2–3倍增长）</td><td>自2022年产业化以来，持续保持</td></tr>
+        <tr><td>订单量年增速</td><td>年均2–3倍增长</td><td>管理层公开披露</td></tr>
+        <tr><td>2025年具身智能订单增长</td><td>同比增长8倍</td><td>2026年3月FLEXIVERSE发布会披露</td></tr>
+        <tr><td>客户复购率</td><td>超60%（客均订单量为去年的2.6倍）</td><td>2025–2026年公开报道</td></tr>
+        <tr><td>生态渠道订单占比</td><td>60%的订单来自生态渠道</td><td>2026年3月发布会披露</td></tr>
+        <tr><td>海外营收占比</td><td>约20%</td><td>管理层公开表态</td></tr>
+        <tr><td>盈亏平衡预期</td><td>预计2026年实现业务层面盈利</td><td>副总裁胡晓平2025年11月公开表态</td></tr>
+        <tr><td>单笔最大订单</td><td>2000台（Fortuntech，马来西亚EMS巨头）</td><td>2026年3月FLEXIVERSE发布会签约</td></tr>
+        <tr><td>全球化覆盖</td><td>欧洲、日韩、北美、东南亚</td><td>已在德国法兰克福设立欧洲分公司</td></tr>
+      </table></div>
+
+      <h3 id="financials">1.8 财务数据</h3>
+      <p>非夕为非上市公司，未披露精确营收、利润等财务数据。以下基于公开信息整理：</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th style="width:100px">指标</th><th>估算/公开信息</th></tr>
+        <tr><td>累计融资总额</td><td>超3.2亿美元（Tracxn统计约$322M，部分早期轮次未计入）</td></tr>
+        <tr><td>估值</td><td>独角兽级别（超10亿美元），自2022年B+轮后维持</td></tr>
+        <tr><td>营收增长</td><td>年均2–3倍增长（管理层公开表述）</td></tr>
+        <tr><td>盈亏状态</td><td>尚未盈利，预计2026年实现业务层面盈亏平衡</td></tr>
+        <tr><td>毛利润</td><td>未公开，但复购率超60%表明产品已找到PMF</td></tr>
+        <tr><td>现金储备</td><td>2026年3月C+轮融资后，现金储备显著增强（Invus为AUM超$120B的长线资本）</td></tr>
+        <tr><td>员工规模</td><td>数百人，研发人员占比超60%</td></tr>
+      </table></div>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li><strong>双公司架构：</strong>非夕科技聚焦"本体基座"（硬件+控制），穹彻智能聚焦"具身大脑"（AI模型），形成软硬件全栈覆盖。穹彻智能由卢策吾担任技术主导，2025年一年内完成三轮融资，包括红杉中国、阿里巴巴等顶级投资方。</li>
+        <li><strong>行业认可：</strong>2019年Rizon拂晓获德国红点奖最高荣誉Best of the Best；2025年入选福布斯中国AI科技企业TOP50"最吸金机器人创业公司"前十；多家北美头部科技企业将其作为具身智能研发首选本体平台。</li>
+        <li><strong>安全认证里程碑：</strong>AEGIS翌界安全体系是全球首批对标ISO 10218-1:2025（2026年初发布的最新工业机器人安全标准）的商用安全架构之一，内置28项主动安全功能。</li>
+        <li><strong>全球化人才：</strong>在硅谷、新加坡等地设有研发和销售办公室，持续吸纳全球顶尖机器人人才。</li>
+        <li><strong>第一性原理：</strong>公司从创立之初就坚持"力控优先"路线，认为"手感"（力觉）是机器人在非结构化环境中完成精细操作的核心，这一判断与当前行业主流"视觉优先"路线形成差异化。</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="a-team">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>创始人王世全在斯坦福BDML实验室师从Cutkosky教授，专攻柔性灵巧手与力觉感知，博士期间的人形攀岩机器人研究更获得IROS最佳论文奖——这一学术背景天然指向"精细操作""力觉交互""非结构化环境"等核心命题。联合创始人卢策吾在斯坦福SAIL师从李飞飞，将计算机视觉与具身智能交叉研究注入公司AI能力。创始团队的斯坦福基因决定了公司从Day 1就选择了"力控优先+通用智能"的复合路线，而非传统工业机器人的"精度优先+示教编程"模式。该团队背景与公司选定的3C电子精密装配、汽车曲面打磨、医疗检测等高要求力控场景高度匹配——这些场景恰是传统位置控制机器人难以胜任的领域。团队的人才结构属于典型的学术-产业混合型：4位斯坦福博士提供前沿研究纵深，来自ABB等工业机器人巨头的产业人才提供工程化落地能力，上海交大联合实验室形成人才蓄水池。</p>
+      </div>
+
+      <div class="analysis-block" id="a-tech">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>非夕选择"力控优先、视觉为辅"的技术路线，与传统工业机器人的"位控为主"形成本质差异。这一路线对其选定的3C精密装配、汽车曲面处理等场景具有极强适配性——力控信号天然包含接触状态信息，可在无精确环境建模的情况下完成柔性接触操作，大幅降低了对结构化环境和精确标定的依赖。然而，力控路线也面临数据稀缺的挑战：行业内视觉数据积累远多于力觉数据，力控模型的通用泛化能力受限于真实物理交互数据的积累速度。非夕通过数千台实机部署积累了独特的多维力觉交互数据，形成了一定的数据壁垒。在AI大模型层面，通过穹彻智能的Noematrix Brain，公司将力觉数据与多模态大模型融合，试图在"力觉基座模型"这一尚未被充分开发的领域建立先发优势。技术路线整体自洽，但"力觉大模型"能否实现与"视觉大模型"同等水平的泛化能力仍需时间验证。</p>
+      </div>
+
+      <div class="analysis-block" id="a-capital">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>2026年3月Invus Group的入局是一个重要信号。Invus作为典型的"长青资本"（evergreen fund），不受传统VC基金退出期限约束，可以为非夕的长期技术投入提供耐心资本——这对于硬件+AI双线投入的机器人公司尤为关键。与多数具身智能公司不同，非夕的股东结构中缺乏明确的产业资本（如车企、物流公司、制造集团），这意味着公司在场景选择上保持了较大的独立性，不会因为产业资本的战略诉求而锁定特定垂直场景。但这也意味着非夕需要通过自建渠道和生态来获取场景入口，而非依靠股东关系绑定客户。奥飞集团的参与更多是财务投资性质，尚未看到明显的消费场景协同。值得注意的是，海外资本（Invus、Atma Capital）占比增加，可能加速公司的国际化进程，但也可能在后续引入国内产业资本或国资时增加股权结构的复杂度。</p>
+      </div>
+
+      <div class="analysis-block" id="a-pivot">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>非夕的发展路径存在一次重要的"隐性调整"：2023年战略孵化穹彻智能（Noematrix）。这一操作实质上是将公司的"大脑"能力独立成军——非夕本体聚焦硬件基座，穹彻智能聚焦AI模型，两者形成生态协作而非内部分工。这种"软硬分离"架构在具身智能行业尚属少见，反映了创始团队对"通用AI大脑需要跨本体泛化、而单一公司的本体产品线可能限制其开放性"的深层认知。另外，2026年FLEXIVERSE发布会的战略定位从"自适应机器人厂商"升级为"通用智能基座平台"，标志着公司从产品公司向平台公司的转型——不再只卖自己的机器人，而是将Orion控制器和MICO平台开放给第三方具身智能公司作为研发载体。这一调整为非夕打开了一个新的增长维度：成为具身智能时代的"基础设施提供商"，类似移动互联网时代的ARM+Android组合。</p>
+      </div>
+
+      <div class="analysis-block" id="a-position">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>非夕在具身智能行业中做出了一个清晰的取舍：不做人形，做力控机械臂的iPhone。创始人王世全多次公开表示"人形并非工业机器人唯一解"，这一定位与非夕的核心技术壁垒（力觉感知与控制）高度一致——人形的价值在于通用交互和类人环境适应，但工业场景的核心需求是"柔顺操作"和"力控精度"，这与形态是否人形关系不大。然而，当前行业资本和舆论的热点高度集中在人形机器人，非夕的"反人形"立场可能在融资叙事和公众认知层面处于劣势。公司的"平台化"战略——将控制器、本体平台开放给第三方AI公司——是一步巧妙的棋：如果具身智能行业未来真是人形主导，非夕至少可以通过控制器和安全系统获得"卖铲子"的位置。这种定位更接近"产业链关键一环"而非"全栈堆叠"，风险分散但想象空间也相对收敛。</p>
+      </div>
+
+      <div class="analysis-block" id="a-other">
+        <h4>2.6 其他重要观察</h4>
+        <p>非夕的复购率（超60%）和客均订单量增长（2.6倍）是技术型机器人公司中极为罕见的商业化验证信号——这意味着产品找到了真实的PMF，而非靠低价补贴或关系营销推量。Fortuntech的2000台采购订单是迄今公开报道中力控机器人领域的最大单笔订单之一，标志着非夕从"小而美"向"规模化"的关键跨越。此外，北美前十大市值企业中已有6家采用非夕产品作为具身智能研发平台——这一数据意味着非夕在"卖铲子"的角色上已经取得了全球顶级客户的验证。穹彻智能2025年一年完成三轮融资（红杉中国、阿里、C资本、Prosperity7 Ventures等），也侧面验证了市场对非夕生态的认可。但公司面临的挑战同样明显：如果人形机器人真正成为主流本体形态，非夕以力控7轴臂为核心的产品矩阵可能面临"错失主战场"的风险。管理层对此的回应是"做基础设施、不做形态押注"——这一策略的成败取决于具身智能行业本体形态的最终收敛方向。</p>
+      </div>
+
+      <h2 id="references">3 参考来源</h2>
+      <div class="references">
+        <ol>
+          <li><a href="http://www.flexiv.cn/history" target="_blank" rel="noopener">非夕科技官方·发展历程</a></li>
+          <li><a href="https://www.flexiv.cn/product/enlight" target="_blank" rel="noopener">非夕科技官方·初昕ENLIGHT产品页</a></li>
+          <li><a href="https://www.flexiv.cn/product/rizon" target="_blank" rel="noopener">非夕科技官方·拂晓RIZON产品页</a></li>
+          <li><a href="https://www.flexiv.cn/news/Flexiv_new_enlight" target="_blank" rel="noopener">非夕科技官方·Enlight初昕发布新闻</a></li>
+          <li><a href="https://finance.sina.com.cn/wm/2026-04-08/doc-inhtuuqa1542393.shtml" target="_blank" rel="noopener">新浪财经·又一家机器人独角兽完成新一轮融资（2026.04）</a></li>
+          <li><a href="http://www.sh.chinanews.com.cn/kjjy/2026-03-24/145499.shtml" target="_blank" rel="noopener">上海中新网·非夕科技发布新一代自适应机器人系统（2026.03.24）</a></li>
+          <li><a href="https://www.stdaily.com/web/gdxw/2026-03/23/content_490791.html" target="_blank" rel="noopener">科技日报·非夕发布新一代自适应机器人系统（2026.03.23）</a></li>
+          <li><a href="https://www.21jingji.com/article/20260324/herald/1dcc1396cd2e0818979370c3ca8a4489.html" target="_blank" rel="noopener">21世纪经济报道·对话非夕科技王世全（2026.03.24）</a></li>
+          <li><a href="https://www.thepaper.cn/newsDetail_forward_32806206" target="_blank" rel="noopener">澎湃新闻·非夕科技创始人王世全：工业机器人最优解未必是人形（2026.03）</a></li>
+          <li><a href="https://www.thepaper.cn/newsDetail_forward_32830563" target="_blank" rel="noopener">澎湃新闻·闵行企业发布新品！构建具身智能物理底座（2026.03）</a></li>
+          <li><a href="https://m.163.com/dy/article/K2P1GO8G0550B1DU.html" target="_blank" rel="noopener">网易·非夕机器人完成近亿美元C轮融资（2025）</a></li>
+          <li><a href="https://www.sohu.com/a/953849189_393779" target="_blank" rel="noopener">搜狐·获近半数客户持续复购，非夕自适应机器人加速商业化落地</a></li>
+          <li><a href="https://www.jfdaily.com/news/detail?id=500442" target="_blank" rel="noopener">上观新闻·自适应机器人获红点最高奖</a></li>
+          <li><a href="https://www.morningstar.com/news/business-wire/20260317637430/flexiv-secures-capital-from-leading-evergreen-investor-to-scale-global-deployment-of-adaptive-robots" target="_blank" rel="noopener">Morningstar/BusinessWire·Flexiv Secures Capital from Leading Evergreen Investor（2026.03.17）</a></li>
+          <li><a href="https://tracxn.com/d/companies/flexiv-robotics" target="_blank" rel="noopener">Tracxn·Flexiv Robotics Funding & Investors</a></li>
+          <li><a href="https://pitchhub.36kr.com/project/1713103228086530" target="_blank" rel="noopener">36氪·Flexiv非夕科技项目信息</a></li>
+          <li><a href="https://www.teoyouth.com/wap/renwu/5618.html" target="_blank" rel="noopener">潮阳青年网·汕头籍斯坦福博士打造估值十亿美元独角兽</a></li>
+          <li><a href="https://browser.qq.com/mobile/news?doc_id=951685a0b6885452" target="_blank" rel="noopener">腾讯新闻·4位斯坦福博士联合创业，非夕科技宣布完成亿级美元C轮融资</a></li>
+          <li><a href="https://m.21jingji.com/article/20260325/bcb7b7618481af364705c314e8954645.html" target="_blank" rel="noopener">21世纪经济报道·对话非夕科技王世全（2026.03.25详细版）</a></li>
+          <li><a href="https://www.163.com/dy/article/KNJHAMUL05568W0A.html" target="_blank" rel="noopener">网易·紫竹高新区企业非夕科技完成新一轮融资（2026.03）</a></li>
+          <li><a href="https://www.flexiv.cn/news" target="_blank" rel="noopener">非夕科技官方·媒体中心</a></li>
+          <li><a href="https://iicnet.cn/article/7981" target="_blank" rel="noopener">IICNET·2000台！非夕科技与全球EMS头部厂商签订战略合作</a></li>
+          <li><a href="https://www.163.com/dy/article/KOFQ3L0T0534A4SC.html" target="_blank" rel="noopener">网易·非夕科技发布Enlight、MICO等新一代机器人产品（2026.03）</a></li>
+          <li><a href="https://www.sfccn.com/2026/3-24/3OMDE0NDlfMjEyMDU3OA.html" target="_blank" rel="noopener">南方财经·对话非夕科技王世全：做具身智能物理基座（2026.03.24）</a></li>
+          <li><a href="https://m.rccaijing.com/news-7436690653541234307.html" target="_blank" rel="noopener">锐创财经·非夕科技完成新一轮融资（2026.03）</a></li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">本页面最后更新于2026年5月4日 · 信息来源于公开报道与官方资料 · 具身智能Wiki</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>睿尔曼智能 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> <span class="breadcrumb-sep">›</span> <span>睿尔曼智能</span></div>
+  <div class="wiki-header"><h1>睿尔曼智能</h1><div class="subtitle">RealMan · 2018年成立 · C轮投后估值32亿元 · 北京/常州 · 超轻量仿人机械臂引领者</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#team">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financials">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#misc">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#a1">2.1 团队背景与场景匹配</a></li>
+        <li class="toc-lvl4"><a href="#a2">2.2 技术路线与场景适配</a></li>
+        <li class="toc-lvl4"><a href="#a3">2.3 股东/资本结构影响</a></li>
+        <li class="toc-lvl4"><a href="#a4">2.4 试错与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#a5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#a6">2.6 其他观察</a></li>
+        <li class="toc-lvl2"><a href="#refs">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">睿尔曼智能</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">睿尔曼智能科技（北京）有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">英文</div><div class="ib-value">RealMan Intelligent Technology</div></div>
+        <div class="ib-row"><div class="ib-label">成立</div><div class="ib-value">2018年1月8日</div></div>
+        <div class="ib-row"><div class="ib-label">总部</div><div class="ib-value">北京市石景山区</div></div>
+        <div class="ib-row"><div class="ib-label">生产基地</div><div class="ib-value">江苏常州科教城</div></div>
+        <div class="ib-row"><div class="ib-label">创始人</div><div class="ib-value">郑随兵</div></div>
+        <div class="ib-row"><div class="ib-label">官网</div><div class="ib-value">realman-robotics.com</div></div>
+        <div class="ib-section">财务数据</div>
+        <div class="ib-row"><div class="ib-label">2025年净利润</div><div class="ib-value">数千万元（已盈利）</div></div>
+        <div class="ib-row"><div class="ib-label">业绩增速</div><div class="ib-value">连续三年三倍增长</div></div>
+        <div class="ib-row"><div class="ib-label">经营性现金流</div><div class="ib-value">良性循环</div></div>
+        <div class="ib-section">估值与融资</div>
+        <div class="ib-row"><div class="ib-label">C轮投后估值</div><div class="ib-value">~32亿元</div></div>
+        <div class="ib-row"><div class="ib-label">累计融资</div><div class="ib-value">~5亿元</div></div>
+        <div class="ib-row"><div class="ib-label">最新融资</div><div class="ib-value">近5亿元（2026.03）</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">关节模组产能</div><div class="ib-value">10万台/年（2025）</div></div>
+        <div class="ib-row"><div class="ib-label">全球客户</div><div class="ib-value">8,000+企业</div></div>
+        <div class="ib-row"><div class="ib-label">机械臂MTBF</div><div class="ib-value">50,000小时</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">赛道</div><div class="ib-value"><span class="tag">核心零部件</span><span class="tag">机械臂</span><span class="tag">具身智能基础设施</span></div></div>
+        <div class="ib-row"><div class="ib-label">路线</div><div class="ib-value"><span class="tag tag-info">全栈自研</span><span class="tag tag-info">超轻量仿人</span></div></div>
+      </aside>
+
+      <p class="article-intro"><strong>睿尔曼智能</strong>（RealMan），成立于2018年，总部位于北京，生产基地位于江苏常州，是国内超轻量仿人机械臂领域的引领者。公司从控制器、驱动器、电机、减速器四大核心零部件完全自主研发，以<strong>「硬件+数据+远程作业网络（GLN）」</strong>三大底层能力构建具身智能基础设施平台。2025年已实现盈利（净利润数千万元），全球服务超8,000家企业客户，一体化关节模组年产能突破10万台。2026年3月完成近5亿元C轮融资（投后估值约32亿元），正在建设AUTRON奥创超级工厂，目标实现百万级关节模组年产能。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper">
+        <table class="wikitable infotable">
+          <tr><th style="width:140px;">项目</th><th>内容</th></tr>
+          <tr><td>公司全称</td><td>睿尔曼智能科技（北京）有限公司</td></tr>
+          <tr><td>英文名称</td><td>RealMan Intelligent Technology (Beijing) Co., Ltd.</td></tr>
+          <tr><td>简称</td><td>睿尔曼智能 / RealMan</td></tr>
+          <tr><td>成立时间</td><td>2018年1月8日</td></tr>
+          <tr><td>注册地址</td><td>北京市石景山区首特产业园</td></tr>
+          <tr><td>法定代表人</td><td>郑随兵</td></tr>
+          <tr><td>注册资本</td><td>约382.56万元人民币</td></tr>
+          <tr><td>生产基地</td><td>江苏省常州科教城智能数字产业园</td></tr>
+          <tr><td>企业资质</td><td>国家高新技术企业</td></tr>
+          <tr><td>上市状态</td><td>未上市</td></tr>
+          <tr><td>官方网站</td><td>www.realman-robotics.com</td></tr>
+        </table>
+      </div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>时间</th><th>事件</th></tr>
+          <tr><td>2018年1月</td><td>睿尔曼智能科技（北京）有限公司在北京石景山区注册成立</td></tr>
+          <tr><td>2019年3月</td><td>完成天使轮融资，投资方坤万创投</td></tr>
+          <tr><td>2021年4月</td><td>完成天使+轮融资，引入欧瑞宏润、杭州长江创投</td></tr>
+          <tr><td>2022年</td><td>在江苏常州设立生产基地（睿尔曼智能科技（江苏）有限公司），落户科教城智能数字产业园</td></tr>
+          <tr><td>2022年7月</td><td>完成A轮融资，引入云启资本</td></tr>
+          <tr><td>2023年5月</td><td>完成A+轮融资，引入科沃斯、元和资本、常高新创投</td></tr>
+          <tr><td>2023年10月</td><td>完成A++轮融资，引入招商局创投</td></tr>
+          <tr><td>2025年</td><td>一体化关节模组年产能突破10万台；连续三年业绩三倍增长；实现盈利（净利润数千万元）</td></tr>
+          <tr><td>2026年1月</td><td>完成B轮融资，投资方金鼎资本、上河动量；参展CES 2026实现跨太平洋遥操作演示</td></tr>
+          <tr><td>2026年3月</td><td>完成近5亿元C轮/战略融资，投后估值约32亿元；宣布建设AUTRON奥创超级工厂，目标百万级产能</td></tr>
+          <tr><td>2026年4月</td><td>亮相FAIR plus 2026（深圳），联合生态伙伴展示"真·干活"机器人生态圈</td></tr>
+        </table>
+      </div>
+
+      <h3 id="team">1.2 创始人及核心团队</h3>
+      <p>睿尔曼智能由<strong>郑随兵</strong>创立并担任董事长兼经理。核心团队成员来自中国<strong>早期的机器人底层技术研发团队</strong>，深耕该领域超过10年，曾参与<strong>国家863项目</strong>以及<strong>国家行业标准制定</strong>。团队整体呈现典型的<strong>产业技术派</strong>特征，侧重于机械臂底层硬件（电机、减速器、驱动器、控制器）的全栈研发能力。公司与北京航空航天大学、北京理工大学、中国农业大学等多所高校建立战略合作关系，形成产学研协同创新平台。</p>
+
+      <div class="table-wrapper">
+        <table class="wikitable infotable">
+          <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+          <tr><td>创始人/董事长/经理</td><td>郑随兵</td><td>公司创始人、法定代表人，持股约28.08%。拥有10年以上机器人底层技术研发经验，曾参与国家863项目及行业标准制定</td></tr>
+          <tr><td>监事/董事</td><td>董芹鹏</td><td>公司监事及董事会成员</td></tr>
+          <tr><td>董事</td><td>许民</td><td>董事会成员</td></tr>
+          <tr><td>董事</td><td>陈昱</td><td>董事会成员</td></tr>
+          <tr><td>董事</td><td>张旭龙</td><td>董事会成员</td></tr>
+          <tr><td>董事</td><td>林敬川</td><td>董事会成员</td></tr>
+          <tr><td>董事</td><td>张颖</td><td>董事会成员</td></tr>
+        </table>
+      </div>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+
+      <h4>融资历史</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>轮次</th><th>时间</th><th>金额</th><th>主要投资方</th></tr>
+          <tr><td>天使轮</td><td>2019.03</td><td>未透露</td><td>坤万创投</td></tr>
+          <tr><td>天使+轮</td><td>2021.04</td><td>未透露</td><td>欧瑞宏润（欧瑞投资）、杭州长江创投</td></tr>
+          <tr><td>A轮</td><td>2022.07</td><td>未透露</td><td>云启资本</td></tr>
+          <tr><td>A+轮</td><td>2023.05</td><td>未透露</td><td>科沃斯、元和资本、元科创投、云启资本、常高新创投</td></tr>
+          <tr><td>A++轮</td><td>2023.10</td><td>未透露</td><td>招商局创投</td></tr>
+          <tr><td>B轮</td><td>2026.01</td><td>未披露</td><td>金鼎资本、上河动量</td></tr>
+          <tr><td>C轮（战略融资）</td><td>2026.03</td><td>近5亿元</td><td>大洋电机、上河动量、九派资本等多家上市公司产业方</td></tr>
+        </table>
+      </div>
+
+      <h4>主要股东结构</h4>
+      <div class="table-wrapper">
+        <table class="wikitable infotable">
+          <tr><th>股东</th><th>持股比例/角色</th><th>背景</th></tr>
+          <tr><td>郑随兵</td><td>28.08%</td><td>创始人、法定代表人</td></tr>
+          <tr><td>新余悦强科技服务中心</td><td>16.32%</td><td>员工持股平台</td></tr>
+          <tr><td>常州云常股权投资中心</td><td>9.84%</td><td>常州区属国资基金</td></tr>
+          <tr><td>科沃斯（海南）投资</td><td>6.59%</td><td>科沃斯集团旗下投资平台（产业资本）</td></tr>
+          <tr><td>大洋电机</td><td>C轮领投方</td><td>A股上市公司，电机龙头企业（产业资本）</td></tr>
+          <tr><td>招商局创投</td><td>A++轮投资方</td><td>招商局集团旗下创投平台（国资）</td></tr>
+          <tr><td>云启资本</td><td>A轮起持续跟投</td><td>市场化VC</td></tr>
+          <tr><td>伯金创投（伯特利参股）</td><td>5000万元投资（2025.12）</td><td>伯特利参股的产业基金</td></tr>
+        </table>
+      </div>
+      <p>公司累计完成7轮融资，累计融资金额约5亿元。2026年3月C轮（近5亿元）为迄今最大单笔融资，投后估值约32亿元。公司目前未上市，无公开IPO计划披露。</p>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <div class="table-wrapper">
+        <table class="wikitable infotable">
+          <tr><th>技术维度</th><th>具体方案</th></tr>
+          <tr><td>核心路线</td><td>全栈自研：控制器、驱动器、电机、减速器四大核心零部件均拥有完全自主知识产权</td></tr>
+          <tr><td>关节模组</td><td>一体化关节模组设计，同等体积扭矩提升35%-55%，同等扭矩体积缩小50%以上；谐波减速器自研锁定利润率与定价权</td></tr>
+          <tr><td>机械臂设计</td><td>超轻量化：机械臂重量比传统方案轻约四分之三；单臂额定负载5kg、最大9kg；TCP线速度1.8m/s</td></tr>
+          <tr><td>数据方案</td><td>北京人形机器人数据训练中心部署108套具身本体+十大真实应用场景；积累千余项任务、千万级轨迹片段真机数据；已开源全球首个高质量真机数据集</td></tr>
+          <tr><td>远程作业</td><td>GLN（Global Labor Network）远程作业网络，实现跨太平洋实时遥操作（北京→拉斯维加斯）；将操作能力转化为可调度、可质检、可结算的网络化服务</td></tr>
+          <tr><td>可靠性</td><td>机械臂MTBF达50,000小时（每天8小时≈17年）；通过CR L3认证、ROHS、Reach（与TÜV南德合作）</td></tr>
+          <tr><td>差异化</td><td>定位为具身智能"系统级基础设施平台"，以"可靠硬件+真机数据+远程作业网络"三大底层能力构建全链路</td></tr>
+        </table>
+      </div>
+      <p>睿尔曼的技术路线核心是<strong>"硬件驱动、自研控本"</strong>——通过自研谐波减速器等核心部件掌握成本结构和定价权，实现从底层到应用层的全栈控制。在具身智能大模型浪潮中，睿尔曼选择<strong>不直接参与"大脑"模型竞赛</strong>，而是为各类具身智能公司提供高可靠性、低成本的硬件本体和数据基础设施，扮演"卖铲人"角色。</p>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>产品类别</th><th>子类/型号</th><th>核心参数</th><th>主要适用场景</th></tr>
+          <tr><td>超轻量仿人机械臂</td><td>RM系列（多型号）</td><td>额定负载5kg，最大负载9kg；TCP线速度1.8m/s；自重远轻于传统方案（约轻75%）；MTBF 50,000h</td><td>工业自动化、科研教育、商业服务、新零售、医疗健康、航空航天</td></tr>
+          <tr><td>一体化关节模组</td><td>多规格系列</td><td>扭矩提升35%-55%；体积缩小50%以上；年产能10万台（2025）→百万级（2026目标）；自研谐波减速器</td><td>机器人本体厂商供应链（如智元机器人、银河通用等）</td></tr>
+          <tr><td>GLN远程作业网络</td><td>远程遥操作平台</td><td>支持跨太平洋实时遥操作（北京→拉斯维加斯）；可调度、可质检、可结算</td><td>远程工业运维、高危环境作业、数据采集</td></tr>
+          <tr><td>数据训练中心</td><td>北京数据中心</td><td>108套具身本体；十大真实应用场景；千万级轨迹片段</td><td>具身智能训练数据供给、开源数据集</td></tr>
+        </table>
+      </div>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>场景分类</th><th>子场景</th><th>代表性客户/合作方</th></tr>
+          <tr><td>工业自动化</td><td>产线上下料、精密装配、质量检测</td><td>智元机器人、银河通用等具身智能头部企业；三星电子、川崎重工</td></tr>
+          <tr><td>商业服务</td><td>新零售（咖啡制作、奶茶调配）、餐饮自动化</td><td>北京卫视春晚机器人包饺子演示</td></tr>
+          <tr><td>科研教育</td><td>高校实验室、科研平台</td><td>苏黎世联邦理工学院（ETH Zurich）、北航、北理工、中国农大</td></tr>
+          <tr><td>医疗健康</td><td>辅助操作、试剂分装</td><td>医疗器械企业</td></tr>
+          <tr><td>航空航天</td><td>精密零部件处理</td><td>航空航天领域企业</td></tr>
+          <tr><td>数据服务</td><td>真机数据采集与供给</td><td>北京数据训练中心（千万级轨迹片段）</td></tr>
+          <tr><td>远程作业</td><td>跨洋遥操作运维、高危环境远程操控</td><td>GLN网络（CES 2026实现北京至拉斯维加斯演示）</td></tr>
+        </table>
+      </div>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <p>睿尔曼是全球范围内商业化落地最为扎实的具身智能上游企业之一。2025年一体化关节模组年产能突破10万台，全球服务超8,000家企业用户，覆盖亚洲、欧洲、北美、南美。2025年已实现盈利（净利润数千万元），连续三年业绩三倍增长，经营性现金流进入良性循环——这在具身智能赛道属于罕见的健康财务模型。</p>
+      <p>公司正在建设AUTRON奥创产线超级工厂，目标实现百万级关节模组年产能（从10万台到100万台的10倍跨越）。在数据基础设施方面，已开源全球首个高质量、模态数量最多的真机数据集，为具身智能行业提供公共训练数据资源。CES 2026展会上完成跨太平洋实时遥操作演示，展示了其GLN远程作业网络的商业化潜力。</p>
+
+      <div class="callout">
+        <div class="callout-title">关键商业里程碑</div>
+        <ul>
+          <li>全球8,000+企业客户，包括三星、西门子、亚马逊、川崎重工、ETH Zurich等顶级合作伙伴</li>
+          <li>2025年净利润数千万元，已实现正向盈利（具身智能行业罕见）</li>
+          <li>关节模组年产能10万台，2026年目标百万级</li>
+          <li>机械臂通过CR L3认证，MTBF 50,000小时</li>
+          <li>开源全球首个高质量多模态真机数据集</li>
+        </ul>
+      </div>
+
+      <h3 id="financials">1.8 财务数据</h3>
+      <p>睿尔曼智能为非上市公司，以下数据基于公开报道和融资公告整理：</p>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>指标</th><th>数据</th><th>备注</th></tr>
+          <tr><td>2025年净利润</td><td>数千万元</td><td>已实现正向盈利（据AI科技评论独家报道）</td></tr>
+          <tr><td>业绩增速</td><td>连续三年三倍增长</td><td>公司官方口径</td></tr>
+          <tr><td>2025年经营性现金流</td><td>良性循环</td><td>具备自我造血能力</td></tr>
+          <tr><td>C轮投后估值</td><td>约32亿元</td><td>2026年3月</td></tr>
+          <tr><td>累计融资</td><td>约5亿元</td><td>创立以来7轮融资</td></tr>
+          <tr><td>关节模组年产能</td><td>10万台（2025）</td><td>目标百万级（AUTRON工厂）</td></tr>
+        </table>
+      </div>
+
+      <h3 id="misc">1.9 其他信息</h3>
+      <ul>
+        <li>睿尔曼在CES 2026上实现北京至拉斯维加斯的跨太平洋实时遥操作演示，展示了GLN远程作业网络的低延迟高可靠性能</li>
+        <li>北京卫视春晚中，睿尔曼机器人完成包饺子全流程并同步积累真实场景数据</li>
+        <li>与TÜV南德合作获得CR L3、ROHS、Reach等国际认证</li>
+        <li>伯特利（A股汽车零部件公司）于2025年12月通过参股基金伯金创投向睿尔曼投资5000万元</li>
+        <li>公司定位已从"超轻量仿人机械臂引领者"升级为"面向具身智能时代的全球化系统级基础设施平台"</li>
+        <li>大洋电机（C轮领投方）为A股上市公司，电机行业龙头，与睿尔曼在电机供应链上存在天然协同</li>
+        <li>2026年FAIR plus展会上，睿尔曼联合生态伙伴展示"真·干活"机器人生态圈落地成果</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="a1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>睿尔曼核心团队来自中国早期的机器人底层技术研发团队，参与过国家863项目和行业标准制定，这一背景决定了公司选择"啃硬骨头"——从减速器、电机、驱动器、控制器四大底层核心零部件完全自研，而不是走"攒机"路线。创始人郑随兵10年以上的底层研发经验使团队对成本结构有深刻理解，能够通过自研谐波减速器等核心部件锁定利润率和定价权。团队选择超轻量仿人机械臂赛道而非追逐人形整机，体现了对自身技术禀赋的清醒认知——底层硬件团队擅长的是精度、可靠性和成本控制，而非AI算法或大模型。这种"做产业上游基础设施"的选择，恰好与当前具身智能行业"大脑强、本体弱"的供需缺口高度匹配。</p>
+      </div>
+
+      <div class="analysis-block" id="a2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>睿尔曼的"全栈自研+超轻量化"技术路线与其目标场景（工业自动化、商业服务、科研教育等）高度适配。超轻量设计（比传统方案轻约75%）使得机械臂可部署在对空间和重量敏感的场景（如新零售门店、移动操作平台），而50,000小时MTBF则满足了工业级可靠性需求。一体化关节模组的体积/扭矩优势使其特别适合具身智能整机厂商——智元机器人、银河通用等头部客户选择睿尔曼作为关节供应商，正是看中其在保持高性能的同时大幅缩减体积的能力。GLN远程作业网络的设计理念（将操作能力网络化）则开辟了"硬件即服务"的新商业模式，从卖设备向卖服务延伸。不过，GLN的实际商业化规模和数据训练中心的变现效率仍需时间验证。</p>
+      </div>
+
+      <div class="analysis-block" id="a3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>睿尔曼的股东结构体现了"产业资本深度绑定"的特征。科沃斯（扫地机器人龙头，6.59%持股）提供消费级机器人市场洞察和渠道资源；大洋电机（C轮领投方）是电机龙头企业，与睿尔曼在电机供应链上形成天然协同；招商局创投带来港口、物流等多元化场景入口；伯特利（汽车零部件）的参股则可能为汽车行业机器人应用打开通道。常州国资的参与（常高新创投、常州云常）与生产基地选址常州高度吻合，反映了地方政府对制造业落地的看重。创始人持股28.08%加上员工持股平台16.32%，保证了团队的战略主导权。总体来看，股东结构偏向产业协同而非纯财务驱动，有利于公司在供应链整合和场景拓展上获得实质性支持。</p>
+      </div>
+
+      <div class="analysis-block" id="a4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>睿尔曼的路径调整体现了从"卖机械臂"到"做基础设施"的战略升级。早期公司定位为"超轻量仿人机械臂引领者"，核心商业模式是销售硬件本体。随着具身智能行业爆发，公司逐步将定位升级为"系统级基础设施平台"，新增了GLN远程作业网络和数据训练中心两大业务线。2026年B轮和C轮之间仅间隔约1.5个月（1月B轮→3月C轮近5亿），表明资本对其战略转向的高度认可。AUTRON奥创超级工厂的规划（年产能从10万台跃升至百万台）是这一战略的关键支撑——从服务数千客户到服务整个具身智能生态。值得关注的是，公司在2025年即实现盈利，说明硬件销售业务的商业模式已初步验证，为后续基础设施业务的扩展提供了财务安全垫。</p>
+      </div>
+
+      <div class="analysis-block" id="a5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>睿尔曼在具身智能产业链中的定位可概括为"卖铲人中的全栈派"——不参与人形整机或大模型竞赛，而是专注于为整个行业提供高可靠性、低成本的硬件本体和数据基础设施。与绿的谐波（专注减速器）、汇川技术（专注伺服驱动）等零部件厂商相比，睿尔曼的全栈自研（控制器+驱动器+电机+减速器）使其能以一体化关节模组的形式提供完整解决方案，降低客户的集成难度。与宇树科技（以整机出货为主但也自研关节）相比，睿尔曼更专注上游，不直接与整机客户竞争。其核心取舍在于：主动放弃整机市场的品牌溢价和规模想象空间，换取上游供应链的广泛覆盖和更健康的财务模型（2025年已盈利）。如果具身智能行业的"军备竞赛"持续，睿尔曼的"军火商"位置将为其提供稳定的增长基础。</p>
+      </div>
+
+      <div class="analysis-block" id="a6">
+        <h4>2.6 其他重要观察</h4>
+        <p>几点值得关注的信号：第一，睿尔曼是具身智能赛道中为数不多已实现盈利的公司（2025年净利润数千万元），这在整个行业普遍深度亏损的背景下极为罕见，其硬件自研+规模效应+成本控制的商业模型值得深入研究。第二，公司开源全球首个高质量多模态真机数据集是战略性举措——通过免费提供数据吸引开发者和研究者进入其生态，从而拉动硬件和GLN网络的使用。第三，跨太平洋遥操作演示（北京→拉斯维加斯）不仅展示了技术能力，更暗示了GLN的全球化劳动力调度野心——如果远程操作网络能解决延迟和可靠性问题，其潜在市场规模远超硬件销售。第四，主要风险在于：如果具身智能行业整体进展慢于预期，或者主要整机客户开始自研关节模组（类苹果垂直整合模式），睿尔曼的"上游供应商"定位可能面临天花板。</p>
+      </div>
+
+      <h2 id="refs">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://finance.eastmoney.com/a/202603043662032486.html" target="_blank">东方财富：睿尔曼智能完成近5亿元融资，深化全球"硬件+数据+远程作业网络"生态布局（2026.03）</a></li>
+          <li><a href="https://m.bjnews.com.cn/detail/1772626883129811.html" target="_blank">新京报：睿尔曼智能宣布完成近5亿元融资（2026.03）</a></li>
+          <li><a href="https://m.163.com/dy/article/KN6SJTGF0511DPVD.html" target="_blank">AI科技评论：独家｜投后估值32亿，睿尔曼智能获2亿元C轮融资（2025/2026）</a></li>
+          <li><a href="https://i.gasgoo.com/news/70449049.html" target="_blank">盖世汽车Seeds：为具身智能打"地基"，睿尔曼智能完成近5亿元融资（2026.03）</a></li>
+          <li><a href="https://www.donews.com/news/detail/4/6454422.html" target="_blank">DoNews：睿尔曼智能完成近5亿元融资，加码具身智能基础设施建设（2026.03）</a></li>
+          <li><a href="https://www.geekpark.net/news/363025" target="_blank">极客公园：睿尔曼亮相FAIR plus 2026，夯实"真·干活"机器人产业生态圈（2026.04）</a></li>
+          <li><a href="https://ex.chinadaily.com.cn/exchange/partners/82/rss/channel/cn/columns/sz8srm/stories/WS695e2260a310942cc499a762.html" target="_blank">中国日报：CES 2026——睿尔曼以三大底层能力构建全球化具身智能新基建（2026.01）</a></li>
+          <li><a href="https://www.industrysourcing.cn/article/474390" target="_blank">工业采购：睿尔曼智能完成近5亿元融资，定义具身智能时代全球化系统级基础设施平台（2026.03）</a></li>
+          <li><a href="https://www.cet.com.cn/wzsy/ycxw/10320945.shtml" target="_blank">中国经济时报：睿尔曼智能完成近5亿元融资，加速布局"硬件+数据+远程作业网络"（2026.03）</a></li>
+          <li><a href="https://pitchhub.36kr.com/project/2011475949978887" target="_blank">36氪：睿尔曼项目信息</a></li>
+          <li><a href="https://vc.pedaily.cn/company/191499.html" target="_blank">投资界：睿尔曼智能科技（北京）有限公司</a></li>
+          <li><a href="http://kjc.changzhou.gov.cn/html/kjc/2024/NQNAKHQB_0522/9032.html" target="_blank">常州市科技局：睿尔曼智能——常州智造让机器人有一"臂"之力（2024.05）</a></li>
+          <li><a href="https://m.sohu.com/a/992856172_161795/" target="_blank">搜狐：具身智能赛道再迎大单，睿尔曼智能获近5亿元战略投资（2026.03）</a></li>
+          <li><a href="https://news.10jqka.com.cn/20260305/c675094492.shtml" target="_blank">同花顺财经：具身智能赛道再迎大单，睿尔曼智能获近5亿元战略投资（2026.03）</a></li>
+          <li><a href="https://news.qq.com/rain/a/20260304A08SOM00" target="_blank">腾讯新闻：做机器人关节的睿尔曼智能完成近5亿元融资（2026.03）</a></li>
+          <li><a href="https://www.jiemian.com/article/13821184.html" target="_blank">界面新闻：伯特利参股基金1个月花了1个亿，接连涉足低空经济、机器人领域（2025.12）</a></li>
+          <li><a href="http://stock.stockstar.com/RB2026030500033758.shtml" target="_blank">证券之星：睿尔曼C轮融资，投资方为大洋电机、上河动量等（2026.03）</a></li>
+          <li><a href="https://guba.eastmoney.com/news,gssz,1674638629.html" target="_blank">东方财富股吧：睿尔曼智能完成近5亿元融资（2026.03）</a></li>
+          <li><a href="https://innohere.com/ir/102113/frame.html" target="_blank">InnoHere：睿尔曼公司详情</a></li>
+          <li><a href="https://www.dutenews.com/n/article/10599200" target="_blank">读特新闻：睿尔曼亮相FAIR plus 2026，百万级产能筑基（2026.04）</a></li>
+          <li><a href="https://app.dahecube.com/nweb/wap/article.html?artid=264943" target="_blank">大河财立方：睿尔曼智能完成近5亿元融资（2026.03）</a></li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">本页面最后更新于2026年5月4日 · 数据来源截至各参考链接标注日期 · 具身智能Wiki</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

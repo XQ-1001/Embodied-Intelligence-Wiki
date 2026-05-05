@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>帕西尼 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a><span class="breadcrumb-sep"> › </span><span>帕西尼</span></div>
+  <div class="wiki-header"><h1>帕西尼</h1><div class="subtitle">PaXini Tech · 成立于2021年 · 深圳 · 估值超百亿 · 全球触觉传感器龙头 · 具身智能触觉基础设施定义者</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#founders">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#technology">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercialization">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financials">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#ana1">2.1 团队背景与场景选择</a></li>
+        <li class="toc-lvl4"><a href="#ana2">2.2 技术路线与场景适配性</a></li>
+        <li class="toc-lvl4"><a href="#ana3">2.3 股东资本与战略影响</a></li>
+        <li class="toc-lvl4"><a href="#ana4">2.4 试错过程与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#ana5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#ana6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#references">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">帕西尼</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">帕西尼感知科技（深圳）有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">英文名</div><div class="ib-value">PaXini Tech / PaXini Perception Technology</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2021年6月29日</div></div>
+        <div class="ib-row"><div class="ib-label">总部</div><div class="ib-value">深圳·南山</div></div>
+        <div class="ib-row"><div class="ib-label">创始人/CEO</div><div class="ib-value">许晋诚 博士（早稻田大学）</div></div>
+        <div class="ib-section">估值/市值</div>
+        <div class="ib-row"><div class="ib-label">最新估值</div><div class="ib-value">超100亿元人民币（2026.3 B轮后）</div></div>
+        <div class="ib-section">财务数据（非公开）</div>
+        <div class="ib-row"><div class="ib-label">累计融资</div><div class="ib-value">远超20亿元人民币</div></div>
+        <div class="ib-row"><div class="ib-label">累计订单</div><div class="ib-value">超5亿元（过去一年）</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">触觉传感器市占率</div><div class="ib-value">全球第一，约80%</div></div>
+        <div class="ib-row"><div class="ib-label">数据工厂</div><div class="ib-value">5座（2026年规划），年产百亿条数据</div></div>
+        <div class="ib-row"><div class="ib-label">第一大外部股东</div><div class="ib-value">比亚迪（持股13.37%）</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">领域</div><div class="ib-value"><span class="tag tag-info">具身智能</span><span class="tag tag-info">触觉传感器</span><span class="tag tag-info">灵巧手</span><span class="tag tag-info">人形机器人</span></div></div>
+        <div class="ib-row"><div class="ib-label">官网</div><div class="ib-value"><a href="https://www.paxini.com" target="_blank">paxini.com</a></div></div>
+      </aside>
+      <p class="article-intro">帕西尼感知科技（PaXini Tech）是中国领先的具身智能基础设施公司，由日本早稻田大学博士许晋诚于2021年创立，总部位于深圳。公司以自研6D霍尔阵列式多维触觉传感技术为核心，构建了从传感器→灵巧手→人形机器人→数据工厂→大模型的全栈闭环，是全球唯一以触觉模态深度集成全模态具身数据闭环训练VTLA大模型的百亿级企业。触觉传感器全球出货量第一，市占率约80%。截至2026年3月完成超10亿元B轮融资，投后估值突破百亿元，股东包括比亚迪（第一大外部股东）、京东、北汽、上汽、TCL、商汤、Meta关联方等。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper"><table class="wikitable infotable">
+        <tr><th>项目</th><th>内容</th></tr>
+        <tr><td>公司全称</td><td>帕西尼感知科技（深圳）有限公司</td></tr>
+        <tr><td>英文名称</td><td>PaXini Tech (PaXini Perception Technology (Shenzhen) Co., Ltd.)</td></tr>
+        <tr><td>成立时间</td><td>2021年6月29日</td></tr>
+        <tr><td>注册地</td><td>广东省深圳市南山区</td></tr>
+        <tr><td>上市状态</td><td>未上市</td></tr>
+        <tr><td>官网</td><td>paxini.com</td></tr>
+        <tr><td>定位</td><td>具身智能基础设施建设者——以多维触觉为核心的全栈具身智能公司</td></tr>
+      </table></div>
+      <h4>发展沿革</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>时间</th><th>事件</th></tr>
+        <tr><td>2021年6月</td><td>帕西尼感知科技成立于深圳市南山区</td></tr>
+        <tr><td>2022年12月</td><td>完成Pre-A轮数千万元融资</td></tr>
+        <tr><td>2024年4月</td><td>完成A+轮融资，投资方含北汽产投、南山战新投</td></tr>
+        <tr><td>2025年4月</td><td>比亚迪超亿元战略投资入股（持股13.37%），为比亚迪在具身智能领域最大单笔投资</td></tr>
+        <tr><td>2025年6月</td><td>完成数亿元A轮融资，投资方含TCL创投、毅达资本、商汤国香等；天津Super EID Factory投产</td></tr>
+        <tr><td>2025年8月</td><td>京东战略领投，2025年4-8月累计揽获超10亿元</td></tr>
+        <tr><td>2026年1月</td><td>首次亮相CES 2026，展示TORA-ONE人形机器人及冰淇淋全流程制作</td></tr>
+        <tr><td>2026年3月</td><td>完成超10亿元B轮融资，黄浦江资本、信安资本联合领投，估值突破百亿；宣布新建4座数据工厂</td></tr>
+        <tr><td>2026年4月</td><td>联合京东云、腾讯云、百度智能云打造全球首个百亿级全模态具身智能数据云商城</td></tr>
+      </table></div>
+
+      <h3 id="founders">1.2 创始人及核心团队</h3>
+      <p>帕西尼由许晋诚博士创立。许晋诚毕业于日本早稻田大学，师从世界著名机器人学家菅野重树教授（Shigeki Sugano），在触觉传感器和机器人领域拥有深厚学术积累。联合创始人聂相如担任公司战略与市场负责人。团队核心成员来自早稻田大学、东京大学等顶尖院校，以及华为、比亚迪等产业龙头，形成「学术攻关+产业落地」的双轮驱动结构。</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+        <tr><td>创始人/CEO</td><td>许晋诚</td><td>日本早稻田大学博士，师从菅野重树教授。在触觉传感器领域深耕多年，拥有多项核心专利，带领团队研发全球领先的6D霍尔阵列式多维触觉传感技术</td></tr>
+        <tr><td>联合创始人</td><td>聂相如</td><td>负责公司战略与市场，2026年CES期间代表公司发表「触觉普惠时代已来」主题演讲</td></tr>
+        <tr><td>核心团队</td><td>—</td><td>来自早稻田大学、东京大学、华为、比亚迪等机构，兼具触觉传感学术前沿与产业量产经验</td></tr>
+      </table></div>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <h4>融资历史</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>时间</th><th>轮次</th><th>规模</th><th>关键投资方</th></tr>
+        <tr><td>2022年12月</td><td>Pre-A轮</td><td>数千万元</td><td>—</td></tr>
+        <tr><td>2024年4月</td><td>A+轮</td><td>—</td><td>北汽产投、南山战新投、盈富泰克</td></tr>
+        <tr><td>2025年4月</td><td>战略投资</td><td>超亿元</td><td>比亚迪（持股13.37%，具身智能领域最大单笔投资）</td></tr>
+        <tr><td>2025年6月</td><td>A轮</td><td>数亿元</td><td>TCL创投、毅达资本、尚颀资本、基石资本、商汤国香等</td></tr>
+        <tr><td>2025年8月</td><td>A系列（京东领投轮）</td><td>—</td><td>京东战略领投，浦耀信晔、宏兆基金、新国都等</td></tr>
+        <tr><td>2025年4-8月</td><td>多轮累计</td><td>超10亿元</td><td>京东、比亚迪、北汽、上汽、TCL、毅达、商汤等</td></tr>
+        <tr><td>2026年3月</td><td>B轮</td><td>超10亿元</td><td>黄浦江资本、信安资本联合领投，珠海科技产业集团（华发&格力）、Meta关联方等</td></tr>
+      </table></div>
+      <h4>股东结构</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>股东类型</th><th>代表机构</th><th>战略意义</th></tr>
+        <tr><td>汽车制造</td><td>比亚迪（13.37%）、北汽产投、上汽（尚颀资本）</td><td>绑定汽车制造场景，产线精密装配需求直接转化</td></tr>
+        <tr><td>电商物流</td><td>京东</td><td>物流仓储分拣场景，数据云商城共建</td></tr>
+        <tr><td>消费电子/TMT</td><td>TCL创投、商汤国香、Meta关联方</td><td>3C制造场景，AI/VR协同</td></tr>
+        <tr><td>国资</td><td>南山战新投、黄浦江资本、信安资本、珠海科技产业集团</td><td>政策支持+地方产业集群协同</td></tr>
+        <tr><td>财务投资</td><td>毅达资本、基石资本</td><td>资本市场背书</td></tr>
+      </table></div>
+
+      <h3 id="technology">1.4 技术路线</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>技术维度</th><th>路线选择</th><th>详情</th></tr>
+        <tr><td>触觉传感</td><td>6D霍尔阵列式多维触觉（全球独创）</td><td>采样频率每秒100万次；力识别精度0.01N；重复精度<0.5%FS；输出频率1000Hz；感知15种维度（六维力+三维力矩、材质、纹理、温度、回弹等）；工业级寿命超300万次；IP68防水防尘</td></tr>
+        <tr><td>核心架构</td><td>HAPTA异构多核阵列软硬件架构</td><td>ITPU多维触觉处理单元（Intelligent Tactile Processing Unit），专用触觉计算芯片</td></tr>
+        <tr><td>AI模型</td><td>OmniVTLA全模态具身智能大模型</td><td>视觉-触觉-语言-动作四模态融合；HyperCosmos全模态世界模型（研发中）</td></tr>
+        <tr><td>控制系统</td><td>PX-Core</td><td>自研机器人运动控制系统</td></tr>
+        <tr><td>数据方案</td><td>超级数据工厂集群</td><td>5座工厂覆盖全国五大区域，年产百亿条全模态数据；OmniSharing DB开放数据集</td></tr>
+        <tr><td>差异化</td><td>触觉为锚的全栈闭环</td><td>全球唯一以触觉模态深度集成全模态数据的百亿级企业；传感器→灵巧手→人形机器人→数据工厂→大模型全链路</td></tr>
+      </table></div>
+      <p>帕西尼的6D霍尔阵列式触觉传感技术为中国突破35项"卡脖子"技术之一（触觉传感器），是目前唯一在人形机器人领域大规模运用的触觉传感器供应商。</p>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>产品分类</th><th>子类/型号</th><th>关键参数</th><th>适用场景</th></tr>
+        <tr><td>触觉传感器</td><td>PX-6AX-GEN3</td><td>3大系列12款型号；0.01N精度；核心指尖触觉传感器</td><td>灵巧手指尖、机器人末端执行器</td></tr>
+        <tr><td>触觉传感器</td><td>PX-3AX</td><td>消费级/大面积部署型</td><td>智能座舱、大面积感知</td></tr>
+        <tr><td>力/力矩传感器</td><td>PX6D / PXTS</td><td>全球首款霍尔原理六维力/力矩传感器；用于腕部与关节力控</td><td>机器人关节力控</td></tr>
+        <tr><td>触觉灵巧手</td><td>DexH13</td><td>全球首款"多维触觉+AI视觉"双模态灵巧手；4指16自由度（13主动+3被动）；单手1140个ITPU单元；800万像素AI手眼相机</td><td>精密装配、物料分拣、科研</td></tr>
+        <tr><td>触觉灵巧手</td><td>DexH5</td><td>经济型版本</td><td>通用操作</td></tr>
+        <tr><td>人形机器人</td><td>TORA-ONE</td><td>53自由度；1.46-1.86m自适应身高；双手超2000颗ITPU单元；轮式底盘</td><td>安检、物流、商超、康养、精密装配</td></tr>
+        <tr><td>人形机器人</td><td>TORA-DOUBLE ONE</td><td>双足/高动态版本；CES 2026首展</td><td>复杂地形、高动态场景</td></tr>
+        <tr><td>数据平台</td><td>OmniSharing DB + 数据云商城</td><td>百亿级全模态具身数据；联合京东云、腾讯云、百度智能云开放</td><td>行业数据集输出、模型训练</td></tr>
+      </table></div>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>场景分类</th><th>具体场景</th><th>合作伙伴/落地</th><th>说明</th></tr>
+        <tr><td>工业制造</td><td>汽车产线精密装配</td><td>比亚迪、北汽、上汽</td><td>触觉传感器+灵巧手用于自动化产线精密装配工位</td></tr>
+        <tr><td>工业制造</td><td>3C制造</td><td>TCL等</td><td>进入3C制造核心生产场景</td></tr>
+        <tr><td>公共服务</td><td>地铁安检</td><td>深圳地铁（岗厦北枢纽）</td><td>TORA-ONE试点安检分流引导，日均拦截违禁品200件</td></tr>
+        <tr><td>物流仓储</td><td>智慧物流分拣</td><td>京东</td><td>仓储分拣场景部署</td></tr>
+        <tr><td>汽车智能座舱</td><td>触觉传感方案</td><td>比亚迪</td><td>安全预警响应时间缩短75%以上</td></tr>
+        <tr><td>医疗康养</td><td>精密操作/康复</td><td>—</td><td>触觉传感器用于精细操作场景</td></tr>
+        <tr><td>消费电子</td><td>触觉传感器模组</td><td>—</td><td>传感器单价降至199元起，进入消费级市场</td></tr>
+        <tr><td>海外展示</td><td>CES 2026国际亮相</td><td>全球市场</td><td>冰淇淋全流程制作展示，吸引全球关注</td></tr>
+      </table></div>
+
+      <h3 id="commercialization">1.7 商业化进展</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>指标</th><th>数据</th><th>说明</th></tr>
+        <tr><td>触觉传感器全球出货量</td><td>全球第一</td><td>市占率约80%，与全球多家顶尖机器人厂商及科研院所合作</td></tr>
+        <tr><td>传感器单价</td><td>从十万元级降至199元起</td><td>实现消费级突破，"触觉普惠"</td></tr>
+        <tr><td>累计订单</td><td>超5亿元（过去一年）</td><td>覆盖工业、物流、公共服务等多场景</td></tr>
+        <tr><td>数据生产</td><td>年产近2亿条→百亿级</td><td>天津工厂→5座工厂（2026年扩张）</td></tr>
+        <tr><td>深圳地铁试点</td><td>日均拦截违禁品200件</td><td>岗厦北枢纽安检场景</td></tr>
+        <tr><td>CES 2026</td><td>首次海外亮相</td><td>展示人形机器人完整闭环能力</td></tr>
+      </table></div>
+      <p>公司2026年明确核心任务是"让技术在实际场景中用起来"，量产爬坡为年度重点。聂相如在2026年3月表示："市场需求远大于产量，正在加班加点逐步提升产能"。</p>
+
+      <h3 id="financials">1.8 财务数据</h3>
+      <p>帕西尼为非上市公司，未公开完整财务报表。已知数据如下：</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>指标</th><th>数据</th><th>时间</th></tr>
+        <tr><td>累计融资总额</td><td>远超20亿元</td><td>截至2026年3月B轮</td></tr>
+        <tr><td>最新估值</td><td>超100亿元</td><td>2026年3月B轮后</td></tr>
+        <tr><td>累计订单额</td><td>超5亿元（过去一年）</td><td>截至2026年3月</td></tr>
+        <tr><td>营收</td><td>未公开披露</td><td>—</td></tr>
+        <tr><td>产能</td><td>数据工厂5座（2026年扩至）；传感器需求远大于产量</td><td>2026年3月</td></tr>
+      </table></div>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>帕西尼是全球唯一以百亿级深度集成触觉模态的全模态实采具身数据闭环训练VTLA大模型的企业。</li>
+        <li>多维触觉传感器为中国突破35项"卡脖子"技术之一，帕西尼是触觉传感器领域国产替代的核心力量。</li>
+        <li>传感器单价从早期十万元级降至199元起，标志着触觉传感从科研级向消费级的大规模渗透。</li>
+        <li>2026年CES首次亮相即引发国际关注，被Interesting Engineering等外媒报道。</li>
+        <li>数据云商城联合京东云、腾讯云、百度智能云三大云平台，用户可在线完成数据选购-签约-支付-交付全流程。</li>
+        <li>5座超级数据工厂分别位于天津、宿迁、武汉、自贡、赣州，辐射华北、华东、华中、西南、华南五大区域。</li>
+        <li>被行业分析机构列为国内8大百亿估值具身智能企业之一。</li>
+        <li>分析人士预计2027年人形机器人将在国内一般应用场景具备商业化价值。</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="ana1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>许晋诚博士师从早稻田大学菅野重树教授——后者是全球触觉传感与灵巧手领域的顶尖学者。这一师承关系使帕西尼从创立之初就具备了触觉传感的「学界制高点」。早稻田大学在仿人机器人领域有半个世纪的积累（从1970年代的WABOT开始），许晋诚的学术背景天然匹配触觉传感→灵巧手→人形机器人的技术级联路径。与其他具身智能创企的「视觉优先」策略不同，帕西尼的创始基因决定了其「触觉为锚」的差异化定位。但创始人背景偏学术（无大型企业高管经历），在公司进入百亿估值后的组织管理、供应链协调、大规模量产等环节可能面临经验缺口，这正是引入比亚迪、京东等产业资本的战略意图所在——产业股东不仅提供场景，更提供制造业和物流领域的运营know-how。</p>
+      </div>
+
+      <div class="analysis-block" id="ana2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>帕西尼选择「触觉为锚」的技术路线是具身智能赛道中极为稀缺的策略。视觉和语言模型已有海量互联网数据支撑，但触觉数据极度稀缺——这正是帕西尼建立壁垒的支点。公司在天津等地建设的超级数据工厂本质上是在解决「触觉数据从哪来」的元问题，通过自建采集基地获得对触觉模态数据的独占性优势。然而，触觉传感器作为底层硬件，其标准化程度高于差异化——当传感器单价从十万元降至199元，意味着技术壁垒正在从「能不能造」转向「能不能以极低成本规模化生产」。帕西尼2026年面临的挑战是：在传感器毛利率被压缩之前，能否通过灵巧手、人形机器人、数据服务等更高附加值的产品线完成价值迁移。</p>
+      </div>
+
+      <div class="analysis-block" id="ana3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>帕西尼的股东结构中，比亚迪以13.37%持股成为第一大外部股东，京东为战略领投方，北汽和上汽通过产业基金参与。这一结构使帕西尼拥有国内具身智能企业中最密集的汽车制造场景资源——四家车企股东的产线为灵巧手和触觉传感器提供了天然的试验场和订单来源。但也可能造成客户集中度风险：如果主要收入依赖车企股东的关联交易，独立第三方客户的拓展能力将受到质疑——这对未来IPO极为关键。Meta关联方的参与则开通了海外科技巨头的协同通道，暗示帕西尼的触觉技术可能在VR/AR触觉反馈等消费电子领域有第二增长曲线。京东的参与不仅带来物流场景，其与帕西尼共建的数据云商城也体现了平台型战略意图。</p>
+      </div>
+
+      <div class="analysis-block" id="ana4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>帕西尼的公开路径呈现出清晰的「三级火箭」演进：第一阶段（2021-2024）以核心部件（触觉传感器）切入市场，建立技术壁垒和行业认知；第二阶段（2024-2025）向上延伸至灵巧手和人形机器人整机，验证「传感器→整机」的垂直整合能力，并获比亚迪、京东等产业资本加持；第三阶段（2025-2026）进一步升维至数据基础设施——建设超级数据工厂、推出数据云商城，定位从「硬件公司」转变为「触觉数据基础设施提供商」。这一三级跃迁在3年内完成，节奏极快，体现了团队在战略升维上的敏锐度。值得关注的是2026年传感器单价降至199元的动作——这标志着公司主动将硬件「白菜化」，以换取触觉数据的市场规模和生态主导权，是典型的「剃须刀+刀片」式战略转型。</p>
+      </div>
+
+      <div class="analysis-block" id="ana5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>在具身智能竞争格局中，帕西尼做出了几个清晰的取舍。第一，定位为「基础设施」而非「品牌整机」——跟优必选、Figure AI等以整机品牌为核心的公司形成差异化，更像机器人行业的「高通+博世」。第二，以触觉而非视觉为入口——在视觉大模型赛道已被OpenAI、Google等巨头主导的背景下，触觉是少有的中国创企可以实现全球领先的细分领域。第三，选择「数据开放」而非「数据封闭」——通过OmniSharing DB和数据云商城构建触觉数据的「App Store」，策略类似于英伟达的CUDA生态：硬件低价铺量，数据/平台服务赚取长期价值。但这一策略的风险在于，当触觉传感器成为标准化商品后，数据独占性是否足以构成护城河？如果比亚迪等车企股东自研触觉传感器，帕西尼的议价能力将受到挑战。</p>
+      </div>
+
+      <div class="analysis-block" id="ana6">
+        <h4>2.6 其他重要观察</h4>
+        <p>首先，帕西尼在4个月内（2025年4-8月）密集完成多轮融资，累计揽获约10亿元，这种节奏在具身智能赛道极为激进。高频融资虽验证了资本市场对其技术壁垒的认可，但也意味着估值增长可能快于业务收入增长，需关注后续商业化能否追赶估值。其次，5座超级数据工厂的全国布局在一年内从1座扩展到5座，固定资产投入巨大，如果数据变现（数据云商城）的收入增长不及预期，可能面临产能过剩风险。第三，CES 2026的国际化亮相是其从「中国公司」向「全球公司」转型的里程碑——触觉传感器本身具有通用性（不像大模型受地缘政治限制），海外市场拓展的阻力相对较小。最后，与智平方的「模型驱动」路线相比，帕西尼的「触觉硬件驱动」路线更接近传统硬科技创业范式——周期更长但壁垒更深，二者分别代表了具身智能赛道「软」和「硬」两种创业哲学。</p>
+      </div>
+
+      <h2 id="references">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://www.21jingji.com/article/20250805/herald/c67c3219711375d66c75b02fe8817835.html" target="_blank">京东战略领投！这家深圳灵巧手公司4个月狂揽10亿 | 21世纪经济报道</a></li>
+          <li><a href="https://www.iyiou.com/analysis/202506181100975" target="_blank">帕西尼A轮数亿元融资落地！灵巧手市场融资、产品双爆发 | 亿欧</a></li>
+          <li><a href="https://post.smzdm.com/p/awwnp3v2/" target="_blank">具身智能企业帕西尼完成超10亿元B轮融资，投后估值破百亿 | 什么值得买</a></li>
+          <li><a href="https://lieyunpro.com/archives/500606" target="_blank">帕西尼感知科技完成超10亿元B轮融资，估值超100亿元 | 猎云网</a></li>
+          <li><a href="https://m.pedaily.cn/news/548979" target="_blank">「帕西尼感知科技」获比亚迪超亿元战略投资 | 投资界</a></li>
+          <li><a href="https://www.stdaily.com/web/gdxw/2025-04/28/content_332431.html" target="_blank">比亚迪超亿元瞄准帕西尼触觉感知技术 | 科技日报</a></li>
+          <li><a href="https://www.eet-china.com/mp/a401880.html" target="_blank">数亿元！比亚迪年度首笔重磅投资 | 电子工程专辑</a></li>
+          <li><a href="https://www.tmtpost.com/7559227.html" target="_blank">比亚迪，加速"造人" | 钛媒体</a></li>
+          <li><a href="https://finance.eastmoney.com/a/202601073611852433.html" target="_blank">帕西尼首次亮相CES 2026 | 东方财富网</a></li>
+          <li><a href="https://www.163.com/dy/article/KIROSBKR05199NPP.html" target="_blank">广东机器人开年"赶场忙"：从工厂车间到CES，竞速商业化落地 | 网易</a></li>
+          <li><a href="https://en.yna.co.kr/view/RPR20260107010000353" target="_blank">PaXini Unveils Tactile Infrastructure for Embodied AI | Yonhap (PRNewswire)</a></li>
+          <li><a href="https://www.koreaherald.com/article/10651060" target="_blank">PaXini Unveils the "Tactile Infrastructure" for Embodied AI at CES 2026 | Korea Herald</a></li>
+          <li><a href="https://interestingengineering.com/ai-robotics/ice-cream-making-humanoid-robot" target="_blank">China's ice-cream-making humanoid robot wows crowds at US tech show | Interesting Engineering</a></li>
+          <li><a href="https://www.sfccn.com/2026/3-3/3OMDE0MDdfMjExMjE3OQ.html" target="_blank">帕西尼联合创始人聂相如：触觉普惠时代已来，重构物理AI新入口 | 南方财经</a></li>
+          <li><a href="https://www.sohu.com/a/995675195_212351" target="_blank">靠"摸"做出百亿估值？Meta、比亚迪、京东入局这家具身智能公司 | 搜狐</a></li>
+          <li><a href="https://baike.baidu.com/item/%E5%B8%95%E8%A5%BF%E5%B0%BC%E6%84%9F%E7%9F%A5%E7%A7%91%E6%8A%80%EF%BC%88%E6%B7%B1%E5%9C%B3%EF%BC%89%E6%9C%89%E9%99%90%E5%85%AC%E5%8F%B8/62499626" target="_blank">帕西尼感知科技（深圳）有限公司 | 百度百科</a></li>
+          <li><a href="https://www.iteschina.com/zh-cn/products/details/25210" target="_blank">多维触觉人形机器人TORA-ONE | ITES</a></li>
+          <li><a href="https://www.eet-china.com/mp/a408149.html" target="_blank">实现多维触觉传感器自主可控，帕西尼获得比亚迪超亿元战略投资 | 电子工程专辑</a></li>
+          <li><a href="https://eu.36kr.com/en/p/3776307484902144" target="_blank">Pacini's Global Premiere: 82 DOF Full-Modal Data Collection | 36Kr (English)</a></li>
+          <li><a href="https://m.hukeji.com/yejie/202504/76605.html" target="_blank">比亚迪亿元布局具身智能，帕西尼触觉传感技术成关键破局点 | 虎科技</a></li>
+          <li><a href="http://www.nsseii.com/CaseStd_793.html" target="_blank">已投企业|帕西尼感知科技获比亚迪超亿元战略投资 | 南山战新投</a></li>
+          <li><a href="http://szare-expo.com/xwzx/zhxw/1693.html" target="_blank">2026展商推荐|帕西尼感知科技 | 深圳国际自动化及机器人展览会</a></li>
+          <li><a href="https://kyodonewsprwire.jp/release/202601072117" target="_blank">PaXini Unveils the "Tactile Infrastructure" for Embodied AI | Kyodo News PR Wire</a></li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">本页面最后更新于2026年5月4日 · 数据来源截至2026年4月公开信息 · 具身智能Wiki</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

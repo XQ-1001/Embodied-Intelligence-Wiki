@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>Foundation Robotics — 具身智能Wiki</title><style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style></head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> › <span>Foundation Robotics</span></div>
+  <div class="wiki-header"><h1>Foundation Robotics</h1><div class="subtitle">Foundation Robotics Labs / Foundation Future Industries · 私募 · 2024 · 全球首个战场部署人形机器人 · 估值~$1.3B</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#founders">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financial">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#a1">2.1 团队背景与场景选择</a></li>
+        <li class="toc-lvl4"><a href="#a2">2.2 技术路线与场景适配</a></li>
+        <li class="toc-lvl4"><a href="#a3">2.3 股东/资本结构影响</a></li>
+        <li class="toc-lvl4"><a href="#a4">2.4 试错过程与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#a5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#a6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#references">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">Foundation Robotics</div>
+        <div class="ib-section">基本信息</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">Foundation Robotics Labs Inc.（亦用Foundation Future Industries）</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2024年4月</div></div>
+        <div class="ib-row"><div class="ib-label">总部</div><div class="ib-value">美国旧金山</div></div>
+        <div class="ib-row"><div class="ib-label">CEO</div><div class="ib-value">Sankaet Pathak</div></div>
+        <div class="ib-row"><div class="ib-label">联合创始人</div><div class="ib-value">Mike LeBlanc、Arjun Sethi</div></div>
+        <div class="ib-section">财务数据</div>
+        <div class="ib-row"><div class="ib-label">估值</div><div class="ib-value">~$1.32B（2025 Series A）</div></div>
+        <div class="ib-row"><div class="ib-label">累计融资</div><div class="ib-value">~$198M</div></div>
+        <div class="ib-row"><div class="ib-label">国防合同</div><div class="ib-value">$18-24M（五角大楼SBIR）</div></div>
+        <div class="ib-row"><div class="ib-label">员工数</div><div class="ib-value">~49-200人</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">产品</div><div class="ib-value">Phantom MK-1（已量产）/ MK-2</div></div>
+        <div class="ib-row"><div class="ib-label">已产台数</div><div class="ib-value">~40台（2025）</div></div>
+        <div class="ib-row"><div class="ib-label">2026目标</div><div class="ib-value">10,000台</div></div>
+        <div class="ib-row"><div class="ib-label">租赁价格</div><div class="ib-value">~$10万/年/台</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">领域</div><div class="ib-value"><span class="tag tag-info">人形机器人</span><span class="tag tag-info">军工</span><span class="tag tag-warn">制造业</span></div></div>
+        <div class="ib-row"><div class="ib-label">上市状态</div><div class="ib-value"><span class="tag tag-warn">私募未上市</span></div></div>
+        <div class="ib-section">官网</div>
+        <div class="ib-row"><div class="ib-label">网址</div><div class="ib-value"><a href="https://www.foundationrobotics.com" target="_blank">foundationrobotics.com</a></div></div>
+      </aside>
+      <p class="article-intro">Foundation Robotics（全称Foundation Robotics Labs Inc.，亦使用Foundation Future Industries品牌）是一家总部位于旧金山的人形机器人初创公司，成立于2024年4月。公司的旗舰产品Phantom MK-1是全球首批进入战场的双足人形机器人，2026年2月被部署至乌克兰前线执行侦察和后勤任务。Foundation由前金融科技公司Synapse CEO Sankaet Pathak、前海军陆战队员Mike LeBlanc及风险投资人Arjun Sethi联合创立，是当前唯一公开拥抱武器化路线的人形机器人公司。其激进的产量目标（2026年10,000台、2027年50,000台）为全行业最高，但面临创始人信誉争议和技术可靠性质疑。</p>
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper">
+        <table class="wikitable infotable">
+          <tr><th>项目</th><th>内容</th></tr>
+          <tr><td>公司全称</td><td>Foundation Robotics Labs Inc.（亦用品牌Foundation Future Industries）</td></tr>
+          <tr><td>英文名称</td><td>Foundation Robotics / Foundation Future Industries</td></tr>
+          <tr><td>成立时间</td><td>2024年4月（部分来源记为2023年5月注册）</td></tr>
+          <tr><td>注册地</td><td>美国加利福尼亚州旧金山</td></tr>
+          <tr><td>上市状态</td><td>私募未上市</td></tr>
+          <tr><td>官方网站</td><td>foundationrobotics.com</td></tr>
+          <tr><td>员工人数</td><td>~49人（PitchBook 2026）；Simplify数据为51-200人区间</td></tr>
+          <tr><td>核心产品</td><td>Phantom MK-1双足人形机器人；Phantom MK-2在研</td></tr>
+        </table>
+      </div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>时间</th><th>事件</th></tr>
+          <tr><td>2023年5月</td><td>公司注册成立（部分来源）</td></tr>
+          <tr><td>2024年4月</td><td>公司正式公开运营</td></tr>
+          <tr><td>2024年8月</td><td>完成$1,100万Pre-seed轮，由Tribe Capital领投</td></tr>
+          <tr><td>2024年6月</td><td>CNBC曝出Foundation在融资过程中夸大与通用汽车（GM）合作关系——声称GM将提供工厂场地和$3亿采购订单，但GM全部否认</td></tr>
+          <tr><td>2024年12月</td><td>收购Boardwalk Robotics（佛罗里达Pensacola），获得其摆线针轮执行器技术和"Alex"上半身机器人原型，公司迁至旧金山</td></tr>
+          <tr><td>2025年1月</td><td>Phantom MK-1在旧金山Temple夜总会以DJ身份公开亮相</td></tr>
+          <tr><td>2025年3月</td><td>Eric Trump（特朗普总统之子）被披露为投资人和"首席战略顾问"</td></tr>
+          <tr><td>2025年5月</td><td>首次客户发货：向亚特兰大汽车零部件制造商租赁3台Phantom机器人</td></tr>
+          <tr><td>2025年5月-8月</td><td>完成~$1.87亿Series A轮，估值$13.2亿，投资者含Tribe Capital、Defined VC</td></tr>
+          <tr><td>2025年12月</td><td>CEO公布"主计划"：2027年实现50,000台累计产量，~$50亿ARR目标</td></tr>
+          <tr><td>2026年2月</td><td>两台Phantom MK-1被部署到乌克兰前线进行侦察与后勤测试——全球首次人形机器人进入实战环境</td></tr>
+          <tr><td>2026年3月</td><td>获得美国陆军、海军、空军SBIR Phase III合同累计$1,800-2,400万；与海军陆战队开展破门测试；在Fox Business展示Phantom持枪能力</td></tr>
+          <tr><td>2026年4月</td><td>Phantom MK-2预期发布，采用注塑成型外壳、扩容电池、175磅负重升级</td></tr>
+        </table>
+      </div>
+
+      <h3 id="founders">1.2 创始人及核心团队</h3>
+      <p>Foundation Robotics由三位背景迥异的联合创始人组成，体现了跨界组合的特征：一位金融科技连续创业者（Pathak）、一位资深军方作战人员（LeBlanc）和一位风险投资家（Sethi）。</p>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+          <tr><td>联合创始人·CEO</td><td>Sankaet Pathak</td><td>前金融科技公司Synapse CEO，该公司2024年破产清算，约$2.65亿客户资金去向不明；电子与计算机工程师，12岁开始编程；在Synapse失败后迅速转向机器人赛道</td></tr>
+          <tr><td>联合创始人</td><td>Mike LeBlanc</td><td>前美国海军陆战队飞行员，执行过300+次作战飞行；曾任Cobalt Robotics（安保机器人公司）联合创始人；14年兵役经历为公司的军事导向提供了直接经验基础</td></tr>
+          <tr><td>联合创始人·董事会成员</td><td>Arjun Sethi</td><td>Tribe Capital联合创始人兼主席、Kraken加密货币交易所联席CEO；57+项投资组合（Carta、Docker等）；在Pathak融资过程中以顾问身份加入后转为联合创始人</td></tr>
+          <tr><td>首席战略顾问</td><td>Eric Trump</td><td>美国总统特朗普之子，2025年3月起任"首席战略顾问"，同时也是投资人；其双重角色引发利益冲突争议</td></tr>
+          <tr><td>制造负责人</td><td>前Tesla高管</td><td>曾在特斯拉负责Model X/Y产能爬坡，2025年被挖角至Foundation负责工厂启动</td></tr>
+        </table>
+      </div>
+      <p>团队特点为<strong>激进跨界型</strong>：无一人来自传统机器人学术或产业背景。Pathak有工程基础但主攻金融科技，LeBlanc提供战场经验但非机器人工程师，Sethi提供资本但不参与日常运营。团队从特斯拉、Boston Dynamics、SpaceX、1X等公司挖角了制造和技术人才来弥补创始团队的技术短板。公司总人数约49-200人，处于快速招聘扩张阶段。</p>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>轮次</th><th>时间</th><th>金额</th><th>估值</th><th>核心投资方</th></tr>
+          <tr><td>Pre-seed</td><td>2024年8月</td><td>$1,100万</td><td>~$7,300万</td><td>Tribe Capital、天使投资人</td></tr>
+          <tr><td>Series A</td><td>2025年5-8月</td><td>$1.87亿</td><td>$13.2亿</td><td>Tribe Capital、Defined VC、阿联酋主权财富基金</td></tr>
+          <tr><td>国防合同</td><td>2025-2026</td><td>$1,800-2,400万</td><td>—</td><td>美国陆军、海军、空军（SBIR Phase III）</td></tr>
+        </table>
+      </div>
+      <p>累计融资约$1.98亿。主要股东包括Tribe Capital（Arjun Sethi的VC基金，管理AUM约$17亿）、Defined VC、及未披露的阿联酋主权基金。Eric Trump作为个人投资人参与了早期轮。与多数人形机器人同行不同，Foundation从国防合同获得了可观的非股权融资。</p>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>维度</th><th>内容</th></tr>
+          <tr><td>AI技术路线</td><td>LLM驱动"任务到运动"控制：大语言模型负责高层任务推理→专属物理-动作模型将自然语言指令翻译为全身协调运动；采用Deep Variational Bayes Filters融合物理感知与模仿学习</td></tr>
+          <tr><td>机器人架构</td><td>双足人形，19自由度上半身；仿肌腱驱动24电机灵巧手（"Alien Technology Hand"）；纯视觉感知（6头载摄像头，近360°FOV），无LiDAR</td></tr>
+          <tr><td>执行器技术</td><td>自研摆线针轮（Cycloidal）执行器：160Nm峰值扭矩，回驱力&lt;1Nm，能效90-95%；通过收购Boardwalk Robotics获得核心技术</td></tr>
+          <tr><td>数据方案</td><td>混合训练：基于状态模型+模仿学习；人类遥操作（VR头显+手部追踪）采集真实世界部署数据实现闭环改进</td></tr>
+          <tr><td>舰队协同</td><td>"Fleet Coherence"共享世界图谱：多机器人实时共享环境数据、任务状态和资源分配</td></tr>
+          <tr><td>全栈/专用选择</td><td>追求全栈但高度依赖收购——执行器来自Boardwalk Robotics，AI架构为内部构建但不自研大模型基座；制造走垂直整合路线（旧金山自有工厂）</td></tr>
+          <tr><td>差异化特色</td><td>公开武器化路线（行业内唯一）；军用/民用"双用途"设计；纯视觉方案（与多数采用LiDAR的竞品形成对比）</td></tr>
+        </table>
+      </div>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>产品线</th><th>型号</th><th>关键参数/特性</th><th>定价</th><th>主要场景</th></tr>
+          <tr><td>通用人形机器人</td><td>Phantom MK-1</td><td>高175cm；重80kg；速度1.7m/s；连续载荷20kg（最大36kg）；19自由度上身+10指灵巧手；8头载摄像头；续航2-3小时；摆线针轮执行器</td><td>RaaS租赁~$10万/年/台（售价~$15万/台）</td><td>工厂物料搬运、组装、乌克兰前线侦察</td></tr>
+          <tr><td>通用人形机器人</td><td>Phantom MK-2（2026年4月预期）</td><td>整合电子（减少短路风险）；防水；扩容电池；载荷提升至~80kg；注塑成型外壳（加速量产）</td><td>未公布</td><td>更广泛工业场景；更多军事应用（破门、排爆）</td></tr>
+        </table>
+      </div>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>场景分类</th><th>具体应用</th><th>合作方/部署实例</th></tr>
+          <tr><td>工业-汽车制造</td><td>装配线物料搬运、零部件安装</td><td>亚特兰大汽车零部件厂（3台租赁，合同含140+台后续订单）；2025年协助生产约20,000辆汽车</td></tr>
+          <tr><td>工业-消费品制造</td><td>包装、物料转运</td><td>2家消费品制造商试点</td></tr>
+          <tr><td>工业-玻璃制造</td><td>材料搬运</td><td>早期试点</td></tr>
+          <tr><td>军事-前线侦察</td><td>战场巡逻、情报收集</td><td>乌克兰前线（2026年2月部署2台）</td></tr>
+          <tr><td>军事-后勤</td><td>弹药补给、装备搬运</td><td>美国陆军、空军SBIR合同</td></tr>
+          <tr><td>军事-特种作战</td><td>破门/爆炸物放置</td><td>美国海军陆战队"破门方式"测试</td></tr>
+          <tr><td>军事-边境巡逻</td><td>DHS边境监控</td><td>与国土安全部"密切接触"讨论中</td></tr>
+          <tr><td>军事-直接战斗</td><td>持枪作战（远期）</td><td>已在演示中操控手枪、霰弹枪和M-16仿制品；人机回路保留最终开火决策权</td></tr>
+        </table>
+      </div>
+      <p>Foundation的场景策略从成立起就清晰选择了<strong>工业+军工"双用途"路线</strong>。与其他所有人形机器人公司明确承诺"非武器化"形成鲜明对比，Foundation从创立就拥抱军事市场，其创始团队背景（海军陆战队退役飞行员+不受约束的CEO+总统家族顾问）使这一路线具有独特可行性。</p>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>指标</th><th>数据</th><th>说明</th></tr>
+          <tr><td>已交付台数</td><td>~40台（2025年）；15台（2026年初）</td><td>从概念到首客户交付约13个月</td></tr>
+          <tr><td>工业客户</td><td>3+家</td><td>含亚特兰大汽车厂、消费品制造商、玻璃厂</td></tr>
+          <tr><td>军用部署</td><td>2台乌克兰前线</td><td>全球首次人形机器人实战部署</td></tr>
+          <tr><td>工业订单</td><td>亚特兰大厂140+台</td><td>分阶段交付</td></tr>
+          <tr><td>国防合同</td><td>$1,800-2,400万累计</td><td>美国陆军、海军、空军SBIR Phase III</td></tr>
+          <tr><td>商业模式</td><td>RaaS租赁（不销售）</td><td>$10万/年/台</td></tr>
+          <tr><td>当前产能</td><td>~1台/天（旧金山工厂）</td><td>需大幅爬坡以实现年产10,000台目标</td></tr>
+        </table>
+      </div>
+
+      <h3 id="financial">1.8 财务数据</h3>
+      <p>Foundation Robotics为私募公司，不公开披露财务数据。以下为基于公开信息的整理：</p>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>指标</th><th>数据</th></tr>
+          <tr><td>累计融资</td><td>~$1.98亿（含股权$1.98亿+国防合同$2,400万）</td></tr>
+          <tr><td>最新估值</td><td>$13.2亿（2025年Series A）</td></tr>
+          <tr><td>市值需求</td><td>有报道称后续融资需求达$5亿，目标估值$30-35亿</td></tr>
+          <tr><td>营收</td><td>预收入阶段（2025年首批租赁收入尚不构成有意义的规模化营收）</td></tr>
+          <tr><td>租赁年收入潜值</td><td>如全部50,000台满租，理论ARR可达$50亿（2027年目标）</td></tr>
+          <tr><td>客户节省预估</td><td>每台机器人每年可为客户节省$9-16.6万劳动力成本</td></tr>
+        </table>
+      </div>
+      <p>当前账面资金：Series A融得$1.87亿后现金储备充裕，足以支撑2026年的产能扩张。但$10,000台年产量目标需要的资本开支远超当前融资规模，后续大概率需要更大规模融资。</p>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>CEO Sankaet Pathak的前公司Synapse于2024年破产，约$2.65亿客户存款下落不明，Pathak本人面临多起诉讼和监管调查</li>
+        <li>2024年6月，CNBC曝光Foundation在融资材料中声称与通用汽车有"合作关系"、GM将提供工厂场地并签下$3亿采购订单——GM随后全盘否认，联合创始人Mike LeBlanc事后表示"感到尴尬"</li>
+        <li>Phantom在TIME和Newsweek的媒体演示中多次摔倒，引发对技术成熟度的质疑</li>
+        <li>Eric Trump作为总统之子的双重角色（投资人+战略顾问+国防承包商受益者）引发了参议员Elizabeth Warren等民主党人的利益冲突调查呼吁</li>
+        <li>Foundation在乌克兰部署人形机器人的行动引发了广泛的国际伦理讨论——目前尚不存在针对AI自主武器的国际法律框架</li>
+        <li>CEO Pathak 2025年12月在Forbes采访中公布的"主计划"提到南极基地→自主陆空交通→月球和火星自维持基地等长期愿景，被部分观察人士认为"脱离现实"</li>
+        <li>公司在2024年12月收购了Boardwalk Robotics，获得了其源自IHMC（佛罗里达人类与机器认知研究所）的摆线针轮执行器技术，被Pathak称为"技术护城河"</li>
+        <li>约30%的零部件来自中国，其余来自美国、墨西哥、以色列和韩国</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="a1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>Foundation的团队背景与其选择的"工业+军工"双用途场景之间存在部分匹配和显著缺口。Mike LeBlanc的14年海军陆战队经历（300+次作战飞行）为军事场景提供了直接的战场需求理解，这在人形机器人公司中是绝无仅有的——其他公司即使想进入军工也无相应的内部专业能力。LeBlanc前公司Cobalt Robotics的安保机器人经验也有一定迁移性。但核心技术能力缺口明显：三位创始人无一来自机器人学术或产业背景，CEO Pathak的技术经验在金融科技而非硬件/控制/AI，公司完全依赖收购（Boardwalk Robotics）和外部招聘（特斯拉、BD等）来填补技术短板。将军工作为核心场景的选择与其说是"技术驱动的自然延伸"，不如说是由团队背景和Eric Trump政治通道共同决定的商业策略。此外，Pathak在Synapse事件中暴露的信任危机，与军工客户对供应商的高可靠性要求之间存在根本性矛盾。</p>
+      </div>
+
+      <div class="analysis-block" id="a2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>Foundation的技术路线选择在特定场景下有其逻辑合理之处。纯视觉方案（无LiDAR）降低了硬件成本和复杂度，在工厂和战场环境中有全天候工作的潜在优势（不受激光干扰影响），但也牺牲了深度感知精度——这在需要精确武器操控的军事应用中可能成为致命缺陷。摆线针轮执行器提供了出色的力矩密度和回驱特性（源自Boardwalk/IHMC多年的双足步态研究），但在高冲击战场环境中的耐久性尚未得到验证。LLM驱动的任务推理是当前行业热点，但在生死攸关的军事场景中，大语言模型的不可预测性和幻觉问题构成了严重的安全风险——战斗中哪怕一次错误推理都可能造成灾难。最根本的问题在于：Phantom的硬件设计（续航2-3小时、20kg载荷）仅适合工厂内部短途物料搬运这一狭窄场景，要扩展到远距离战场作战需要在能源密度、装甲防护、通信抗干扰等方面进行根本性重新设计——这与其"2027年50,000台"的量产时间表严重不匹配。</p>
+      </div>
+
+      <div class="analysis-block" id="a3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>Foundation的股东结构呈现"风投+政治+国防"的独特三角组合，这决定了其战略路径与同行截然不同。Tribe Capital（Arjun Sethi的VC基金）作为主要财务投资者需要高估值回报，这解释了公司激进的产量目标和大规模融资节奏——这些目标服务于估值叙事而非实际运营逻辑。Eric Trump的角色是最特殊的变量：他既提供了对特朗普政府的直接政策影响通道（国防预算、监管豁免），也带来了政治风险——如果2028年政权更迭，Foundation的"Trump关联"标签可能成为在民主党政府中获得国防合同的障碍。阿联酋主权基金的参与值得关注：中东国家可能将Foundation视为平衡中美在具身AI领域竞争的工具，其出资逻辑可能不完全基于商业回报。与竞争对手相比，Foundation的资本结构奖励高风险高回报的策略，而非稳健的技术迭代——这在一家硬件可靠性尚未得到充分验证的机器人公司中尤为危险。</p>
+      </div>
+
+      <div class="analysis-block" id="a4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>Foundation成立仅两年多，时间跨度不足以形成全面的路径试错记录，但已有几次显著调整值得关注。第一次（也是最重大的）是2024年12月收购Boardwalk Robotics——这本质上是对"自研执行器"路线的放弃，承认内部不具备从零开发核心驱动技术的能力。收购也带来了从Pensacola到旧金山的地理/文化整合挑战。第二次是从纯工业路线转向"军用优先"——公司最初以解决劳动力短缺为叙事主轴，但在发现军工合同可以快速提供非稀释性融资和战略护城河后，迅速将军事场景提升为核心定位。第三次调整是对GM关系的过度宣传被曝光后的信用修复——CNBC报道后Foundation被迫收敛其夸大合作伙伴关系的做法，此后更倾向于用"正在谈判中"的模糊表述。这些调整的共同特征是<strong>机会主义驱动</strong>而非长期战略规划——哪里可以获得资本或关注，就往哪里转。</p>
+      </div>
+
+      <div class="analysis-block" id="a5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>Foundation在人形机器人行业采取了极为清晰的差异化定位：做"唯一的武器化选手"。这一取舍的逻辑是——如果所有人都承诺非武器化，那么军工市场就是完全蓝海，Foundation可以独享。风险同样清晰：武器化路线可能使公司在商业市场上被排斥（企业客户可能不愿与"制造杀手机器人"的公司合作），形成"军工客户虽大但总量有限、民用市场被自我封堵"的局面。另一个核心取舍是"速度优先于可靠性"——Foundation从成立到客户交付仅13个月，声称行业最快，但代价是产品成熟度不足（公开场合多次摔倒、GM虚假宣传）。这与Figure AI或Tesla Optimus的"慢即是快"路线形成对比。产量目标上的取舍也值得关注：2027年50,000台目标远超所有同行（Tesla Optimus内部目标约10,000台），这种目标设定更像是服务于融资叙事而非可执行的制造计划。本质上，Foundation选择了"高叙事+高争议+高速度"的策略路径，牺牲的是行业信誉和技术稳健性。</p>
+      </div>
+
+      <div class="analysis-block" id="a6">
+        <h4>2.6 其他重要观察</h4>
+        <p>Foundation Robotics是整个具身智能赛道中最具争议性的公司之一，其存在本身就是对行业规范的挑战。几个结构性观察：第一，乌克兰实战部署的意义被过度解读——2台机器人在前线执行有限的非战斗任务（侦察/后勤）与"机器人士兵参战"的叙事之间存在巨大落差，但媒体标题经济放大了这种叙事影响，间接推高了公司估值。第二，CEO Pathak的Synapse往事不是简单的"创业失败"而是涉及数十万用户资金的未解案件，这在资本市场中通常会导致融资困难，但在当前的AI泡沫环境中似乎被投资人不合理忽视——这可能是市场失灵的信号。第三，Foundation揭示了具身AI领域的一个深层次问题：当创业公司的核心"资产"更多是政治通道（Eric Trump）和媒体叙事而非技术积累时，行业如何评估其真实价值？第四，与竞争对手的相对位置：Figure AI明确非武器化且有BMW商业合同，Tesla有自研能力和汽车场景资源，1X有挪威背景的稳健工业路线，Foundation在这些维度上均无优势——其唯一的差异化（军工通道）高度依赖于特朗普政府的存续。第五，如果Foundation失败，其"军工人形机器人"赛道可能被关闭多年——过度承诺后的信任崩塌将导致监管机构对所有类似提案更加审慎。</p>
+      </div>
+
+      <h2 id="references">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://techcrunch.com/2025/05/08/ex-synapse-ceo-reportedly-trying-to-raise-100m-for-his-new-humanoid-robotics-venture/" target="_blank">TechCrunch — Ex-Synapse CEO reportedly trying to raise $100M for his new humanoid robotics venture (2025)</a></li>
+          <li><a href="https://techcrunch.com/2024/08/22/founder-of-failed-fintech-synapse-says-hes-raised-11m-for-new-robotics-startup/" target="_blank">TechCrunch — Founder of failed fintech Synapse says he's raised $11M for new robotics startup (2024)</a></li>
+          <li><a href="https://www.cnbc.com/2024/06/12/robotics-startup-synapse-ceo-exaggerated-gm-claims.html" target="_blank">CNBC — Robotics startup cofounded by Synapse CEO is raising funds with exaggerated claims about GM ties (2024)</a></li>
+          <li><a href="https://www.forbes.com/sites/johnkoetsier/2025/12/16/humanoid-robots-for-war-and-work-startup-plans-to-build-50000-by-end-of-2027/" target="_blank">Forbes — Humanoid Robots For War And Work: Startup Plans To Build 50,000 By End Of 2027 (2025)</a></li>
+          <li><a href="https://thenextweb.com/news/foundation-humanoid-robot-soldiers-pentagon" target="_blank">The Next Web — Foundation Future Industries wins $24M Pentagon contracts for humanoid robot soldiers (2026)</a></li>
+          <li><a href="https://www.nbcbayarea.com/news/local/humanoid-robot-soldier-foundation/4041777/" target="_blank">NBC Bay Area — San Francisco startup pitches Trump admin on arming robots for U.S. military (2026)</a></li>
+          <li><a href="https://time.com/article/2026/03/09/ai-robots-soldiers-war/" target="_blank">TIME — Rise of the AI Soldiers (2026)</a></li>
+          <li><a href="https://www.newsweek.com/could-this-humanoid-robot-become-the-armys-ultimate-warrior-11063424" target="_blank">Newsweek — Could this humanoid robot become the army's ultimate warrior? (2026)</a></li>
+          <li><a href="https://interestingengineering.com/military/us-foundation-build-50000-humanoid-robots" target="_blank">Interesting Engineering — US firm Foundation plans to build 50,000 humanoid robots by 2027 (2025)</a></li>
+          <li><a href="https://sfstandard.com/2025/08/13/humanoid-robots-military-foundation-terminator/" target="_blank">SF Standard — Meet the San Francisco startup looking to build the real-life Terminator (2025)</a></li>
+          <li><a href="https://www.humanoidsdaily.com/news/foundation-robotics-reportedly-aiming-for-100m-raise-at-1b-valuation" target="_blank">Humanoids Daily — Foundation Robotics Reportedly Aiming for $100M Raise at $1B Valuation (2025)</a></li>
+          <li><a href="https://www.humanoidsdaily.com/news/foundation-ceo-details-path-to-armed-robots-aims-for-10000-units-in-2026" target="_blank">Humanoids Daily — Foundation CEO Details Path to Armed Robots, Aims for 10,000 Units in 2026</a></li>
+          <li><a href="https://defensemirror.com/news/41311/American_Humanoid_Robots_to_Battle_Russian_Soldiers_on_Ukrainian_Frontline" target="_blank">Defense Mirror — American Humanoid Robots to Battle Russian Soldiers on Ukrainian Frontline (2026)</a></li>
+          <li><a href="https://militarnyi.com/en/news/ukraine-receives-phantom-mk-1-humanoid-robots-for-testing/" target="_blank">Militarnyi — Ukraine Receives Phantom MK-1 Humanoid Robots for Testing (2026)</a></li>
+          <li><a href="https://www.foxbusiness.com/media/eric-trump-backed-robot-startup-lands-24m-pentagon-deal-compete-china" target="_blank">Fox Business — Eric Trump-backed robot startup lands $24M Pentagon deal (2026)</a></li>
+          <li><a href="https://pitchbook.com/profiles/company/601822-99" target="_blank">PitchBook — Foundation Robotics Labs 2026 Company Profile</a></li>
+          <li><a href="https://www.newcomer.co/p/foundation-future-seeks-3-billion" target="_blank">Newcomer — Foundation Future Seeks $3 Billion Valuation as Ex-Synapse CEO Tries Robotics Comeback (2025)</a></li>
+          <li><a href="https://www.eweek.com/news/foundation-startup-50k-humanoid-robots/" target="_blank">eWeek — This New Startup Plans to Deploy 50,000 Humanoid Robots by 2027 (2025)</a></li>
+          <li><a href="https://www.chipsilicon.com/humanoid/phantom-mk1-humanoid-robot" target="_blank">ChipSilicon — Phantom MK1 Humanoid Robot Specifications</a></li>
+          <li><a href="https://mezha.net/eng/bukvy/foundation_sent_phantom_humanoid-2/" target="_blank">Mezha — Foundation sent Phantom humanoid robots to Ukraine for frontline testing (2026)</a></li>
+          <li><a href="https://www.cbinsights.com/company/foundation-4" target="_blank">CB Insights — Foundation Company Profile: Products, Competitors, Financials</a></li>
+          <li><a href="https://forgeglobal.com/foundation-robotics-labs_ipo/" target="_blank">Forge Global — Foundation Robotics Labs IPO Investment Opportunities</a></li>
+          <li><a href="https://robohorizon.uk/en-gb/news/2026/03/foundation-robotics-ukraine-humanoids/" target="_blank">RoboHorizon — Foundation Robotics tests humanoid bots in Ukraine for 'defence' (2026)</a></li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">本页面由具身智能Wiki自动分发器生成 · 数据截至2026年5月 · 所有信息来自公开可查来源 · 不构成投资建议</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

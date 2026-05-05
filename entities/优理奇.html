@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>优理奇 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+:root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+html { scroll-behavior: smooth; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+.page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+.top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+.top-nav a { color: var(--link); text-decoration: none; }
+.top-nav a:hover { text-decoration: underline; }
+.top-nav .breadcrumb-sep { color: #a2a9b1; }
+.wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+.wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+.wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+.wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+.toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+.toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+.toc-nav ul { list-style: none; padding-left: 0; }
+.toc-nav li { margin: 2px 0; }
+.toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+.toc-nav a:hover { text-decoration: underline; }
+.toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+.toc-nav .toc-lvl2 { font-weight: 600; }
+.toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+.toc-nav .toc-lvl4 { padding-left: 28px; font-size: 0.74rem; color: #54595d; }
+.wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+.infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+.infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+.ib-row { display: flex; border-top: 1px solid #ddd; }
+.ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+.ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+.ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+p { margin: 8px 0; }
+.article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+.wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+.wiki-article li { margin: 3px 0; line-height: 1.7; }
+.wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+.wikitable.infotable { width: auto; min-width: 320px; }
+.table-wrapper { overflow-x: auto; }
+.wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+.wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+.wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+.wikitable tr:nth-child(even) { background: var(--table-stripe); }
+.tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+.tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+.tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+.callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+.callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+.analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+.analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+.references { font-size: 0.82rem; margin-top: 24px; }
+.references ol { padding-left: 2.2em; }
+.references li { margin: 3px 0; }
+.references a { color: var(--link); word-break: break-all; }
+.page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+@media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> <span class="breadcrumb-sep">›</span> <span>优理奇</span></div>
+  <div class="wiki-header"><h1>优理奇</h1><div class="subtitle">UniX AI · 2024年成立 · 创始人为00后耶鲁博士 · 累计融资近10亿元 · 单月交付破百台</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#founders">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#technology">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercialization">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financials">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#a1">2.1 团队背景与场景选择的匹配度</a></li>
+        <li class="toc-lvl4"><a href="#a2">2.2 技术路线与场景的适配性</a></li>
+        <li class="toc-lvl4"><a href="#a3">2.3 股东/资本结构对战略的影响</a></li>
+        <li class="toc-lvl4"><a href="#a4">2.4 试错过程与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#a5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#a6">2.6 其他重要观察、分析</a></li>
+        <li class="toc-lvl2"><a href="#references">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">优理奇</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">上海优理奇智能科技有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">英文</div><div class="ib-value">UniX AI</div></div>
+        <div class="ib-row"><div class="ib-label">注册名</div><div class="ib-value">优理奇机器人科技（苏州）有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">成立</div><div class="ib-value">2024年2月/4月</div></div>
+        <div class="ib-row"><div class="ib-label">总部</div><div class="ib-value">上海 · 苏州工业园区</div></div>
+        <div class="ib-section">财务数据</div>
+        <div class="ib-row"><div class="ib-label">累计融资</div><div class="ib-value">近10亿元（半年5轮）</div></div>
+        <div class="ib-row"><div class="ib-label">估值</div><div class="ib-value">18亿元（2025年12月）</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">创始人/CEO</div><div class="ib-value">杨丰瑜（Fred Yang，2000年生）</div></div>
+        <div class="ib-row"><div class="ib-label">首席科学家</div><div class="ib-value">王贺升（上海交大教授、IROS 2025总主席）</div></div>
+        <div class="ib-row"><div class="ib-label">核心产品</div><div class="ib-value">Wanda 2.0、Panther黑豹、Martian</div></div>
+        <div class="ib-row"><div class="ib-label">月交付量</div><div class="ib-value">持续破100台</div></div>
+        <div class="ib-row"><div class="ib-label">在手订单</div><div class="ib-value">超1,000台（亿级）</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">类型</div><div class="ib-value"><span class="tag">具身智能</span><span class="tag-info">通用人形机器人</span><span class="tag-info">苏州十小虎</span></div></div>
+        <div class="ib-section">官网</div>
+        <div class="ib-row"><div class="ib-label">官网</div><div class="ib-value"><a href="https://www.unix-group.ai" target="_blank">unix-group.ai</a></div></div>
+      </aside>
+
+      <p class="article-intro"><strong>优理奇</strong>（UniX AI），全称上海优理奇智能科技有限公司，成立于2024年初，总部位于上海及苏州工业园区，由00后耶鲁大学计算机博士杨丰瑜（Fred Yang）休学回国创立。公司以"算法×可量产硬件×场景驱动"三位一体架构为核心，聚焦通用具身智能机器人的研发、制造与商业化。旗下核心产品包括轮式双臂人形机器人Wanda 2.0（定价8.8万元起）和新一代Panther黑豹系列。优理奇在成立不到两年内完成5轮以上融资、累计近10亿元，2025年底实现单月交付破百台（全球少数迈过该门槛的企业之一），在手订单超千台、达亿级规模，并在CES 2026完成全球化首秀。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper">
+      <table class="wikitable infotable">
+        <tr><th>项目</th><th>内容</th></tr>
+        <tr><td>全称</td><td>上海优理奇智能科技有限公司</td></tr>
+        <tr><td>英文名称</td><td>UniX AI</td></tr>
+        <tr><td>注册主体</td><td>优理奇机器人科技（苏州）有限公司</td></tr>
+        <tr><td>成立日期</td><td>2024年2月（苏州工业园区注册），2024年4月公开运营</td></tr>
+        <tr><td>总部</td><td>上海；苏州工业园区（研发+量产基地）</td></tr>
+        <tr><td>制造基地</td><td>四川绵阳（投资5亿元，5,000㎡）</td></tr>
+        <tr><td>上市状态</td><td>未上市</td></tr>
+        <tr><td>官网</td><td>unix-group.ai</td></tr>
+        <tr><td>定位</td><td>具身智能通用人形机器人研发、制造、销售与场景落地</td></tr>
+      </table>
+      </div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>时间</th><th>事件</th></tr>
+        <tr><td>2023年</td><td>杨丰瑜因家庭养老需求从耶鲁大学休学，决定回国创业</td></tr>
+        <tr><td>2024年2月</td><td>优理奇机器人科技（苏州）有限公司注册成立</td></tr>
+        <tr><td>2024年7月</td><td>首席科学家王贺升教授（上海交大）加盟，经历"三顾茅庐"及一次8小时长谈</td></tr>
+        <tr><td>2024年8月</td><td>世界机器人大会首秀Wanda 1.0及Martian双足机器人</td></tr>
+        <tr><td>2024年12月</td><td>Wanda 2.0开启预售</td></tr>
+        <tr><td>2025年5月</td><td>完成天使轮及天使+轮数亿元融资</td></tr>
+        <tr><td>2025年中</td><td>Wanda 2.0量产交付，苏州工厂面积超2,500㎡</td></tr>
+        <tr><td>2025年</td><td>世界人形机器人运动会：酒店清洁包揽冠亚军、迎宾服务夺冠（两金一银）</td></tr>
+        <tr><td>2025年9月</td><td>绵阳制造基地：40天落地、3个月投产（"绵阳速度"），投资5亿元、5,000㎡</td></tr>
+        <tr><td>2025年10月</td><td>IROS 2025全球首发UniOpenArmX标准化机械臂</td></tr>
+        <tr><td>2025年12月</td><td>完成天使++++轮及天使+++++轮合计3亿元融资，投后估值18亿元</td></tr>
+        <tr><td>2025年底</td><td>单月交付量持续突破100台，订单总额突破亿元</td></tr>
+        <tr><td>2026年1月</td><td>CES 2026拉斯维加斯首秀，单日接待超5,000人次，意向订单破亿</td></tr>
+        <tr><td>2026年1月</td><td>登上央视《新闻联播》，超2,000家海外媒体报道，外交部发言人转发</td></tr>
+        <tr><td>2026年2月</td><td>发布Panther黑豹系列新一代轮式双臂人形机器人</td></tr>
+        <tr><td>2026年3月</td><td>完成近3亿元新一轮股权融资，中金汇融、洪山资本、广州产投等参投</td></tr>
+      </table>
+      </div>
+
+      <h3 id="founders">1.2 创始人及核心团队</h3>
+      <p>优理奇由00后创始人杨丰瑜领衔，团队配置呈现鲜明的"一半学术+一半产业"混合特征。产业端核心成员来自华为、比亚迪、大疆、优必选、追觅、博世、海康、三花、富兴机电等头部企业；学术端由王贺升教授坐镇。团队累计发表400余篇顶会顶刊论文。</p>
+
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+        <tr><td>创始人/CEO</td><td>杨丰瑜（Fred Yang）</td><td>2000年出生，四川绵阳籍。密歇根大学计算机本科，耶鲁大学计算机博士（休学）。全球首个触觉融合多模态大模型UniTouch及全球最大视触觉数据集Touch and Go第一作者，视触觉领域发表15篇顶会论文。北美计算机协会杰出本科科学家，2024胡润U25中国创业先锋。曾任职Google DeepMind。2023年因家庭养老需求休学回国创业。</td></tr>
+        <tr><td>首席科学家</td><td>王贺升</td><td>上海交通大学电气学院副院长、特聘教授、博导。IROS 2025全球总主席（该会议成立以来首位中国内地主席）。视觉伺服与机器人控制领域权威，拥有50余项专利。2024年7月经杨丰瑜"三顾茅庐"加盟优理奇。</td></tr>
+      </table>
+      </div>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <h4>融资历史</h4>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>轮次</th><th>时间</th><th>金额</th><th>估值</th><th>主要投资方</th></tr>
+        <tr><td>天使轮 + 天使+</td><td>2025年5月</td><td>数亿元</td><td>—</td><td>中关村前沿基金、赛纳资本、长安私人资本</td></tr>
+        <tr><td>天使++++ + 天使+++++</td><td>2025年12月</td><td>合计3亿元</td><td>18亿元</td><td>川商基金、吴中金控、益华资本、青域基金、太浩创投，老股东赛纳资本追加</td></tr>
+        <tr><td>新一轮股权融资</td><td>2026年3月</td><td>近3亿元</td><td>—</td><td>中金汇融、洪山资本、广州产投、谢诺投资；老股东吴中金控、涌铧投资超额追投</td></tr>
+      </table>
+      </div>
+
+      <h4>股东结构特点</h4>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>股东类型</th><th>代表方</th><th>角色/影响</th></tr>
+        <tr><td>国有/政府基金</td><td>中金汇融、洪山资本、广州产投、吴中金控、川商基金</td><td>2026年后从纯VC过渡到"VC+国资"混合结构，提供政策和产业园区资源</td></tr>
+        <tr><td>早期VC</td><td>中关村前沿基金、赛纳资本、长安私人资本、益华资本、青域基金、太浩创投</td><td>天使阶段识别并支持，赛纳资本持续追加</td></tr>
+        <tr><td>财务顾问</td><td>光源资本、投中资本</td><td>多轮融资FA，协助资本运作</td></tr>
+      </table>
+      </div>
+      <p>融资特点：半年内完成5轮以上融资，累计近10亿元。资方背景从早期市场化VC逐步升级为国家队（中金汇融、广州产投等）主导，反映了从"赛道押注"向"产业化背书"的资本结构跃迁。</p>
+
+      <h3 id="technology">1.4 技术路线</h3>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>维度</th><th>详情</th></tr>
+        <tr><td>AI架构</td><td>"算法铁三角"：UniTouch（视触觉融合多模态感知大模型——"眼"）+ UniFlex（高效泛化模仿学习框架——"手"）+ UniCortex（长序任务规划架构——"脑"）。核心思路是让机器人通过视觉生成触觉先验，减少对昂贵实体触觉传感器的依赖</td></tr>
+        <tr><td>数据方案</td><td>基于全球最大视触觉数据集Touch and Go训练；先跑场景、再谈模型——暂不依赖VLA端到端大模型（认为当前缺乏足够高质量数据），让机器人在真实场景中积累数据后再迭代</td></tr>
+        <tr><td>全栈/专用</td><td>全栈自研路线——核心零部件自研率超80%（关节模组、减速器、机械臂等），将关节模组研发周期从行业6个月压缩至2-3个月，实现指数级降本</td></tr>
+        <tr><td>自研特色</td><td>全球首款量产8自由度仿生机械臂；不装实体高精度触觉传感器（用算法生成触觉先验大幅降本）；"算法×硬件×场景"三位一体而非纯软件或纯硬件路线</td></tr>
+        <tr><td>差异化决策</td><td>暂不使用VLA端到端大模型（与北京人形等形成鲜明对比），认为应先在真实场景中积累操作数据，待数据规模和质量足够后再训练大模型</td></tr>
+      </table>
+      </div>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>产品分类</th><th>子类/型号</th><th>关键参数</th><th>发布时间</th><th>定价</th><th>适用场景</th></tr>
+        <tr><td>轮式双臂人形</td><td>Wanda 1.0</td><td>首款产品，洗衣/清洁/制作汉堡</td><td>2024年9月</td><td>—</td><td>家庭服务验证</td></tr>
+        <tr><td>轮式双臂人形</td><td>Wanda 2.0</td><td>18自由度、身高1420-1680mm（可升降260mm）、8-DoF仿生机械臂、单臂负载12kg、续航8-16h、SLAM导航、360°LiDAR</td><td>2025年</td><td>基础版8.8万元；高阶版18.8万/26.8万</td><td>酒店清洁、安保、零售餐饮、家庭服务</td></tr>
+        <tr><td>轮式双臂人形</td><td>Panther黑豹</td><td>34自由度、身高1600-1750mm、80cm升降行程、全向四转四驱底盘、48V动力平台、算力最高2070TOPS、重量约80kg</td><td>2026年2月</td><td>$100K-$130K</td><td>智慧酒店、安保、零售导购、物流、柔性制造</td></tr>
+        <tr><td>双足人形</td><td>Martian</td><td>23-29自由度、双臂负载30kg、整机最大负载50kg、关节扭矩最高450Nm</td><td>2024年8月</td><td>$100K-$150K</td><td>研发验证、早期部署</td></tr>
+        <tr><td>科研配件</td><td>UniOpenArmX</td><td>标准化机械臂，面向科研教育</td><td>2025年10月(IROS)</td><td>—</td><td>高校科研、教育培训</td></tr>
+      </table>
+      </div>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>场景分类</th><th>合作方/客户</th><th>应用内容</th></tr>
+        <tr><td>酒店服务</td><td>酒店集团</td><td>客房清洁（世界人形机器人运动会包揽冠亚军）、迎宾接待（冠军）、泡茶接待、调酒</td></tr>
+        <tr><td>安保巡逻</td><td>物业公司</td><td>公共空间安保巡逻、异常检测</td></tr>
+        <tr><td>零售餐饮</td><td>零售商、餐饮连锁</td><td>门店导购、餐吧/酒廊调酒、掼蛋（薄片抓取操作）</td></tr>
+        <tr><td>智能物流</td><td>物流企业</td><td>分拣、搬运、贴边对齐操作</td></tr>
+        <tr><td>柔性制造</td><td>制造企业</td><td>刺绣（毫米级定位）、高尔夫挥杆（双臂闭链力控）</td></tr>
+        <tr><td>家庭服务</td><td>C端消费者</td><td>洗衣、清洁、做饭（多机协同）、叠衣、夹豆腐/捏鸡蛋等精细操作</td></tr>
+        <tr><td>医疗/养老</td><td>养老社区</td><td>辅助服务、日常照护（创始人创业动机之一）</td></tr>
+        <tr><td>教育科研</td><td>高校、科研机构</td><td>UniOpenArmX标准化平台</td></tr>
+        <tr><td>海外</td><td>美国东西海岸各1家、欧洲1家、中东1家、新加坡1家</td><td>全球合作伙伴拓展中</td></tr>
+      </table>
+      </div>
+
+      <h3 id="commercialization">1.7 商业化进展</h3>
+      <p><strong>交付能力</strong>：2025年底起单月交付量持续突破100台，全球少数迈过月交付三位数门槛的具身智能企业。特斯拉Optimus 2026年月均目标约83台，优理奇已超越该基准。在手订单超1,000台，订单规模达亿级。</p>
+      <p><strong>制造基地</strong>：苏州工厂（研发+量产，超2,500㎡），绵阳制造总部基地（投资5亿元、5,000㎡，40天落地、3个月投产，本地配套率80%）。2025年实际出货约200台。2026年目标大几千台，2027年奔万台。</p>
+      <p><strong>定价策略</strong>：Wanda 2.0基础版8.8万元——行业同类产品价格的1/3至1/5。Panther定价$100K-$130K（约72-94万人民币）。</p>
+      <p><strong>全球化</strong>：CES 2026首秀（单日接待超5,000人次、意向订单破亿）；建立全球合作伙伴计划（北美、欧洲、中东、亚洲各1家）；新加坡为首个海外目标市场；海外订单跃至数千万量级，海外买家追到苏州提走三代机现货。</p>
+      <p><strong>商业化飞轮</strong>：价格下降→规模提升→数据回流→模型迭代→产品升级→更大规模。</p>
+
+      <h3 id="financials">1.8 财务数据</h3>
+      <p>优理奇为非上市初创企业，未公开披露经审计的详细财报。以下为基于公开信息的汇总：</p>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>指标</th><th>2024</th><th>2025</th><th>2026（截至Q1）</th></tr>
+        <tr><td>融资总额</td><td>—</td><td>天使轮数亿元 + 两轮3亿元</td><td>近3亿元新一轮融资</td></tr>
+        <tr><td>估值</td><td>—</td><td>18亿元（2025.12）</td><td>—</td></tr>
+        <tr><td>订单签约</td><td>—</td><td>数千万元</td><td>在手订单超千台（亿级）</td></tr>
+        <tr><td>实际出货</td><td>—</td><td>约200台</td><td>月交付持续破百台</td></tr>
+        <tr><td>制造投资</td><td>—</td><td>绵阳基地5亿元</td><td>产能爬坡中</td></tr>
+        <tr><td>收入估测</td><td>—</td><td>估计3,000-5,000万元</td><td>若月交付爬坡至200-500台，年收入可达2-5亿元</td></tr>
+      </table>
+      </div>
+      <p>2026年3月完成新一轮近3亿元融资后，账面资金储备充裕。绵阳基地一期年产1,000台，年营收预计1.43亿元。</p>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>入选苏州"十小虎"企业（与思必驰、追觅并列）及江苏人形机器人"十三太保"</li>
+        <li>外交部发言人毛宁在社交平台转发优理奇CES报道；《华尔街日报》将优理奇纳入与特斯拉Optimus的竞争比较</li>
+        <li>CEO杨丰瑜与宇树科技王兴兴先后登上央视新闻联播跨年报道，被部分媒体并称为"具身智能双00后"</li>
+        <li>Wanda 2.0是全球首款搭载量产8自由度仿生机械臂的等身人形机器人</li>
+        <li>绵阳基地配套率高达80%，长虹、九洲、富临精工等本地企业提供供应链支持</li>
+        <li>创始人"反共识"之一：暂不追VLA大模型，先跑场景再建模型——被行业部分人士视为务实路线</li>
+        <li>优理奇在2025年中曾遭遇"破产谣言"，随后以连续大额融资和交付数据打破质疑</li>
+        <li>公司原名"优理奇机器人科技（苏州）有限公司"，后以上海优理奇智能科技有限公司作为控股/品牌主体</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="a1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>杨丰瑜的学术背景集中在视触觉融合感知（UniTouch、Touch and Go均为其第一作者成果），这直接解释了优理奇选择酒店清洁、家庭服务、餐饮操作等"触觉密集型"场景的战略逻辑——这些场景的核心难点在于柔性物体操作（叠衣、夹豆腐、捏鸡蛋、掼蛋薄片抓取），正是视触觉技术的天然用武之地。王贺升教授的视觉伺服专长为运动控制层提供了学术支撑。产业团队来自华为、比亚迪、大疆、追觅等的消费电子和机器人量产经验，则回应了"从实验室到产线"的工程化挑战。整体来看，团队的学术基因决定了场景选择的"软操作"偏好，而产业基因则保证了交付纪律。</p>
+      </div>
+
+      <div class="analysis-block" id="a2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>优理奇明确选择"暂不追VLA端到端大模型"的路线，与北京人形（慧思开物+XR-1 VLA）、Figure（专有模型）形成鲜明对比。这一决策的逻辑基础是：当前具身操作的高质量数据极度稀缺，在此条件下训练VLA可能导致"大模型幻觉"转移至物理操作领域，风险较高。优理奇选择先以模仿学习（UniFlex）+ 视触觉融合（UniTouch）在有限场景中做到可靠，再通过规模化部署回流真实数据，最终迭代至更通用的模型。这一路线与目标场景（酒店、餐饮、家庭等结构化程度中等的B端场景）高度适配——这些场景任务边界清晰、容错空间适中，不需要AGI级别的通用推理能力。</p>
+      </div>
+
+      <div class="analysis-block" id="a3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>优理奇的资本结构经历了从纯VC（2025年5月中关村前沿基金等）到"VC+国资"混合型（2025年12月川商基金、吴中金控等）再到"国家队主导"（2026年3月中金汇融、洪山资本、广州产投）的快速跃迁。这种变化对战略有两层含义：其一，国资入局意味着政府层面对优理奇"交付派"路线的认可，有助于获取产业园区资源（如绵阳基地的40天落地速度）和政策支持；其二，国资股东的回报预期通常比VC更偏长期和产业化，这为优理奇的"先上规模再谈利润"策略提供了资本耐心。潜在风险是：如果国资股东对"规模化"的期望与公司实际的产能爬坡节奏出现偏差，可能带来战略摩擦。</p>
+      </div>
+
+      <div class="analysis-block" id="a4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>优理奇的路径调整可以概括为三步：第一步（2024年Wanda 1.0/Martian）——"技术验证+多形态探索"，同时布局轮式和双足两条线，验证哪种形态更适合商业化；第二步（2025年Wanda 2.0）——"聚焦轮式+极致降本"，明确轮式双臂为商业化的主攻方向（双足Martian退居研发验证），同时以8.8万元定价实现行业同类1/3至1/5的成本优势；第三步（2026年Panther）——"性能升级+全球化"，在验证了Wanda的交付能力后推出高端线Panther，面向海外市场。另外，2025年中遭遇"破产谣言"事件可能促使公司在后续PR策略上更加主动（如CES 2026高调亮相、新闻联播报道）。</p>
+      </div>
+
+      <div class="analysis-block" id="a5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>优理奇做出了几个清晰而果敢的取舍。第一，放弃双足主攻轮式——创始人直言"客户关心的是机器人能干多少活，而不是有没有腿"，这与宇树、Figure、特斯拉等坚持双足路线的厂商形成差异化。第二，放弃工业场景（焊接、装配、重载搬运），主攻"泛B端蓝海"——酒店、物业、零售、餐饮等服务场景。这一选择避开了与发那科、库卡、ABB等工业机器人巨头以及优必选（3C制造）的直接竞争。第三，放弃VLA大模型路线，选择"先落地后模型"的渐进式智能化——这使优理奇在交付速度上领先于仍在大模型研发阶段的同行。核心风险在于：如果VLA路线在未来1-2年内出现突破性进展，"先落地"路线的技术护城河可能被迅速侵蚀。</p>
+      </div>
+
+      <div class="analysis-block" id="a6">
+        <h4>2.6 其他重要观察、分析</h4>
+        <p>其一，优理奇的"绵阳速度"（40天落地、3个月投产）揭示了地方政府的具身智能产业争夺战——绵阳以长虹、九洲等军工电子产业链为基础，试图打造西部的机器人制造重镇。这对优理奇是双刃剑：短期内获得低成本产能，长期可能面临多地政府的利益协调压力。其二，CES 2026的"破圈效应"值得关注：外交部发言人转发、《华尔街日报》竞争比较——这表明优理奇已不仅是一家创业公司，更成为中国具身智能出海的"国家名片"之一。其三，创始人杨丰瑜的00后身份在PR层面构成了独特的叙事优势（被媒体称为"具身智能双00后"），但这种叙事也可能带来"天才少年"标签下的过高期望压力。</p>
+      </div>
+
+      <h2 id="references">3 参考资料</h2>
+      <div class="references">
+      <ol>
+        <li><a href="https://www.unix-group.ai" target="_blank">优理奇UniX AI官方网站</a></li>
+        <li><a href="https://www.unix-group.ai/article/196/detail/119.html" target="_blank">优理奇官网：完成两轮合计3亿元天使++++轮及天使+++++轮融资</a></li>
+        <li><a href="https://www.unix-group.ai/article/196/detail/137.html" target="_blank">优理奇官网：完成3亿元新一轮股权融资</a></li>
+        <li><a href="https://www.unix-group.ai/article/196/detail/136.html" target="_blank">优理奇官网：发布Panther黑豹系列机器人</a></li>
+        <li><a href="https://www.unix-group.ai/article/196/detail/129.html" target="_blank">优理奇官网：CES 2026与全球共舞</a></li>
+        <li><a href="https://www.unix-group.ai/article/196/detail/132.html" target="_blank">优理奇官网：CES获新闻联播报道</a></li>
+        <li><a href="https://www.unix-group.ai/article/196/detail/47.html" target="_blank">优理奇官网：完成数亿元天使轮及天使+轮融资</a></li>
+        <li><a href="https://www.leaderobot.com/news/preview/7332" target="_blank">Leaderobot：单月破百台，手握亿级订单——优理奇如何成为"最能交付"的具身智能公司</a></li>
+        <li><a href="https://www.leaderobot.com/news/5565" target="_blank">Leaderobot：打破破产谣言！优理奇UnixAI完成天使+轮融资</a></li>
+        <li><a href="https://www.iyiou.com/news/202603021122968" target="_blank">亿欧：优理奇机器人完成近3亿元新一轮融资</a></li>
+        <li><a href="https://www.egsea.com/news/detail/2190190.html" target="_blank">易海：优理奇机器人完成两轮合计3亿元融资</a></li>
+        <li><a href="https://www.itjuzi.com/addedOrangeArticle/13266" target="_blank">IT桔子：半年融资5轮，累计近10亿——00后耶鲁博士的"反共识"创业</a></li>
+        <li><a href="https://aipfia.zhidx.com/p/536904.html" target="_blank">智东西：00后耶鲁博士，在苏州造人形机器人，刚融资近3亿</a></li>
+        <li><a href="https://www.donews.com/news/detail/1/6446178.html" target="_blank">DoNews：优理奇机器人完成近3亿元新一轮融资</a></li>
+        <li><a href="https://www.36kr.com/p/3607498224239619" target="_blank">36氪：VC开始重新审视机器人泡沫了</a></li>
+        <li><a href="https://www.pencilnews.cn/p/46645.html" target="_blank">铅笔道：00后耶鲁博士融资3亿，造的机器人会捏蛋</a></li>
+        <li><a href="http://www.sipac.gov.cn/kjzszx/jqhd/202603/e6748d78fea8419dbb197f77757e395e.shtml" target="_blank">苏州工业园区：优理奇完成3亿元新一轮股权融资</a></li>
+        <li><a href="http://www.myrb.net/html/2025/news/9/428766.html" target="_blank">绵阳日报：项目40天落地、年产能将破千台</a></li>
+        <li><a href="https://www.sohu.com/a/944550178_121106884" target="_blank">搜狐：AI绵阳——40天落地、3个月投产，优理奇绵阳基地</a></li>
+        <li><a href="https://www.sohu.com/a/1015359847_489960" target="_blank">搜狐：优理奇现象——当中国机器人不再被"衡量"</a></li>
+        <li><a href="https://wap.eastmoney.com/a/202602153651110710.html" target="_blank">东方财富：优理奇发布新一代高性能具身智能机器人</a></li>
+        <li><a href="https://agent.ren/2026/0305/8776.shtml" target="_blank">AgentRen：优理奇单月交付破百台，亿级订单在手</a></li>
+        <li><a href="https://m.ourjiangsu.com/news/2025/12/8/1447640827652603904.html" target="_blank">江苏广电：吴中八杰——优理奇机器人，国内率先实现具身智能场景化交付</a></li>
+        <li><a href="https://interestingengineering.com/ai-robotics/worlds-first-humanoid-robot-for-household" target="_blank">Interesting Engineering: World's first humanoid robot for real household use</a></li>
+        <li><a href="https://www.originofbots.com/robot/panther-by-unix-ai-details-specifications-rating" target="_blank">Origin of Bots: Panther by UniX AI specs</a></li>
+        <li><a href="https://www.xhby.net/content/s683955f9e4b0cade5e5bc73a.html" target="_blank">新华日报：优理奇把机器人价格打下来了</a></li>
+        <li><a href="http://field.10jqka.com.cn/20260305/c675084960.shtml" target="_blank">同花顺：00后耶鲁博士造人形机器人，完成3亿元新一轮融资</a></li>
+        <li><a href="http://cn.cvcapital.com/mobile/view/news-detail.html?id=4532" target="_blank">投中资本：优理奇机器人完成数亿元天使轮及天使+轮融资</a></li>
+        <li><a href="https://media.qimingpian.cn/2026/03/02/659ca984538969ee2980257a400cb702.html" target="_blank">企名片：优理奇机器人完成近3亿元新一轮股权融资</a></li>
+        <li><a href="https://lieyunpro.com/archives/500544" target="_blank">猎云网：优理奇机器人完成近3亿元新一轮融资</a></li>
+      </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">本页面数据截止至2026年5月4日。内容基于公开资料整理，仅供参考，不构成任何投资建议。如有信息更新或更正，请联系维护方。</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

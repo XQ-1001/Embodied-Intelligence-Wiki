@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>普渡机器人 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> <span class="breadcrumb-sep">›</span> <span>普渡机器人</span></div>
+  <div class="wiki-header"><h1>普渡机器人</h1><div class="subtitle">Pudu Robotics · 2016 · 估值超百亿 · 全球商用服务机器人市占率第一</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#team">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financial">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#analysis-1">2.1 团队与场景匹配度</a></li>
+        <li class="toc-lvl4"><a href="#analysis-2">2.2 技术路线与场景适配性</a></li>
+        <li class="toc-lvl4"><a href="#analysis-3">2.3 资本结构对战略的影响</a></li>
+        <li class="toc-lvl4"><a href="#analysis-4">2.4 试错与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#analysis-5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#analysis-6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#references">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">普渡机器人</div>
+        <div class="ib-row"><div class="ib-label">英文名称</div><div class="ib-value">Pudu Robotics</div></div>
+        <div class="ib-row"><div class="ib-label">公司全称</div><div class="ib-value">深圳市普渡科技股份有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2016年1月13日</div></div>
+        <div class="ib-row"><div class="ib-label">注册地</div><div class="ib-value">中国深圳</div></div>
+        <div class="ib-row"><div class="ib-label">创始人/CEO</div><div class="ib-value">张涛</div></div>
+        <div class="ib-section">财务数据</div>
+        <div class="ib-row"><div class="ib-label">2026年估值</div><div class="ib-value">超100亿元人民币</div></div>
+        <div class="ib-row"><div class="ib-label">累计融资</div><div class="ib-value">超20亿元人民币</div></div>
+        <div class="ib-row"><div class="ib-label">2025年增长</div><div class="ib-value">营收同比超100%</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">全球市占率</div><div class="ib-value">23%（全球第一）</div></div>
+        <div class="ib-row"><div class="ib-label">累计出货</div><div class="ib-value">超12万台</div></div>
+        <div class="ib-row"><div class="ib-label">覆盖国家</div><div class="ib-value">80+个</div></div>
+        <div class="ib-row"><div class="ib-label">海外营收占比</div><div class="ib-value">超80%</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">赛道</div><div class="ib-value">商用服务机器人</div></div>
+        <div class="ib-row"><div class="ib-label">产品形态</div><div class="ib-value">配送/清洁/工业/人形</div></div>
+        <div class="ib-row"><div class="ib-label">上市状态</div><div class="ib-value">未上市（拟IPO）</div></div>
+        <div class="ib-section">官网</div>
+        <div class="ib-row"><div class="ib-label">官网</div><div class="ib-value"><a href="https://www.pudurobotics.com" target="_blank">pudurobotics.com</a></div></div>
+      </aside>
+      <p class="article-intro">普渡机器人（Pudu Robotics），全称深圳市普渡科技股份有限公司，成立于2016年，是全球领先的商用服务机器人企业。公司以"一脑多形"技术架构为核心，覆盖服务配送、商用清洁、工业配送、通用具身智能四大产品线，累计出货超12万台，业务遍及全球80多个国家和地区。据Frost & Sullivan 2023年报告，普渡以23%的全球市场份额位居商用服务机器人行业第一。2026年4月，普渡完成近10亿元人民币新一轮融资，估值突破百亿，成为国内第15家具身智能百亿独角兽。</p>
+      <h2 id="facts">1 事实层</h2>
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper">
+        <table class="wikitable infotable">
+          <tr><th>项目</th><th>内容</th></tr>
+          <tr><td>公司全称</td><td>深圳市普渡科技股份有限公司</td></tr>
+          <tr><td>英文名称</td><td>Shenzhen Pudu Technology Co., Ltd. / Pudu Robotics</td></tr>
+          <tr><td>成立时间</td><td>2016年1月13日</td></tr>
+          <tr><td>注册地</td><td>广东省深圳市南山区</td></tr>
+          <tr><td>创始人/CEO</td><td>张涛</td></tr>
+          <tr><td>上市情况</td><td>未上市，拟登陆资本市场</td></tr>
+          <tr><td>官网</td><td>www.pudurobotics.com / pudutech.com</td></tr>
+          <tr><td>员工规模（峰值）</td><td>超3000人（2021年），经调整后约1000+人</td></tr>
+          <tr><td>研发占比</td><td>超50%</td></tr>
+        </table>
+      </div>
+      <h4>发展沿革</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>时间</th><th>事件</th></tr>
+          <tr><td>2016年</td><td>张涛在深圳创立普渡科技，获长盈精密天使投资</td></tr>
+          <tr><td>2017年</td><td>首款产品"欢乐送"面世，获德国红点最佳设计奖；获首个海外客户（奥地利商超）</td></tr>
+          <tr><td>2018年</td><td>完成5000万元A轮融资（启创资本领投）</td></tr>
+          <tr><td>2019年</td><td>与海底捞达成战略合作；推出"贝拉"配送机器人，海外爆红</td></tr>
+          <tr><td>2020年</td><td>疫情期间发起"技术抗疫"行动；获美团、红杉中国、腾讯等投资</td></tr>
+          <tr><td>2021年</td><td>团队从300人扩张至3000人；C轮融资约10亿元；开辟清洁机器人业务线</td></tr>
+          <tr><td>2022年</td><td>组织"瘦身"调整，强调从规模驱动转向经营效率驱动</td></tr>
+          <tr><td>2023年</td><td>完成过亿元C3轮融资（普华资本）；全球市占率23%，成为独角兽</td></tr>
+          <tr><td>2024年</td><td>发布D9人形机器人、D7类人形机器人；盐城建湖工厂落成（年产能10万台）</td></tr>
+          <tr><td>2025年</td><td>营收翻倍增长；工业配送上市一年出货超4000台；清洁业务占比超70%</td></tr>
+          <tr><td>2026年4月</td><td>完成近10亿元新一轮融资，估值破百亿；美国达拉斯总部启用；BG1系列全球首发</td></tr>
+        </table>
+      </div>
+      <h3 id="team">1.2 创始人及核心团队</h3>
+      <p>普渡机器人的创始团队呈现"学术+产业"混合型人才结构，核心成员毕业于香港科技大学、香港中文大学、清华大学、中科院、哈工大、华中科大、电子科大等顶尖院校，多人曾在Robocon、RoboCup等顶级机器人赛事中获奖。团队产业背景覆盖大疆、华为、腾讯、阿里巴巴、美团、西门子等知名企业，曾主导开发过低速无人驾驶、扫地机器人、工业机械臂、手术机械臂等产品。公司研发人员占比超50%。</p>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+          <tr><td>创始人/CEO</td><td>张涛</td><td>香港科技大学机械工程系MPhil（AI与机器人学方向），后休学创业。拥有超350项机器人技术专利。三次创业经历：飞行汽车（2009年）、科技媒体雷锋网（首任主编/CEO，2010年）、家庭机器人EZ Robotics（2012-2015年）。2016年创立普渡，被评为2024年《财富》"中国40位40岁以下商界精英"、福布斯中国科创人物。</td></tr>
+          <tr><td>联合创始人</td><td>（未公开披露全名）</td><td>核心联创均具有机器人大赛冠军背景及大疆、华为等产业经验。</td></tr>
+          <tr><td>核心团队</td><td>多学科交叉</td><td>涵盖机械工程、电子工程、计算机视觉、SLAM导航、AI算法等领域，兼具学术研究与产业落地双重能力。</td></tr>
+        </table>
+      </div>
+      <h3 id="funding">1.3 融资与股东</h3>
+      <h4>融资历史</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>轮次</th><th>时间</th><th>金额</th><th>投后估值</th><th>主要投资方</th></tr>
+          <tr><td>天使轮</td><td>2016年</td><td>未披露</td><td>—</td><td>长盈精密</td></tr>
+          <tr><td>A轮</td><td>2018年</td><td>5000万元</td><td>—</td><td>启创资本（领投）、榕泉资本等</td></tr>
+          <tr><td>B轮</td><td>2020年</td><td>过亿元</td><td>—</td><td>美团、红杉中国</td></tr>
+          <tr><td>C1+C2轮</td><td>2021年</td><td>约10亿元</td><td>—</td><td>腾讯、深投控、大湾区共同家园基金等</td></tr>
+          <tr><td>C3轮</td><td>2023年</td><td>过亿元</td><td>超10亿美元</td><td>普华资本</td></tr>
+          <tr><td>新一轮</td><td>2026年4月</td><td>近10亿元</td><td>超100亿人民币</td><td>龙岗金控、亚投资本（联合领投）；北汽产投、蓝思科技、弘晖基金及多地政府引导基金</td></tr>
+        </table>
+      </div>
+      <h4>股东结构</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>股东类型</th><th>代表机构</th><th>特征</th></tr>
+          <tr><td>创始人</td><td>张涛及创始团队</td><td>控股地位</td></tr>
+          <tr><td>互联网/平台资本</td><td>腾讯、美团</td><td>场景协同（本地生活、餐饮）</td></tr>
+          <tr><td>财务VC</td><td>红杉中国、启创资本、普华资本、弘晖基金</td><td>长期财务回报导向</td></tr>
+          <tr><td>产业资本</td><td>北汽产投、蓝思科技</td><td>制造业/汽车场景协同</td></tr>
+          <tr><td>国资/政府引导基金</td><td>龙岗金控、深投控、大湾区共同家园基金</td><td>属地产业政策绑定</td></tr>
+        </table>
+      </div>
+      <p>普渡机器人目前未上市，但2026年融资后明确表示资金用途之一为"为登陆资本市场筑牢根基"，被业界视为商用服务机器人赛道体量最大的拟IPO公司之一。</p>
+      <h3 id="tech">1.4 技术路线</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>维度</th><th>详情</th></tr>
+          <tr><td>总体AI架构</td><td>"一脑多形"（One Brain, Multiple Embodiments）：统一底层AI大模型驱动多形态机器人（专用/类人形/人形/四足）</td></tr>
+          <tr><td>三大核心技术</td><td>移动（Mobility）— 自主导航/SLAM/多机调度；操作（Manipulation）— 仿生双臂/灵巧手；交互（AI Interaction）— 语音/视觉/多模态</td></tr>
+          <tr><td>数据方案</td><td>12万+台设备全球运行数据 → 数据飞轮反哺算法优化，真实场景数据驱动迭代</td></tr>
+          <tr><td>自研程度</td><td>核心自研：导航算法、多机协同调度系统、运动控制器、集成关节模组、AI Magic Cleaning清洁算法</td></tr>
+          <tr><td>产品方法论</td><td>PISTF模型：Industry（行业）× Scenario（场景）× Task（任务）三维驱动产品定义</td></tr>
+          <tr><td>路线选择</td><td>专用→类人形→人形渐进路线：先在配送/清洁成熟场景打磨移动能力，再向操作能力延伸</td></tr>
+        </table>
+      </div>
+      <p>普渡的技术路线特点是"务实渐进"——从最成熟的自动移动切入，逐步叠加操作与交互能力。其"一脑多形"架构大幅降低了多产品线的研发边际成本：配送、清洁、工业搬运、人形机器人共享同一AI底座，仅在机械本体上差异化。AI Magic Cleaning系统实现了从传统"自动化清洁"到"AI原生清洁"的代际跨越，具备干湿垃圾识别、智能分类处理、自动切换清洁模式等能力。3D VSLAM + LiDAR双芯片高算力架构为其导航系统提供支撑。</p>
+      <h3 id="products">1.5 产品形态</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>产品线</th><th>子类</th><th>代表型号</th><th>关键参数</th><th>发布时间</th></tr>
+          <tr><td>服务配送</td><td>餐饮/酒店配送</td><td>欢乐送、贝拉、闪电匣</td><td>多层托盘式；猫形外观；多机协同调度</td><td>2017年起</td></tr>
+          <tr><td>商用清洁</td><td>中小型洗地机</td><td>MT1、CC1 Pro</td><td>CC1全球出货超2万台；60%部署欧美</td><td>2021年起</td></tr>
+          <tr><td>商用清洁</td><td>大型AI洗地机</td><td>PUDU BG1系列</td><td>AI Magic Cleaning；3D VSLAM+LiDAR；外扩贴边；前扫后洗一体</td><td>2026年3月</td></tr>
+          <tr><td>工业配送</td><td>AMR搬运</td><td>PUDU T150</td><td>载重150kg；轻载入门级；降中小企业自动化门槛</td><td>2026年1月</td></tr>
+          <tr><td>工业配送</td><td>AMR搬运</td><td>中重型AMR系列</td><td>覆盖150kg–600kg载重段</td><td>2025年</td></tr>
+          <tr><td>通用具身智能</td><td>全尺寸人形</td><td>PUDU D9</td><td>全尺寸双足人形机器人</td><td>2024年</td></tr>
+          <tr><td>通用具身智能</td><td>类人形</td><td>PUDU D7</td><td>类人形服务机器人</td><td>2024年</td></tr>
+          <tr><td>通用具身智能</td><td>四足</td><td>PUDU D5</td><td>四足机器人</td><td>2025年</td></tr>
+          <tr><td>通用具身智能</td><td>类人形+操作</td><td>闪电匣Arm</td><td>7自由度仿生双臂；11自由度灵巧手；275TOPS算力</td><td>2026年3月</td></tr>
+        </table>
+      </div>
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>场景分类</th><th>具体场景</th><th>代表客户/合作伙伴</th></tr>
+          <tr><td>餐饮服务</td><td>送餐、回盘、迎宾</td><td>海底捞（全国数百家门店）</td></tr>
+          <tr><td>商业零售</td><td>商超导购/清洁</td><td>家乐福、沃尔玛</td></tr>
+          <tr><td>酒店服务</td><td>客房配送、大堂服务</td><td>万达酒店等</td></tr>
+          <tr><td>工业/仓储</td><td>物料搬运、线边配送</td><td>覆盖制造业与物流仓储企业</td></tr>
+          <tr><td>物业保洁</td><td>大型商场/写字楼清洁</td><td>Gom Schoonhouden B.V.（欧洲）、Edeka</td></tr>
+          <tr><td>医疗健康</td><td>药品配送、消毒</td><td>梅奥医学中心（Mayo Clinic）</td></tr>
+          <tr><td>公共机构</td><td>政府/科技园区服务</td><td>NASA</td></tr>
+          <tr><td>交通枢纽</td><td>机场/车站导航</td><td>新加坡等交通枢纽</td></tr>
+          <tr><td>企业服务</td><td>办公空间配送</td><td>埃森哲、霍尼韦尔</td></tr>
+          <tr><td>邮轮/娱乐</td><td>邮轮服务</td><td>挪威邮轮（Norwegian Cruise Line）</td></tr>
+        </table>
+      </div>
+      <p>普渡的场景覆盖呈现"以餐饮零售为基本盘、清洁为第二曲线、工业为第三曲线"的梯次布局。在海外市场，其合作伙伴网络超700家渠道商，覆盖80+个国家和地区。2026年与荷兰Gom Schoonhouden及台湾和椿科技（Aurotek）的战略合作，标志着清洁产品线正式打入欧洲和东亚高端市场。</p>
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>指标</th><th>数据</th><th>时间/来源</th></tr>
+          <tr><td>全球累计出货量</td><td>超12万台</td><td>2026年4月官方披露</td></tr>
+          <tr><td>全球市占率</td><td>23%，全球第一</td><td>Frost & Sullivan 2023年报告</td></tr>
+          <tr><td>覆盖国家/地区</td><td>80+个</td><td>2026年4月</td></tr>
+          <tr><td>全球渠道伙伴</td><td>超700家</td><td>2026年4月</td></tr>
+          <tr><td>服务客户数</td><td>超4万家</td><td>2026年4月</td></tr>
+          <tr><td>清洁机器人营收占比</td><td>超70%</td><td>2025年全年</td></tr>
+          <tr><td>工业配送机器人累计出货</td><td>超4,000台（上市首年）</td><td>2025年</td></tr>
+          <tr><td>美洲部署量</td><td>近15,000台</td><td>2026年4月</td></tr>
+          <tr><td>北美营收同比增长</td><td>285%</td><td>2025年</td></tr>
+          <tr><td>新加坡部署量</td><td>超650台</td><td>截至2026年</td></tr>
+          <tr><td>盐城建湖工厂年产能</td><td>10万台（设计）</td><td>2024年落成</td></tr>
+        </table>
+      </div>
+      <h3 id="financial">1.8 财务数据</h3>
+      <p>普渡机器人为非上市公司，详细年报数据未公开披露。以下为可获取的公开财务相关数据：</p>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>指标</th><th>2022年</th><th>2023年</th><th>2024年</th><th>2025年</th></tr>
+          <tr><td>营收（估算）</td><td>约1亿美元</td><td>—</td><td>—</td><td>同比翻倍增长</td></tr>
+          <tr><td>海外营收占比</td><td>—</td><td>—</td><td>—</td><td>连续多年超80%</td></tr>
+          <tr><td>EBITDA</td><td>—</td><td>—</td><td>—</td><td>接近转正</td></tr>
+          <tr><td>估值</td><td>—</td><td>超10亿美元</td><td>—</td><td>超100亿人民币（2026年4月）</td></tr>
+          <tr><td>累计融资</td><td>—</td><td>超10亿元</td><td>—</td><td>超20亿元</td></tr>
+        </table>
+      </div>
+      <div class="callout">
+        <div class="callout-title">财务观察</div>
+        <p>普渡是商用服务机器人赛道中率先接近EBITDA转正的企业之一。清洁机器人业务占比超70%，成为核心增长引擎；海外营收占比超80%，显示出较强的全球化变现能力。2026年近10亿元融资到账后，账面资金储备充裕。</p>
+      </div>
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li><strong>"六边形战士"评价</strong>：业界将普渡评为技术、产品、量产、渠道、出海、服务六大维度均衡发展的"六边形战士"，在赛道中属于罕见的无短板企业。</li>
+        <li><strong>出海方法论</strong>：采用"Glocal"全球本地化策略 + MAANSC本地化营销模型，海外营收占比超80%。</li>
+        <li><strong>盐城生产基地</strong>：位于江苏盐城建湖县，设计年产能10万台，2024年落成投产，是公司规模化产能布局的核心资产。</li>
+        <li><strong>研发中心布局</strong>：深圳总部 + 成都分公司 + 香港研发中心，三地协同。</li>
+        <li><strong>2021-2022年组织调整</strong>：团队从300人膨胀至3000人后，因宏观环境变化主动"瘦身"，在行业率先提出"依靠经营活着，而不是融资"，被认为具有较强组织自律性。</li>
+        <li><strong>海外总部</strong>：美国达拉斯，2026年4月正式启用，辐射整个美洲市场。</li>
+        <li><strong>"滴滴模式"海外复制</strong>：普渡被媒体称为机器人出海的"滴滴模式"——以中国供应链成本优势+本地化渠道深耕，快速复制到全球市场。</li>
+      </ul>
+      <h2 id="analysis">2 分析层</h2>
+      <div class="analysis-block" id="analysis-1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>创始人张涛的创业轨迹——从服务机器人概念验证（EZ Robotics家庭机器人）到商用服务机器人——与其最终选定的餐饮/清洁场景高度匹配。家庭机器人因技术周期不成熟而失败的经历，使其在普渡创业初期果断选择从"自动移动"这一最成熟的技术维度切入，避开了操作和交互尚不成熟的时间窗口风险。港科大机械工程背景（AI与机器人学）为其提供了扎实的技术判断力，而科技媒体（雷锋网）的创业经历则赋予了市场敏感度和投资人关系网络。核心团队的机器人竞赛冠军+大疆/华为产业背景，在硬件量产与供应链管理上提供了直接经验。整体而言，团队是典型的"产业老兵+学术精英"混合型，在找准PMF（产品-市场匹配）方面有显著优势。</p>
+      </div>
+      <div class="analysis-block" id="analysis-2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>普渡的"一脑多形"架构与其多场景扩张战略高度适配。该架构的本质是"软件定义硬件"——AI底座统一，机械本体按场景需求差异化。这使普渡从配送切入清洁、工业乃至人形机器人时，能复用导航、调度、交互等核心算法模块，边际研发成本远低于从零开发独立产品线的竞争对手。PISTF产品方法论（行业×场景×任务三维驱动）进一步确保新产品不是技术炫技，而是真实需求驱动。然而，从专用向人形的延伸也存在路线风险：配送/清洁的移动能力与人形所需的灵巧操作之间存在技术鸿沟，BG1的AI Magic Cleaning是清洁场景的深度定制，与人形通用智能的技术方向存在分叉张力。</p>
+      </div>
+      <div class="analysis-block" id="analysis-3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>普渡的股东构成呈现多元平衡特征：腾讯、美团代表互联网场景资本，为其提供了本地生活/餐饮渠道的天然协同入口；红杉中国、启创资本等财务VC保障了战略自主性和资本市场的背书；龙岗金控、深投控等深圳国资背景则强化了属地政策支持和工厂用地的获取能力。2026年新入局的北汽产投（汽车产业资本）和蓝思科技（精密制造）暗示了向工业和汽车场景延伸的可能性。这种"互联网+财务+国资+产业"四维股东结构，使普渡在场景绑定上保持了灵活性——既未过度依赖单一客户，又有足够的产业资源支持新场景探索。</p>
+      </div>
+      <div class="analysis-block" id="analysis-4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>普渡经历过两次关键调整。第一次是2021-2022年的组织"瘦身"：团队从300人快速扩张至3000人（受资本热潮驱动）后，面临宏观环境急剧变化，张涛果断收缩，提出"依靠经营活着而不是融资"的经营哲学。这在当时服务机器人赛道普遍"烧钱换规模"的氛围中属于罕见的自律性决策，事后被证明具有先见之明。第二次是2022年后从单一配送向清洁的战略重心迁移：配送虽是基本盘，但天花板相对有限；清洁机器人市场规模更大、客户支付意愿更强、复购率更高。这一调整使清洁在2025年贡献超70%营收，成为真正的第二曲线。两次调整均展现出较强的战略纠偏能力和组织弹性。</p>
+      </div>
+      <div class="analysis-block" id="analysis-5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>普渡在竞争格局中选择了一条"务实全栈"路径——不走纯软件/大脑模型授权的轻资产路线（如某些AI公司），也不走仅做单一形态硬件的重资产路线（如传统AGV厂商），而是在软件（AI底座）+硬件（多形态本体）+场景（全球化渠道）三个维度同时做深。这类似于"服务机器人领域的Apple+Foxconn混合体"——既掌握核心AI技术又拥有自有产能。其关键取舍在于：在产品形态上选择从专用机器人起步（而非一开始就做人形），在商业化上选择全球出海（而非仅聚焦国内）。这种取舍使其在12万台出货量的数据飞轮效应方面建立了显著的先发壁垒，但也意味着后续需要持续烧钱以维持多线并行的研发和渠道投入。</p>
+      </div>
+      <div class="analysis-block" id="analysis-6">
+        <h4>2.6 其他重要观察</h4>
+        <p>普渡最值得关注的是其"从场景出发定义产品"而非"从技术出发寻找场景"的产品哲学。张涛三次创业经历中，两次与技术周期错判（飞行汽车、家庭机器人），使其在普渡时代极度重视"在正确的时间做正确的事"。这种务实文化体现在：不追人形热点做PR，而是先让清洁和配送机器人跑通商业闭环、夯实基本盘。另一个值得关注的信号是其"欧美高端市场优先"的出海策略——不同于大多数中国机器人企业选择东南亚等价格敏感市场，普渡的标杆客户清单（家乐福、沃尔玛、梅奥医学中心、NASA）显示出其品牌溢价能力和对高端渠道的渗透力。如果普渡能在2026-2027年成功登陆资本市场，有可能成为全球商用服务机器人领域市值最高的独立上市公司。</p>
+      </div>
+      <h2 id="references">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://app.dahecube.com/nweb/wap/article.html?artid=271498" target="_blank">大河财立方 — 普渡机器人完成近10亿元融资，估值超百亿</a></li>
+          <li><a href="https://egs.stcn.com/news/detail/2277304.html" target="_blank">证券时报 — 普渡机器人完成近10亿元融资，估值突破100亿元</a></li>
+          <li><a href="https://36kr.com/p/3786490420878344" target="_blank">36氪 — 融资近十亿、估值破百亿，普渡机器人何以被资本持续看好？</a></li>
+          <li><a href="https://www.dealstreetasia.com/stories/china-pudu-robotics-valuation-480327" target="_blank">DealStreetAsia — China's Pudu Robotics bags nearly $150m, valuation tops $1.5b</a></li>
+          <li><a href="http://www.pudurobotics.com/kr/news/pudu-robotics-raises-150-million-exceeds-1-5-billion-valuation" target="_blank">Pudu Robotics官网 — Pudu Robotics Raises Nearly USD 150 Million</a></li>
+          <li><a href="https://www.tipranks.com/news/private-companies/pudu-robotics-secures-150-million-and-debuts-ai-native-bg1-cleaning-platform" target="_blank">TipRanks — Pudu Robotics Secures $150 Million and Debuts AI-Native BG1 Cleaning Platform</a></li>
+          <li><a href="https://www.tipranks.com/news/private-companies/pudu-robotics-raises-150-million-launches-ai-cleaning-platform-and-opens-dallas-hq-to-accelerate-americas-growth" target="_blank">TipRanks — Pudu Robotics Opens Dallas HQ to Accelerate Americas Growth</a></li>
+          <li><a href="https://www.manilatimes.net/2026/04/17/tmt-newswire/pr-newswire/pudu-robotics-announces-strategic-partnership-with-gom-schoonhouden-bv" target="_blank">Manila Times — Pudu Robotics Strategic Partnership with Gom Schoonhouden B.V.</a></li>
+          <li><a href="https://www.chinaagv.com/news/detail/202604/35753.html" target="_blank">中国AGV网 — 普渡机器人与荷兰清洁服务商Gom达成战略合作</a></li>
+          <li><a href="https://www.chinatimes.com/newspapers/20260422000465-260204" target="_blank">中时新闻网 — 和椿携手普渡机器人，扩大智动化布局</a></li>
+          <li><a href="https://www.jinghaimedia.com/archives/47663" target="_blank">京海传媒 — Pudu Robotics 2026春季发布会于台北盛大启幕</a></li>
+          <li><a href="https://finance.yahoo.com/sectors/technology/articles/pudu-robotics-inaugurates-u-headquarters-141200349.html" target="_blank">Yahoo Finance — Pudu Robotics Inaugurates U.S. Headquarters in Dallas</a></li>
+          <li><a href="http://finance.stockstar.com/IG2026042800038039.shtml" target="_blank">证券之星 — 普渡机器人美国新总部正式落地达拉斯</a></li>
+          <li><a href="https://robot.ofweek.com/2026-04/ART-8321202-8460-30685847.html" target="_blank">OFweek机器人网 — 近10亿融资到位！国内第15家100亿具身独角兽诞生</a></li>
+          <li><a href="https://t.cj.sina.com.cn/articles/view/8489816127/1fa08503f00101al2m" target="_blank">新浪财经 — 从裁员千人、融资10亿到估值破百亿：普渡科技的"渡劫"与"渡己"</a></li>
+          <li><a href="https://nai500.com/zh-hans/blog/2026/04/10-pudu/" target="_blank">NAI500 — 10家值得关注的中国机器人公司（在Pudu融资后）</a></li>
+          <li><a href="https://www.zaobao.com/finance/world/story20260118-8090808" target="_blank">联合早报 — 早人物：普渡科技创始人张涛，三次创业渐渐掌握节奏</a></li>
+          <li><a href="https://fgw.sz.gov.cn/ztzl/qtztzl/szscjmyjjfzzhfwpt/mqfc/myqyjdxsj/content/post_12623955.html" target="_blank">深圳市发改委 — 普渡机器人创始人张涛：中国服务机器人走向世界</a></li>
+          <li><a href="https://www.dutenews.com/n/article/7102900" target="_blank">读特新闻 — 深圳口述史：张涛坚守"发明家精神"</a></li>
+          <li><a href="https://news.qq.com/rain/a/20230428A080GU00" target="_blank">腾讯新闻 — 深圳起家的机器人，悄悄进驻全球餐厅</a></li>
+          <li><a href="https://www.thepaper.cn/newsDetail_forward_22160059" target="_blank">澎湃新闻 — 普渡获亿元融资，张涛危机解除了？</a></li>
+          <li><a href="https://parsers.vc/startup/pudurobotics.com/" target="_blank">Parsers VC — Pudu Robotics Funding, Valuation, Investors, News</a></li>
+          <li><a href="https://roboticsbusinessnews.com/news/86/2808/pudu-robotics-and-gom-schoonhouden-launch-europes-first-ai-native-bg1-cleaning-robot-deployment.html" target="_blank">Robotics Business News — Europe's First AI-Native BG1 Cleaning Robot Deployment</a></li>
+          <li><a href="https://www.x-techcon.com/article/133126.html" target="_blank">烯牛数据 — 普渡机器人完成近10亿元融资，估值破百亿</a></li>
+          <li><a href="https://www.kczg.org.cn/zt530activity/newsDetail?id=6180914" target="_blank">科创中国 — 深圳口述史｜张涛：坚守"发明家精神"</a></li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">本页面最后更新于2026年5月4日 · 内容基于公开资料整理 · 具身智能Wiki</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

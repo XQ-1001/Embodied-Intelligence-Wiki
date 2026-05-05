@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>法奥机器人 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a><span class="breadcrumb-sep"> › </span><span>法奥机器人</span></div>
+  <div class="wiki-header"><h1>法奥机器人</h1><div class="subtitle">FAIR Robotics · 2019年成立 · 苏州 · 中国协作机器人销量第一 · 已完成股改</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#team">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financials">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#analysis1">2.1 团队背景与场景选择的匹配度</a></li>
+        <li class="toc-lvl4"><a href="#analysis2">2.2 技术路线与场景的适配性</a></li>
+        <li class="toc-lvl4"><a href="#analysis3">2.3 股东/资本结构对战略的影响</a></li>
+        <li class="toc-lvl4"><a href="#analysis4">2.4 试错过程与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#analysis5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#analysis6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#references">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">法奥机器人</div>
+        <div class="ib-section">公司信息</div>
+        <div class="ib-row"><div class="ib-label">英文名称</div><div class="ib-value">FAIR Robotics</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2019年</div></div>
+        <div class="ib-row"><div class="ib-label">总部</div><div class="ib-value">苏州高新区</div></div>
+        <div class="ib-row"><div class="ib-label">创始人/董事长</div><div class="ib-value">姚庭</div></div>
+        <div class="ib-row"><div class="ib-label">上市状态</div><div class="ib-value">已完成股改，筹备IPO</div></div>
+        <div class="ib-row"><div class="ib-label">官网</div><div class="ib-value">fair-robotics.com</div></div>
+        <div class="ib-section">核心数据（2025年）</div>
+        <div class="ib-row"><div class="ib-label">年度签单</div><div class="ib-value">13,000+台（+86%）</div></div>
+        <div class="ib-row"><div class="ib-label">年度出货</div><div class="ib-value">11,000+台（+68%）</div></div>
+        <div class="ib-row"><div class="ib-label">海外签单</div><div class="ib-value">4,200+台（+251%）</div></div>
+        <div class="ib-row"><div class="ib-label">海外出货</div><div class="ib-value">3,100+台（+176%）</div></div>
+        <div class="ib-section">融资信息</div>
+        <div class="ib-row"><div class="ib-label">累计融资</div><div class="ib-value">超2亿美元</div></div>
+        <div class="ib-row"><div class="ib-label">最新轮次</div><div class="ib-value">C轮近1亿美元（2026.3）</div></div>
+        <div class="ib-section">市场地位</div>
+        <div class="ib-row"><div class="ib-label">国内协作机器人</div><div class="ib-value">销量第1（GGII 2025）</div></div>
+        <div class="ib-row"><div class="ib-label">海外出货量</div><div class="ib-value">国内第1</div></div>
+        <div class="ib-row"><div class="ib-label">全球覆盖</div><div class="ib-value">100+国家/地区</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">产品类别</div><div class="ib-value"><span class="tag">协作机器人</span><span class="tag tag-info">人形Tier 1</span><span class="tag">焊接专用</span></div></div>
+      </aside>
+
+      <p class="article-intro">法奥机器人（FAIR Robotics）成立于2019年，总部位于苏州高新区，是中国协作机器人赛道的头部企业。公司以核心零部件全栈自研为技术根基，是国内唯一实现谐波减速器、伺服电机、控制器、编码器、驱动器、刹车全部自研自产的协作机器人本体厂商。2025年以超1.1万台出货量位居中国协作机器人销量第一、海外出货量第一。2026年3月完成近1亿美元C轮融资并同步完成股份制改造，正加速向"协作机器人普及者+人形机器人Tier 1核心供应商"双轮驱动转型。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper">
+      <table class="wikitable infotable">
+        <tr><th>项目</th><th>内容</th></tr>
+        <tr><td>公司全称</td><td>法奥（苏州）机器人技术股份有限公司</td></tr>
+        <tr><td>英文名称</td><td>FAIR (Suzhou) Robotics Technology Co., Ltd.</td></tr>
+        <tr><td>成立时间</td><td>2019年</td></tr>
+        <tr><td>总部</td><td>江苏省苏州市高新区</td></tr>
+        <tr><td>生产基地</td><td>苏州、淄博两大基地；苏州全球运营总部（建设中，总投资4亿元，占地约23亩）</td></tr>
+        <tr><td>上市状态</td><td>已完成股份制改造，筹备IPO</td></tr>
+        <tr><td>企业资质</td><td>国家级专精特新"小巨人"企业（2025年）；江苏省唯一入选工信部机器人本体与关键零部件双规范企业</td></tr>
+        <tr><td>官方网站</td><td>fair-robotics.com</td></tr>
+        <tr><td>海外服务中心</td><td>美国、德国、日本（3个）</td></tr>
+        <tr><td>海外销售网点</td><td>50+个</td></tr>
+      </table>
+      </div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>时间</th><th>事件</th></tr>
+        <tr><td>2019年</td><td>姚庭创立于苏州高新区，定位协作机器人研发制造</td></tr>
+        <tr><td>2021年6月</td><td>完成A/A+轮合计约3,000万美元融资，顺为资本、高瓴创投入局</td></tr>
+        <tr><td>2022年3月</td><td>完成超5,000万美元B轮融资，源码资本领投，阿里、美团龙珠参投</td></tr>
+        <tr><td>2022-2024年</td><td>完成全核心零部件自研自产，FR系列11款型号全面覆盖3-35kg</td></tr>
+        <tr><td>2025年</td><td>获评国家级专精特新"小巨人"；Pre-C轮引入民生股权基金等；销量首破万台</td></tr>
+        <tr><td>2025年</td><td>焊接行业出货突破3,000台；海外出货3,100+台，欧洲占比49%</td></tr>
+        <tr><td>2026年2月</td><td>苏州全球运营总部基地奠基，总投资4亿元</td></tr>
+        <tr><td>2026年3月</td><td>完成近1亿美元C轮融资（国寿双碳基金领投），同步完成股份制改造</td></tr>
+        <tr><td>2026年4月</td><td>携全协作方案亮相德国汉诺威工业博览会，锚定欧洲年度3,000台出货目标</td></tr>
+      </table>
+      </div>
+
+      <h3 id="team">1.2 创始人及核心团队</h3>
+      <p>法奥机器人的核心团队以哈工大机器人研究所为学术根基，叠加ABB等国际机器人巨头产业经验，属于典型的"学术+产业"双驱型团队，在工业机器人本体及核心部件研发方面拥有逾十年经验。</p>
+
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+        <tr><td>创始人/董事长</td><td>姚庭</td><td>哈尔滨工业大学机器人研究所出身；曾供职于全球工业机器人巨头ABB；因制造"机器人中国芯"的执念回国创业；曾联合创办正棋机器人（顺丰、京东等主流物流企业独家供应商），在工业机器人领域拥有深厚的产业积累和人脉资源</td></tr>
+        <tr><td>联合创始人</td><td>巩相峰</td><td>同样毕业于哈尔滨工业大学机械制造及控制工程研究所；具备多年海外机器人研究及商业化经验</td></tr>
+        <tr><td>科学顾问</td><td>蔡鹤皋院士</td><td>中国机器人领域泰斗级学者，哈工大机器人研究所创始元老</td></tr>
+      </table>
+      </div>
+      <p>核心团队成员来自瑞士联邦理工（ETH Zurich）、南京大学等国内外顶尖高校。公司与哈工大建有联合机器人研究中心，形成了从基础研究到产业化的完整人才梯队。2026年启动的苏州总部基地项目规划中包含与哈工大苏州高等研究院的产学研深度合作。</p>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+
+      <h4>融资历史</h4>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>时间</th><th>轮次</th><th>金额</th><th>主要投资方</th></tr>
+        <tr><td>2021.06</td><td>A/A+轮</td><td>约3,000万美元</td><td>顺为资本、高瓴创投、清流资本、钟鼎资本</td></tr>
+        <tr><td>2022.03</td><td>B轮</td><td>超5,000万美元</td><td>源码资本（领投）、阿里巴巴、美团龙珠；顺为、高瓴、钟鼎等跟投</td></tr>
+        <tr><td>2025.05</td><td>Pre-C轮</td><td>未披露</td><td>民生股权基金、融享创投等产业及国资背景资本</td></tr>
+        <tr><td>2026.03</td><td>C轮</td><td>近1亿美元</td><td>国寿双碳基金（中国人寿旗下，领投）、博原资本（参投）；顺为、源码、清流等老股东跟投</td></tr>
+      </table>
+      </div>
+
+      <h4>股东结构特征</h4>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>股东类型</th><th>代表机构</th><th>战略意义</th></tr>
+        <tr><td>互联网/产业资本</td><td>阿里巴巴、美团龙珠</td><td>为物流/新零售场景应用打开通道</td></tr>
+        <tr><td>头部VC</td><td>顺为资本、高瓴创投、源码资本、清流资本、钟鼎资本、华映资本</td><td>提供持续资金支持和行业资源</td></tr>
+        <tr><td>国资/战略资本</td><td>国寿双碳基金（中国人寿）、民生股权基金、融享创投</td><td>国家级战略资本注入，强化政企合作和长期稳定性</td></tr>
+      </table>
+      </div>
+
+      <div class="callout"><div class="callout-title">股改与IPO进展</div>2026年3月C轮融资完成后同步完成股份制改造，公司注册名称已变更为"法奥（苏州）机器人技术股份有限公司"。融资资金重点用于核心技术研发、产品矩阵升级、全球化产能布局以及加速人形机器人产业化落地。公司正积极筹备资本市场路径（IPO），尚未披露具体上市地。</div>
+
+      <h3 id="tech">1.4 技术路线</h3>
+
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>技术维度</th><th>详情</th></tr>
+        <tr><td>总体技术路线</td><td>"全栈自研+极致性价比"，从底层核心零部件到上层控制系统全部自主研发和生产</td></tr>
+        <tr><td>核心零部件自研</td><td>谐波减速器（独创DST齿形）、伺服电机、控制器、编码器、驱动器、刹车——国内唯一全部自研自产的协作机器人本体厂商</td></tr>
+        <tr><td>AI路线</td><td>"AI + 协作机器人"战略，推动具身智能场景落地；定位为人形机器人Tier 1核心供应商</td></tr>
+        <tr><td>人形机器人方案</td><td>凭借累计超30万套核心模组生产经验，提供从关节模组到整机的全链条方案</td></tr>
+        <tr><td>焊接技术</td><td>WM系列焊接专用机器人，2025年焊接行业出货突破3,000台</td></tr>
+        <tr><td>生态合作</td><td>与igus、MISUMI建立全球渠道合作；与哈工大建立联合研究中心</td></tr>
+      </table>
+      </div>
+
+      <p>法奥的技术路线与传统协作机器人厂商有本质区别——通过全栈自研核心零部件实现极致的成本控制和供应链自主可控。独创的DST齿形谐波减速机显著优化了产品寿命。在AI层面，法奥选择了"硬件赋能"而非"自研AI大脑"的路线，即以全栈自研的关节模组和本体能力为基础，开放生态给AI算法伙伴，定位为人形机器人产业链的Tier 1供应商。2025年作为江苏省唯一入选工信部机器人本体与关键零部件双规范的企业，标志着其技术标准已达国家级认可。</p>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <p>法奥以FR系列通用协作机器人为核心，构建了覆盖工业、商业、焊接三大场景的产品矩阵。</p>
+
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>产品系列</th><th>型号</th><th>负载范围</th><th>定位</th><th>应用场景</th></tr>
+        <tr><td>FR系列</td><td>FR3-FR35（11款）</td><td>3-35kg</td><td>通用协作机器人</td><td>CNC上下料、码垛搬运、装配检测、Bin Picking</td></tr>
+        <tr><td>WM系列</td><td>焊接专用</td><td>—</td><td>焊接协作机器人</td><td>焊接加工、打磨（2025年焊接行业出货3,000+台）</td></tr>
+        <tr><td>C系列</td><td>—</td><td>—</td><td>商用协作机器人</td><td>餐饮服务、摄影摄像等商用场景</td></tr>
+        <tr><td>人形机器人方案</td><td>关节模组+整机</td><td>—</td><td>人形Tier 1核心供应商</td><td>为人形机器人厂商提供关节模组到整机的全链条方案</td></tr>
+      </table>
+      </div>
+
+      <p>2026年汉诺威展会上，法奥展示了双臂协作机器人（两套机械臂同步联动）、柔性抓取机器人（适配易损/异形工件如生鲜果蔬）、汽车部件检测机器人（激光轮廓仪+AI视觉，微米级精度）、电池检测机器人（电芯/模组/PACK线检测，数据直连MES）等全场景解决方案，均由欧洲团队本地化自生长形成。</p>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>场景类别</th><th>具体应用</th><th>代表客户/合作伙伴</th></tr>
+        <tr><td>汽车制造</td><td>部件装配、检测、焊接</td><td>Toyota、Hyundai、AISIN、DENSO</td></tr>
+        <tr><td>电子/半导体</td><td>精密装配、检测、上下料</td><td>Samsung</td></tr>
+        <tr><td>工业制造</td><td>CNC上下料、码垛搬运、打磨抛光</td><td>BOSCH</td></tr>
+        <tr><td>焊接</td><td>焊接加工、弧焊</td><td>WM系列专用客户，2025年出货3,000+台</td></tr>
+        <tr><td>新能源</td><td>电池检测（电芯/模组/PACK线）</td><td>—</td></tr>
+        <tr><td>消费品</td><td>包装、码垛、搬运</td><td>Unilever</td></tr>
+        <tr><td>物流</td><td>Bin Picking、料箱搬运</td><td>（创始人前公司正棋机器人曾服务顺丰/京东）</td></tr>
+        <tr><td>商用服务</td><td>餐饮、摄影摄像</td><td>C系列客户</td></tr>
+        <tr><td>具身智能/人形</td><td>关节模组供应、整机方案</td><td>定位为Tier 1供应商</td></tr>
+      </table>
+      </div>
+
+      <p>法奥的场景布局呈现"工业为主、焊接为特色、人形为新增长极"的三层结构。汽车和电子制造是传统主力场景，焊接专用机器人已成为差异化亮点（2025年出货超3,000台），而人形机器人供应链是2026年的战略重点。全球渠道伙伴igus和MISUMI为其覆盖100+国家的分销网络提供了重要支撑。</p>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>指标</th><th>2025年数据</th><th>同比增长</th></tr>
+        <tr><td>年度签单量</td><td>13,000+台</td><td>+86%</td></tr>
+        <tr><td>年度出货量</td><td>11,000+台</td><td>+68%</td></tr>
+        <tr><td>海外签单量</td><td>4,200+台</td><td>+251%</td></tr>
+        <tr><td>海外出货量</td><td>3,100+台</td><td>+176%</td></tr>
+        <tr><td>欧洲出货占比</td><td>约49%</td><td>—</td></tr>
+        <tr><td>焊接行业出货</td><td>3,000+台</td><td>—</td></tr>
+        <tr><td>国内协作机器人排名</td><td>销量第1</td><td>GGII 2025</td></tr>
+        <tr><td>海外协作机器人排名</td><td>出货量第1</td><td>GGII 2025</td></tr>
+      </table>
+      </div>
+
+      <p>法奥是协作机器人领域首家实现年产销均破万台的国产品牌。海内外订单已排至2026年下半年。2026年欧洲市场年度出货目标为3,000台，已在欧洲建立高度本地化、自循环的运营体系（市场→产品→服务→交付闭环）。全球运营总部基地（总投资4亿元）建成后将进一步扩大产能。</p>
+
+      <h3 id="financials">1.8 财务数据</h3>
+
+      <p>法奥机器人目前为非上市公司，详细财务数据未公开披露。以下为公开信息汇总：</p>
+
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>指标</th><th>数据/状态</th><th>说明</th></tr>
+        <tr><td>融资总额</td><td>累计超2亿美元</td><td>A轮至C轮合计</td></tr>
+        <tr><td>最新估值</td><td>未公开（推测独角兽级别）</td><td>C轮近1亿美元，VC/PE阵容豪华</td></tr>
+        <tr><td>营收</td><td>未公开</td><td>年产销均破万台可作为收入规模参考</td></tr>
+        <tr><td>盈利状态</td><td>未公开</td><td>全栈自研对毛利率应有正面影响</td></tr>
+        <tr><td>产能投资</td><td>4亿元</td><td>苏州全球运营总部基地（2026年2月开工）</td></tr>
+        <tr><td>核心模组产量</td><td>累计超30万套</td><td>关节模组生产经验</td></tr>
+      </table>
+      </div>
+
+      <div class="callout"><div class="callout-title">财务观察</div>法奥机器人目前处于高增长阶段，尚未公开披露完整财务报表。考虑到其全栈自研带来的成本结构优势、年产销破万台的规模效应以及超2亿美元的融资储备，公司财务安全垫较为充裕。C轮融资后同步完成股改，预计未来IPO招股书将公开更详细的财务数据。</div>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>法奥是2026年汉诺威工业博览会（HANNOVER MESSE）主办方特邀的人形机器人主题演讲企业之一。</li>
+        <li>公司独创DST齿形谐波减速机，显著优化产品寿命，是核心零部件自研的重要技术突破。</li>
+        <li>创始人姚庭此前联合创办的正棋机器人曾为顺丰、京东等主流物流企业的独家供应商，这一产业资源为法奥在物流自动化场景的拓展提供了天然入口。</li>
+        <li>法奥是江苏省唯一入选工信部机器人本体与关键零部件"双规范"的企业（2025年）。</li>
+        <li>公司的全球化路径高度依赖欧洲市场，已在欧洲建立了从市场、产品到服务、交付的完整本地化闭环。</li>
+        <li>长期独家财务顾问为元启资本，从早期到C轮持续服务。</li>
+        <li>2026年展出的双臂协作机器人、柔性抓取机器人等方案均由欧洲团队本地化自生长形成，体现了"全球化即本地化"的组织能力。</li>
+        <li>与哈工大苏州高等研究院的产学研合作已被纳入苏州总部基地的规划。</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="analysis1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>姚庭团队的哈工大+ABB背景与法奥"全栈自研+工业场景深耕"的路线高度匹配。姚庭出自哈工大机器人研究所（中国机器人学术重镇），又在ABB积累了国际一线工业机器人的产品化和量产经验，这使得法奥从创立第一天就具备"从核心零部件到整机到场景"的全链条思维。尤为关键的是，姚庭曾创办正棋机器人并成功将产品打入顺丰、京东等头部物流企业，这意味着法奥的创始团队不仅懂技术，还懂如何将机器人产品推入高标准的工业客户产线。蔡鹤皋院士的科学顾问角色则为团队提供了学术深度和行业公信力。团队人才结构以哈工大系为根基、ETH Zurich等海外名校为补充，整体呈现扎实的工程驱动型特点，但在AI算法、多模态感知等具身智能前沿领域的积累可能相对薄弱。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>法奥的"全栈自研+极致性价比"技术路线与其"工业场景快速渗透"的商业策略高度适配。通过自研谐波减速器、伺服电机、控制器等核心零部件，法奥不仅实现了更低的BOM成本（支撑"极致性价比"定价策略），还获得了供应链自主可控的竞争优势——在机器人核心零部件仍大量依赖进口的背景下，这一能力尤为稀缺。独创的DST齿形谐波减速机直接优化了产品寿命，对工业场景中"高可靠性、低维护成本"的核心需求形成了精准回应。焊接专用WM系列的推出（2025年出货3,000+台）证明了公司具备将通用技术平台快速适配垂直场景的能力。在人形机器人方向，法奥选择了"做Tier 1供应商而非整机厂商"的策略，与其在关节模组领域的技术积累（累计30万+套模组经验）天然衔接，避免了与宇树、智元等整机厂商的直接竞争。但AI算法层的能力缺口是其从"部件供应商"跨越到"智能体解决方案商"时需要补齐的短板。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>法奥的股东结构经历了从"市场化VC主导"到"国资战略资本领衔"的演进。早期顺为资本（小米系）和高瓴创投的入局为法奥带来了消费电子和智能硬件生态的潜在协同；B轮引入阿里巴巴和美团龙珠，则意味着互联网巨头对物流和本地生活自动化场景的战略性押注——这与创始人姚庭此前在物流机器人领域的资源和经验形成共振。2026年C轮由国寿双碳基金（中国人寿旗下）领投，标志着国家级战略资本的正式入场。"双碳"基金的属性暗示法奥的节能型协作机器人可以被纳入绿色制造的政策框架中，这为其在政企合作、政府采购和产业园区资源获取方面打开了新通道。同时，C轮引入的博原资本（博世旗下）进一步加强了法奥与欧洲工业生态的联系。完成股改意味着IPO已进入实质性准备阶段，资本市场的压力将推动公司在维持高增速的同时更加注重盈利能力的改善。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>法奥的发展路径相对聚焦和顺滑，没有经历剧烈的战略摇摆，这与其创始团队的产业经验和"全栈自研"的技术确定性有关。但仍可识别出几次重要调整：(1) 从"协作机器人普及者"到"人形机器人Tier 1"的战略延伸——2025年之前法奥的品牌叙事主要围绕协作机器人的工业渗透；2026年C轮融资后，人形机器人被明确提升为与协作机器人并列的战略支柱，这既是技术自然延伸（关节模组复用），也是对资本市场的叙事升级。(2) 欧洲市场从"出口"到"本地化自循环"的模式升级——2025年之前法奥在欧洲以经销为主；2026年明确建立了市场→产品→服务→交付的本地化闭环，并锚定年度3,000台出货目标，标志着从"贸易型全球化"向"运营型全球化"的跃迁。(3) 股份制改造的完成和IPO筹备的启动，意味着公司将从"技术/市场驱动"阶段进入"资本市场驱动"阶段，治理结构和管理体系将面临升级压力。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>法奥在中国协作机器人赛道的核心竞争取舍可以概括为"要市场占有率，先要成本控制力"。与优傲（Universal Robots）等国际品牌的高端路线不同，法奥选择通过全栈自研实现极致性价比，快速抢占中低端工业场景的渗透率——这一策略在2025年取得了GGII销量第一的验证。在具身智能浪潮中，法奥做出了与大多数国内友商不同的取舍：不做人形机器人整机，而是定位为Tier 1核心供应商。这意味着法奥可以同时服务多家整机厂商，利用规模化关节模组生产放大成本优势，避免了"高投入整机研发、低概率跑出爆款"的风险。但这一策略的潜在风险在于：如果未来人形机器人行业出现高度集成的"整机一体化"趋势（类似苹果模式），Tier 1供应商的话语权可能被削弱。在协作机器人领域，法奥的11款型号覆盖3-35kg全范围，与节卡、遨博、艾利特等国内对手形成了全产品线正面竞争，能否在规模扩张的同时维持毛利率将是关键考验。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis6">
+        <h4>2.6 其他重要观察</h4>
+        <p>(1) <strong>欧洲市场的战略权重</strong>：法奥在欧洲的布局已远超一般出口模式——49%的海外出货占比、本地化自循环运营体系、博原资本（博世系）的股东协同，使得欧洲不仅是法奥的销售市场，更是其技术品牌升级和产品验证的跳板。但这也意味着法奥对中欧贸易政策波动的敏感性较高。(2) <strong>隐形营收规模</strong>：以年产销破万台、产品均价参考协作机器人行业水平（约10-20万元/台），法奥2025年营收估计在10-20亿元量级，已具备相当的体量。C轮近1亿美元融资侧面印证了其估值可能已在10亿美元（独角兽）级别。(3) <strong>"小巨人"的政策红利</strong>：法奥2025年入选国家级专精特新"小巨人"，叠加国寿双碳基金的战略投资，其在政府采购、智能制造试点项目、地方产业园资源等方面享有显著的政策优势。(4) <strong>焊接赛道的差异化壁垒</strong>：WM系列在焊接行业年出货3,000+台，这一垂直深耕在协作机器人厂商中较为少见，可能成为法奥在特定工业细分领域的护城河。</p>
+      </div>
+
+      <h2 id="references">3 参考资料</h2>
+      <div class="references">
+      <ol>
+        <li><a href="https://api3.cls.cn/share/article/2325935" target="_blank">协作机器人赛道再获重磅融资 法奥机器人C轮斩获近1亿美元 — 财联社</a></li>
+        <li><a href="https://finance.sina.com.cn/wm/2026-03-26/doc-inhsiqks2700081.shtml" target="_blank">法奥完成近1亿美元C轮融资：加快人形机器人赛道布局，已同步完成股改 — 新浪财经</a></li>
+        <li><a href="https://www.163.com/dy/article/KOULEI8L05568W0A.html" target="_blank">码刻｜「法奥机器人」宣布完成近1亿美元C轮融资 老股东源码持续加码 — 源码资本/网易</a></li>
+        <li><a href="https://news.qq.com/rain/a/20260325A024EB00" target="_blank">苏州协作机器人，拿下近1亿美元融资 — 腾讯新闻</a></li>
+        <li><a href="https://nuxt.cyzone.cn/article/828277.html" target="_blank">融资丨法奥完成近1亿美元C轮融资 — 创业邦</a></li>
+        <li><a href="https://www.xhby.net/content/s69c2386de4b09187ac9beb31.html" target="_blank">创投观察站｜国寿双碳基金领投，法奥机器人获C轮融资 — 新华报业</a></li>
+        <li><a href="https://www.donews.com/news/detail/4/6481737.html" target="_blank">法奥机器人完成近1亿美元C轮融资 — DoNews</a></li>
+        <li><a href="https://www.askci.com/news/chanye/20260407/100900277552774085204602_7.shtml" target="_blank">2026年中国协作机器人行业市场前景预测研究报告 — 中商情报网</a></li>
+        <li><a href="https://news.pedaily.cn/202203/487992.shtml" target="_blank">「法奥机器人」宣布完成超5000万美元B轮融资，源码资本领投 — 投资界</a></li>
+        <li><a href="https://www.ebrun.com/20220309/476361.shtml" target="_blank">产业融资快报 | 法奥机器人获超5000万美元B轮融资 — 亿邦动力</a></li>
+        <li><a href="https://finance.eastmoney.com/a/202603263686016661.html" target="_blank">协作机器人赛道再获重磅融资 法奥机器人C轮斩获近1亿美元 — 东方财富</a></li>
+        <li><a href="https://www.skjcsc.com/newsdetail/2026/03/25/37396.html" target="_blank">苏州协作机器人，拿下近1亿美元融资 — 数控机床市场网</a></li>
+        <li><a href="https://finance.sina.com.cn/wm/2026-04-25/doc-inhvsqpm0917225.shtml" target="_blank">锚定欧洲3000台年度出货目标，法奥机器人携全协作方案亮相全球顶尖工业展 — 新浪财经</a></li>
+        <li><a href="http://www.gongkong.com/news/202602/448332.html" target="_blank">锚定智造未来，铸就创新高地丨法奥机器人总部基地奠基仪式圆满举行 — 工控网</a></li>
+        <li><a href="https://www.163.com/dy/article/KRACFM2L0511D0C3.html" target="_blank">汉诺威工业展｜协作机器人应用方案最全厂家 — 网易</a></li>
+        <li><a href="https://i.gasgoo.com/news/70451363.html" target="_blank">Seeds | 法奥机器人完成近1亿美元C轮融资 — 盖世汽车</a></li>
+        <li><a href="https://www.sohu.com/a/1000800720_439726" target="_blank">法奥机器人完成近1亿美元C轮融资，VC/PE阵容豪华 — 搜狐</a></li>
+        <li><a href="http://www.beiduolab.com/business/1537.html" target="_blank">法奥机器人宣布获得超5000万美元B轮融资，由源码资本领投 — 北斗实验室</a></li>
+        <li><a href="http://app.myzaker.com/news/article.php?pk=69c46b2cb15ec0432e060048" target="_blank">法奥机器人完成近1亿美元C轮融资 — ZAKER</a></li>
+        <li><a href="https://m.jrj.com.cn/madapter/biz/2022/03/09120134544003.shtml" target="_blank">融资丨「法奥机器人」完成超5000万美元B轮融资 — 金融界</a></li>
+        <li><a href="https://www.10100.com/article/128859967" target="_blank">锚定欧洲3000台年度出货目标，法奥机器人携全协作方案亮相 — 大数跨境</a></li>
+        <li><a href="https://h5.haxililiang.com/zhuanlan/dushuhui/2026-03-25/38120.html" target="_blank">法奥机器人完成近1亿美元C轮融资 — 哈西力量</a></li>
+      </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">本页面内容基于公开信息整理，数据截止至2026年5月。法奥机器人 — 具身智能Wiki</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

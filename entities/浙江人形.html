@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>浙江人形 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> <span class="breadcrumb-sep">›</span> <span>浙江人形</span></div>
+  <div class="wiki-header"><h1>浙江人形</h1><div class="subtitle">Zhejiang Humanoid Robot Innovation Center · 2023年成立 · 累计融资22亿元 · 宁波</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#team">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financials">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#misc">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#a1">2.1 团队背景与场景匹配</a></li>
+        <li class="toc-lvl4"><a href="#a2">2.2 技术路线与场景适配</a></li>
+        <li class="toc-lvl4"><a href="#a3">2.3 股东/资本结构影响</a></li>
+        <li class="toc-lvl4"><a href="#a4">2.4 试错与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#a5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#a6">2.6 其他观察</a></li>
+        <li class="toc-lvl2"><a href="#refs">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">浙江人形</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">浙江人形机器人创新中心有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">英文</div><div class="ib-value">Zhejiang Humanoid Robot Innovation Center</div></div>
+        <div class="ib-row"><div class="ib-label">成立</div><div class="ib-value">2023年12月21日</div></div>
+        <div class="ib-row"><div class="ib-label">注册地</div><div class="ib-value">宁波市海曙区</div></div>
+        <div class="ib-row"><div class="ib-label">法定代表人</div><div class="ib-value">熊蓉</div></div>
+        <div class="ib-row"><div class="ib-label">官网</div><div class="ib-value">zj-humanoid.com</div></div>
+        <div class="ib-section">财务数据（2024年1-7月）</div>
+        <div class="ib-row"><div class="ib-label">营收</div><div class="ib-value">62.83万元</div></div>
+        <div class="ib-row"><div class="ib-label">净亏损</div><div class="ib-value">930.11万元</div></div>
+        <div class="ib-row"><div class="ib-label">总资产</div><div class="ib-value">3.0亿元</div></div>
+        <div class="ib-row"><div class="ib-label">净资产</div><div class="ib-value">1.13亿元</div></div>
+        <div class="ib-section">估值与融资</div>
+        <div class="ib-row"><div class="ib-label">最新估值</div><div class="ib-value">~18.53亿元（2024.08）</div></div>
+        <div class="ib-row"><div class="ib-label">累计融资</div><div class="ib-value">22亿元</div></div>
+        <div class="ib-row"><div class="ib-label">政府补贴承诺</div><div class="ib-value">9.4亿元（2024-2027）</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">产品品牌</div><div class="ib-value">领航者 NAVIAI</div></div>
+        <div class="ib-row"><div class="ib-label">人员规模</div><div class="ib-value">50-99人</div></div>
+        <div class="ib-row"><div class="ib-label">注册资本</div><div class="ib-value">6,177.14万元</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">赛道</div><div class="ib-value"><span class="tag">人形机器人整机</span><span class="tag">具身智能</span></div></div>
+        <div class="ib-row"><div class="ib-label">路线</div><div class="ib-value"><span class="tag tag-info">工业精准作业</span><span class="tag tag-info">全栈自研</span></div></div>
+      </aside>
+
+      <p class="article-intro"><strong>浙江人形机器人创新中心</strong>（简称"浙江人形"），成立于2023年12月，总部位于宁波市海曙区，由浙江大学熊蓉教授团队与宁波市政府联合共建，中控技术为单一最大股东。公司以<strong>「可泛化的精准作业能力」</strong>为核心护城河，推出「领航者 NAVIAI」系列人形机器人，覆盖双足、轮臂、双臂手等多种形态，率先在华为、吉利、国家电网等头部企业产线实现批量应用，并作为国产人形机器人出海先行者进入BEKO土耳其工厂。累计融资22亿元，是浙江省人形机器人产业的核心标杆企业之一。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper">
+        <table class="wikitable infotable">
+          <tr><th style="width:140px;">项目</th><th>内容</th></tr>
+          <tr><td>公司全称</td><td>浙江人形机器人创新中心有限公司</td></tr>
+          <tr><td>英文名称</td><td>Zhejiang Humanoid Robot Innovation Center</td></tr>
+          <tr><td>简称</td><td>浙江人形</td></tr>
+          <tr><td>成立时间</td><td>2023年12月21日</td></tr>
+          <tr><td>注册地址</td><td>浙江省宁波市海曙区甬水桥科创中心1号C区4楼402室</td></tr>
+          <tr><td>法定代表人</td><td>熊蓉</td></tr>
+          <tr><td>注册资本</td><td>6,177.14万元人民币</td></tr>
+          <tr><td>所属行业</td><td>计算机、通信和其他电子设备制造业</td></tr>
+          <tr><td>人员规模</td><td>50-99人</td></tr>
+          <tr><td>上市状态</td><td>未上市</td></tr>
+          <tr><td>官方网站</td><td>zj-humanoid.com</td></tr>
+          <tr><td>统一社会信用代码</td><td>91330203MAD8YHJ198</td></tr>
+        </table>
+      </div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>时间</th><th>事件</th></tr>
+          <tr><td>2023年12月</td><td>浙江人形机器人创新中心有限公司在宁波海曙正式注册成立，熊蓉教授团队与宁波市政府联合共建</td></tr>
+          <tr><td>2024年2月</td><td>中控技术、宁波云熠以1元/股平价增资入股，中控技术持股44.4%成为单一最大股东</td></tr>
+          <tr><td>2024年3月</td><td>在宁波海曙区甬水桥科创中心正式启动运营，发布首款全域自研人形机器人整机「领航者1号」</td></tr>
+          <tr><td>2024年7月</td><td>甬元财新（宁波财政局）、海曙产投等入局，增资价12.5元/股，投后估值约5.17亿元</td></tr>
+          <tr><td>2024年8月</td><td>发布首个具有精确技能作业能力的人形机器人「领航者2号 NAVIAI」；完成新一轮增资，中控技术出资2.86亿元领投，浙创投、联想创投、冯源资本、方广资本等跟投，投后估值约18.53亿元</td></tr>
+          <tr><td>2025年</td><td>获第十届"创客中国"全国总决赛创业组唯一一等奖；在2025国际人形机器人技能大赛中获商用场景冠军</td></tr>
+          <tr><td>2025年</td><td>在全球率先实现人形机器人在真实工厂的批量应用，客户覆盖华为、吉利、国家电网、BEKO等</td></tr>
+          <tr><td>2026年1月</td><td>完成4.5亿元Pre-A轮融资，引入招商创科等新股东，一年半累计筹资22亿元</td></tr>
+          <tr><td>2026年3月</td><td>正式发布NAVIAI硬件体系（双臂手U系列、轮臂WA系列、双足I系列），核心零部件国产化率达91%</td></tr>
+          <tr><td>2026年4月</td><td>携手凯傲集团（KION）亮相德国LogiMAT 2026展会，NAVIAI-WA2连续三天零故障运行</td></tr>
+        </table>
+      </div>
+
+      <h3 id="team">1.2 创始人及核心团队</h3>
+      <p>浙江人形由<strong>浙江大学熊蓉教授</strong>领衔创立，核心团队源自浙江大学智能系统与控制研究所机器人实验室，拥有25年AI机器人技术沉淀，发表高水平论文近200篇，授权发明专利60余项。团队博士占比35%，硕士占比31%，整体呈现典型的<strong>学术派+产业派混合型</strong>人才结构。中控技术实控人褚健作为熊蓉在浙大时期的"伯乐"（原工业控制技术国家重点实验室主任），在资本与产业资源层面深度赋能。</p>
+
+      <div class="table-wrapper">
+        <table class="wikitable infotable">
+          <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+          <tr><td>首席科学家/法定代表人</td><td>熊蓉</td><td>浙江大学控制科学与工程学院教授、博士生导师，浙大智能系统与控制研究所机器人实验室主任。科技部重点专项智能机器人专家组成员。曾获2013年浙江省科学技术奖一等奖、2017年全国五一巾帼奖章。拥有25年机器人技术研究经验，2016年创办AMR公司迦智科技</td></tr>
+          <tr><td>董事长</td><td>陈克温</td><td>企业运营管理负责人</td></tr>
+          <tr><td>财务负责人</td><td>林剑勇</td><td>负责公司财务管理</td></tr>
+          <tr><td>监事</td><td>赵晶</td><td>公司监事</td></tr>
+          <tr><td>关键赋能方</td><td>褚健</td><td>中控技术实控人，原浙江大学工业控制技术国家重点实验室主任，熊蓉在浙大时期的导师。通过中控技术持股38.85%成为浙江人形单一最大股东，在流程工业场景资源上深度绑定</td></tr>
+        </table>
+      </div>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+
+      <h4>融资历史</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>轮次</th><th>时间</th><th>金额/估值</th><th>主要投资方</th></tr>
+          <tr><td>创立</td><td>2023.12</td><td>—</td><td>熊蓉团队 + 宁波市政府 + 产业伙伴</td></tr>
+          <tr><td>第一轮增资</td><td>2024.02</td><td>1元/股（平价）</td><td>中控技术、宁波云熠</td></tr>
+          <tr><td>第二轮增资</td><td>2024.07</td><td>12.5元/股，投后约5.17亿元</td><td>甬元财新（宁波财政局）、海曙产投、迦智科技等</td></tr>
+          <tr><td>第三轮增资</td><td>2024.08</td><td>投后约18.53亿元</td><td>中控技术（2.86亿元领投）、浙创投（1亿元）、联想创投、冯源资本、方广资本</td></tr>
+          <tr><td>Pre-A轮</td><td>2026.01</td><td>4.5亿元，累计22亿元</td><td>招商创科、宁波金控、越秀产业基金、宁波人才集团、海发控股等</td></tr>
+        </table>
+      </div>
+
+      <h4>主要股东结构</h4>
+      <div class="table-wrapper">
+        <table class="wikitable infotable">
+          <tr><th>股东类型</th><th>股东</th><th>背景</th></tr>
+          <tr><td>产业资本</td><td>中控技术（38.85%）</td><td>流程工业控制龙头，单一最大股东</td></tr>
+          <tr><td>核心技术团队</td><td>宁波领跑者/领智者/领行者（合计约45.98%）</td><td>熊蓉团队持股平台，实际控制方</td></tr>
+          <tr><td>产业资本</td><td>招商创科</td><td>招商局集团战略性新兴产业投资平台</td></tr>
+          <tr><td>产业资本</td><td>联想创投</td><td>联想集团旗下基金</td></tr>
+          <tr><td>产业资本</td><td>冯源资本</td><td>韦尔股份董事长虞仁荣创办的半导体产业基金</td></tr>
+          <tr><td>省级国资</td><td>浙江省创业投资集团（浙创投，约5.4%）</td><td>浙江省级国有投资平台</td></tr>
+          <tr><td>市区级国资</td><td>宁波金控、海发控股、甬元财新</td><td>宁波市属及海曙区属国有投资平台</td></tr>
+          <tr><td>国资背景基金</td><td>越秀产业基金</td><td>越秀资本旗下</td></tr>
+          <tr><td>市场化基金</td><td>方广资本</td><td>含国家中小企业发展基金出资</td></tr>
+        </table>
+      </div>
+      <p>宁波市及海曙区两级政府承诺2024-2027年分批提供专项补贴共计<strong>9.4亿元</strong>（截至2024年7月已到账1.7亿元）。公司目前未上市，尚无公开IPO计划披露。</p>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <div class="table-wrapper">
+        <table class="wikitable infotable">
+          <tr><th>技术维度</th><th>具体方案</th></tr>
+          <tr><td>AI架构</td><td>「VLM + VLA + VLN」三位一体大脑模型体系，覆盖交互（视觉语言模型）、操作（视觉语言动作模型）与导航（视觉语言导航）</td></tr>
+          <tr><td>数据方案</td><td>Real2Sim2Real数据闭环：场景采集→仿真训练→真实部署，实现快速泛化；知识驱动的视-触融合感控模型</td></tr>
+          <tr><td>感知方案</td><td>纯视觉融合 + 双目深度感知；微秒级多传感器硬件同步</td></tr>
+          <tr><td>控制方案</td><td>自研高性能一体化关节控制算法；双臂协同控制同步延迟&lt;1ms；1000-4000Hz高频响应EtherCAT通信</td></tr>
+          <tr><td>全栈/专用路线</td><td>全栈自研（硬件+软件+算法），核心零部件国产化率91%，零部件"甬产率"42%</td></tr>
+          <tr><td>差异化特色</td><td>以「可泛化的精准作业」为核心竞争力，末端重复定位精度达±0.02mm；从工业"炼钢厂"向家庭"试金石"平滑迁移；"黑白箱"融合智能算法</td></tr>
+          <tr><td>计算平台</td><td>BC-275（275 TOPS）和BC-2070（2070 TFLOPS，搭载NVIDIA Jetson Thor，符合ISO 26262车规标准）</td></tr>
+        </table>
+      </div>
+      <p>浙江人形的技术路线核心思路是<strong>"场景驱动、精度制胜、软硬融合"</strong>。以工业产线的高精度、高可靠性要求为起点验证技术（轴孔装配容差&lt;0.1mm），逐步向商业服务和家庭场景迁移。公司强调"系列化、高性能、低成本、国产化"四大支柱，成本较同类竞品降低30%以上。在软件层面，通过Real2Sim2Real数据闭环加速技能泛化，使得机器人可在新场景中快速适配。</p>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <p>浙江人形旗下产品统一归属「领航者 NAVIAI」品牌，2026年3月正式发布完整硬件体系，涵盖双臂手作业、轮臂人形、双足人形三大系列，以及配套核心零部件。</p>
+
+      <h4>整机产品</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>系列</th><th>型号</th><th>形态</th><th>核心参数</th><th>主要场景</th></tr>
+          <tr><td>双臂手作业</td><td>NAVIAI-U</td><td>固定式双臂</td><td>28-31 DOF；单臂提拉22kg；末端精度±0.02mm；支持7×24h持续作业</td><td>工业流水线、教育实训、商业服务</td></tr>
+          <tr><td>轮臂人形</td><td>NAVIAI-WA1</td><td>轮式+双臂</td><td>移动速度6km/h；导航精度≤3cm/1.5°；臂手腰协同延迟&lt;1ms</td><td>巡检、物流、零售</td></tr>
+          <tr><td>轮臂人形</td><td>NAVIAI-WA2</td><td>轮式+双臂</td><td>8DOF仿人臂；末端精度±0.02mm；续航6h；充电~2h；爬坡12°</td><td>高端制造、化工实验室、物流仓储</td></tr>
+          <tr><td>双足人形</td><td>NAVIAI-I2</td><td>全尺寸双足</td><td>41 DOF；最大步速7.2km/h；自重60kg；轻量化材料</td><td>教育科研、导览、舞台演示</td></tr>
+          <tr><td>双足人形</td><td>NAVIAI-I3</td><td>全尺寸双足</td><td>身高180cm；最大步速9km/h；负重25kg；关节扭矩360N·m；腰部3DOF</td><td>安防巡检、前沿科研、户外作业</td></tr>
+        </table>
+      </div>
+
+      <h4>核心零部件</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>类别</th><th>型号</th><th>关键参数</th></tr>
+          <tr><td>灵巧手</td><td>F5D6-L / F5D6-P</td><td>5指6DOF；自重400g（业内最轻之一）；指尖力6-10N；五指指尖力传感器；开合寿命30万次；CAN总线+完整SDK</td></tr>
+          <tr><td>仿人臂</td><td>AH2-74 / AH3-84</td><td>7-8 DOF；工作半径652.5mm；自重6.4kg；负载自重比0.63；重复定位精度±0.02mm</td></tr>
+          <tr><td>谐波关节</td><td>JH系列</td><td>扭矩3.3-220N·m；JH-B14-81-E转矩密度约66N·m/kg；JH-D11-101-E自重仅315g（腕部专用）</td></tr>
+          <tr><td>行星关节</td><td>JP系列</td><td>扭矩7.5-150N·m；JP-B105-12-E最大转矩216N·m，转矩密度约73N·m/kg</td></tr>
+          <tr><td>智能控制器</td><td>BC-275</td><td>AI算力275 TOPS；控制频率1000Hz；双路EtherCAT冗余</td></tr>
+          <tr><td>智能控制器</td><td>BC-2070</td><td>AI算力2070 TFLOPS（FP4稀疏）；NVIDIA Jetson Thor；控制频率4000Hz；ISO 26262车规标准；HSM硬件安全模块</td></tr>
+        </table>
+      </div>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>场景分类</th><th>子场景</th><th>合作方/客户</th><th>落地情况</th></tr>
+          <tr><td>工业制造</td><td>汽车装配（前桥多部件精密装配）</td><td>吉利（全球最大汽车主机制造商）</td><td>产线批量应用，装配成功率超99.99%</td></tr>
+          <tr><td>工业制造</td><td>ICT产品精密装配（轴孔装配容差&lt;0.1mm）</td><td>华为</td><td>产线批量应用</td></tr>
+          <tr><td>工业制造</td><td>流程工业生产操作</td><td>中控技术</td><td>股权+业务双联动</td></tr>
+          <tr><td>工业制造</td><td>家电产品质检</td><td>BEKO（土耳其工厂）</td><td>国产人形机器人海外工厂落地先行者</td></tr>
+          <tr><td>工业制造</td><td>柔性布料分片</td><td>全球顶尖纺织设备企业</td><td>精细操作验证</td></tr>
+          <tr><td>物流仓储</td><td>智能仓储调度、物料搬运、分拣</td><td>凯傲集团（KION，德国）</td><td>LogiMAT 2026展会，连续三天零故障；NAVIAI-WA2抓取成功率99%</td></tr>
+          <tr><td>能源电力</td><td>配电室人机协同巡检</td><td>国家级电网</td><td>已落地</td></tr>
+          <tr><td>商业零售</td><td>智慧零售胶囊仓</td><td>华侨城文旅科技</td><td>引流率33%，交易转化率15%，坪效较传统售货机提升2-3倍</td></tr>
+          <tr><td>家庭服务</td><td>家庭厨房（COOK机器人总厨）</td><td>方太</td><td>AWE展会完成22步骤中餐全流程自主作业</td></tr>
+          <tr><td>康养服务</td><td>喂饭辅助</td><td>深圳全资子公司</td><td>打通"抓取餐具-舀取食物-平稳递送"完整动作链</td></tr>
+          <tr><td>科研教育</td><td>实验室、教学平台</td><td>多个科研院校</td><td>产品在售</td></tr>
+          <tr><td>石油化工</td><td>实验室及商场智能场景</td><td>头部石油、日化企业</td><td>探索阶段</td></tr>
+        </table>
+      </div>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <p>浙江人形是全球率先在真实工厂实现人形机器人批量应用的团队之一，已在华为、吉利等头部企业产线开展规模化验证。公司与德国凯傲集团签署战略合作，成为其唯一人形机器人技术合作伙伴，在LogiMAT 2026展会上实现NAVIAI-WA2连续三天零故障运行，同种料箱抓放成功率99%（综合97%）。2026年3月发布的"NAVIAI零售胶囊仓"以华侨城为合作方，坪效较传统售货机提升2-3倍。</p>
+      <p>在国际化方面，已进驻BEKO土耳其工厂，NAVIAI关键部件通过CE认证。公司牵头成立浙江省人形机器人产业技术联盟、全国具身智能行业产教融合共同体，参与首个智能控制系统国家标准制定（联合41家单位）。但在出货量层面，公司未公开披露具体整机出货台数，2024年前7月营收仅62.83万元，商业化仍处于早期放量阶段。</p>
+      <div class="callout">
+        <div class="callout-title">商业化亮点</div>
+        <ul>
+          <li>2025国际人形机器人技能大赛商用场景冠军，单次抓取12秒/次，100%准确率</li>
+          <li>第十届"创客中国"全国总决赛创业组唯一一等奖</li>
+          <li>核心零部件国产化率91%，成本较竞品低30%以上</li>
+          <li>零部件"甬产率"42%，与敏实集团、中大力德、舜宇光学等宁波本土企业深度合作</li>
+        </ul>
+      </div>
+
+      <h3 id="financials">1.8 财务数据</h3>
+      <p>浙江人形目前为非上市公司，公开财务数据仅披露至2024年1-7月（源自中控技术2024年8月增资公告中的评估报告）。2025年及以后的单体财务数据未单独公开披露。</p>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>指标</th><th>2024年1-7月</th><th>备注</th></tr>
+          <tr><td>营业收入</td><td>62.83万元</td><td>商业化仍处于极早期</td></tr>
+          <tr><td>净亏损</td><td>-930.11万元</td><td>主要由研发投入和人员成本导致</td></tr>
+          <tr><td>总资产（账面）</td><td>3.0亿元</td><td>—</td></tr>
+          <tr><td>总负债</td><td>1.91亿元</td><td>—</td></tr>
+          <tr><td>净资产</td><td>1.13亿元</td><td>—</td></tr>
+          <tr><td>评估后全部权益价值</td><td>10.15亿元</td><td>评估基准日2024年7月31日</td></tr>
+          <tr><td>政府补贴（2024-2027承诺）</td><td>9.4亿元</td><td>截至2024年7月已到账1.7亿元</td></tr>
+          <tr><td>累计融资</td><td>22亿元</td><td>截至2026年1月</td></tr>
+        </table>
+      </div>
+      <p>关联方中控技术2025年上半年机器人业务整体收入约1.1亿元（含巡检、协作、物流及人形机器人四类），新签订单2亿元，但此为中控技术自身机器人业务口径，非浙江人形单体数据。</p>
+
+      <h3 id="misc">1.9 其他信息</h3>
+      <ul>
+        <li>浙江人形是浙江省"人形机器人产业创新发展实施方案（2024-2027年）"重点支持企业，全省目标到2027年整机年产2万台、核心产业规模200亿元</li>
+        <li>公司牵头成立浙江省人形机器人产业技术联盟，联合41家单位参与首个智能控制系统国家标准制定</li>
+        <li>首席科学家熊蓉同时创办了AMR企业迦智科技（2016年成立），迦智科技也为浙江人形股东之一</li>
+        <li>中控技术董事长崔山公开表示：将持续赋能浙江人形，共促人形机器人在工业场景的规模化、平台化应用</li>
+        <li>招商创科总经理邓伟栋表示：长期看好具身智能作为战略性新兴产业，将联动招商局集团产业资源</li>
+        <li>公司核心理念："系列化、高性能、低成本、国产化"四大支柱</li>
+        <li>已在深圳设立全资子公司，布局康养服务场景</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="a1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>熊蓉教授团队来自浙江大学智能系统与控制研究所，25年深耕机器人运动控制、环境感知与智能操作领域，其学术积累直接决定了浙江人形选择"工业精准作业"作为核心场景的逻辑——这不是追逐热点的投机，而是技术禀赋的自然延伸。熊蓉2016年创办的迦智科技已在AMR（自主移动机器人）领域验证了物流场景的产业化能力，如今升级到人形机器人，本质上是将已有的工业客户关系和技术积累从"移动"升级到"移动+操作"。褚健（中控技术实控人）作为熊蓉的前导师，为团队提供了流程工业场景的天然入口——中控技术在化工、石化等行业拥有数万家客户，这意味着浙江人形不需要从零开拓工业市场。团队的高学术密度（博士35%、硕士31%）保证了前沿技术攻关能力，但可能面临从实验室到产线工程化的组织文化挑战。</p>
+      </div>
+
+      <div class="analysis-block" id="a2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>浙江人形的"工业先行"技术路线在人形机器人赛道中独树一帜。多数人形机器人公司选择从科研教育或消费展示切入（门槛低、反馈快），而浙江人形直接挑战工业产线的高精度、高可靠性场景——这需要末端重复定位精度±0.02mm、双臂协同延迟&lt;1ms等硬指标，技术门槛极高但也构建了难以复制的壁垒。其"VLM+VLA+VLN"三位一体大脑架构覆盖了从视觉感知到动作执行再到自主导航的完整链路，与工业场景的多工序、多工位作业需求高度匹配。Real2Sim2Real数据闭环对于工业场景尤为关键——真实产线数据难以大规模获取，仿真训练可以低成本生成海量训练样本。风险在于：工业场景对可靠性要求极端苛刻（装配成功率需&gt;99.99%），一旦在实际产线中出现系统性故障，客户的信任成本极高。</p>
+      </div>
+
+      <div class="analysis-block" id="a3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>浙江人形的股东结构是"产业资本+省市区三级国资+市场化基金"的经典组合。中控技术作为单一最大股东（38.85%）是最关键的变量——它不仅是财务投资者，更是场景提供方和产业背书。通过中控，浙江人形可以进入流程工业（化工、石化、电力）的数万家客户现场，这是其他纯财务投资驱动的人形公司难以获取的资源。招商创科的入局则打开了招商局集团港口、物流、地产等多元化场景的可能性。省市国资（浙创投、宁波金控、海曙产投）提供的不只是资金，更有9.4亿元专项补贴和宁波本地的产业配套（敏实集团、中大力德、舜宇光学）。不过，国资主导的资本结构可能在决策效率、商业灵活性方面存在一定制约，且核心团队通过持股平台合计约45.98%的控制权，保证了创始团队的战略主导权。</p>
+      </div>
+
+      <div class="analysis-block" id="a4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>浙江人形成立仅两年多，已经历了较为清晰的场景聚焦过程。最初发布的"领航者1号"定位为通用型双足人形机器人，但很快在2024年8月的"领航者2号NAVIAI"中转向强调"精确技能作业能力"，并同时布局了双足、轮臂、双臂手三种形态——这表明团队认识到"通用人形"在当前阶段难以产生实际商业价值，转而以具体作业能力为核心卖点。2026年的硬件体系发布进一步明确了"工业优先级"路线。从客户阵容的变化也能看出这一调整的成效：从最初的科研教育场景，逐步扩展到华为、吉利等工业头部客户。与方太合作家庭厨房COOK则是从工业向家庭的策略性延伸探索，路线清晰但节奏审慎。</p>
+      </div>
+
+      <div class="analysis-block" id="a5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>浙江人形在人形机器人行业中的定位可以概括为"工业精准作业的iPhone路线"——不走通用大模型驱动的通用机器人（如Figure AI），也不走低成本消费级四足（如宇树科技早期路线），而是聚焦高精度、高可靠性的工业操作场景，以硬件精度和全栈自研能力构建壁垒。这与北京人形机器人创新中心（走通用平台路线）、智元机器人（走"大脑"模型+生态伙伴本体路线）形成差异化。其核心取舍在于：主动放弃消费级和科研教育的大规模出货量（这些市场门槛低但竞争激烈），选择工业产线的高壁垒、长周期、强粘性市场。如果工业人形机器人的PMF（产品市场匹配）被验证，浙江人形凭借先发优势和客户锁定效应将占据有利位置；但如果工业场景短期内无法规模化，其高研发投入和低营收的财务结构将面临压力。</p>
+      </div>
+
+      <div class="analysis-block" id="a6">
+        <h4>2.6 其他重要观察</h4>
+        <p>几点值得关注的信号：第一，浙江人形2026年加速了品牌建设和生态布局——NAVIAI硬件体系发布会、LogiMAT国际首秀、零售胶囊仓发布密集推进，表明公司正从"技术验证"阶段转向"市场推广"阶段。第二，凯傲集团（年收入113亿欧元的德国物流巨头）选择浙江人形作为"唯一人形机器人技术合作伙伴"，这是对其技术成熟度的重要背书。第三，公司尚未披露IPO计划，但累计22亿元融资+9.4亿元政府补贴提供了充足资金缓冲，短期内不需要为生存担忧。第四，需要关注的核心风险是营收转化速度——2024年前7月仅62.83万元收入，如果到2026年底仍无显著的商业化收入增长，可能引发市场对其商业模式的质疑。第五，深圳子公司的设立（聚焦康养）和与方太的合作（家庭厨房）表明公司正在为工业之外的第二增长曲线布局。</p>
+      </div>
+
+      <h2 id="refs">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://www.jiemian.com/article/11588423.html" target="_blank">界面新闻：成立8个月估值18亿，中控技术入股的这家人形机器人公司有何玄机？（2024.08）</a></li>
+          <li><a href="https://www.leaderobot.com/news/7116" target="_blank">Leaderobot：22亿元资本集结！浙江人形再获4.5亿元Pre-A轮融资（2026.01）</a></li>
+          <li><a href="http://www.jjckb.cn/20260123/db7e1207902344a0800570141d46eeb2/c.html" target="_blank">经济参考报：浙江人形机器人创新中心获4.5亿元Pre-A轮融资（2026.01）</a></li>
+          <li><a href="https://www.haishu.gov.cn/col/col1229101148/art/2026/art_429afb5701cc40f98648cf6b311b1935.html" target="_blank">宁波海曙区政府：22亿元！浙江人形再获4.5亿元Pre-A轮融资（2026.01）</a></li>
+          <li><a href="http://news.cnnb.com.cn/system/2026/01/26/030739034.shtml" target="_blank">中国宁波网：完成4.5亿元融资！甬产人形机器人再次"出圈"（2026.01）</a></li>
+          <li><a href="https://zjnews.zjol.com.cn/202601/t20260126_31473094.shtml" target="_blank">浙江在线：完成4.5亿元融资！甬产人形机器人再次"出圈"（2026.01）</a></li>
+          <li><a href="https://www.ningbo.gov.cn/art/2026/1/26/art_1229099769_59514402.html" target="_blank">宁波市政府：甬产人形机器人再次"出圈"（2026.01）</a></li>
+          <li><a href="https://www.iyiou.com/news/202601231120463" target="_blank">亿欧：融资4.5亿！浙江人形以"可泛化精准作业"破局（2026.01）</a></li>
+          <li><a href="https://vr.zhidx.com/p/530383.html" target="_blank">智东西：4.5亿元！浙大教授造机器人，多家国资集体押注（2026.01）</a></li>
+          <li><a href="http://www.cima.org.cn/nnews.asp?vid=46779" target="_blank">中国仪器仪表行业协会：中控技术投资入股的浙江人形再获4.5亿元Pre-A轮融资（2026.01）</a></li>
+          <li><a href="http://cnews.chinadaily.com.cn/a/202603/31/WS69cb8285a310942cc49a5d94.html" target="_blank">中国日报：NAVIAI硬件体系重磅发布，以可泛化高精准夯实具身智能底座（2026.03）</a></li>
+          <li><a href="https://m.jiemian.com/article/14188280.html" target="_blank">界面新闻：全栈自研，领航应用：NAVIAI人形机器人硬件体系重磅发布（2026.03）</a></li>
+          <li><a href="https://www.pingwest.com/a/312587" target="_blank">品玩：浙江人形NAVIAI：以可泛化高精准定义新一代机器人（2026.03）</a></li>
+          <li><a href="http://www.chinahightech.com/chuangye/2026-03/31/content_495672.html" target="_blank">中国高新网：浙江人形机器人创新中心正式发布"NAVIAI零售胶囊仓"（2026.03）</a></li>
+          <li><a href="https://www.cinn.cn/hz/2026/04-22/vrGlByeD.html" target="_blank">中国工业新闻网：NAVIAI人形机器人亮相国际顶会LogiMAT，携手凯傲集团（2026.04）</a></li>
+          <li><a href="https://www.pingwest.com/a/313122" target="_blank">品玩：具身智能落地物流领域，浙江人形携手凯傲集团亮相顶会LogiMAT（2026.04）</a></li>
+          <li><a href="https://www.haishu.gov.cn/col/col1229100536/art/2026/art_74a873616eb84177878755e8891398b4.html" target="_blank">宁波海曙区政府：浙江人形携手凯傲，"国际首秀"惊艳LogiMAT（2026.04）</a></li>
+          <li><a href="https://m.jiemian.com/article/14133896.html" target="_blank">界面新闻：浙江人形NAVIAI实现可泛化高精准作业，联合方太拓局全场景家庭服务（2026）</a></li>
+          <li><a href="https://m.qixin.com/company/b7fa552e-7624-44d2-99d9-cddea423fb0d" target="_blank">启信宝：浙江人形机器人创新中心有限公司工商信息</a></li>
+          <li><a href="https://www.baike.com/wikiid/7508683690563698723" target="_blank">快懂百科：浙江人形机器人创新中心</a></li>
+          <li><a href="http://www.zqrb.cn/gscy/ggkx/2025-10-20/A1760948802986.html" target="_blank">证券日报：中控技术2025年上半年机器人业务已实现收入1.1亿元（2025.10）</a></li>
+          <li><a href="https://auto.gasgoo.com/news/202601/23I70444023C601.shtml" target="_blank">盖世汽车：浙大教授带队，这家人形机器人公司刚拿下4.5亿融资（2026.01）</a></li>
+          <li><a href="https://www.lejucaijing.com/news-7420274053279839891.html" target="_blank">乐居财经：浙大女教授造机器人、多家国资集体押注（2026.01）</a></li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">本页面最后更新于2026年5月4日 · 数据来源截至各参考链接标注日期 · 具身智能Wiki</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

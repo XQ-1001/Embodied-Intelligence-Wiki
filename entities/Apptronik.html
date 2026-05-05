@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>Apptronik — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> <span class="breadcrumb-sep">›</span> <span>Apptronik</span></div>
+  <div class="wiki-header"><h1>Apptronik</h1><div class="subtitle">美国 · 2016年创立 · UT Austin人机交互实验室孵化 · 通用人形机器人Apollo · 估值超55亿美元 · 累计融资约10亿美元</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#founders">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#finance">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#analysis1">2.1 团队背景与场景选择的匹配度</a></li>
+        <li class="toc-lvl4"><a href="#analysis2">2.2 技术路线与场景的适配性</a></li>
+        <li class="toc-lvl4"><a href="#analysis3">2.3 股东/资本结构对战略的影响</a></li>
+        <li class="toc-lvl4"><a href="#analysis4">2.4 试错过程与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#analysis5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#analysis6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#refs">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+
+      <aside class="infobox">
+        <div class="infobox-title">Apptronik</div>
+        <div class="ib-row"><div class="ib-label">英文名称</div><div class="ib-value">Apptronik, Inc.</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2016年</div></div>
+        <div class="ib-row"><div class="ib-label">创始人/CEO</div><div class="ib-value">Jeff Cardenas</div></div>
+        <div class="ib-row"><div class="ib-label">首席科学家</div><div class="ib-value">Dr. Luis Sentis</div></div>
+        <div class="ib-row"><div class="ib-label">总部</div><div class="ib-value">美国德克萨斯州奥斯汀</div></div>
+        <div class="ib-row"><div class="ib-label">员工人数</div><div class="ib-value">约300人（2026年）</div></div>
+        <div class="ib-row"><div class="ib-label">上市状态</div><div class="ib-value">未上市</div></div>
+        <div class="ib-section">估值/融资</div>
+        <div class="ib-row"><div class="ib-label">最新估值</div><div class="ib-value">约55亿美元（2026.2）</div></div>
+        <div class="ib-row"><div class="ib-label">累计融资</div><div class="ib-value">约10亿美元</div></div>
+        <div class="ib-row"><div class="ib-label">Series A总计</div><div class="ib-value">超9.35亿美元</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">旗舰产品</div><div class="ib-value">Apollo通用人形机器人</div></div>
+        <div class="ib-row"><div class="ib-label">Apollo高度</div><div class="ib-value">173 cm (5'8")</div></div>
+        <div class="ib-row"><div class="ib-label">Apollo重量</div><div class="ib-value">73 kg (160 lbs)</div></div>
+        <div class="ib-row"><div class="ib-label">Apollo负载</div><div class="ib-value">25 kg (55 lbs)</div></div>
+        <div class="ib-row"><div class="ib-label">自由度</div><div class="ib-value">44+ DOF</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">行业</div><div class="ib-value"><span class="tag tag-info">人形机器人</span><span class="tag tag-info">通用具身智能</span><span class="tag tag-info">AI+硬件</span></div></div>
+        <div class="ib-row"><div class="ib-label">官网</div><div class="ib-value"><a href="https://apptronik.com/" target="_blank">apptronik.com</a></div></div>
+      </aside>
+
+      <p class="article-intro"><strong>Apptronik</strong>是一家美国通用人形机器人公司，2016年从德克萨斯大学奥斯汀分校（UT Austin）人类中心机器人实验室（HCRL）分拆成立，总部位于德克萨斯州奥斯汀。公司以旗舰产品<strong>Apollo</strong>通用人形机器人闻名，累计融资约10亿美元，2026年2月估值超55亿美元。Apptronik的核心技术源自NASA Valkyrie人形机器人项目（DARPA机器人挑战赛），拥有10年以上的关节执行器、全身控制和动态行走研发积累。公司已与Google DeepMind、Mercedes-Benz、GXO Logistics、Jabil等建立战略合作伙伴关系。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper"><table class="wikitable infotable">
+        <tr><th>项目</th><th>内容</th></tr>
+        <tr><td>公司全称</td><td>Apptronik, Inc.</td></tr>
+        <tr><td>成立时间</td><td>2016年</td></tr>
+        <tr><td>注册地</td><td>美国德克萨斯州奥斯汀（Austin, Texas）</td></tr>
+        <tr><td>上市状态</td><td>未上市</td></tr>
+        <tr><td>创始人/CEO</td><td>Jeff Cardenas</td></tr>
+        <tr><td>首席科学家</td><td>Dr. Luis Sentis（UT Austin HCRL实验室主任）</td></tr>
+        <tr><td>官网</td><td>https://apptronik.com/</td></tr>
+        <tr><td>员工人数</td><td>约300人（2026年，年同比翻倍）</td></tr>
+        <tr><td>业务模式</td><td>Robotics-as-a-Service (RaaS)，硬件+软件+服务订阅</td></tr>
+      </table></div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>时间</th><th>事件</th></tr>
+        <tr><td>2012–2013年</td><td>UT Austin HCRL团队参与NASA-DARPA机器人挑战赛，为Valkyrie人形机器人设计串联弹性执行器（SEA）和控制器</td></tr>
+        <tr><td>2013年</td><td>Jeff Cardenas及团队因Valkyrie设计获NASA精英团队奖（NASA Elite Team Award）</td></tr>
+        <tr><td>2016年</td><td>Apptronik正式从UT Austin HCRL分拆成立，核心团队包括Valkyrie项目的核心成员</td></tr>
+        <tr><td>2016–2022年</td><td>与NASA合作开发Valkyrie 2；为USSOCOM开发外骨骼系统；内部迭代开发Astra（上半身人形）和Draco（双足动态行走平台）</td></tr>
+        <tr><td>2022年</td><td>与NASA签署商业化合作协议，为Apollo的太空应用奠定基础</td></tr>
+        <tr><td>2023年8月</td><td>正式发布旗舰通用人形机器人Apollo</td></tr>
+        <tr><td>2025年2月</td><td>完成3.5亿美元(后扩大至4.15亿)初始Series A融资，Google DeepMind参投</td></tr>
+        <tr><td>2026年2月</td><td>完成5.2亿美元Series A-X扩展轮，估值超55亿美元；投资方包括Google、Mercedes-Benz、B Capital、AT&T Ventures、John Deere、QIA</td></tr>
+        <tr><td>2026年（计划）</td><td>计划发布新一代Apollo机型；在Austin建立机器人训练数据中心，在California设立新办公室</td></tr>
+      </table></div>
+
+      <h3 id="founders">1.2 创始人及核心团队</h3>
+      <p>Apptronik的创始团队源于<strong>UT Austin人类中心机器人实验室（HCRL）</strong>，该实验室由Dr. Luis Sentis领导，在人形机器人动态行走、全身力控、串联弹性执行器等领域居世界前沿。CEO <strong>Jeff Cardenas</strong>拥有UT Austin商业学士和技术商业化硕士学位，曾在Deloitte咨询技术部门工作，并创办过多家初创公司和非营利组织，兼具商业化和技术背景。</p>
+      <p>团队人才结构属于<strong>学术深度+产业转化型</strong>：核心技术团队拥有10年以上人形机器人专用研发经验（从Valkyrie项目延续至今），这在全球人形机器人创业公司中独一无二。2026年公司约300人，年同比翻倍，计划继续扩招200+人。</p>
+
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+        <tr><td>联合创始人/CEO</td><td>Jeff Cardenas</td><td>UT Austin商业学士+技术商业化硕士；前Deloitte咨询技术实践；IC²研究所全球商业化团队成员；多次创业者；获NASA精英团队奖</td></tr>
+        <tr><td>联合创始人/首席科学家</td><td>Dr. Luis Sentis</td><td>UT Austin航空航天工程系教授，HCRL实验室主任；Stanford博士后（师从Oussama Khatib）；人形机器人全身控制、动态行走、力控执行器领域权威</td></tr>
+        <tr><td>联合创始人/CTO</td><td>Nick Paine</td><td>UT Austin HCRL出身；Valkyrie项目核心工程师；主导Apollo执行器系统的多代迭代开发</td></tr>
+      </table></div>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>轮次</th><th>时间</th><th>金额</th><th>估值</th><th>领投/主要投资方</th></tr>
+        <tr><td>历史轮次（累计）</td><td>2016–2024</td><td>约6,500万美元</td><td>—</td><td>Capital Factory等早期支持方</td></tr>
+        <tr><td>Series A初始轮</td><td>2025年2月</td><td>3.5–4.15亿美元</td><td>约20亿美元</td><td>B Capital、Capital Factory联合领投；Google参投</td></tr>
+        <tr><td>Series A-X扩展轮</td><td>2026年2月</td><td>5.2亿美元</td><td>超55亿美元</td><td>B Capital、Google联合领投；Mercedes-Benz、QIA、AT&T Ventures、John Deere、PEAK6参投</td></tr>
+      </table></div>
+      <p>股东结构呈现<strong>"战略产业资本+顶级AI平台+财务资本"三重驱动</strong>：Mercedes-Benz（汽车制造场景绑定）、Google DeepMind（AI底座）、John Deere（农业/工业机械场景）、AT&T（通信/物流场景）构成产业方矩阵；B Capital和QIA提供财务支撑。Google和Mercedes-Benz均为重复投资者。</p>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>维度</th><th>详情</th></tr>
+        <tr><td>AI架构</td><td>双轨制——Google DeepMind Gemini Robotics模型（Gemini 3/ER 1.5）+ NVIDIA Project GR00T基础模型；结合DeepMind的通用空间推理与NVIDIA的机器人学习框架</td></tr>
+        <tr><td>执行器方案</td><td>自研线性电动执行器（Linear Electric Actuators），力控优先而非位置控制优先，模拟人类肌肉线性发力机制；历经13+代迭代；约1/3更少部件，约50%更高速度</td></tr>
+        <tr><td>全身控制</td><td>基于UT Austin HCRL多年积累的全身力控和动态运动规划算法；每个关节配备力矩传感器，支持实时力反馈和自适应接触</td></tr>
+        <tr><td>计算平台</td><td>NVIDIA Jetson AGX Orin + Jetson Orin NX双计算架构，275+ TOPS AI算力，支持边缘实时推理</td></tr>
+        <tr><td>传感器套件</td><td>RGB相机+深度相机+力矩传感器+IMU惯性测量单元</td></tr>
+        <tr><td>模块化设计</td><td>Apollo支持三种形态：双足行走版、轮式底座版、固定式底座/吊装版，同一上半身可适配不同移动平台</td></tr>
+        <tr><td>安全认证</td><td>执行器电子件通过TÜV SÜD安全认证（与Texas Instruments合作开发）；设Perimeter Zone和Impact Zone分级安全机制</td></tr>
+        <tr><td>差异化</td><td>10年+人形机器人独家研发履历（全球人形初创公司最深厚）；执行器13代迭代；NASA-DARPA挑战赛技术源头</td></tr>
+      </table></div>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>产品</th><th>类型</th><th>关键参数</th><th>主要用途</th></tr>
+        <tr><td>Apollo</td><td>通用人形机器人</td><td>高173cm/重73kg/负载25kg/44+DOF/4hr电池(可热插拔)/步速1.2m/s/22hr日运行</td><td>制造物流搬运、分拣、装配、上下料</td></tr>
+        <tr><td>Astra（前身平台）</td><td>上半身人形机器人</td><td>双臂操作平台，固定式底座</td><td>实验室研发验证、上半身操作任务</td></tr>
+        <tr><td>Draco（前身平台）</td><td>双足动态行走平台</td><td>专用双足行走测试台</td><td>腿部运动控制算法验证</td></tr>
+      </table></div>
+      <p>公司计划于2026年发布新一代Apollo机型，详细信息待公布。Apollo采用RaaS(Robotics-as-a-Service)订阅模式，年费约8万美元/台（相当于豪华轿车的年度成本）。</p>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>场景分类</th><th>具体应用</th><th>合作方</th><th>当前阶段</th></tr>
+        <tr><td>汽车制造</td><td>零部件搬运、分拣、套件组装(kitting)、机器上下料</td><td>Mercedes-Benz</td><td>厂区指定安全区域试点</td></tr>
+        <tr><td>仓储物流</td><td>拆垛、码垛、订单分拣、货物搬运</td><td>GXO Logistics</td><td>仓库试点部署</td></tr>
+        <tr><td>电子制造</td><td>产线辅助、物料管理</td><td>Jabil</td><td>制造工厂试点</td></tr>
+        <tr><td>零售</td><td>货架补货、库存管理</td><td>—</td><td>中长期目标市场</td></tr>
+        <tr><td>医疗/养老</td><td>辅助护理、物品递送</td><td>—</td><td>中长期目标市场</td></tr>
+        <tr><td>家居</td><td>清洁、烹饪、老人照护</td><td>—</td><td>远期愿景（CEO估计约10年后）</td></tr>
+      </table></div>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>指标</th><th>数据</th><th>时间/来源</th></tr>
+        <tr><td>商业试点客户</td><td>Mercedes-Benz、GXO Logistics、Jabil共3家</td><td>截至2026年2月</td></tr>
+        <tr><td>Apollo安全部署区域</td><td>目前限定在Perimeter Zone + 光幕隔离的指定区域</td><td>2026年初</td></tr>
+        <tr><td>Apollo年费定价</td><td>约8万美元/台（RaaS订阅模式）</td><td>2026年2月</td></tr>
+        <tr><td>2027年订单目标</td><td>10亿美元（B Capital预期）</td><td>2026年2月</td></tr>
+        <tr><td>员工增长</td><td>约150人→约300人（翻倍）</td><td>2025–2026年</td></tr>
+        <tr><td>计划新增岗位</td><td>至少200人</td><td>未来一年</td></tr>
+        <tr><td>新办公室</td><td>加州新办公室 + Austin机器人训练数据中心</td><td>2026年计划</td></tr>
+      </table></div>
+
+      <h3 id="finance">1.8 财务数据</h3>
+      <p>Apptronik目前未上市，处于商业化早期阶段，未公开披露营收数据。公司依靠股权融资维持运营和扩张，累计融资约10亿美元。截至2026年2月Series A-X轮完成，账面现金充裕（仅此5.2亿美元新增资金）。收入模式为RaaS订阅制，实际规模化营收预计从2027年开始产生。</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>财务维度</th><th>数据和说明</th></tr>
+        <tr><td>年营收（估计）</td><td>未公开披露，推测仍在千万美元级别（试点阶段，尚未规模化放量）</td></tr>
+        <tr><td>累计融资总额</td><td>约10亿美元</td></tr>
+        <tr><td>最新估值</td><td>超55亿美元（2026年2月）</td></tr>
+        <tr><td>账面现金</td><td>充裕（仅最新一轮即5.2亿美元）</td></tr>
+        <tr><td>烧钱速度（估计）</td><td>约300人团队规模，估算年运营开支1-2亿美元级别</td></tr>
+        <tr><td>盈亏状态</td><td>深度亏损（研发+扩产投入期）</td></tr>
+      </table></div>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>2025年全球人形机器人赛道融资总额约140亿美元，2026年势头延续。Apptronik的主要竞争对手包括<strong>Figure AI</strong>（估值约390亿美元，Nvidia参投）、<strong>Tesla Optimus</strong>（特斯拉2026年计划CapEx约200亿美元，部分用于Optimus）、<strong>Agility Robotics</strong>（Digit）、<strong>1X Technologies</strong>、<strong>Unitree</strong>（宇树科技）及大量中国低价人形厂商（预计2026年中国市场出货约28,000台）。</li>
+        <li>CEO Jeff Cardenas定义为"一个机器人做数千种任务，而非一千个机器人做一种任务"，强调Apollo的<strong>通用性</strong>而非专用性。这一定位与Figure AI相似但区别于Tesla（特斯拉先用Optimus做内部工厂任务）。</li>
+        <li>Apollo是<strong>模块化架构</strong>：同一上半身可在双足行走、轮式底座、固定吊装三种形态间切换，便于不同场景部署。</li>
+        <li>公司拥有<strong>全球最深厚的学术-产业人形机器人研发履历</strong>——从2012年DARPA挑战赛延续至今超10年，开发过15+种机器人系统。</li>
+        <li>Google DeepMind在实验室演示中展示了Apollo的以下能力：玩Jenga塔（需物理推理）、打包午餐、分类衣物、遵循自然语言指令、从未知物体中自主规划多步操作。</li>
+        <li>安全策略分阶段性推进：当前→ Perimeter Zone（外部传感器+光幕隔离）→未来→ 协作安全（动态减速/停止/绕行人类）。</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="analysis1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>Apptronik的创始团队源于UT Austin HCRL——全球顶尖的<strong>人形机器人学术实验室</strong>，技术基因鲜明。核心成员从2012年DARPA挑战赛开始深耕人形机器人，在动态行走、力控执行器、全身控制等基础技术上有10年+积累。CEO Jeff Cardenas兼具技术商业化背景(Deloitte+IC²研究所)，形成了"学术深度+商业化意识"的平衡。团队选择以<strong>制造物流</strong>为首发场景，与Mercedes-Benz和GXO的战略合作提供了工业验证窗口。但团队整体偏学术/工程导向，在制造业运营、供应链管理和企业销售方面存在人才缺口——这可能是其选择通过与大型产业合作伙伴（Mercedes-Benz/Jabil）贴身部署而非自建销售渠道的原因。此外，团队的NASA航天基因也与未来太空应用场景（月球/火星基地运维）形成潜在匹配，NASA早在2022年已与Apptronik签署商业化协议。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>Apptronik选择了一条<strong>"双AI底座"</strong>路线：Google DeepMind Gemini提供通用空间推理和自然语言交互能力，NVIDIA GR00T提供机器人学习和Sim2Real框架。这一路线的核心逻辑是：人形机器人的"大脑"能力过于复杂，单靠一家创业公司自研既不经济也不现实。通过绑定两个AI巨头，Apptronik将自身定位为<strong>"AI时代的机器人硬件+中间件层"</strong>。但其自研的线性电动执行器（13代迭代）和全身力控则是不可外包的核心壁垒。这一路线与首发场景（制造物流）的适配性：制造环境相对结构化，对通用AI的需求低于家庭场景——这意味着Apollo在工厂中的表现更依赖硬件可靠性和执行器性能，而非Gemini的泛化推理。换句话说，<strong>Apollo在工厂的成功更多考验硬件+系统集成</strong>，而非AI——这对力控执行器积累深厚的Apptronik是利好。但当拓展至非结构化环境（零售、家庭），Gemini的基础模型能力将变为关键变量。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>Apptronik的股东结构呈现出罕见的<strong>"三重嵌套"</strong>：（1）<strong>AI巨头Google</strong>：提供Gemini模型和战略背书，但同时也意味着对AI路线的深度依赖——Google在人形机器人领域与其它公司（如1X Technologies、Intrinsic等）也有布局，Apptronik在Google生态内的排他性存疑。（2）<strong>产业场景方</strong>：Mercedes-Benz（汽车制造）、John Deere（农业/工业机械）、AT&T（通信/物流），每一方都代表一个潜在的大规模需求场景，但这种"一个场景一个股东"的模式也可能导致Apollo被迫服务于投资方各自的特定需求，难以集中资源深耕单一场景。（3）<strong>财务资本</strong>：B Capital + QIA提供资金弹药。QIA(卡塔尔投资局)的进入意味着中东主权财富基金对人形赛道的看好，但也可能在估值和退出预期上施加压力。整体来看，<strong>股东结构利好短期场景验证（有现成的试点客户），但长期可能面临场景分散和战略方向受多方牵制的风险</strong>。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>Apptronik的路径调整可划分为三个阶段：（1）<strong>2016–2022：漫长的基础研发期</strong>——开发Valkyrie 2 + 军方外骨骼 + 内部平台Astra/Draco，这段时间商业化方向不明确，主要依赖政府合同和早期投资维持。（2）<strong>2022–2025：从太空到工厂的聚焦</strong>——2022年与NASA签约后本可走太空机器人路线，但公司转而锚定通用人形机器人Apollo，首发选择制造物流场景，这一转向意味着认识到"太空市场规模有限，而制造业劳动力短缺是巨大的近中期市场"。（3）<strong>2025–2026：融资驱动的规模化冲刺</strong>——在12个月内完成近10亿美元Series A融资，从150人快速扩张至300+人，估值从约20亿美元→55亿美元。这一阶段的路径挑战是：<strong>资金充裕但产品成熟度尚未与巨额估值匹配</strong>——Apollo仍处于Perimeter Zone安全隔离的试点阶段，离全协作安全和大规模部署还有显著距离。如果2027年10亿美元订单目标无法兑现，估值承压风险较大。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>Apptronik的核心取舍可简化为：<strong>"做通用iPhone还是专用iPod？"</strong>——公司明确选择前者（"一个机器人千种任务"）。在竞争格局中，其主要差异化因素包括：（1）<strong>最深厚的人形机器人学术传承</strong>——10年+的前期研发不可复制，这是对抗Tesla和Figure AI的先发优势；（2）<strong>执行器自研壁垒</strong>——线性力控执行器13代迭代，TÜV认证，硬件成熟度在初创公司中领先；（3）<strong>Google DeepMind独家AI绑定</strong>——Gemini的通用空间推理能力是竞争对手无法直接复制的；（4）<strong>模块化形态</strong>——同一Apollo在双足/轮式/固定式间切换，降低了不同场景的部署摩擦。主要劣势：<strong>估值溢价高但收入为零</strong>——55亿美元估值与零规模化营收之间的鸿沟是最大风险；<strong>无明显成本优势</strong>——Tesla可复用其超级工厂和供应链体系降低成本，Figure AI在规模化生产上步伐更快。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis6">
+        <h4>2.6 其他重要观察</h4>
+        <p>（1）<strong>2025-2026是人形机器人"泡沫检验期"</strong>——全行业140亿美元融资涌入但实际部署量极小（全球人形机器人在工厂的实际运行数量可能不足1,000台）。Apptronik的55亿估值建立在对2027年后的爆发式增长预期上，存在显著的"提前定价"风险。（2）<strong>Google-Apple生态竞争的外溢</strong>：Google通过Apptronik/DeepMind在人形机器人硬件端布局，Apple则通过机器人相关收购和内部项目（代号"J953"）推进——人形赛道可能成为科技巨头之间的新战场。（3）<strong>中国市场变量</strong>：2026年预计中国市场人形机器人出货28,000台（以宇树、智元、优必选等为代表），价格可能低至2-3万美元/台——远低于Apollo的8万美元/年订阅费。中国厂商的"价格屠刀"效应可能挤压Apptronik的中低端场景空间。（4）<strong>NASA航天基因的期权价值</strong>：如果NASA/Artemis月球任务需人形机器人进行基地建设运维，Apptronik将获得独特的需求场景。</p>
+      </div>
+
+      <h2 id="refs">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://apptronik.com/" target="_blank">Apptronik官方网站</a></li>
+          <li><a href="https://apptronik.com/news-collection/apptronik-closes-over-935-million-series-a" target="_blank">Apptronik Closes Over $935 Million Series A (官方公告, 2026.2.11)</a></li>
+          <li><a href="https://apptronik.com/leadership" target="_blank">Apptronik Leadership团队页面</a></li>
+          <li><a href="https://www.cnbc.com/2026/02/11/apptronik-raises-520-million-at-5-billion-valuation-for-apollo-robot.html" target="_blank">Apptronik raises $520 million to beat Chinese humanoids, Tesla Optimus to market — CNBC (2026.2.11)</a></li>
+          <li><a href="https://www.therobotreport.com/apptronik-brings-in-another-520m-to-ramp-up-apollo-production/" target="_blank">Apptronik brings in another $520M to ramp up Apollo production — The Robot Report (2026.2.11)</a></li>
+          <li><a href="https://news.crunchbase.com/venture/ai-humanoid-robot-funding-apptronik/" target="_blank">Amid Record Robotics Funding, Apptronik Raises $520M Series A Extension — Crunchbase News</a></li>
+          <li><a href="https://techcrunch.com/2023/05/23/apptronik-readies-its-humanoid-robot-for-a-summer-unveil/" target="_blank">Apptronik readies its humanoid robot for a summer unveil — TechCrunch (2023.5.23)</a></li>
+          <li><a href="https://interestingengineering.com/ai-robotics/us-startup-raises-funds-to-deploy-apollo" target="_blank">Google, Mercedes-Benz back Apollo robot in race against Tesla Optimus — Interesting Engineering</a></li>
+          <li><a href="https://ca.finance.yahoo.com/news/apptronik-makes-humanoid-robots-raises-120000471.html" target="_blank">Apptronik, which makes humanoid robots, raises $350M as category heats up — Yahoo Finance (2025.2)</a></li>
+          <li><a href="https://www.rundown.ai/articles/apptroniks-935m-humanoid-moment" target="_blank">Apptronik's $935M humanoid moment — Rundown AI</a></li>
+          <li><a href="https://ctol.digital/news/apptronik-935m-series-a-humanoid-robots-industrial-scale/" target="_blank">Apptronik's $935M Series A: The Race to Industrialize Humanoid Robots — CTOL.digital</a></li>
+          <li><a href="https://www.fox7austin.com/news/nasa-austin-robotics-company-apptronik-humanoid-robots" target="_blank">NASA and Austin robotics company Apptronik partner on humanoid robots — Fox 7 Austin</a></li>
+          <li><a href="https://www.automationworld.com/factory/robotics/article/22525903/apptronik-and-nasa-roll-out-humanoid-robot" target="_blank">A Robot for a Range of Applications — Automation World</a></li>
+          <li><a href="https://ca.finance.yahoo.com/news/austin-robotics-company-apptronik-ready-120058078.html" target="_blank">Austin robotics company Apptronik ready to grow after signing NASA deal — Yahoo Finance</a></li>
+          <li><a href="https://deepwiki.com/google-deepmind/mujoco_menagerie/2.1-apptronik-apollo" target="_blank">Apptronik Apollo — DeepWiki (MuJoCo Menagerie, Google DeepMind)</a></li>
+          <li><a href="https://aiwiki.ai/wiki/apptronik_apollo" target="_blank">Apollo (Apptronik) — AI Wiki</a></li>
+          <li><a href="https://timesofindia.indiatimes.com/technology/tech-news/apptronik-raises-520-million-to-scale-humanoid-robots-humans-and-robots-working-side-by-side-may-soon-be-real/articleshow/128256543.cms" target="_blank">Apptronik raises $520 million to scale humanoid robots — The Times of India (2026.2.12)</a></li>
+          <li><a href="https://economictimes.indiatimes.com/tech/funding/humanoid-startup-apptronik-raises-520-million-with-backing-from-google-and-mercedes-benz/articleshow/128216664.cms" target="_blank">Humanoid startup Apptronik raises $520 million with backing from Google and Mercedes-Benz — Economic Times</a></li>
+          <li><a href="https://www.thestar.com.my/tech/tech-news/2026/02/11/humanoid-startup-apptronik-raises-520-million-with-backing-from-google-and-mercedes-benz" target="_blank">Humanoid startup Apptronik raises $520 million with backing from Google and Mercedes-Benz — The Star Malaysia</a></li>
+          <li><a href="https://www.fidelity.com/news/article/company-news/202602111939RTRSNEWSCOMBINED_L6N3Z7011_1" target="_blank">Humanoid startup Apptronik raises $520 million with backing from Google and Mercedes-Benz — Reuters via Fidelity</a></li>
+          <li><a href="https://chejiahao.autohome.com.cn/info/19846676" target="_blank">国外机器人选手Apptronik：无缝接入"人类工人岗位" — 汽车之家</a></li>
+          <li><a href="https://www.manilatimes.net/2026/02/11/tmt-newswire/globenewswire/apptronik-closes-over-935-million-series-a-with-new-520-million-extension-round/2276347" target="_blank">Apptronik Closes Over $935 Million Series A — Manila Times / GlobeNewswire</a></li>
+        </ol>
+      </div>
+
+    </article>
+  </div>
+  <div class="page-footer">页面生成于2026年5月4日 · 数据截至2026年4月 · 具身智能Wiki项目</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>云迹科技 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> <span class="breadcrumb-sep">›</span> <span>云迹科技</span></div>
+  <div class="wiki-header"><h1>云迹科技</h1><div class="subtitle">Yunji Technology · 02670.HK · 2014年成立 · 港股机器人服务智能体第一股</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#team">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financial">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#analysis1">2.1 团队背景与场景选择</a></li>
+        <li class="toc-lvl4"><a href="#analysis2">2.2 技术路线与场景适配</a></li>
+        <li class="toc-lvl4"><a href="#analysis3">2.3 股东结构对战略影响</a></li>
+        <li class="toc-lvl4"><a href="#analysis4">2.4 试错与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#analysis5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#analysis6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#references">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">云迹科技</div>
+        <div class="ib-section">财务数据（2025年）</div>
+        <div class="ib-row"><div class="ib-label">营业收入</div><div class="ib-value">3.01亿元</div></div>
+        <div class="ib-row"><div class="ib-label">毛利率</div><div class="ib-value">37.6%</div></div>
+        <div class="ib-row"><div class="ib-label">净亏损</div><div class="ib-value">-2.95亿元</div></div>
+        <div class="ib-row"><div class="ib-label">研发费用</div><div class="ib-value">6,215万元</div></div>
+        <div class="ib-section">估值/市值</div>
+        <div class="ib-row"><div class="ib-label">IPO市值</div><div class="ib-value">~98亿港元（首日）</div></div>
+        <div class="ib-row"><div class="ib-label">当前市值</div><div class="ib-value">约73-83亿港元</div></div>
+        <div class="ib-row"><div class="ib-label">D轮估值</div><div class="ib-value">40.8亿元（2021年）</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">覆盖酒店</div><div class="ib-value">全球40,000+家</div></div>
+        <div class="ib-row"><div class="ib-label">日均在线机器人</div><div class="ib-value">3.2万台</div></div>
+        <div class="ib-row"><div class="ib-label">年服务次数</div><div class="ib-value">7.5亿次</div></div>
+        <div class="ib-row"><div class="ib-label">专利总数</div><div class="ib-value">997项</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">领域</div><div class="ib-value">服务机器人 · 具身智能</div></div>
+        <div class="ib-row"><div class="ib-label">股票代码</div><div class="ib-value">02670.HK</div></div>
+        <div class="ib-row"><div class="ib-label">成立年份</div><div class="ib-value">2014年</div></div>
+        <div class="ib-row"><div class="ib-label">注册地</div><div class="ib-value">中国北京</div></div>
+        <div class="ib-section">官网</div>
+        <div class="ib-row"><div class="ib-label">网址</div><div class="ib-value"><a href="https://www.yunjichina.com.cn" target="_blank">yunjichina.com.cn</a></div></div>
+      </aside>
+
+      <p class="article-intro">云迹科技（Yunji Technology，02670.HK）成立于2014年，总部位于北京，是中国领先的服务机器人及AI智能体供应商。公司以"具身智能+离身智能+生态"三位一体架构为核心，主营复合多态机器人硬件及HDOS（酒店数字运营系统）软件，在全球40余个国家覆盖超过4万家酒店，日均在线机器人3.2万台，年服务次数达7.5亿次。2025年10月16日在港交所主板以18C章挂牌上市，成为"港股机器人服务智能体第一股"。公司累计完成8轮超12亿元融资，投资方包括阿里巴巴、腾讯、科大讯飞、启明创投、联想创投、携程等。2025年营收3.01亿元，HDOS订阅客户同比增长925%，正从硬件销售商向AI服务基础设施提供商转型。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper"><table class="wikitable infotable">
+        <tr><th>项目</th><th>内容</th></tr>
+        <tr><td>公司全称</td><td>云迹科技股份有限公司</td></tr>
+        <tr><td>英文名称</td><td>Yunji Technology Co., Ltd.</td></tr>
+        <tr><td>成立时间</td><td>2014年</td></tr>
+        <tr><td>注册地</td><td>中国北京</td></tr>
+        <tr><td>上市交易所</td><td>香港联交所（02670.HK）</td></tr>
+        <tr><td>上市时间</td><td>2025年10月16日（18C章）</td></tr>
+        <tr><td>发行价</td><td>95.6港元/股</td></tr>
+        <tr><td>创始人/CEO</td><td>支涛</td></tr>
+        <tr><td>员工人数</td><td>约500人（研发占比超40%）</td></tr>
+        <tr><td>官方网站</td><td>www.yunjichina.com.cn</td></tr>
+        <tr><td>主营业务</td><td>复合多态机器人、HDOS智能操作系统、AI智能体应用</td></tr>
+      </table></div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>时间</th><th>事件</th></tr>
+        <tr><td>2014年</td><td>公司成立，获天使轮融资750万元，科大讯飞领投</td></tr>
+        <tr><td>2015年</td><td>A轮3,100万元，科大讯飞追投</td></tr>
+        <tr><td>2017年</td><td>A+轮引入腾讯战略投资5,600万元；海航创投、澜亭资本参投</td></tr>
+        <tr><td>2019年</td><td>B轮7,500万元，携程、金茂资本、光控众盈投资</td></tr>
+        <tr><td>2020年</td><td>B+轮1.28亿元，联想创投领投</td></tr>
+        <tr><td>2021年</td><td>C轮2.645亿元（启明创投领投，投后估值22.89亿）；D轮5.8亿元（阿里领投，投后估值40.8亿）</td></tr>
+        <tr><td>2022年</td><td>获吴文俊人工智能科学技术奖；推出UP复合多态机器人</td></tr>
+        <tr><td>2024年</td><td>营收2.45亿元，覆盖酒店超3万家，开始推进IPO</td></tr>
+        <tr><td>2025年10月</td><td>港交所挂牌（02670.HK），公开发售超额认购5,657倍，首日市值一度逼近100亿港元</td></tr>
+        <tr><td>2026年3月</td><td>联想Tech World 2026发布与联想数字孪生联动方案；中关村论坛签约PolyU、Blue Pin三方战略合作</td></tr>
+        <tr><td>2026年4月</td><td>香港创科展（InnoEX 2026）四展并进；发布首份年报（2025年营收3.01亿元）</td></tr>
+      </table></div>
+
+      <h3 id="team">1.2 创始人及核心团队</h3>
+      <p>云迹科技创始团队由具身智能领域的连续创业者组成，整体团队呈"产业派+工科派"混合型人才结构。公司员工约500人，研发人员占比超过40%，已累计申请专利997项（含405项发明专利）。</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+        <tr><td>创始人/CEO</td><td>支涛</td><td>连续创业者，具身智能行业十余年经验。主导公司从0到1的产品定义、商业化落地和融资战略。2025年带领公司在港交所上市，提出"具身智能+离身智能+生态"三位一体战略框架</td></tr>
+        <tr><td>联合创始人</td><td>未完全公开</td><td>与支涛共同持有IPO后36.52%股份，技术及商业背景互补</td></tr>
+        <tr><td>副总裁</td><td>谢云鹏</td><td>负责生态合作与国际化战略。在2026年中关村论坛上提出京港澳"铁三角"协同生态概念</td></tr>
+      </table></div>
+      <p>团队整体风格务实，以"先深耕、再拓展"为核心理念，不追求人形机器人的炫技式展示，而是专注于酒店场景的垂直深耕和跨场景渐进式复制。公司曾两次获得吴文俊人工智能科学技术奖，并参与制定26项行业标准。</p>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <h4>融资历史</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>轮次</th><th>时间</th><th>金额</th><th>核心投资方</th></tr>
+        <tr><td>天使轮</td><td>2014年</td><td>750万元</td><td>安徽人工智能公司（科大讯飞）、洋葱基金</td></tr>
+        <tr><td>A轮</td><td>2015年</td><td>3,100万元</td><td>科大讯飞</td></tr>
+        <tr><td>A+轮</td><td>2017年</td><td>6,000万元</td><td>海航创投、澜亭资本</td></tr>
+        <tr><td>A+战略</td><td>2017年</td><td>5,600万元</td><td>腾讯（林芝腾讯）</td></tr>
+        <tr><td>B轮</td><td>2019年</td><td>7,500万元</td><td>金茂资本、携程、光控众盈</td></tr>
+        <tr><td>B+战略</td><td>2020年</td><td>1.28亿元</td><td>联想创投、沸点资本</td></tr>
+        <tr><td>C轮</td><td>2021年8月</td><td>2.645亿元</td><td>启明创投、中信证券、腾讯、联想（投后估值22.89亿）</td></tr>
+        <tr><td>D轮</td><td>2021年12月</td><td>5.8亿元</td><td>阿里巴巴（杭州灏月）、河南科投、启明创投（投后估值40.8亿）</td></tr>
+        <tr><td>IPO</td><td>2025年10月</td><td>公开发售</td><td>港交所18C章上市，超额认购5,657倍</td></tr>
+      </table></div>
+
+      <h4>IPO后主要股东结构</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>股东</th><th>持股比例</th><th>类型</th></tr>
+        <tr><td>支涛及联合创始人</td><td>36.52%</td><td>创始团队</td></tr>
+        <tr><td>沸点资本</td><td>10.70%</td><td>最大外部股东</td></tr>
+        <tr><td>安徽人工智能公司（科大讯飞）</td><td>9.57%</td><td>产业资本</td></tr>
+        <tr><td>林芝腾讯</td><td>9.09%</td><td>产业资本</td></tr>
+        <tr><td>启明创投</td><td>约5.39%</td><td>财务投资</td></tr>
+        <tr><td>联想基金</td><td>4.22%</td><td>产业资本</td></tr>
+        <tr><td>阿里巴巴（杭州灏月）</td><td>2.94%</td><td>产业资本</td></tr>
+      </table></div>
+
+      <div class="callout">
+        <div class="callout-title">上市关键信息</div>
+        <p>云迹科技通过港交所18C规则（特专科技公司通道）上市，允许未盈利科技企业挂牌。IPO公开发售超额认购5,657倍，冻结资金约1,891亿港元。上市前公司账上曾有19.25亿元赎回负债，IPO成功后自动转为权益，对赌压力已解除。</p>
+      </div>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>技术维度</th><th>方案/路线</th><th>说明</th></tr>
+        <tr><td>AI技术架构</td><td>具身智能+离身智能双引擎</td><td>具身智能=UP机器人的物理交互（手脚）；离身智能=HDOS云端决策（大脑）</td></tr>
+        <tr><td>大模型应用</td><td>多模态大模型+垂直场景部署</td><td>意图识别、知识图谱、多机协同调度；预计2028下半年大规模应用强化/迁移/终身学习</td></tr>
+        <tr><td>全栈/专用路线</td><td>全栈自研（硬件+操作系统+AI决策）</td><td>自研YJ-ROS操作系统、HQAS诊断系统、HDOS云端大脑，形成软硬一体闭环</td></tr>
+        <tr><td>数据方案</td><td>"场景基因库"+数据飞轮</td><td>4万+酒店7.5亿次真实交互数据积累，驱动AI持续训练和跨场景泛化</td></tr>
+        <tr><td>硬件平台</td><td>"1+N+AIoT"模块化架构</td><td>1台UP机器人+N个可切换功能舱+AIoT设备网络，支持秒级功能切换</td></tr>
+        <tr><td>导航精度</td><td>厘米级定位</td><td>多传感器融合，导航避障准确率超99%</td></tr>
+        <tr><td>群智协同</td><td>多机群体协同调度</td><td>云端统一调度、跨楼层无缝协作、全球10万+部电梯接入</td></tr>
+        <tr><td>操作能力</td><td>从"移动"向"操作"跨越中</td><td>抓取、分拣、烹饪、洗衣等高精度操作正在研发推进</td></tr>
+      </table></div>
+      <p>云迹科技的技术路线核心在于"软硬一体+场景闭环"：硬件端通过模块化设计降低复用成本，软件端通过HDOS实现单机智能到群体智能的跃迁。公司不走"通用人形机器人"路线，而是以轮式+模块化功能舱作为具身智能载体，在酒店场景中完成了从"会移动的机器人"到"能理解空间的智能体"的价值跃升。公司拥有997项专利（含405项发明专利），参与制定26项行业标准，完成11项国家及行业标准。</p>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>产品分类</th><th>子类</th><th>型号/说明</th><th>定位</th><th>典型售价</th></tr>
+        <tr><td rowspan="3">硬件机器人</td><td>润系列（Run）</td><td>入门级单舱送物机器人</td><td>存量市场，逐步退市</td><td>~1.31万元</td></tr>
+        <tr><td>格格系列</td><td>双舱主力机型</td><td>销售主力，2024年出货6,358台</td><td>~2.09万元</td></tr>
+        <tr><td>UP系列</td><td>复合多态移动机器人，旗舰具身智能载体</td><td>快速增长，2024年出货672台</td><td>~2.23万元</td></tr>
+        <tr><td rowspan="3">软件系统</td><td>HDOS</td><td>酒店数字运营系统（AI智能体操作系统）</td><td>"云端大脑"，订阅制</td><td>SaaS订阅模式</td></tr>
+        <tr><td>YJ-ROS</td><td>机器人AI操作系统</td><td>底层平台</td><td>随硬件搭载</td></tr>
+        <tr><td>HQAS</td><td>AI Agent智能诊断系统</td><td>支持23种语言</td><td>增值服务</td></tr>
+        <tr><td>AIoT设备</td><td>智能货柜</td><td>面向C端即时零售</td><td>第三增长曲线</td><td>按部署收费</td></tr>
+      </table></div>
+      <p>云迹科技的整机机器人均价从2016年的约13万元降至2024年的1.31万元，降幅超90%，反映了行业价格战的激烈程度。2025年前5个月出货量达4,287台，同比增幅68%。HDOS订阅客户数从2024年的237名激增至2025年末的2,430名，增幅925%，标志着公司从"卖硬件"向"卖服务"转型的加速。</p>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>场景分类</th><th>子场景</th><th>关键合作方/客户</th><th>核心应用</th></tr>
+        <tr><td rowspan="4">酒店（核心场景）</td><td>送物配送</td><td>华住、锦江、首旅如家、亚朵</td><td>客房物品配送、外卖接力</td></tr>
+        <tr><td>即时零售</td><td>智能货柜部署</td><td>C端商品销售（AI伴宠团子、煮面机器人、洗衣服务、便利购）</td></tr>
+        <tr><td>智慧运营</td><td>洲际、万豪、凯悦、开元</td><td>HDOS全局调度、动态决策、多机协同</td></tr>
+        <tr><td>外卖接力</td><td>美团外卖</td><td>"骑手+机器人"接力覆盖2万+酒店</td></tr>
+        <tr><td>医疗</td><td>手术室/急诊/检验科</td><td>北京协和医院、东阳人民医院、曼谷医院</td><td>标本配送、药品递送，降低交叉感染风险</td></tr>
+        <tr><td>工厂</td><td>智能物流/无人上下料</td><td>立讯集团（世界500强）</td><td>工厂AI智能体：物料搬运+生产数据优化</td></tr>
+        <tr><td>楼宇/城市</td><td>外卖配送</td><td>顺丰同城</td><td>"骑士+机器人"接力，覆盖300+城市</td></tr>
+        <tr><td>餐饮</td><td>AI烹饪/咖啡</td><td>AI大厨、AI咖啡师</td><td>酒店场景内的餐饮协同</td></tr>
+      </table></div>
+      <p>云迹科技的场景策略呈现"酒店为中心、多元外溢"的结构：酒店场景贡献2025年收入的81%（2.44亿元），但工厂场景收入同比增长393%至1,509万元，医疗覆盖约200家医院，楼宇场景与顺丰同城合作覆盖全国300余城市。</p>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>指标</th><th>2024年</th><th>2025年</th><th>变化</th></tr>
+        <tr><td>覆盖酒店数</td><td>30,000+家</td><td>40,000+家</td><td>+33%</td></tr>
+        <tr><td>日均在线机器人</td><td>2.7万台</td><td>3.2万台</td><td>+18.5%</td></tr>
+        <tr><td>年服务次数</td><td>未披露</td><td>7.5亿次</td><td>—</td></tr>
+        <tr><td>海外覆盖</td><td>30+国家</td><td>40+国家</td><td>+33%</td></tr>
+        <tr><td>覆盖医院</td><td>未披露</td><td>约200家</td><td>—</td></tr>
+        <tr><td>HDOS订阅客户</td><td>237名</td><td>2,430名</td><td>+925%</td></tr>
+        <tr><td>智能货柜部署</td><td>—</td><td>2,231台</td><td>新增</td></tr>
+        <tr><td>前5月出货量</td><td>—</td><td>4,287台</td><td>+68%（同比）</td></tr>
+      </table></div>
+      <p>根据弗若斯特沙利文2024年数据，云迹科技在中国机器人服务智能体市场份额为6.3%（排名第一），在酒店场景份额为13.9%（超过第二至第五名总和），同时在线机器人数量及服务消费者数量为全球第一。中国331个地级行政区覆盖率达99%。公司海外收入2025年为1,906万元（同比+92.1%），占比提升至6.3%，重点布局东南亚、日本、韩国及港澳地区。</p>
+
+      <h3 id="financial">1.8 财务数据</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>指标</th><th>2022年</th><th>2023年</th><th>2024年</th><th>2025年</th></tr>
+        <tr><td>营业收入</td><td>1.61亿元</td><td>1.45亿元</td><td>2.45亿元</td><td>3.01亿元</td></tr>
+        <tr><td>同比增速</td><td>—</td><td>-10.0%</td><td>+68.6%</td><td>+23.1%</td></tr>
+        <tr><td>毛利率</td><td>24.3%</td><td>27.0%</td><td>43.5%</td><td>37.6%</td></tr>
+        <tr><td>净亏损</td><td>-3.65亿</td><td>-2.65亿</td><td>-1.85亿</td><td>-2.95亿</td></tr>
+        <tr><td>研发费用</td><td>—</td><td>—</td><td>—</td><td>6,215万元</td></tr>
+        <tr><td>研发费用率</td><td>—</td><td>—</td><td>—</td><td>~20.6%</td></tr>
+        <tr><td>酒店场景收入</td><td>—</td><td>—</td><td>—</td><td>2.44亿（81.0%）</td></tr>
+        <tr><td>AI数字化系统收入</td><td>—</td><td>—</td><td>—</td><td>8,793万（29.2%）</td></tr>
+        <tr><td>智能体应用收入</td><td>—</td><td>—</td><td>—</td><td>3,387万（+194.1%）</td></tr>
+        <tr><td>海外收入</td><td>—</td><td>—</td><td>—</td><td>1,906万（+92.1%）</td></tr>
+      </table></div>
+
+      <h4>机构预测（2026-2028）</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>年份</th><th>预测营收（国泰海通）</th><th>预测净利润</th></tr>
+        <tr><td>2026E</td><td>3.94-4.07亿元</td><td>-2.52亿元</td></tr>
+        <tr><td>2027E</td><td>5.30-5.46亿元</td><td>-1.55亿元</td></tr>
+        <tr><td>2028E</td><td>7.05-7.25亿元</td><td>-0.72亿元</td></tr>
+      </table></div>
+      <p>国泰海通证券和兴证国际均给予"增持"评级，其中国泰海通目标价292.03港元。机构预计公司将在2028年前后接近盈亏平衡点。2025年公司账面现金及等价物通过IPO获得较大充实（IPO募资规模对应约100亿港元市值）。</p>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>两次获得"吴文俊人工智能科学技术奖"</li>
+        <li>参与制定26项行业标准，完成11项国家及行业标准</li>
+        <li>导航避障系统运行准确率超99%</li>
+        <li>全球首批推出"服务智能体全自主闭环学习系统"的企业之一</li>
+        <li>与全球超10万部电梯实现接入，完成楼宇内外的无缝物流衔接</li>
+        <li>IPO超额认购5,657倍创港股18C规则下纪录</li>
+        <li>"维科杯·OFweek 2025"年度应用创新奖（HDOS系统）</li>
+        <li>中国331个地级行政区酒店覆盖率99%</li>
+        <li>三条增长曲线：复合多态机器人（第一曲线）→ HDOS订阅（第二曲线）→ C端场景运营（第三曲线）</li>
+        <li>与联想、香港理工大学、Blue Pin、西交大、香港诺达机器人等建立产学研生态闭环</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="analysis1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>创始人支涛作为具身智能领域十余年的连续创业者，团队整体呈"产业派+工科派"混合型结构，并非顶级学术明星团队，但这恰好与云迹选择的酒店服务场景高度匹配。酒店场景的需求特征是高频率、低技术风险、强运营属性，而非前沿科研突破——这正是产业派团队的优势所在。支涛团队没有追求人形机器人的技术炫技，而是务实选择了轮式+模块化功能舱的工程化路线，体现出对商业化落地的深刻理解。腾讯、阿里、携程等产业资本的持续注资也侧面验证了该团队在产业资源整合方面的能力被认可。不过，随着公司向工厂、医疗等高精度操作场景拓展，创始团队在工业自动化和医疗级技术方面的经验短板可能成为制约。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>云迹的"具身智能+离身智能"双引擎架构与其选择的酒店场景存在较好的适配。酒店场景的核心需求是物品配送、空间调度和客户服务——这些任务对灵巧操作的要求低，但对定位精度、多机协同和场景理解要求高。云迹的厘米级导航+HDOS云端调度恰好切中要害。然而，从"移动智能"向"操作智能"的跨越（如分拣、烹饪、抓取）将是技术路线的核心挑战：现有轮式底盘+模块化功能舱能否支撑高精度操作存在疑问。公司预计强化学习等能力2028年才进入"大规模应用期"，表明从移动到操作的技术跨越至少还需要2-3年的研发投入。在当前路线下，云迹更适合"高频物流型场景"而非"高精度操作型场景"。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>云迹的股东结构呈现出"科技巨头背书+酒店产业协同+财务投资"的均衡格局。腾讯（9.09%）和阿里（2.94%）为AI和云计算能力提供底层支持，携程（B轮参投）天然绑定酒店OTA渠道，联想创投（4.22%）带来硬件供应链和全球渠道资源。科大讯飞（9.57%）自天使轮持续加持，在语音交互和多模态AI方面形成技术协同。值得注意的是，这些产业股东并非直接"绑定"场景——酒店客户仍需云迹自主开拓——但它们在数据、渠道和技术生态上的协同效应不可忽视。IPO解除了19.25亿元赎回负债的"达摩克利斯之剑"，使公司在场景拓展上获得了更大的战略自由度。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>云迹的发展路径展示了教科书式的"聚焦-验证-拓展"策略：早期以单舱"润"系列切入，后转向双舱"格格"系列满足多任务需求，再升级为复合多态UP系列实现具身智能载体化。2021-2022年的战略调整最为关键——公司意识到纯硬件销售毛利率持续承压（机器人均价9年降幅超90%），果断将重心从"卖硬件"转向"卖服务"，推出HDOS订阅模式和智能体应用。这一转向在2025年的财务数据中得到验证：智能体应用收入同比增194%，HDOS订阅客户暴增925%。从酒店向工厂（立讯集团）、楼宇（顺丰同城）的跨场景拓展也展现出路径上的渐进性而非跃进式。不过，工厂场景收入仅1,509万元（占比5%），表明跨域复制的规模化仍需2-3年验证。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>云迹在具身智能行业格局中的核心取舍是"做iPhone还是做iPod"——它明确选择了酒店场景的"专用务实路线"（iPod），而非通用人形机器人的"全能路线"（iPhone）。这一选择在商业化层面是理性的：酒店场景全球市场规模巨大，单个场景即可支撑一家百亿市值公司；且云迹在这一场景的份额（13.9%）已超过第二至第五名总和。但这一取舍也存在结构性风险：酒店场景收入占比仍超80%，场景集中度极高；一旦酒店市场趋于饱和或出现颠覆性替代技术（如酒店自建机器人体系），公司增长空间将受限。与宇树科技（通用人形+四足路线）相比，云迹的估值天花板可能更低，但商业化确定性更强。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis6">
+        <h4>2.6 其他重要观察</h4>
+        <p>2026年第一季度云迹科技密集发布多项战略合作——联想Tech World、中关村论坛三方签约（PolyU+Blue Pin）、香港创科展"四展并进"——这些动作的密度和规格暗示公司正在从"酒店服务商"向"具身智能平台型公司"进行品牌升级。京港澳"铁三角"（北京研发-港澳国际化桥头堡）的生态布局尤其值得关注：如果能在香港和东南亚复制酒店场景的成功经验并输出HDOS操作系统标准，云迹有可能从中国的"酒店机器人龙头"进化为全球的"服务智能体操作系统供应商"。另一个值得跟踪的信号是智能货柜2,231台的部署——这代表着从B端服务向C端商业的跨越，其商业模型的单位经济模型将在下一份年报中得到初步验证。</p>
+      </div>
+
+      <h2 id="references">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://www.thepaper.cn/newsDetail_forward_31784213">澎湃新闻：十年磨一股，云迹估值仍不及宇树？</a></li>
+          <li><a href="https://www.36kr.com/p/3512996783692162">36氪：大厂投资的女总裁敲钟了，开盘冲到近100亿</a></li>
+          <li><a href="https://36kr.com/p/3511268833827716">36氪：8轮融12亿，"酒店机器人"去IPO了</a></li>
+          <li><a href="https://www.yunjichina.com.cn/news-detail/256.html">云迹官网：云迹登陆港交所开盘市值超98亿港元</a></li>
+          <li><a href="https://www.21jingji.com/article/20251019/herald/55d1843f8a15b5fd806b6691d59e6001.html">21世纪经济报道：服务超3万家酒店 阿里腾讯抢着投 云迹科技赴港上市</a></li>
+          <li><a href="https://www.cinn.cn/yc/2025/10-16/J1VljEqD.html">中国工业新闻：港股首家：开盘大涨近49%，能否破解商业化魔咒？</a></li>
+          <li><a href="https://www.chinastarmarket.cn/detail/1995754">科创板日报：去年售出8285台，营收2.45亿元</a></li>
+          <li><a href="https://finance.eastmoney.com/a/202604303726040577.html">东方财富：云迹首份年报成绩单：智能体收入翻倍，订阅经济起势</a></li>
+          <li><a href="https://www.donews.com/article/detail/8480/100566.html">DoNews：从云迹科技年报，看服务机器人的"反脆弱"样本</a></li>
+          <li><a href="https://finance.eastmoney.com/a/202604303726336729.html">东方财富：云迹科技服务智能体进入价值兑现期 三条曲线全面突破</a></li>
+          <li><a href="http://3g.cnfol.com/news/shangyeyaowen/20260430/32192953.shtml">中金在线：云迹科技首份年报 总收入3.01亿元</a></li>
+          <li><a href="https://www.p5w.net/roll/finance/202604/t20260430_6468731.htm">全景网：云迹科技2025年业绩揭晓，HDOS订阅客户近十倍增长</a></li>
+          <li><a href="https://m.chinaventure.com.cn/news/113-20251016-388405.html">投中网：融了8轮的机器人公司，刚刚IPO了</a></li>
+          <li><a href="http://www.nbd.com.cn/articles/2026-04-02/4323096.html">每日经济新闻：具身智能爆发拐点将至 云迹CEO李全印访谈</a></li>
+          <li><a href="http://hk.stockstar.com/IG2026041700030062.shtml">证券之星：国泰海通证券予云迹科技"增持"评级</a></li>
+          <li><a href="https://www.yunjichina.com.cn/news-detail/315.html">云迹官网：云迹科技亮相联想TechWorld2026</a></li>
+          <li><a href="http://hkcd.com/hkcdweb/content/2026/03/29/content_8747432.html">香港商报：云迹科技与PolyU、Blue Pin达成战略合作</a></li>
+          <li><a href="https://www.yunjichina.com.cn/news-detail/326.html">云迹官网：云迹科技亮相香港创科展InnoEX 2026</a></li>
+          <li><a href="https://invest.beijing.gov.cn/tcgz/tzbjqqhzhb/202603/t20260331_4570756.html">北京市投资促进服务中心：京港澳联手 两大重磅签约落地</a></li>
+          <li><a href="https://www.yunjichina.com.cn/news_detail/327.html">云迹官网：云迹HDOS系统荣获OFweek 2025年度应用创新奖</a></li>
+          <li><a href="https://www.yunjichina.com.cn/news_detail/291.html">云迹官网：构建全球领先的服务智能体生态系统</a></li>
+          <li><a href="https://www.yunjichina.com.cn/news/323.html">云迹官网：云迹科技的"朋友圈"——构建产学研闭环生态</a></li>
+          <li><a href="https://robot.ofweek.com/2026-04/ART-898890-8420-30686428.html">OFweek机器人网：从"会移动的机器人"到"能理解空间的智能体"</a></li>
+          <li><a href="https://www.fxbaogao.com/detail/5312314">发现报告：兴证国际首次覆盖报告</a></li>
+          <li><a href="https://www.djyanbao.com/preview/4525838">洞见研报：云迹科技首次覆盖报告</a></li>
+          <li><a href="http://www.jjckb.cn/20250811/aad582c4f3dc4f77acdbfb74002b5197/c.html">经济参考报：云迹科技推动服务机器人多场景落地</a></li>
+          <li><a href="https://news.qq.com/rain/a/20260430A06AB600">腾讯新闻：云迹科技年报揭晓 HDOS订阅量暴增近十倍</a></li>
+        </ol>
+      </div>
+
+    </article>
+  </div>
+  <div class="page-footer">本页面最后更新于2026年5月4日 · 具身智能Wiki项目 · 数据来源于公开信息及公司官方披露</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body>
+</html>

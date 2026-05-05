@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>破壳机器人 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> <span class="breadcrumb-sep">›</span> <span>破壳机器人</span></div>
+  <div class="wiki-header"><h1>破壳机器人</h1><div class="subtitle">Poke Robot · 非上市 · 2026年3月成立 · 天使轮数千万美元 · 估值约4亿美元 · 团队约20人</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#team">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#finance">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#a1">2.1 团队背景与场景选择的匹配度</a></li>
+        <li class="toc-lvl4"><a href="#a2">2.2 技术路线与场景的适配性</a></li>
+        <li class="toc-lvl4"><a href="#a3">2.3 股东/资本结构对战略的影响</a></li>
+        <li class="toc-lvl4"><a href="#a4">2.4 试错过程与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#a5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#a6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#refs">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">破壳机器人</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">破壳（北京）智能科技有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">英文</div><div class="ib-value">Poke Robot（非正式）</div></div>
+        <div class="ib-row"><div class="ib-label">成立</div><div class="ib-value">2026年3月</div></div>
+        <div class="ib-row"><div class="ib-label">注册地</div><div class="ib-value">北京</div></div>
+        <div class="ib-row"><div class="ib-label">上市状态</div><div class="ib-value">非上市</div></div>
+        <div class="ib-section">财务数据</div>
+        <div class="ib-row"><div class="ib-label">累计融资</div><div class="ib-value">数千万美元（天使轮）</div></div>
+        <div class="ib-row"><div class="ib-label">估值</div><div class="ib-value">约4亿美元（2026.04）</div></div>
+        <div class="ib-section">估值/市值</div>
+        <div class="ib-row"><div class="ib-label">最新轮次</div><div class="ib-value">天使轮（2026.04）</div></div>
+        <div class="ib-row"><div class="ib-label">投资方</div><div class="ib-value">云启资本、顺为资本、小米战投、弘晖基金、星海图、BV百度风投等</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">员工数</div><div class="ib-value">约20人</div></div>
+        <div class="ib-row"><div class="ib-label">技术路线</div><div class="ib-value">世界模型（视频→动作）</div></div>
+        <div class="ib-row"><div class="ib-label">模型参数</div><div class="ib-value">32B（第一代）</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label"><span class="tag">C端家庭</span><span class="tag">世界模型</span><span class="tag">清华系</span></div><div class="ib-value"><span class="tag tag-info">天使轮</span><span class="tag tag-warn">预营收</span></div></div>
+      </aside>
+      <p class="article-intro"><strong>破壳机器人（Poke Robot）</strong>是一家成立于2026年3月的中国具身智能初创企业，由清华大学交叉信息研究院助理教授、「伯克利归国四子」之一的许华哲创立，定位为纯C端家庭具身智能机器人公司。许华哲在联合创办的星海图估值冲破200亿元之际选择单飞创业，成立仅1个月即完成由云启资本领投的数千万美元天使轮融资，估值约4亿美元。公司以自研「世界模型」（视频→动作）为核心技术路线，主动放弃行业主流的VLA方案，采用独创的UAG并联式训练架构，目标两年内推出可用的家庭机器人。投资方阵容包括小米战投、顺为资本、星海图等，引发市场对「雷军系押注C端家庭机器人」的广泛关注。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper">
+        <table class="wikitable infotable">
+          <tr><th>项目</th><th>内容</th></tr>
+          <tr><td>公司全称</td><td>破壳（北京）智能科技有限公司</td></tr>
+          <tr><td>英文名称</td><td>Poke Robot（非正式，媒体报道通用）</td></tr>
+          <tr><td>成立时间</td><td>2026年3月</td></tr>
+          <tr><td>注册地</td><td>北京</td></tr>
+          <tr><td>上市情况</td><td>非上市</td></tr>
+          <tr><td>创始人/CEO</td><td>许华哲</td></tr>
+          <tr><td>行业定位</td><td>C端家庭具身智能机器人</td></tr>
+          <tr><td>团队规模</td><td>约20人，核心来自清华大学具身智能实验室</td></tr>
+        </table>
+      </div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>时间</th><th>事件</th></tr>
+          <tr><td>2023年</td><td>许华哲作为联合创始人兼首席科学家参与创办星海图（具身智能独角兽）</td></tr>
+          <tr><td>2026年2月</td><td>许华哲在星海图估值冲破200亿元时正式离职，决定单飞创业</td></tr>
+          <tr><td>2026年3月</td><td>破壳（北京）智能科技有限公司正式注册成立</td></tr>
+          <tr><td>2026年4月</td><td>完成数千万美元天使轮融资，云启资本领投，估值约4亿美元</td></tr>
+          <tr><td>2026年4月</td><td>密集接受36氪、凤凰网科技、网易等媒体深度专访，公布完整战略</td></tr>
+          <tr><td>2026年4月</td><td>第一代32B参数具身世界模型完成首轮训练</td></tr>
+          <tr><td>2026年8月（计划）</td><td>计划展示全新数据采集系统</td></tr>
+        </table>
+      </div>
+
+      <h3 id="team">1.2 创始人及核心团队</h3>
+      <p>破壳机器人由许华哲单人创立并担任CEO，核心团队约20人，基本来自清华大学具身智能实验室（Tsinghua Embodied Intelligence Lab），其余成员正在大规模招聘中。团队整体为极强的学术派结构，尤其在具身智能算法和机器人学习领域具有国内顶尖的研究积累。</p>
+
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+          <tr><td>创始人/CEO</td><td>许华哲</td><td>清华大学电子工程系本科，UC Berkeley博士，斯坦福大学博士后。清华大学交叉信息研究院助理教授、博导，清华大学具身智能实验室（Tsinghua Embodied Intelligence Lab）负责人。被称为「伯克利归国四子」之一。2023年作为联合创始人兼首席科学家参与创办星海图，主导具身智能技术路线。2026年2月在星海图估值超200亿元之际离职单飞。初高中时期受《乔布斯传》影响，怀有创办To C科技公司的长期愿景。</td></tr>
+        </table>
+      </div>
+      <p>团队特点：核心成员均为清华具身智能实验室出身，在具身智能算法、强化学习、机器人操作领域有深度学术积累。团队整体规模约20人，处于初创期快速招聘阶段，属于典型的「学术大牛带队+实验室嫡系」人才结构。</p>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <h4>融资历史</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>轮次</th><th>时间</th><th>金额</th><th>估值</th><th>主要投资方</th></tr>
+          <tr><td>天使轮</td><td>2026.04</td><td>数千万美元</td><td>约4亿美元</td><td>云启资本（领投）、顺为资本、小米战投、弘晖基金、星海图、BV百度风投、英诺天使基金、水木清华校友种子基金、东方嘉富等</td></tr>
+          <tr><td>下一轮（预期）</td><td>谈判中</td><td>未披露</td><td>预期约7亿美元</td><td>未披露</td></tr>
+        </table>
+      </div>
+
+      <h4>股东结构</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>类型</th><th>股东</th><th>特征</th></tr>
+          <tr><td>产业资本</td><td>小米战投、星海图</td><td>小米战投代表雷军系C端战略布局；星海图以「老东家投前员工」方式参与种子轮，属生态闭环战略</td></tr>
+          <tr><td>头部VC</td><td>云启资本（领投）、顺为资本、弘晖基金、BV百度风投</td><td>一线美元/双币基金，顺为资本为雷军系核心VC</td></tr>
+          <tr><td>学术/校友</td><td>英诺天使基金、水木清华校友种子基金</td><td>清华系早期基金，提供学术圈层资源</td></tr>
+          <tr><td>市场化</td><td>东方嘉富</td><td>综合金融服务机构</td></tr>
+        </table>
+      </div>
+      <p>资本结构显著特征：产业资本+顶级VC+学术资本的混合型结构。小米战投和顺为资本的参与使公司带有强烈的「雷军系」标签，星海图以老东家身份注资则体现了具身智能赛道生态协同的趋势。目前尚处天使轮，创始人持股比例未公开。</p>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>维度</th><th>内容</th></tr>
+          <tr><td>AI技术架构</td><td>自研「视频→动作」世界模型，完全放弃行业主流的VLA（视觉-语言-动作）方案。核心思想：让机器人直接理解物理世界中「一个动作会导致什么变化」，而非经过语言中介</td></tr>
+          <tr><td>训练架构</td><td>UAG（Unconditioned Action Guidance）并联式预训练架构：①先对动作做预训练 → ②构建动作预测器 → ③动作预测器与视觉模型联合训练。相比传统瀑布式级联方案，训练效率提升至少5倍</td></tr>
+          <tr><td>模型规模</td><td>第一代具身世界模型参数规模32B，已完成首轮训练，处于数据迭代爬坡期</td></tr>
+          <tr><td>强化学习</td><td>贯穿预训练（离线RL）和后训练（在线RL）全流程。创新点：用价值函数评估数据质量，区分好/次优/失败数据；目标是在多任务上同时保持高成功率高速度，突破人类数据上限</td></tr>
+          <tr><td>数据方案</td><td>三层采集体系：①外骨骼数据采集（高精度高成本）→ ②UMI硬手套（低成本大批量，已迭代5-6版）→ ③第一人称视角自然行为视频。关键差异：大量使用机器人自测/探索数据（含失败样本）作为RL训练养料</td></tr>
+          <tr><td>全栈/专用</td><td>走全栈路线：自研本体（轮式底盘+双臂）+ 自研灵巧手 + 自研世界模型 + 自研数据采集系统，软硬件垂直整合</td></tr>
+        </table>
+      </div>
+      <p>破壳机器人的技术路线在2026年中国具身智能赛道中具有极高的差异化程度。当绝大多数企业（智元、银河通用、宇树等）沿用VLA/VLM基座模型路线时，许华哲明确提出「绝对不能我们造身体，等美国造大脑」，选择从底层架构重新设计具身智能的训练范式。世界模型路线的核心赌注在于：语言作为中介会引入信息损失，视频→动作的直接映射才能保留完整的物理世界先验。</p>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>维度</th><th>详情</th></tr>
+          <tr><td>形态</td><td>轮式底盘 + 双臂形态，自研本体，软硬件垂直整合</td></tr>
+          <tr><td>能力范围</td><td>不做「万能机器人」，聚焦约10件具体家庭任务：物体传递、收纳整理、精细清洁、洗衣、多步骤家务串联。主动放弃高风险动作（抱婴儿、烧热水）</td></tr>
+          <tr><td>价格区间</td><td>五位数起步（1万-数万人民币），定位「科技潮品 + 家庭助手 + 管家」复合体</td></tr>
+          <tr><td>目标用户</td><td>高净值家庭、科技尝鲜人群、有老人/儿童/宠物的中高收入家庭、高端住宅/物业/养老照护场景</td></tr>
+          <tr><td>发货时间</td><td>尚未发货。许华哲预测「两年内中国将出现可用的家庭机器人」</td></tr>
+        </table>
+      </div>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>场景分类</th><th>具体应用</th><th>说明</th></tr>
+          <tr><td>家庭服务（核心）</td><td>精细清洁、衣物收纳、物品传递、多步骤家务串联</td><td>全部聚焦C端家庭场景，不做工厂，不做商业服务</td></tr>
+          <tr><td>养老照护</td><td>辅助日常起居、物品取送</td><td>目标场景之一，非核心起步场景</td></tr>
+          <tr><td>高端物业</td><td>家庭管家服务</td><td>未来扩展方向</td></tr>
+        </table>
+      </div>
+      <p>破壳机器人的场景选择与中国具身智能行业主流路径形成鲜明对比：绝大多数企业（智元、银河通用、宇树、优必选等）采取「先工厂后家庭」的渐进路线，破壳是极少数直接切入纯C端家庭场景的企业。许华哲认为：工厂场景本质是标准化的，家庭场景的「混乱」才是训练通用模型的最佳土壤。</p>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <div class="callout">
+        <div class="callout-title">⚠️ 预营收阶段</div>
+        <p>破壳机器人成立于2026年3月，截至2026年5月，公司处于产品研发和数据迭代的早期阶段，尚未产生任何营收或产品出货。以下所有商业化指标均不适用。</p>
+      </div>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>指标</th><th>状态</th></tr>
+          <tr><td>产品发货</td><td>无。首款产品尚未发布，预计最早2027-2028年</td></tr>
+          <tr><td>订单/预售</td><td>无公开信息</td></tr>
+          <tr><td>标杆客户</td><td>无（未进入商业化阶段）</td></tr>
+          <tr><td>营收</td><td>0（预营收阶段）</td></tr>
+        </table>
+      </div>
+
+      <h3 id="finance">1.8 财务数据</h3>
+      <div class="callout">
+        <div class="callout-title">⚠️ 数据说明</div>
+        <p>破壳机器人为初创企业，成立仅1个月，无任何营收、利润或历史财务数据。公司为非上市企业，无需公开披露财务信息。以下仅为融资端参考数据。</p>
+      </div>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>指标</th><th>数据</th><th>说明</th></tr>
+          <tr><td>累计融资</td><td>数千万美元</td><td>仅天使轮（2026.04）</td></tr>
+          <tr><td>估值</td><td>约4亿美元</td><td>天使轮定价（2026.04）</td></tr>
+          <tr><td>营收（2026）</td><td>0</td><td>预营收</td></tr>
+          <tr><td>毛利率</td><td>不适用</td><td>—</td></tr>
+          <tr><td>账面现金</td><td>未披露</td><td>估算：天使轮融资额（数千万美元）扣除初期研发运营支出</td></tr>
+        </table>
+      </div>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>许华哲为「伯克利归国四子」之一，其余三位为高阳（千寻智能）、弋力（自变量机器人）、许华哲本人（破壳机器人）——四人均为UC Berkeley博士，在具身智能领域各自创业。</li>
+        <li>破壳机器人的命名寓意「小鸡破壳而出」，象征具身智能从实验室走向家庭的新生。</li>
+        <li>公司同时自研灵巧手和数据采集手套（已迭代5-6版），计划2026年8月末展示全新数据采集系统。</li>
+        <li>许华哲的创业时间线高度紧凑：2月离职、3月注册公司、4月完成融资+媒体曝光+模型首轮训练，体现了极强的执行节奏。</li>
+        <li>在C端家庭赛道中，破壳机器人面临的主要竞争来自自变量机器人（X Square，阿里/字节/美团/小米投资，B轮近20亿）、荣耀（消费级人形机器人12.8-15.8万元）等。</li>
+        <li>雷军在2026年3月两会期间表示：通用人形机器人进家庭「路还很长」，成本太高（二三十万家庭难接受）。小米同时投资了破壳机器人和自变量机器人，体现了在家庭机器人赛道的双轨布局策略。</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="a1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>许华哲的学术背景——UC Berkeley博士（强化学习/机器人操作）、斯坦福博士后、清华具身智能实验室负责人——天然适配家庭场景的开放环境挑战。他的研究核心一直是「机器人在非结构化环境中的泛化操作」，而家庭正是最高变异性、最大泛化难度的场景。选择C端而非B端，与其说是市场选择，不如说是学术信仰的延伸：在许华哲看来，工厂的标准化环境对训练真正的通用智能帮助有限，家庭「混乱」才是通向AGI的最佳训练场。然而，团队约20人且以算法研究人员为主的结构，意味着公司在硬件工程、供应链管理、量产制造等环节存在明显的经验缺口——这是家庭机器人赛道最大的「交付地狱」，也是纯学术团队面临的核心风险。</p>
+      </div>
+
+      <div class="analysis-block" id="a2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>破壳选择「世界模型」而非VLA，在技术哲学层面有严密的逻辑：家庭场景的任务高度物理化（抓取、放置、推拉、擦拭），语言中介引入的语义歧义和信息损失在此类场景中可能成为瓶颈。视频→动作的直接映射在理论上有更高的信息保真度。但世界模型路线的核心挑战在于数据需求：视频-动作对的采集成本远高于文本-动作对，且需要大量「失败数据」作为RL训练养料。破壳的三层数据采集方案（外骨骼+手套+第一人称）和「不丢弃失败数据」的策略是有意识地在应对这一挑战，但能否在两年内将32B模型训练到家庭场景可商用的水平，仍有较大的不确定性。32B参数对于「理解物理世界」这个目标而言可能偏小，后续可能需要大幅扩容。</p>
+      </div>
+
+      <div class="analysis-block" id="a3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>破壳的股东结构具有极强的战略信号意义。小米战投和顺为资本的组合，意味着雷军系在家庭机器人赛道的双轨押注（另一轨为自变量机器人的近20亿B轮）。这为破壳提供了三重潜在资源：小米智能家居生态的渠道协同、小米供应链的硬件制造能力支持、以及雷军系资本在后续轮次的持续跟投能力。星海图以「老东家注资」方式参与天使轮，则暗示了具身智能赛道的生态闭环思路——星海图侧重工业/通用能力，破壳聚焦家庭应用，两家可能在「数据+应用」层面形成战略协同。但值得注意的是，产业资本的绑定也可能限制破壳的未来选择空间——例如在生态排他性、定价策略等方面可能受到小米体系的影响。</p>
+      </div>
+
+      <div class="analysis-block" id="a4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>破壳机器人成立仅一个多月，目前尚未经历显著的试错与路径调整。但从许华哲的职业轨迹中可以观察到一种清晰的「路径深化」：星海图时期他主导具身智能算法方向，积累了工业级具身系统的工程经验和大规模团队管理经验；在星海图估值达到200亿高点时选择离开，表明他认为星海图的「先B后C」路线无法满足他对纯C端家庭机器人的追求。破壳的创立本身即是一次重大的路径选择——放弃已被验证的工业落地路径，押注一个在全球范围内尚未被证明可行的纯C端家庭机器人市场。这种「主动离开舒适区」的决策，在具身智能领域相当罕见。</p>
+      </div>
+
+      <div class="analysis-block" id="a5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>破壳机器人的核心取舍可以概括为三个维度。第一，场景取舍：完全放弃工厂B端（中国具身智能当前最大的变现市场），All-in家庭C端（全球尚未跑通的终极场景）。第二，产品取舍：不做万能机器人，只做10件具体家务——本质上是在追求「窄而深」的可靠闭环，而非「宽而浅」的炫技Demo。第三，技术取舍：放弃已被行业广泛采纳的VLA路线，赌世界模型是通向通用操作智能的正确路径。这三个取舍叠加，构成了一个极端高赔率、中等胜率的赌注：如果家庭场景跑通、世界模型有效、产品交付可靠，破壳将拥有极高的护城河；但如果任何一个环节卡住（尤其是家庭场景的泛化瓶颈），公司可能长期停留在「技术愿景强、商业兑现慢」的状态。</p>
+      </div>
+
+      <div class="analysis-block" id="a6">
+        <h4>2.6 其他重要观察</h4>
+        <p>破壳机器人的出现标志着中国具身智能赛道进入了一个新阶段：从「拼融资规模、拼工厂落地」的同质化竞争，开始出现真正意义上差异化的路线选择。许华哲在200亿估值巅峰「激流勇退」的行为本身具有很强的信号意义——顶级技术人才开始用脚投票，选择自己相信的技术方向而非跟随行业共识。另外值得注意的是时间窗口：许华哲认为「这两年」是家庭机器人的最佳入场时机（硬件供应链成熟、数据更丰富、融资环境改善），但雷军在同一时间表示家庭机器人「路还很长」。这种创始人与核心投资方之间的时间预期差，未来可能成为公司战略节奏上的张力点。最后，破壳与自变量机器人（同为「伯克利归国四子」中的弋力创办，同样聚焦家庭、获小米投资）之间可能形成有趣的「雷军系家庭机器人德比」——两家在技术路线、产品定义和资源获取上的竞争与分化，将成为观察中国C端具身智能演进的重要窗口。</p>
+      </div>
+
+      <h2 id="refs">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://www.163.com/dy/article/KRLPVUIR05568W0A.html" target="_blank">网易：人形机器人变天！中国"破壳"背水一战（2026.04）</a></li>
+          <li><a href="https://www.163.com/dy/article/KRMQGA1P0516EPQ9.html" target="_blank">网易：200亿巅峰离场！清华教授再创业，all in家庭机器人（2026.04）</a></li>
+          <li><a href="https://tech.ifeng.com/c/8sey1IIaI9E" target="_blank">凤凰网科技：离开百亿独角兽后，许华哲说"绝对不能我们造身体，等美国造大脑"（2026.04）</a></li>
+          <li><a href="https://www.163.com/dy/article/KQ3N711N0516EPQ9.html" target="_blank">网易：估值4亿美元！清华系具身智能入局家庭场景（2026.04）</a></li>
+          <li><a href="https://36kr.com/p/3784365164322055" target="_blank">36氪：「破壳机器人」许华哲：两年内，中国将出现可用的家庭机器人（2026.04）</a></li>
+          <li><a href="https://vr.zhidx.com/p/553325.html" target="_blank">智东西：雷军，投了一家刚成立1个月的北京家庭机器人公司（2026.04）</a></li>
+          <li><a href="https://m.finance.itbear.com.cn/html/2026-04/383696.html" target="_blank">ITBEAR：云启顺为等资本联手，清华团队创业打造家庭机器人新势力破壳机器人（2026.04）</a></li>
+          <li><a href="https://m.finance.itbear.com.cn/html/2026-04/383800.html" target="_blank">ITBEAR：许华哲再创业！破壳机器人获数千万美元融资（2026.04）</a></li>
+          <li><a href="https://m.ageclub.net/article-detail/9072" target="_blank">AgeClub：东方嘉富投资清华叉院许华哲「破壳机器人」数千万美元首轮融资（2026.04）</a></li>
+          <li><a href="https://www.huxiu.com/article/4853998.html" target="_blank">虎嗅：具身智能赛道转向家庭场景，破壳机器人完成数千万美元天使轮融资（2026.04）</a></li>
+          <li><a href="https://t.10jqka.com.cn/pid_619185840.shtml" target="_blank">同花顺：破壳机器人天使轮融资，融资额数千万美元（2026.04）</a></li>
+          <li><a href="https://www.iyiou.com/data/202604271128307" target="_blank">亿欧：北京破壳智能获天使轮融资（2026.04）</a></li>
+          <li><a href="https://app.myzaker.com/news/article.php?pk=69eeb5a98e9f09032e264520" target="_blank">ZAKER：「破壳机器人」许华哲：两年内，中国将出现可用的家庭机器人（2026.04）</a></li>
+          <li><a href="https://baijiahao.baidu.com/s?id=1863583390152605201" target="_blank">百度百家号：「破壳机器人」许华哲：两年内，中国将出现可用的家庭机器人（2026.04）</a></li>
+          <li><a href="https://news.marsbit.co/20260427091608352881.html" target="_blank">MarsBit：「破壳机器人」许华哲：两年内，中国将出现可用的家庭机器人（2026.04）</a></li>
+          <li><a href="https://36kr.com/p/3731059367703298" target="_blank">36氪：150家人形机器人公司的淘汰赛（2026）</a></li>
+          <li><a href="https://www.stcn.com/article/detail/3753646.html" target="_blank">证券时报：具身智能机器人融资狂飙（2026）</a></li>
+          <li><a href="https://www.jiemian.com/article/14120377.html" target="_blank">界面新闻：单月融资超百亿，谁在疯抢机器人？（2026）</a></li>
+          <li><a href="https://www.bjrd.gov.cn/zyfb/zt/14jqgrd04chybjdbthdztbd/bjtdt/202603/t20260309_4552305.html" target="_blank">北京人大：雷军：通用型人形机器人进家庭还要多久？（2026.03）</a></li>
+          <li><a href="https://news.china.com/socialgd/10000169/20260309/49306579.html" target="_blank">中华网：雷军回应人形机器人何时走进家庭（2026.03）</a></li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">本页面由具身智能Wiki自动分发器生成 · 数据截至2026年5月 · 内容仅供参考，不构成投资建议</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

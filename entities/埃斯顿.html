@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>埃斯顿 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> <span class="breadcrumb-sep">›</span> <span>埃斯顿</span></div>
+  <div class="wiki-header"><h1>埃斯顿</h1><div class="subtitle">Estun · 002747.SZ / 02715.HK · 1993年创立 · 2025年营收48.88亿元 · 中国工业机器人出货量第一</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#team">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financials">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#analysis-1">2.1 团队背景与场景匹配度</a></li>
+        <li class="toc-lvl4"><a href="#analysis-2">2.2 技术路线与场景适配性</a></li>
+        <li class="toc-lvl4"><a href="#analysis-3">2.3 股东结构对战略的影响</a></li>
+        <li class="toc-lvl4"><a href="#analysis-4">2.4 试错与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#analysis-5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#analysis-6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#references">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">埃斯顿</div>
+        <div class="ib-row"><div class="ib-label">公司全称</div><div class="ib-value">南京埃斯顿自动化股份有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">英文名称</div><div class="ib-value">Estun Automation Co., Ltd.</div></div>
+        <div class="ib-row"><div class="ib-label">创立时间</div><div class="ib-value">1993年</div></div>
+        <div class="ib-row"><div class="ib-label">注册地</div><div class="ib-value">中国江苏省南京市</div></div>
+        <div class="ib-row"><div class="ib-label">上市信息</div><div class="ib-value">A股 002747.SZ（2015年）/ 港股 02715.HK（2026年）</div></div>
+        <div class="ib-row"><div class="ib-label">创始人/实控人</div><div class="ib-value">吴波（持股约42.15%表决权）</div></div>
+        <div class="ib-row"><div class="ib-label">总裁（CEO）</div><div class="ib-value">吴侃</div></div>
+        <div class="ib-section">财务数据（2025）</div>
+        <div class="ib-row"><div class="ib-label">营业收入</div><div class="ib-value">48.88亿元</div></div>
+        <div class="ib-row"><div class="ib-label">归母净利润</div><div class="ib-value">0.35~0.50亿元（扭亏）</div></div>
+        <div class="ib-row"><div class="ib-label">毛利率</div><div class="ib-value">Q4升至32.97%</div></div>
+        <div class="ib-row"><div class="ib-label">研发投入</div><div class="ib-value">4.76亿元（占9.74%）</div></div>
+        <div class="ib-section">估值/市场地位</div>
+        <div class="ib-row"><div class="ib-label">A股市值</div><div class="ib-value">约246亿元（机构目标）</div></div>
+        <div class="ib-row"><div class="ib-label">中国市场地位</div><div class="ib-value">工业机器人出货量第一（份额10.5%）</div></div>
+        <div class="ib-row"><div class="ib-label">全球出货排名</div><div class="ib-value">第5位（份额5.5%，2024）</div></div>
+        <div class="ib-section">官网</div>
+        <div class="ib-row"><div class="ib-label">官方网站</div><div class="ib-value"><a href="https://www.estun.com" target="_blank">estun.com</a></div></div>
+      </aside>
+
+      <p class="article-intro">埃斯顿（Estun，A股代码002747.SZ / 港股代码02715.HK）成立于1993年，总部位于江苏省南京市，是中国工业机器人龙头企业。公司由东南大学教师出身的吴波创立，从伺服系统核心部件起步，三十年深耕自动化领域，形成了"核心部件—工业机器人—智能制造系统"的全产业链布局。2015年登陆深交所，2026年3月成为国内工业机器人领域首家"A+H"双上市企业。2025年营收48.88亿元，中国市场工业机器人出货量首次超越发那科等"四大家族"，登顶第一。公司通过子公司埃斯顿酷卓（持股13.95%）布局人形机器人赛道，已推出Codroid 02全尺寸双足人形机器人。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper"><table class="wikitable infotable">
+      <tr><th>项目</th><th>内容</th></tr>
+      <tr><td>公司全称</td><td>南京埃斯顿自动化股份有限公司</td></tr>
+      <tr><td>英文名称</td><td>Estun Automation Co., Ltd.（"ESTUN"取自西班牙语意为"东方第一"）</td></tr>
+      <tr><td>创立时间</td><td>1993年（自动化公司）；2015年3月20日深交所上市；2026年3月9日港交所上市</td></tr>
+      <tr><td>注册地</td><td>中国江苏省南京市江宁区</td></tr>
+      <tr><td>上市信息</td><td>深交所中小板 002747.SZ（2015年）；港交所主板 02715.HK（2026年），国内工业机器人领域首家"A+H"双上市</td></tr>
+      <tr><td>官方网站</td><td>www.estun.com</td></tr>
+      <tr><td>实际控制人</td><td>吴波家族（直接+间接行使约42.15%表决权）</td></tr>
+      <tr><td>所属赛道</td><td><span class="tag">工业机器人</span><span class="tag">伺服系统</span><span class="tag">人形机器人</span><span class="tag">智能制造</span></td></tr>
+      </table></div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper"><table class="wikitable">
+      <tr><th>时间</th><th>事件</th></tr>
+      <tr><td>1993年</td><td>吴波在南京江宁一间不足百平方米厂房创立埃斯顿工业自动化有限公司，从伺服系统切入</td></tr>
+      <tr><td>1998年</td><td>攻克高精度交流伺服系统（±0.01mm），实现关键部件国产替代</td></tr>
+      <tr><td>2003年</td><td>推出完全自主研发的交流伺服系统，价格降至进口产品的1/3，打破日系品牌垄断</td></tr>
+      <tr><td>2010年</td><td>第一台工业机器人诞生，正式进军机器人本体制造</td></tr>
+      <tr><td>2015年</td><td>深交所上市（002747.SZ），开启"内生增长+外延并购"双轮驱动</td></tr>
+      <tr><td>2017年</td><td>收购英国Trio（高端运动控制）和美国Barrett（灵巧手技术）</td></tr>
+      <tr><td>2019年</td><td>联合控股股东以约1.96亿欧元收购德国焊接机器人巨头Cloos</td></tr>
+      <tr><td>2022年</td><td>成立参股子公司埃斯顿酷卓，布局协作与人形机器人</td></tr>
+      <tr><td>2025年</td><td>中国市场工业机器人出货量首超发那科，登顶第一（份额10.5%）；全年营收48.88亿元扭亏为盈</td></tr>
+      <tr><td>2026年3月</td><td>港交所主板上市（02715.HK），募资约14.86亿港元，成为首家"A+H"中国机器人企业</td></tr>
+      </table></div>
+
+      <h3 id="team">1.2 创始人及核心团队</h3>
+      <p>埃斯顿的创始基因深植于中国制造业自主化的历史进程。吴波从大学教师转型企业家，历经三十年将一家伺服系统小厂打造为中国工业机器人出货量第一的龙头企业。公司治理呈现典型的家族控股+职业经理人特征，吴波之子吴侃已接棒总裁职务。</p>
+
+      <div class="table-wrapper"><table class="wikitable">
+      <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+      <tr><td>创始人、实际控制人</td><td>吴波</td><td>1955年出生，东南大学机械系硕士，曾任南京林业大学教师4年；1993年39岁时创业；2026年福布斯全球亿万富豪榜约15亿美元</td></tr>
+      <tr><td>副董事长、总裁</td><td>吴侃</td><td>吴波之子，实际操盘公司运营；同时担任埃斯顿酷卓法定代表人/董事长</td></tr>
+      <tr><td>埃斯顿酷卓CEO</td><td>李远平（博士）</td><td>工信部人形机器人"揭榜挂帅"项目核心成员，主导人形机器人业务</td></tr>
+      <tr><td>埃斯顿酷卓CTO</td><td>臧家炜（博士）</td><td>原埃斯顿未来技术研究院院长，负责人形机器人技术研发</td></tr>
+      </table></div>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <p>埃斯顿为A+H双上市公司，主要通过资本市场融资。2026年港股IPO募资约14.86亿港元，公开发售超额认购11.6倍。旗下人形机器人子公司埃斯顿酷卓于2024年完成Pre-A轮1.3亿元融资，投资方包括国家先进制造产业投资基金二期和江苏省战新母基金。</p>
+
+      <div class="table-wrapper"><table class="wikitable">
+      <tr><th>类别</th><th>详情</th></tr>
+      <tr><td>A股上市</td><td>2015年深交所中小板上市（002747.SZ）</td></tr>
+      <tr><td>港股上市</td><td>2026年3月港交所主板上市（02715.HK），发行价15.36~17.00港元，募资约14.86亿港元</td></tr>
+      <tr><td>实际控制人</td><td>吴波家族：直接持股12.74%，通过南京派雷斯特间接持股29.26%，合计约42.15%表决权</td></tr>
+      <tr><td>港股基石投资者</td><td>嘉实基金、亨通光电、海天国际等7家</td></tr>
+      <tr><td>埃斯顿酷卓（人形）融资</td><td>Pre-A轮1.3亿元（2024年11月）：国家先进制造产业投资基金二期（1亿）+江苏省战新母基金（3000万）；埃斯顿持有13.95%</td></tr>
+      <tr><td>江苏鼎汇创新中心</td><td>2025年10月成立，注册资本6000万，联合绿的谐波、亨通线缆、安培龙、泉峰汽车等</td></tr>
+      </table></div>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <p>埃斯顿坚持"核心部件100%自研+全产业链垂直整合"的技术路线，从伺服系统（肌肉与神经）起步，逐步向上延伸至控制器、工业机器人整机和人形机器人。公司研发投入常年维持在营收的10%左右。</p>
+
+      <div class="table-wrapper"><table class="wikitable">
+      <tr><th>技术维度</th><th>方案</th><th>说明</th></tr>
+      <tr><td>核心部件</td><td>伺服电机+控制器+减速器100%自研</td><td>中国唯一实现三大核心部件全自研的工业机器人企业；1998年突破高精度伺服（±0.01mm）</td></tr>
+      <tr><td>运动控制</td><td>自研控制器+Trio（英国）高端多轴控制</td><td>2017年收购Trio补强高端运动控制技术</td></tr>
+      <tr><td>工业机器人</td><td>96款机器人，负载3kg~1200kg</td><td>MTBF达12万小时；700kg重载机器人入选工信部首台重大技术装备推广目录</td></tr>
+      <tr><td>人形机器人</td><td>快慢系统具身架构</td><td>慢系统：视觉语言大模型任务理解；快系统：流匹配算法实时运动控制；关节模组全自研</td></tr>
+      <tr><td>AI融合</td><td>免示教焊接、数字孪生工厂</td><td>工业机器人+AI应用落地</td></tr>
+      <tr><td>研发投入</td><td>2025年4.76亿元（占营收9.74%）</td><td>累计800+项专利；常年维持营收10%左右</td></tr>
+      </table></div>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <p>埃斯顿拥有中国最全的工业机器人产品矩阵，同时通过参股子公司埃斯顿酷卓布局人形机器人。</p>
+
+      <div class="table-wrapper"><table class="wikitable">
+      <tr><th>产品系列</th><th>型号/代表</th><th>形态</th><th>定位</th><th>关键参数</th></tr>
+      <tr><td>工业机器人</td><td>96款，六轴/SCARA/协作/重载</td><td>多关节机械臂</td><td>核心营收来源（占82%）</td><td>负载3kg~1200kg；MTBF 12万小时；2025年出货量中国第一</td></tr>
+      <tr><td>自动化核心部件</td><td>伺服电机/驱动器/控制器</td><td>运动控制部件</td><td>技术根基</td><td>精度±0.01mm；占营收18%</td></tr>
+      <tr><td>焊接系统（Cloos）</td><td>中厚板焊接机器人</td><td>焊接专用</td><td>全球焊接Top3</td><td>2019年收购德国Cloos，中厚板焊接核心工艺</td></tr>
+      <tr><td>人形机器人（酷卓）</td><td>Codroid 02 / 启蒙C05-U / 磐石C05-L</td><td>双足/轮式人形</td><td>具身智能新方向</td><td>Codroid 02：170cm/70kg，31自由度；通过欧盟EN ISO安全认证</td></tr>
+      <tr><td>协作机器人（酷卓）</td><td>多可协作系列</td><td>协作机械臂</td><td>增长最快品类</td><td>2025年协作机器人出货增长超270%</td></tr>
+      </table></div>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <p>埃斯顿业务覆盖全球，海外收入占比约34%。欧洲为最大海外市场，2024年欧洲收入10.69亿元。</p>
+
+      <div class="table-wrapper"><table class="wikitable">
+      <tr><th>场景分类</th><th>具体场景</th><th>部署状态</th><th>代表客户</th></tr>
+      <tr><td>汽车制造</td><td>焊接、搬运、装配</td><td>规模化成熟业务</td><td>比亚迪、赛力斯等头部车企</td></tr>
+      <tr><td>锂电新能源</td><td>动力电池产线</td><td>出货量国内第一（份额16.9%）</td><td>宁德时代等</td></tr>
+      <tr><td>光伏</td><td>光伏组件制造</td><td>全球市占率超50%</td><td>隆基等</td></tr>
+      <tr><td>金属加工</td><td>钣金折弯</td><td>国内市占率超70%</td><td>金属加工企业</td></tr>
+      <tr><td>3C电子</td><td>精密装配、检测</td><td>规模化</td><td>3C制造企业</td></tr>
+      <tr><td>欧洲市场</td><td>汽车零部件、金属加工</td><td>德国/波兰/意大利基地</td><td>欧洲头部汽车零部件厂商</td></tr>
+      <tr><td>人形机器人（探索）</td><td>工业搬运、教育科研</td><td>小批量出货（数十台）</td><td>高校、科研机构、工业企业</td></tr>
+      </table></div>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <p>埃斯顿是中国规模化程度最高的工业机器人企业，2025年实现历史性突破——中国市场出货量首超发那科。</p>
+      <ul>
+        <li>2025年营收48.88亿元，工业机器人出货量中国市场第一（份额10.5%），全球第五（份额5.5%）</li>
+        <li>光伏机器人全球市占率超50%，全球第一；钣金折弯机器人国内市占率超70%</li>
+        <li>动力电池机器人国内出货量第一（份额16.9%）</li>
+        <li>全球75个服务网点，7大制造基地（国内5处+德国2处+波兰1处）</li>
+        <li>波兰工厂2026年6月投产，年产能1.5万台</li>
+        <li>海外收入占比约34%，欧洲为最大海外市场</li>
+        <li>人形机器人Codroid 02已获首批数十台订单，在教育科研领域小批量出货</li>
+        <li>港股募资14.86亿港元，用于全球产能扩张、战略并购、研发及服务能力提升</li>
+      </ul>
+
+      <h3 id="financials">1.8 财务数据</h3>
+      <p>以下数据来自埃斯顿（002747.SZ）公开年报及港股招股书。</p>
+
+      <div class="table-wrapper"><table class="wikitable">
+      <tr><th>指标</th><th>2023年</th><th>2024年</th><th>2025年</th><th>2026年Q1</th></tr>
+      <tr><td>营业收入</td><td>46.52亿元</td><td>40.09亿元</td><td>48.88亿元</td><td>12.17亿元</td></tr>
+      <tr><td>同比增速</td><td>—</td><td>-13.83%</td><td>+21.93%</td><td>-2.22%</td></tr>
+      <tr><td>归母净利润</td><td>—</td><td>-8.10亿元</td><td>0.35~0.50亿元（扭亏）</td><td>0.978亿元</td></tr>
+      <tr><td>毛利率</td><td>—</td><td>28.3%</td><td>Q4升至32.97%</td><td>30.39%</td></tr>
+      <tr><td>研发投入</td><td>—</td><td>—</td><td>4.76亿元（占9.74%）</td><td>—</td></tr>
+      <tr><td>经营现金流</td><td>—</td><td>0.57亿元</td><td>5.07亿元</td><td>—</td></tr>
+      <tr><td>资产负债率</td><td>—</td><td>—</td><td>约69.18%</td><td>—</td></tr>
+      <tr><td>商誉规模</td><td>—</td><td>—</td><td>约10亿元</td><td>—</td></tr>
+      </table></div>
+
+      <div class="table-wrapper"><table class="wikitable infotable">
+      <tr><th>业务板块</th><th>2025年收入</th><th>占比</th></tr>
+      <tr><td>工业机器人及智能制造系统</td><td>39.97亿元</td><td>~82%</td></tr>
+      <tr><td>自动化核心部件及运动控制系统</td><td>8.91亿元</td><td>~18%</td></tr>
+      </table></div>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>公司英文名"ESTUN"取自西班牙语，意为"东方第一"，体现了创立之初的国际化愿景</li>
+        <li>吴波创业初期用三年时间拆解73台进口伺服电机，手绘图纸超10万张，体现了极强的逆向工程与自主化决心</li>
+        <li>2024年巨亏主要来自商誉减值等非现金项目（Cloos等子公司受全球经济放缓影响），2025年主业强势反转</li>
+        <li>2025年工业机器人出货量首超发那科，是中国工业机器人产业四十年来首次有本土品牌在出货量上超越日本"四大家族"之首</li>
+        <li>港交所上市募资用途：25%全球产能扩张+25%战略并购+20%下一代机器人研发+10%全球服务能力+20%偿贷及营运资金</li>
+        <li>人形机器人子公司埃斯顿酷卓为参股公司（埃斯顿持股13.95%），不纳入合并报表</li>
+        <li>全系列通过CE机械指令、ISO 13849功能安全认证；国内"唯二"通过协作机器人德国TÜV功能安全认证</li>
+        <li>牵头成立江苏鼎汇具身智能机器人创新中心（注册资本6000万元），联合绿的谐波、亨通线缆、安培龙、泉峰汽车等</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="analysis-1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>埃斯顿的创始团队背景堪称中国制造业自主化进程的缩影。吴波从东南大学教师转型企业家，其核心驱动力来自"没有核心技术就没有议价权"的切肤之痛——这种经历深刻塑造了埃斯顿"先做强核心部件，再做整机"的路径选择。团队整体呈现"工程师文化+家族治理"的双重特征：一方面，三十年的伺服系统研发积淀使公司在工业场景中拥有极深的know-how壁垒；另一方面，吴波家族合计约42%的表决权使战略决策高度集中。在具身智能和人形机器人领域，埃斯顿通过参股子公司埃斯顿酷卓（持股仅13.95%）而非全资控股的方式布局，这一架构既降低了上市公司的财务风险，也保持了创业团队的灵活性——酷卓CEO李远平和CTO臧家炜均为机器人领域的青年学术人才，与母公司传统工业自动化的基因形成互补。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>埃斯顿"核心部件100%自研+全产业链垂直整合"的技术路线与工业场景高度适配，尤其是在光伏（全球市占率超50%）、钣金折弯（国内超70%）、动力电池（国内第一）等细分领域，埃斯顿凭借成本优势和快速响应能力形成了对发那科等外资品牌的替代效应。在向人形机器人延伸时，埃斯顿选择了"快慢系统具身架构"——慢系统负责高层语义理解与任务规划，快系统负责实时运动控制——这一架构本质上是对工业机器人控制算法（快系统）与视觉语言大模型（慢系统）的融合。埃斯顿三十年的伺服控制经验为快系统提供了深厚的工程积累，但在慢系统（大模型/感知推理）方面，相比智元等以AI为核心的公司存在能力差距。值得注意的是，埃斯顿选择通过参股而非全资控股方式布局人形机器人，这在一定程度上反映了对技术路线不确定性的风险管理。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>埃斯顿的资本结构经历了从"家族企业"到"A+H双上市公司"的演进。吴波家族约42%的表决权确保了战略的连续性和决策效率，这在需要长期投入的高端制造领域是重要优势。但家族控股也意味着公司治理的透明度和外部监督力度可能弱于机构主导型企业。2026年港股上市引入了嘉实基金、亨通光电等基石投资者，叠加此前A股市场的机构持股，公司的资本来源更加多元化。人形机器人子公司埃斯顿酷卓的融资结构极具战略意义——国家先进制造产业投资基金二期（1亿元）和江苏省战新母基金（3000万）的入局，既是国家级产业政策对埃斯顿人形路线的背书，也为后续政府订单和场景资源打开了通道。但值得注意的是，埃斯顿上市公司资产负债率高达69.18%、商誉约10亿元，财务杠杆偏高。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>埃斯顿三十年发展中的关键路径调整体现出清晰的战略逻辑。第一步：从伺服部件到工业机器人整机（2010年）——这是从"卖铲子"到"挖金子"的纵向延伸，逻辑是核心部件自研降低了整机成本。第二步：从内生增长到外延并购（2017-2019年）——收购英国Trio（运动控制）、美国Barrett（灵巧手）、德国Cloos（焊接），补齐了技术短板并打开了欧洲市场。第三步：从工业机器人到人形机器人（2022年至今）——通过参股子公司埃斯顿酷卓而非全资投入的方式进入，这既是对技术不确定性的审慎管理，也是对上市公司股东利益的保护。2024年的大额亏损（-8.10亿元，主要来自商誉减值）是一次重要的压力测试，公司2025年的扭亏为盈和经营现金流大幅改善（5.07亿元）证明其工业基本盘仍然稳固。但人形机器人业务目前仅"数十台订单"的规模，距离实质性商业化贡献仍有显著距离。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>埃斯顿在竞争格局中的核心取舍可以概括为"工业纵深优先vs平台生态优先"。与智元机器人的"全栈平台型"路线（大模型+OS+硬件+生态）不同，埃斯顿选择了更聚焦的"工业纵深"路线——深耕工业场景、核心部件自研、通过并购获取海外市场和关键技术。这一策略的优势在于：工业场景的客户粘性极高（一旦进入产线，替换成本极高），且核心部件自研构筑了成本壁垒（光伏机器人全球超50%市占率即为明证）。但在具身智能的新范式下，埃斯顿的挑战在于：工业机器人的"精确定位+预编程"范式与具身智能的"感知-推理-执行"范式存在本质张力，而公司在大模型、仿真平台、开发者生态等方面的投入远不及智元等竞争对手。人形机器人子公司仅持股13.95%的架构也意味着，即便酷卓成功，上市公司能享受的收益也有限。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-6">
+        <h4>2.6 其他重要观察与分析</h4>
+        <p>第一，埃斯顿2025年工业机器人出货量超越发那科登顶中国市场第一，这是一个里程碑式的事件——中国工业机器人产业四十年来首次有本土品牌在出货量上超越"四大家族"之首。但需注意出货量≠收入≠利润：发那科的全球营收规模约为埃斯顿的数倍，且利润率高得多。第二，埃斯顿的全球化路径（收购Cloos+Trio→在德国/波兰建厂→港股上市）为中国制造业企业"出海"提供了一个务实范本：以并购获取技术和渠道，以本土化制造规避贸易壁垒，以港股上市获取国际资本认同。第三，港股募资14.86亿港元中25%用于战略并购，暗示公司可能继续通过收购补齐人形机器人的AI/软件短板。第四，吴波家族的两代传承（吴波→吴侃）已基本完成，吴侃主导港股上市和酷卓布局，二代接班带来了更强的资本市场意识和国际化视野，但对传统工业企业的深度运营能力尚需时间验证。</p>
+      </div>
+
+      <h2 id="references">3 参考资料</h2>
+      <div class="references">
+      <ol>
+        <li><a href="https://wap.stockstar.com/detail/JC2026012200030101" target="_blank">全年扭亏为盈，看好公司具身智能+国际化布局 — 证券之星</a></li>
+        <li><a href="https://stock.hexun.com/2026-01-29/223324733.html" target="_blank">埃斯顿(002747)：全年扭亏为盈 看好公司具身智能+国际化布局 — 和讯</a></li>
+        <li><a href="https://www.163.com/dy/article/KKUED2D80519DG1H.html" target="_blank">从工业龙头到"人形机器人玩家"，埃斯顿有哪些优势基因？— 网易</a></li>
+        <li><a href="https://www.tmtpost.com/7894283.html" target="_blank">埃斯顿的中国机器人故事，要用真金白银撑起来 — 钛媒体</a></li>
+        <li><a href="https://stcn.com/article/detail/3677798.html" target="_blank">埃斯顿总裁吴侃：借"A+H"上市东风 从中国第一迈向全球前三 — 证券时报</a></li>
+        <li><a href="https://forbeschina.com/technology/71139" target="_blank">A股富豪叩关港股！埃斯顿通过港交所聆讯，冲击"A+H"双平台 — 福布斯中国</a></li>
+        <li><a href="https://finance.itbear.com.cn/html/2026-01/317939.html" target="_blank">从讲台到全球市场：71岁大学老师领航埃斯顿再冲港股IPO — 科技熊</a></li>
+        <li><a href="https://www.lieyunpro.com/archives/500501" target="_blank">年入超40亿，南京跑出一个工业机器人IPO — 猎云网</a></li>
+        <li><a href="http://www.iheima.com/article-393531.html" target="_blank">工业机器人"一哥"，又要IPO了 — i黑马</a></li>
+        <li><a href="http://njrb.njdaily.cn/html/2025-09/14/content_52_228061.htm" target="_blank">3款系列产品落地，拿下首批数十台订单 — 南京日报</a></li>
+        <li><a href="https://leaderobot.com/news/5614" target="_blank">人形机器人赛道"破局者"！埃斯顿酷卓发布Codroid 02 — 机器人大讲堂</a></li>
+        <li><a href="https://finance.eastmoney.com/a/202509033503360964.html" target="_blank">埃斯顿：埃斯顿酷卓新发布了第二代人形机器人Codroid 02 — 东方财富网</a></li>
+        <li><a href="https://api3.cls.cn/share/article/1877826" target="_blank">埃斯顿：参股人形机器人公司酷卓科技已完成Pre-A轮1.3亿元战略融资 — 财联社</a></li>
+        <li><a href="http://www.cfgw.net.cn/2025-06/19/content_25136451.html" target="_blank">省战新产业专项基金首投项目埃斯顿酷卓发布新一代人形机器人Codroid 02 — 财富管理网</a></li>
+        <li><a href="https://m.nbd.com.cn/articles/2025-02-18/3755744.html" target="_blank">埃斯顿：公司持有埃斯顿酷卓13.95%股份 — 每日经济新闻</a></li>
+        <li><a href="https://js.ifeng.com/c/8nfEgcCeiQn" target="_blank">埃斯顿等多家名企豪掷6000万，江苏鼎汇具身智能机器人创新中心来了 — 凤凰网江苏</a></li>
+        <li><a href="https://www.xhby.net/content/s690a0470e4b0c1378d705b16.html" target="_blank">新赛道上崭露头角，这家人形机器人企业做对什么？— 新华日报</a></li>
+        <li><a href="https://www.zgjssw.gov.cn/shixianchuanzhen/nanjing/202504/t20250419_8477943.shtml" target="_blank">人形机器人赛道跑出"工业派"黑马 — 中共江苏省委新闻网</a></li>
+        <li><a href="http://vip.stock.finance.sina.com.cn/q/go.php/vReport_Show/kind/lastest/rptid/830075515237/index.phtml" target="_blank">埃斯顿(002747)公司动态研究报告：盈利修复 机器人业务成长动能充足 — 新浪财经</a></li>
+        <li><a href="https://www.gt-io.com/zh/post/status/19525102" target="_blank">借工业机器人领域首家"A+H"上市东风 从中国第一迈向全球前三 — Gate广场</a></li>
+        <li><a href="http://basic.10jqka.com.cn/mobile/002747/company.html" target="_blank">埃斯顿(002747)公司资料 — 同花顺</a></li>
+        <li><a href="https://www.laohu8.com/post/537602947981408" target="_blank">2025扭亏+募资14亿扩产！工业机器人龙头埃斯顿港股IPO争议中登场 — 老虎社区</a></li>
+      </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">本页面为具身智能Wiki项目内容，遵循学术引用规范。最后更新：2026年5月4日。数据来源均为公开报道与公司官方披露。</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

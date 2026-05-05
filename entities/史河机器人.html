@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>史河机器人 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a><span class="breadcrumb-sep"> › </span><span>史河机器人</span></div>
+  <div class="wiki-header"><h1>史河机器人</h1><div class="subtitle">RobotPlusPlus · 2015年成立 · 舟山 · 中国爬壁机器人龙头 · 船舶除锈市占率70%</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#team">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financials">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#analysis1">2.1 团队背景与场景选择的匹配度</a></li>
+        <li class="toc-lvl4"><a href="#analysis2">2.2 技术路线与场景的适配性</a></li>
+        <li class="toc-lvl4"><a href="#analysis3">2.3 股东/资本结构对战略的影响</a></li>
+        <li class="toc-lvl4"><a href="#analysis4">2.4 试错过程与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#analysis5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#analysis6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#references">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">史河机器人</div>
+        <div class="ib-section">公司信息</div>
+        <div class="ib-row"><div class="ib-label">英文品牌</div><div class="ib-value">RobotPlusPlus (Robot++)</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2015年9月9日</div></div>
+        <div class="ib-row"><div class="ib-label">总部</div><div class="ib-value">浙江省舟山市普陀区（2025年迁址）</div></div>
+        <div class="ib-row"><div class="ib-label">创始人/CEO</div><div class="ib-value">许华旸</div></div>
+        <div class="ib-row"><div class="ib-label">上市状态</div><div class="ib-value">未上市（上市主体已落舟山）</div></div>
+        <div class="ib-row"><div class="ib-label">官网</div><div class="ib-value"><a href="https://www.robotplusplus.cn" target="_blank">robotplusplus.cn</a></div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">船舶除锈市占率</div><div class="ib-value">70%（国内第一）</div></div>
+        <div class="ib-row"><div class="ib-label">累计作业</div><div class="ib-value">3,000+艘十万吨级以上货轮</div></div>
+        <div class="ib-row"><div class="ib-label">服务船厂</div><div class="ib-value">100+家</div></div>
+        <div class="ib-row"><div class="ib-label">全球覆盖</div><div class="ib-value">20+国家</div></div>
+        <div class="ib-row"><div class="ib-label">员工规模</div><div class="ib-value">160+人，研发占比>60%</div></div>
+        <div class="ib-row"><div class="ib-label">专利储备</div><div class="ib-value">400+项（近半数为发明）</div></div>
+        <div class="ib-section">融资信息</div>
+        <div class="ib-row"><div class="ib-label">累计融资</div><div class="ib-value">约3.05亿元（11轮）</div></div>
+        <div class="ib-row"><div class="ib-label">最新轮次</div><div class="ib-value">C轮（2025年12月）</div></div>
+        <div class="ib-row"><div class="ib-label">2026年订单目标</div><div class="ib-value">3亿元</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">产品类别</div><div class="ib-value"><span class="tag">爬壁机器人</span><span class="tag tag-info">特种机器人</span><span class="tag">船舶除锈</span></div></div>
+      </aside>
+
+      <p class="article-intro">史河机器人（RobotPlusPlus），全称浙江史河科技有限公司，成立于2015年，源于清华大学制造工程研究所，是全球领先的高空爬壁特种机器人企业。公司以"让世上没有危险的工作"为使命，专注船舶除锈、化工防腐、风电运维等高空高危场景的机器人替代。其核心产品船舶除锈机器人在国内市场占有率达70%，累计完成3,000余艘十万吨级以上货轮除锈作业，出货量和作业量均为全球第一。2025年公司主体从北京迁至浙江舟山并实现大规模量产，2026年推出全国首款具身特种机器人，从"经验驱动"向"数据驱动"转型。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper">
+      <table class="wikitable infotable">
+        <tr><th>项目</th><th>内容</th></tr>
+        <tr><td>公司全称</td><td>浙江史河科技有限公司</td></tr>
+        <tr><td>英文品牌</td><td>RobotPlusPlus（Robot++）</td></tr>
+        <tr><td>曾用名</td><td>北京史河科技有限公司（2015-2025）</td></tr>
+        <tr><td>成立时间</td><td>2015年9月9日</td></tr>
+        <tr><td>注册地/总部</td><td>浙江省舟山市普陀区（2025年10月从北京迁址）</td></tr>
+        <tr><td>分支机构</td><td>北京、青岛、宁波、深圳、成都</td></tr>
+        <tr><td>上市状态</td><td>未上市，上市主体已落于舟山</td></tr>
+        <tr><td>企业资质</td><td>国家级专精特新"小巨人"、国家高新技术企业、国家知识产权优势企业、中关村金种子企业</td></tr>
+        <tr><td>官方网站</td><td>www.robotplusplus.cn</td></tr>
+        <tr><td>员工规模</td><td>160+人，研发人员占比超60%，博士占比超50%</td></tr>
+        <tr><td>注册资本</td><td>5,351.74万元（迁址后）</td></tr>
+      </table>
+      </div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>时间</th><th>事件</th></tr>
+        <tr><td>2015年</td><td>许华旸于北京创立史河科技，源于清华大学制造工程研究所</td></tr>
+        <tr><td>2017年</td><td>完成天使轮融资（熊猫资本），首款爬壁机器人样机问世</td></tr>
+        <tr><td>2018年</td><td>Pre-A轮（百度风投领投2,000万元）；产品进入船舶除锈领域</td></tr>
+        <tr><td>2019年</td><td>Pre-A+轮（中发展集团/银盈资本，3,500万元）；获评福布斯亚洲U30</td></tr>
+        <tr><td>2020年</td><td>合同额约5,000万元；船舶除锈机器人开始规模推广</td></tr>
+        <tr><td>2022年</td><td>B轮1,500万美元（美团+复星联合领投）；开始海外布局</td></tr>
+        <tr><td>2024年</td><td>B+至B+++++轮累计数亿元（浙能集团等）</td></tr>
+        <tr><td>2025年10月</td><td>公司主体从北京迁至浙江舟山普陀区，更名"浙江史河科技有限公司"</td></tr>
+        <tr><td>2025年11月</td><td>舟山大规模量产基地全面投产</td></tr>
+        <tr><td>2025年12月</td><td>C轮融资（强港基金、复兴资本/海港创投）</td></tr>
+        <tr><td>2026年2月</td><td>发布HighMaster系列除锈机器人，实现整船100%全覆盖</td></tr>
+        <tr><td>2026年3月</td><td>宣布全国首款具身特种机器人即将投运</td></tr>
+      </table>
+      </div>
+
+      <h3 id="team">1.2 创始人及核心团队</h3>
+      <p>史河机器人的核心团队以清华大学机械系为学术根基，属于典型的"顶级学府+国家重点实验室"驱动的技术密集型团队。团队博士占比超50%，主创人员全部来自清华大学、北京航空航天大学、北京理工大学等机器人领域国家重点实验室，兼具世界500强企业工作经历和创业经验。</p>
+
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+        <tr><td>创始人/CEO</td><td>许华旸</td><td>清华大学机械系博士、博士后；在校期间发表机器人方向顶级论文5篇，申请发明专利十余项；2015年读博期间发起minipc一体机项目获种子投资并被收购，获创业第一桶金后转型特种机器人；福布斯亚洲U30、福布斯中国U30、胡润百富U30</td></tr>
+        <tr><td>联合创始人/CTO</td><td>王志超</td><td>北京航空航天大学自动化系博士；10年自动化/物联网/机器视觉研发经验；曾任艾睿电子（Arrow Electronics）北京技术负责人</td></tr>
+        <tr><td>联合创始人/COO</td><td>姜雨</td><td>曾任太极计算机轨道交通事业部销售总监、同方股份重大项目部市场总监；具备丰富的政企大客户销售与项目交付经验</td></tr>
+      </table>
+      </div>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+
+      <h4>融资历史</h4>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>时间</th><th>轮次</th><th>金额</th><th>主要投资方</th></tr>
+        <tr><td>2017-2018</td><td>天使轮</td><td>约1,000万元</td><td>熊猫资本（领投）、启迪之星、老鹰基金</td></tr>
+        <tr><td>2018.06</td><td>Pre-A轮</td><td>2,000万元</td><td>BV百度风投（领投）、智能电网创投、熊猫资本（投后估值1.2亿元）</td></tr>
+        <tr><td>2019.10</td><td>Pre-A+轮</td><td>3,500万元</td><td>中发展集团、银盈资本（联合领投）、盛世资本、京信供销基金、科鑫资本</td></tr>
+        <tr><td>2021</td><td>A轮</td><td>未披露</td><td>未公开</td></tr>
+        <tr><td>2022.05</td><td>B轮</td><td>1,500万美元</td><td>美团、复星（联合领投）</td></tr>
+        <tr><td>2024-2025.03</td><td>B+至B+++++轮</td><td>累计数亿元</td><td>浙能集团等国内一线机构</td></tr>
+        <tr><td>2025.12</td><td>C轮</td><td>未披露</td><td>强港基金、复兴资本（海港创投）</td></tr>
+      </table>
+      </div>
+
+      <h4>股东结构特征</h4>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>股东类型</th><th>代表机构</th><th>战略意义</th></tr>
+        <tr><td>科技/互联网资本</td><td>BV百度风投、美团</td><td>AI技术与本地生活场景的战略协同</td></tr>
+        <tr><td>产业资本</td><td>复星、浙能集团</td><td>工业/能源场景资源赋能</td></tr>
+        <tr><td>国资/战略基金</td><td>中发展集团、强港基金（海港创投）、复兴资本</td><td>海洋经济、港口战略，与舟山迁址协同</td></tr>
+      </table>
+      </div>
+
+      <div class="callout"><div class="callout-title">上市预期</div>2025年10月将公司主体从北京迁至舟山，舟山成为中国总部及上市主体所在地。C轮引入强港基金（海港创投），与舟山海洋经济战略深度绑定。公司处于快速扩张阶段，上市路径正在筹备中。</div>
+
+      <h3 id="tech">1.4 技术路线</h3>
+
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>技术维度</th><th>详情</th></tr>
+        <tr><td>总体技术路线</td><td>"模块化底盘+可更换上装"的硬件平台化路线，结合"AI+特种作业"向具身智能升级</td></tr>
+        <tr><td>吸附技术</td><td>双技术路线并行：①磁吸附（永磁钕铁硼材料，用于钢铁壁面）；②负压吸附（用于玻璃/混凝土等非铁壁面）</td></tr>
+        <tr><td>负载能力</td><td>负载自重比高达3:1（行业平均1-1.5:1），最大负载150kg</td></tr>
+        <tr><td>曲面适应</td><td>柔性铰链及曲面自适应机构，可适应半径0.5m曲面，覆盖船体98%以上区域；最大越障15mm</td></tr>
+        <tr><td>定位导航</td><td>首创第三视角图像识别+多传感器融合，厘米级立面定位精度；第四代已具备自主导航功能</td></tr>
+        <tr><td>环保技术</td><td>超高压水射流+真空回收装置，废水100%实时回收；自研间隙密封技术水泵（打破国外垄断，节能30%）</td></tr>
+        <tr><td>AI/具身智能</td><td>"四级结构化数据"体系（信号→事件→任务→结果）；焊缝识别、表面缺陷检测；2026年推出首款具身特种机器人</td></tr>
+      </table>
+      </div>
+
+      <p>史河的技术路线以"硬件平台化、软件智能化"为核心理念。在硬件层面，模块化底盘设计使得同一底盘可搭载水射流、喷砂、喷涂、检测等不同上装，实现跨场景适配。在软件层面，从第三视角图像识别起步逐步向AI自主识别过渡——第四代机器人已具备自主导航能力，2026年推出的具身特种机器人将实现"作业即采集，运行即沉淀"的数据闭环。自研间隙密封技术水泵是核心零部件国产化的重要突破，体积缩小1/3、节能30%、维护间隔从300小时延长至2,000小时，价格比国外同类产品低20%。</p>
+
+      <h3 id="products">1.5 产品形态</h3>
+
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>产品系列</th><th>代表型号</th><th>功能</th><th>核心参数</th></tr>
+        <tr><td>船舶除锈（HighMate）</td><td>HighMate V40 Ultra</td><td>超高压水射流除锈</td><td>效率40-50m²/h（人工5倍），覆盖率98%</td></tr>
+        <tr><td>船舶除锈</td><td>HighMate V40 Max</td><td>全能型除锈</td><td>四轮组柔性磁吸附底盘</td></tr>
+        <tr><td>船舶除锈</td><td>HighMate C20</td><td>内舱清洗</td><td>可翻越正反折角/倒仰角，触达95%区域</td></tr>
+        <tr><td>船舶除锈（2026新品）</td><td>HighMaster系列</td><td>2m/4m/28m三款</td><td>协同实现整船100%全覆盖</td></tr>
+        <tr><td>化工防腐（HighMate AP）</td><td>HighMate AP系列</td><td>喷砂/水射流/喷涂多工艺</td><td>石化储罐专用，防爆型可选</td></tr>
+        <tr><td>风电运维（BeeBot）</td><td>BeeBot V20</td><td>塔筒检测</td><td>单根全检4小时（人工8-10倍）</td></tr>
+        <tr><td>建筑清洗（BeeBot）</td><td>BeeBot Pro 大黄蜂</td><td>高层外墙清洗</td><td>玻璃幕墙等非铁壁面</td></tr>
+        <tr><td>具身特种机器人（2026）</td><td>第四代+</td><td>自主理解任务→分解动作→执行→反馈</td><td>全国首款具身特种机器人</td></tr>
+      </table>
+      </div>
+
+      <p>2026年2月发布的HighMaster系列是产品线的重大升级，三款设备（2m/4m/28m工作高度）分别对应坞底、舭龙骨和船尾大面积除锈，三机协同首次实现整船除锈100%全覆盖。年内还将推出新一代轮式机器人，从修船延伸至造船领域，填补焊缝打磨等精细化作业的空白。</p>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>场景类别</th><th>具体应用</th><th>代表客户/合作伙伴</th></tr>
+        <tr><td>船舶修造</td><td>船体除锈（主力）、内舱清洗、焊缝打磨（2026延伸）</td><td>中船重工、中船工业、中远集团、招商系等100+船厂</td></tr>
+        <tr><td>化工防腐</td><td>储罐打磨、防爆除锈、防腐喷涂</td><td>中石油、中石化</td></tr>
+        <tr><td>能源电力</td><td>火电锅炉探伤检测、风电塔筒检测运维</td><td>国电投、大唐集团、国家特检院</td></tr>
+        <tr><td>建筑清洗</td><td>高层外墙（玻璃幕墙）清洗</td><td>—</td></tr>
+        <tr><td>基础设施</td><td>跨海大桥检测配套（规划）、污水处理设备（规划）</td><td>浙江特检院</td></tr>
+        <tr><td>造船（2026新场景）</td><td>焊缝打磨、分段建造中的精细化作业</td><td>舟山本地船企</td></tr>
+      </table>
+      </div>
+
+      <p>史河的场景布局呈现"船舶为绝对核心、化工/能源为增长两翼、建筑/基建为远期储备"的靶心结构。舟山船企占其总订单量近六成，迁址后这一比例预计将进一步上升。2026年正从修船向造船延伸，同时规划向海上风电、跨海大桥配套等舟山海洋经济相关领域拓展。</p>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>指标</th><th>数据</th><th>说明</th></tr>
+        <tr><td>国内船舶除锈市占率</td><td>70%</td><td>绝对龙头</td></tr>
+        <tr><td>累计作业船舶</td><td>3,000+艘</td><td>十万吨级以上货轮</td></tr>
+        <tr><td>服务船厂</td><td>100+家</td><td>国内外大型船厂</td></tr>
+        <tr><td>全球覆盖</td><td>20+国家</td><td>东南亚、中东、欧洲、非洲、北美</td></tr>
+        <tr><td>全球排名</td><td>出货量/作业量/市占率全球第一</td><td>爬壁机器人细分赛道</td></tr>
+        <tr><td>2025年合同额</td><td>首批约1,000万元（舟山产线试产）</td><td>千万元级海外订单同步赶工</td></tr>
+        <tr><td>2026年1月</td><td>已获订单超3,000万元</td><td>首批新品订单约600万元来自上海</td></tr>
+        <tr><td>2026年全年目标</td><td>集团订单3亿元</td><td>预计2027-2030年保持70-80%增速</td></tr>
+        <tr><td>回本周期</td><td>6-12个月</td><td>船舶领域</td></tr>
+      </table>
+      </div>
+
+      <p>史河的商业化经历了从"机器人即服务（RaaS）"向"硬件销售+租赁"的转型，船舶领域客户回本周期已压缩至6-12个月。2025年11月舟山量产基地全面投产后产能大幅提升，2026年1月订单已超3,000万元，生产线满负荷运转，全年订单排至第二季度。海外客户已专程到舟山工厂考察，非洲客户正在洽谈独家代理权。</p>
+
+      <h3 id="financials">1.8 财务数据</h3>
+
+      <p>史河机器人为非上市公司，详细财务数据未公开披露。以下为公开信息汇总：</p>
+
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>指标</th><th>数据/状态</th><th>说明</th></tr>
+        <tr><td>融资总额</td><td>约3.05亿元</td><td>11轮累计</td></tr>
+        <tr><td>最新估值</td><td>未公开</td><td>C轮后估值未披露</td></tr>
+        <tr><td>2020年合同额</td><td>约5,000万元</td><td>疫情年份</td></tr>
+        <tr><td>2025年试产订单</td><td>首批约1,000万元</td><td>舟山产线10月试投产</td></tr>
+        <tr><td>2026年1月订单</td><td>超3,000万元</td><td>年初</td></tr>
+        <tr><td>2026年目标</td><td>集团订单3亿元</td><td>翻倍级增长</td></tr>
+        <tr><td>2027-2030年展望</td><td>每年70-80%增速</td><td>高速增长期</td></tr>
+      </table>
+      </div>
+
+      <div class="callout"><div class="callout-title">对标参考</div>美国竞争对手Gecko Robotics于2025年6月完成1.25亿美元D轮融资，估值达12.5亿美元。虽然Gecko以AI数据平台为估值核心（与史河的硬件驱动模式不同），但两家企业在爬壁机器人这一底层技术上存在重叠。史河若成功向具身智能和数据平台方向延伸，估值想象空间将被重新定义。</div>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>史河机器人的企业使命是"让世上没有危险的工作"，定位清晰且具有社会价值。</li>
+        <li>全球修船业务80%以上的业务量在中国，年涂装面积达2,000万-3,000万平方米，为史河提供了巨大的本土市场基本盘。</li>
+        <li>公司自研的间隙密封技术水泵打破了国外长期垄断，体积缩小约1/3、节能30%，价格比国外同类产品低20%，维护间隔从300小时延长至2,000小时。</li>
+        <li>史河机器人在舟山的量产基地充分依托当地船舶产业集聚优势，与船企形成了"产学研销"良性闭环：船厂需求→研发方向→实景测试→工人反馈→产品迭代。</li>
+        <li>2026年第四代机器人已具备自主导航功能（设定矩形作业区域→自动完成），正在推进视觉算法融入以实现自主识别锈点。</li>
+        <li>史河曾获评"中关村国际前沿科技创新大赛TOP 10"，在特种机器人领域具有较高的行业认可度。</li>
+        <li>公司层面，2025年10月迁址更名标志着从"北京科创企业"向"舟山海洋经济核心企业"的战略身份转换。</li>
+        <li>全球爬壁机器人赛道已呈现"欧美Gecko，亚太史河"的双极格局初步形态。</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="analysis1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>许华旸团队出自清华大学机械系制造工程研究所，学术基因深厚。清华机械系在机器人机构学、曲面加工、智能制造等领域有深厚的学术积累，这直接支撑了史河在复杂曲面壁面吸附、负载自重比优化等方面的核心技术突破。CTO王志超的北航自动化+机器视觉背景则补齐了导航与感知能力，COO姜雨的太极/同方政企销售经验为打通中船、中石化等央企大客户提供了关键渠道资源。团队"顶级学术+产业老兵+销售通路"的三角结构，与高空特种机器人"高技术壁垒+高客户门槛"的赛道特征高度匹配。但值得注意的是，AI和具身智能需要数据科学、强化学习等新能力，史河现有团队以传统机器人和自动化为主，在向"数据驱动"转型过程中可能需要引入AI算法方面的重量级人才。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>史河的"模块化底盘+可更换上装"技术路线是其最核心的战略智慧。在特种机器人领域，各细分场景（除锈、喷漆、检测、清洗）的壁垒在于"如何在特定壁面可靠移动"，而非"上装工具本身"。史河选择将研发重心放在吸附、越障、曲面适应等移动能力上，通过标准化底盘接口兼容多种工艺上装，实现了"一次研发、多场景复用"的杠杆效应。磁吸附+负压吸附的双技术路线则使得同一平台可以覆盖钢铁壁面（船舶/储罐）和非铁壁面（玻璃幕墙/混凝土），大幅扩大了可服务市场。在AI层面，史河的"四级结构化数据"体系（信号→事件→任务→结果）体现了从设备传感器数据中提取结构化价值的意图，但要实现真正的"具身智能"（自主理解任务→分解动作→执行→反馈），还需要大量真实作业数据的积累和算法迭代。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>史河的股东结构演进清晰地勾勒出其战略重心的转移轨迹。早期BV百度风投的入局为机器视觉和AI能力的建立提供了技术生态支撑；B轮美团和复星的联合领投则意味着本地生活（建筑清洗）和工业场景（化工/能源）的双线布局。最具战略意义的转折是2025年C轮引入强港基金（海港创投）并完成主体迁址舟山——这不仅是融资行为，更是一次"产业根据地"的重新锚定。舟山是全球最大的船舶修造基地之一，迁址后史河与船厂客户形成"门对门"的产业协同，大幅度降低了产品迭代周期和服务交付成本。从资本角度看，强港基金的港口/海洋经济属性也暗示着史河未来的上市故事将是"海洋经济+特种机器人"的复合叙事，而非单纯的机器人硬件公司。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>史河的发展路径中有几次重要的调整：(1) 从minipc一体机到特种机器人——创始人许华旸读博期间的minipc项目被收购后，将资金转向了技术壁垒更高的高空机器人方向，这是一次基于自身清华机械背景的理性转型。(2) 从RaaS到硬件销售——早期史河以"机器人即服务"模式运营，按作业面积收费，降低了客户试用门槛；随着产品成熟度和客户信任度提升，逐渐转向硬件销售+租赁，改善了现金流和收入可预测性。(3) 从北京到舟山的战略大转移——2025年的迁址不仅是地理迁移，更是从"技术研发驱动"到"产业深耕驱动"的模式升级。北京保留了研发功能，而生产、测试、客户交互全部扎根舟山，形成了"北京研、舟山造"的双城格局。(4) 从修船到造船的场景延伸——2026年规划中的焊缝打磨机器人标志着史河从"维护保养"向"制造环节"的跃迁，这是更大的市场但技术难度也更高。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>史河在全球爬壁机器人赛道做出了"硬件全栈+场景垂直深耕"的战略取舍。与美国对标的Gecko Robotics以"AI+数据平台"为核心、硬件为采集工具不同，史河的竞争壁垒建立在"在船舶除锈这个单一场景做到极致"——70%市占率、3,000+艘作业经验、100+船厂客户、舟山产业集聚效应。这种"窄场景、深壁垒"的策略使得史河在细分领域几乎不可撼动。但取舍的另一面是：史河在AI数据平台层面的积累远不如Gecko（后者70-80%收入来自检测服务和SaaS订阅），如果将估值对标Gecko的12.5亿美元，史河需要证明自己不仅是"全球最大的除锈机器人公司"，更是"能够从作业数据中持续创造价值的平台公司"。2026年的具身智能布局正是对这一短板的针对性补强。在国内，史河在爬壁机器人细分赛道的竞争对手（镌极、圣瑞、行知行、彼合彼方等）在规模和市占率上都较史河有明显差距。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis6">
+        <h4>2.6 其他重要观察</h4>
+        <p>(1) <strong>全球修船业的"中国红利"</strong>：全球80%以上的修船业务在中国，每年2,000万-3,000万平方米涂装面积构成了史河的天然护城河。只要中国修船产业不外移，史河的国内基本盘就极其稳固。(2) <strong>从"除锈"到"数据资产"的价值跃升</strong>：史河2026年提出的"作业即采集，运行即沉淀"目标——计划两年内构建国内首个大规模高质量物理交互数据库——如果实现，将使其从"设备销售商"变为"数据平台商"，估值逻辑将发生根本性变化。但这一转型需要AI算法团队的大规模扩充和数据处理基础设施的持续投入。(3) <strong>舟山生态位的不可复制性</strong>：迁址舟山后与船企的"产学研销"闭环是一个需要时间沉淀的壁垒，竞争对手难以短期复制。但过度依赖舟山也意味着如果当地船舶产业出现周期性波动，史河将首当其冲。(4) <strong>国际化的窗口期</strong>：史河已进入20+国家，非洲客户正在洽谈独家代理，但相比Gecko获得的美国国防部/海军等国家级客户，史河的海外客户以商业船厂为主，政治壁垒较低但客户黏性也可能较弱。(5) <strong>企业使命的社会价值</strong>："让世上没有危险的工作"这一使命在ESG和双碳政策背景下具有额外的叙事价值，有利于获得政府支持和公众认可。</p>
+      </div>
+
+      <h2 id="references">3 参考资料</h2>
+      <div class="references">
+      <ol>
+        <li><a href="https://www.robotplusplus.cn" target="_blank">史河机器人官方网站 (RobotPlusPlus)</a></li>
+        <li><a href="https://wapbaike.baidu.com/item/北京史河科技有限公司/22565667" target="_blank">北京史河科技有限公司 — 百度百科</a></li>
+        <li><a href="http://static.cyzone.cn/article/804456.html" target="_blank">对标12.5亿美金独角兽，史河机器人继续领跑中国高空机器人赛道 — 创业邦</a></li>
+        <li><a href="http://zcl.just.edu.cn/2026/0312/c3210a371198/page.htm" target="_blank">全国首款具身特种机器人即将投运，史河科技引领船舶海工迈入"数据驱动"新时代 — 江苏科技大学</a></li>
+        <li><a href="https://epaper.wifizs.cn/zsrb/2025-11/21/content_99230577.html" target="_blank">舟山首个大规模量产特种机器人项目昨全面投产 — 舟山日报</a></li>
+        <li><a href="https://epaper.wifizs.cn/zsrb/2025-11/24/content_99230946.html" target="_blank">舟山缘何成特种机器人的"梦工厂"？ — 舟山日报</a></li>
+        <li><a href="https://epaper.wifizs.cn/zsrb/2026-02/09/content_99241349.html" target="_blank">"史河机器人"成功突破国外技术封锁 — 舟山日报</a></li>
+        <li><a href="https://finance.sina.cn/2026-02-12/detail-inhmqmpx9540026.d.html" target="_blank">节能30%，浙江企业自研"除锈神器"订单火爆 — 新浪财经</a></li>
+        <li><a href="http://ptnews.zjol.com.cn/putuo/system/2026/03/17/035174630.shtml" target="_blank">史河科技以自主研发打造硬核实力 把根扎深 把技练精 把路走宽 — 浙江在线/普陀新闻网</a></li>
+        <li><a href="https://m.cyzone.cn/article/629506.html" target="_blank">让世上没有危险的工作，史河科技用特种机器人服务高空工业场景 — 创业邦</a></li>
+        <li><a href="https://www.robotplusplus.cn/news/87.html" target="_blank">高空作业机器人的领导者RobotPlusPlus在B系列中筹集了1500万美元 — 史河官网</a></li>
+        <li><a href="https://m.bjnews.com.cn/detail/166179148614733.html" target="_blank">机器人秀硬核技术，"爬墙"为船除锈 — 新京报</a></li>
+        <li><a href="https://vc.pedaily.cn/company/10091.html" target="_blank">浙江史河科技有限公司 — 投资界</a></li>
+        <li><a href="http://news.jstv.com/a/20180419/1524103401618.shtml" target="_blank">智能特种机器人公司史河科技完成千万级天使轮融资 — 江苏卫视</a></li>
+        <li><a href="http://www.iheima.com/article-193574.html" target="_blank">史河科技完成2000万Pre-A轮融资，BV百度风投领投 — i黑马</a></li>
+        <li><a href="https://media.qimingpian.cn/qmp/933d426f5f9934e99082a9e0cd597231.html" target="_blank">史河科技获得3500万元新一轮融资 — 企名片</a></li>
+        <li><a href="https://news.pedata.cn/594533.html" target="_blank">智能高空机器人研发商"史河科技"完成3500万元Pre-A+轮融资 — 投中网</a></li>
+        <li><a href="https://pro.jiqizhixin.com/database/solutions/d8ea052b-7089-4a1c-a06c-fa9d65c77ffd" target="_blank">爬壁机器人解决方案 — 机器之心方案库</a></li>
+        <li><a href="http://www.jushenyanxishe.com/archives/497533" target="_blank">中国史河、美国Gecko两家头部均获数亿投资，高空机器人加速驶入千亿快车道 — 具身研习社</a></li>
+        <li><a href="https://dxpress.gelonghui.com/p/4324009" target="_blank">全球爬壁机器人底盘研究报告：市场规模、头部企业竞争及产业链分析 — 格隆汇</a></li>
+        <li><a href="https://www.kczg.org.cn/fruit/detail?id=554108" target="_blank">超高压水射流除锈机器人 — 科创中国</a></li>
+        <li><a href="https://www.shipoe.com/news/show-86299.html" target="_blank">史河科技拟中标超高压水射流货舱除锈清洗爬壁机器人关键技术研发项目 — ShipOE</a></li>
+        <li><a href="https://m.163.com/dy/article/KF28C4P605149TGD.html" target="_blank">大规模生产特种机器人！这家公司从北京迁至普陀 — 网易</a></li>
+        <li><a href="https://tracxn.com/d/sectors/wall-climbing-robots/__LmOdxkDTn165qLNjGEho0POC4smr82va3xe49SSyF_o#about" target="_blank">Wall Climbing Robots - 2026 Market & Investments Trends — Tracxn</a></li>
+      </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">本页面内容基于公开信息整理，数据截止至2026年5月。史河机器人 — 具身智能Wiki</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>新松机器人 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> <span class="breadcrumb-sep">›</span> <span>新松机器人</span></div>
+  <div class="wiki-header"><h1>新松机器人</h1><div class="subtitle">SIASUN · 300024.SZ · 2000年成立 · 2025年营收41.22亿元 · A股市值约225亿元</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#team">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financials">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#analysis-1">2.1 团队背景与场景匹配度</a></li>
+        <li class="toc-lvl4"><a href="#analysis-2">2.2 技术路线与场景适配性</a></li>
+        <li class="toc-lvl4"><a href="#analysis-3">2.3 股东结构对战略的影响</a></li>
+        <li class="toc-lvl4"><a href="#analysis-4">2.4 试错与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#analysis-5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#analysis-6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#references">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">新松机器人</div>
+        <div class="ib-row"><div class="ib-label">公司全称</div><div class="ib-value">沈阳新松机器人自动化股份有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">英文名称</div><div class="ib-value">SIASUN Robot & Automation Co., Ltd.</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2000年4月</div></div>
+        <div class="ib-row"><div class="ib-label">注册地</div><div class="ib-value">中国辽宁省沈阳市</div></div>
+        <div class="ib-row"><div class="ib-label">上市信息</div><div class="ib-value">深交所创业板 300024.SZ（2009年上市）</div></div>
+        <div class="ib-row"><div class="ib-label">创始人</div><div class="ib-value">曲道奎博士</div></div>
+        <div class="ib-row"><div class="ib-label">董事长</div><div class="ib-value">胡琨元</div></div>
+        <div class="ib-row"><div class="ib-label">总裁</div><div class="ib-value">张进</div></div>
+        <div class="ib-row"><div class="ib-label">实际控制人</div><div class="ib-value">中国科学院沈阳自动化研究所</div></div>
+        <div class="ib-section">财务数据（2025）</div>
+        <div class="ib-row"><div class="ib-label">营业收入</div><div class="ib-value">41.22亿元</div></div>
+        <div class="ib-row"><div class="ib-label">归母净利润</div><div class="ib-value">-3.98亿元</div></div>
+        <div class="ib-row"><div class="ib-label">毛利率</div><div class="ib-value">12.48%</div></div>
+        <div class="ib-row"><div class="ib-label">研发投入</div><div class="ib-value">3.64亿元（占营收8.84%）</div></div>
+        <div class="ib-section">估值/市值</div>
+        <div class="ib-row"><div class="ib-label">A股市值</div><div class="ib-value">约225亿元（2026年4月）</div></div>
+        <div class="ib-row"><div class="ib-label">员工人数</div><div class="ib-value">3,422人</div></div>
+        <div class="ib-section">官网</div>
+        <div class="ib-row"><div class="ib-label">官方网站</div><div class="ib-value"><a href="https://www.siasun.com" target="_blank">siasun.com</a></div></div>
+      </aside>
+
+      <p class="article-intro">新松机器人（SIASUN，股票代码300024.SZ）成立于2000年4月，总部位于辽宁省沈阳市，是中国机器人产业的开拓者和龙头企业。公司由中国科学院沈阳自动化研究所孵化，创始人为曲道奎博士——师从"中国机器人之父"蒋新松院士。2009年登陆深交所创业板，成为"中国机器人第一股"。新松拥有中国最全的机器人产品线，覆盖工业机器人、移动机器人（AGV）、特种机器人和半导体装备等领域，业务遍及全球40余个国家和地区。2025年公司营收41.22亿元，各类机器人销量约13,676台（同比增65%），并成立具身智能研究院，发布"松羿""松行"等人形机器人产品，全面布局具身智能新赛道。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper"><table class="wikitable infotable">
+      <tr><th>项目</th><th>内容</th></tr>
+      <tr><td>公司全称</td><td>沈阳新松机器人自动化股份有限公司</td></tr>
+      <tr><td>英文名称</td><td>SIASUN Robot & Automation Co., Ltd.</td></tr>
+      <tr><td>成立时间</td><td>2000年4月30日</td></tr>
+      <tr><td>注册地</td><td>中国辽宁省沈阳市浑南区</td></tr>
+      <tr><td>上市信息</td><td>深交所创业板上市（2009年10月），股票代码300024.SZ，"中国机器人第一股"</td></tr>
+      <tr><td>官方网站</td><td>www.siasun.com</td></tr>
+      <tr><td>实际控制人</td><td>中国科学院沈阳自动化研究所</td></tr>
+      <tr><td>所属赛道</td><td><span class="tag">工业机器人</span><span class="tag">移动机器人</span><span class="tag">半导体装备</span><span class="tag">具身智能</span></td></tr>
+      </table></div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper"><table class="wikitable">
+      <tr><th>时间</th><th>事件</th></tr>
+      <tr><td>2000年</td><td>由中科院沈阳自动化所机器人研究室20-30名科研人员发起成立，公司名取自蒋新松院士之名</td></tr>
+      <tr><td>2001年</td><td>中标成都军区后勤仓库项目；首台量产国产移动机器人问世</td></tr>
+      <tr><td>2006年</td><td>真空（洁净）机器人通过国家级鉴定，填补国内空白</td></tr>
+      <tr><td>2007年</td><td>首次在全球招标中胜出美国通用汽车，改写中国机器人只有进口没有出口的历史</td></tr>
+      <tr><td>2009年</td><td>创业板上市，成为"中国机器人第一股"</td></tr>
+      <tr><td>2012年</td><td>28台伺服点焊机器人进入国际知名汽车品牌焊接生产线</td></tr>
+      <tr><td>2018年</td><td>平昌冬奥会闭幕式"北京8分钟"，24台移动机器人惊艳世界</td></tr>
+      <tr><td>2024年</td><td>业务覆盖全球40余国，服务4000+企业；《财富》世界500强中45%的制造业企业是新松客户</td></tr>
+      <tr><td>2025年4月</td><td>成立具身智能研究院，发布"松羿""松行""睿可RICO"人形机器人</td></tr>
+      <tr><td>2025年</td><td>各类机器人销量13,676台（+65%），新加坡港部署近200台港口移动机器人</td></tr>
+      </table></div>
+
+      <h3 id="team">1.2 创始人及核心团队</h3>
+      <p>新松机器人的创始基因深植于中国科学院沈阳自动化研究所——中国机器人技术的国家级策源地。公司名"新松"取自"中国机器人之父"蒋新松院士，体现了学术传承与技术立企的基因。团队整体以工科科研背景为主，管理风格稳健偏传统制造业。</p>
+
+      <div class="table-wrapper"><table class="wikitable">
+      <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+      <tr><td>创始人</td><td>曲道奎</td><td>博士，师从蒋新松院士，中国机器人产业领军人物，博士生导师，长期担任公司董事长/总裁</td></tr>
+      <tr><td>董事长</td><td>胡琨元</td><td>中国科学院沈阳自动化研究所背景，现任公司董事长</td></tr>
+      <tr><td>总裁/总经理</td><td>张进</td><td>2025年新一代领导层接棒，主导公司日常经营</td></tr>
+      <tr><td>实际控制人</td><td>中国科学院沈阳自动化研究所</td><td>国家级科研机构，为公司提供持续的技术与人才支撑</td></tr>
+      </table></div>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <p>新松机器人作为A股上市公司，主要通过资本市场和债务融资。2025年实施首期限制性股票激励计划，覆盖729名员工共1,540.8万股。目前长短期借款合计约22.9亿元。</p>
+
+      <div class="table-wrapper"><table class="wikitable">
+      <tr><th>类别</th><th>详情</th></tr>
+      <tr><td>上市信息</td><td>2009年深交所创业板上市（300024.SZ），IPO募集资金用于产业化升级</td></tr>
+      <tr><td>实际控制人</td><td>中国科学院沈阳自动化研究所（国有科研机构）</td></tr>
+      <tr><td>融资方式</td><td>以债务融资为主（长短期借款约22.9亿元），辅以股权激励</td></tr>
+      <tr><td>股权激励</td><td>2024年首期限制性股票激励，覆盖729人共1,540.8万股</td></tr>
+      <tr><td>合资/投资</td><td>与松下、吉利、新加坡港务集团等建立深度战略合作和合资关系</td></tr>
+      </table></div>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <p>新松坚持"核心零部件自研+系统集成"的技术路线，拥有运动控制器、伺服电机、伺服驱动器等核心零部件的自主研发能力。2025年成立的具身智能研究院是其从传统工业机器人向"机器人+AI"融合转型的关键支点。</p>
+
+      <div class="table-wrapper"><table class="wikitable">
+      <tr><th>技术维度</th><th>方案</th><th>说明</th></tr>
+      <tr><td>AI架构</td><td>类脑分层智能（大脑感知推理+小脑运动控制）</td><td>2025年具身智能研究院主攻方向；多模态大模型+强化学习+模仿学习</td></tr>
+      <tr><td>核心零部件</td><td>运动控制器、伺服电机、伺服驱动器（自研）</td><td>全链条自主化，国产替代核心能力</td></tr>
+      <tr><td>移动机器人系统</td><td>IMRS 2.0系统（自研）</td><td>集成3D-SLAM与群体智能算法，支持动态环境毫米级定位</td></tr>
+      <tr><td>半导体装备</td><td>真空机械手、EFEM（自研）</td><td>攻克无碰撞路径规划、AWC精度优化；批量导入终端FAB厂</td></tr>
+      <tr><td>人形机器人</td><td>松羿/松行/睿可（早期）</td><td>双足爆发力8000N，2ms控制周期，重复定位精度±0.05mm</td></tr>
+      <tr><td>技术积累</td><td>800+项科研任务，700+项有效专利</td><td>累计创造百余项行业第一</td></tr>
+      </table></div>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <p>新松拥有中国最全的机器人产品线，构建了"3+3+N"战略体系。</p>
+
+      <div class="table-wrapper"><table class="wikitable">
+      <tr><th>产品系列</th><th>型号/代表</th><th>形态</th><th>定位</th><th>关键参数</th></tr>
+      <tr><td>工业机器人</td><td>SA/SN/SP/SR四大系列16款</td><td>六轴/多关节</td><td>主力营收来源</td><td>近百台大负载机器人批量应用于国内汽车焊装主线</td></tr>
+      <tr><td>移动机器人（AGV）</td><td>标准叉车、潜伏顶升型、工业清扫</td><td>轮式/叉车式</td><td>最大业务板块（占营收近60%）</td><td>新加坡港近200台；重载型额定负载65吨</td></tr>
+      <tr><td>半导体装备</td><td>真空机械手、EFEM、LOADPORT</td><td>精密洁净设备</td><td>国产替代核心</td><td>2025年收入约5.25亿元，批量导入终端FAB厂</td></tr>
+      <tr><td>协作机器人（多可DUCO）</td><td>多可系列</td><td>协作机械臂</td><td>中小企业和海外市场</td><td>中科新松子品牌，出口东南亚/欧洲</td></tr>
+      <tr><td>特种机器人</td><td>爬壁焊接、重载桁架、重离子治疗床</td><td>专用形态</td><td>特定场景</td><td>大跨距10M/2吨重载桁架机器人</td></tr>
+      <tr><td>人形机器人</td><td>松羿（轮式）、松行（双足）、睿可RICO</td><td>类人形态</td><td>具身智能新方向</td><td>松行：8000N爆发力，2ms控制周期，±0.05mm精度</td></tr>
+      </table></div>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <p>新松业务遍及全球40+国家，服务4000+企业客户。2024年《财富》世界500强中45%的制造业企业为其客户。</p>
+
+      <div class="table-wrapper"><table class="wikitable">
+      <tr><th>场景分类</th><th>具体场景</th><th>部署状态</th><th>代表客户/项目</th></tr>
+      <tr><td>汽车制造</td><td>焊接、装配、涂装、总装</td><td>规模化成熟业务</td><td>宝马、通用汽车、吉利；近百台机器人汽车焊装主线</td></tr>
+      <tr><td>港口物流</td><td>集装箱搬运、堆码</td><td>标杆项目</td><td>新加坡港（近200台，全球最大中转港最大移动机器人供应商）</td></tr>
+      <tr><td>半导体</td><td>晶圆搬运、洁净室传输</td><td>批量导入FAB厂</td><td>国内主要半导体厂商；真空机械手国产替代</td></tr>
+      <tr><td>锂电新能源</td><td>物料搬运、产线自动化</td><td>批量应用</td><td>国内外锂电龙头企业</td></tr>
+      <tr><td>3C电子</td><td>精密装配、检测</td><td>规模化</td><td>多可协作机器人典型场景</td></tr>
+      <tr><td>仓储零售</td><td>智能仓储、四向穿梭车</td><td>合作推进中</td><td>智世机器人合作</td></tr>
+      <tr><td>医疗康养</td><td>重离子治疗床</td><td>特种应用</td><td>医疗机构</td></tr>
+      <tr><td>人形机器人（探索中）</td><td>工业制造、商业服务、家庭陪伴</td><td>技术储备阶段</td><td>具身智能研究院；尚未贡献实质营收</td></tr>
+      </table></div>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <p>新松机器人是中国规模化程度最高的机器人企业之一，2025年各类机器人销量约13,676台，同比增长65%。</p>
+      <ul>
+        <li>2025年营收41.22亿元，2026年Q1营收6.30亿元</li>
+        <li>工业机器人近百台大负载机器人批量进入国内汽车焊装主线，打破外资垄断</li>
+        <li>新加坡港累计部署近200台港口移动机器人，成为全球最大中转港最大的移动机器人供应商</li>
+        <li>半导体装备业务收入约5.25亿元，真空机械手批量导入终端FAB厂，实现国产替代</li>
+        <li>移动机器人（AGV）为最大业务板块，占营收近60%</li>
+        <li>业务覆盖全球40余国，服务4000+企业客户</li>
+        <li>海外布局：新加坡（区域中心）、泰国、马来西亚、日本、韩国、德国、匈牙利、美国、墨西哥</li>
+        <li>人形机器人仍处技术储备与场景探索阶段，尚未产生实质营收</li>
+      </ul>
+
+      <h3 id="financials">1.8 财务数据</h3>
+      <p>以下数据来自新松机器人（300024.SZ）公开年报及季报。</p>
+
+      <div class="table-wrapper"><table class="wikitable">
+      <tr><th>指标</th><th>2023年</th><th>2024年</th><th>2025年</th><th>2026年Q1</th></tr>
+      <tr><td>营业收入</td><td>—</td><td>41.38亿元</td><td>41.22亿元</td><td>6.30亿元</td></tr>
+      <tr><td>同比增速</td><td>—</td><td>—</td><td>-0.40%</td><td>-8.42%</td></tr>
+      <tr><td>归母净利润</td><td>—</td><td>-1.94亿元</td><td>-3.98亿元</td><td>-0.93亿元</td></tr>
+      <tr><td>毛利率</td><td>—</td><td>14.62%</td><td>12.48%</td><td>14.14%</td></tr>
+      <tr><td>研发投入</td><td>—</td><td>—</td><td>3.64亿元（占8.84%）</td><td>—</td></tr>
+      <tr><td>资产总额</td><td>—</td><td>119.90亿元</td><td>116.08亿元</td><td>—</td></tr>
+      <tr><td>净资产</td><td>—</td><td>44.31亿元</td><td>41.43亿元</td><td>—</td></tr>
+      <tr><td>经营现金流</td><td>—</td><td>-0.42亿元</td><td>+1.61亿元</td><td>—</td></tr>
+      </table></div>
+
+      <div class="table-wrapper"><table class="wikitable infotable">
+      <tr><th>业务板块</th><th>2024年收入</th></tr>
+      <tr><td>工业机器人及系统集成</td><td>12.03亿元</td></tr>
+      <tr><td>自动化装配与检测生产线</td><td>12.84亿元</td></tr>
+      <tr><td>物流与仓储自动化成套装备</td><td>7.86亿元</td></tr>
+      <tr><td>半导体装备</td><td>5.74亿元</td></tr>
+      <tr><td>交通自动化系统</td><td>2.81亿元</td></tr>
+      </table></div>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>公司名"新松"取自已故中国工程院院士蒋新松之名——他是国家"863"计划自动化领域首席科学家、中科院沈阳自动化所原所长，被誉为"中国机器人之父"</li>
+        <li>2018年平昌冬奥会闭幕式"北京8分钟"，24台新松移动机器人配合演出，向世界展示了中国机器人技术实力</li>
+        <li>是中国唯一一家入选"全球机器人50强"（ Robotics Business Review）的中国企业</li>
+        <li>旗下拥有中科新松（协作机器人品牌"多可DUCO"）、新松新加坡等多家子公司</li>
+        <li>需注意区分：沈阳新松机器人（300024.SZ，本文主体）与上海新松机器人（未上市独角兽，专注康复/人形，估值约80亿元，投资方包括Prosperity7 Ventures、IDG资本等）为两个独立实体</li>
+        <li>2025年半导体装备收入约5.25亿元，是国产化率提升的重要受益者</li>
+        <li>获评新加坡"科技创新奖"（SIASUN Singapore）</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="analysis-1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>新松机器人诞生于中科院沈阳自动化所——中国工业机器人科研的"国家队"基地，这一背景深刻塑造了其场景选择逻辑。创始团队以工科科研人员为主，天然倾向于"重工业+大客户+系统级交付"的模式，而非消费级产品路线。曲道奎师从蒋新松院士的学术传承，使公司在工业机器人、特种装备等领域拥有深厚的技术自信，但也导致其在面对具身智能、人形机器人等新范式时采取较为审慎的"跟随+务实"策略——先守住工业基本盘，再逐步探索新形态。团队缺乏互联网/消费电子领域的核心高管，这与其在C端场景布局迟缓、人形机器人商业化节奏较慢的现状高度吻合。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>新松的"核心零部件自研+系统集成"技术路线与传统工业场景高度适配。在汽车制造、港口物流、半导体等结构化环境中，对精度、可靠性、抗干扰能力的要求远高于灵活性，这正是新松二十余年积累的强项。然而，在向具身智能转型的过程中，这一路线面临根本性挑战：工业机器人的"精确定位+预编程"范式与具身智能的"感知-推理-执行"范式存在本质差异。新松2025年成立具身智能研究院、引入多模态大模型和强化学习，可以视为对这一矛盾的有意识回应，但从技术积累到产品落地的距离仍然较长。公司的优势在于拥有真实工业场景和海量应用数据，这为训练具身智能模型提供了稀缺的"真机数据"资源。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>新松机器人实际控制人为中国科学院沈阳自动化研究所——这一国有科研机构背景为公司战略带来了鲜明的双重性：优势在于稳定的技术人才供给、国家级科研项目资源（如国家科技重大专项支持半导体装备研发）、以及在国防安全和重大工程领域的独特准入；约束在于决策链条较长、市场化激励机制受限（虽然2024年实施了股权激励覆盖729人）。与智元、宇树等民营企业的灵活资本运作相比，新松在融资节奏、估值弹性、海外并购等方面受到更多制度性约束。此外，公司以债务融资为主（借款约22.9亿元）而非股权融资，在连续亏损的背景下财务压力加大，可能限制其在新兴方向的投入力度。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>新松的发展历程呈现出明显的"渐进式扩张"而非"跃迁式转型"特征。公司从最初的AGV和工业机器人出发，逐步覆盖到特种机器人、半导体装备、协作机器人，每一轮扩张都基于已有技术能力的自然延伸。2025年成立具身智能研究院并发布人形机器人产品，是公司成立25年来最显著的战略转向信号——从"自动化设备"向"智能体"的范式迁移。但值得注意的是，当前人形机器人产品线（松羿/松行/睿可）仍处于Demo和技术储备阶段，"尚未对业绩形成积极贡献"。公司提出的"先上岗再进家"落地策略，与其在工业场景的深厚积累一致，但人形机器人在工业中的性价比尚未被证明，这可能使其面临"路线正确但节奏落后"的风险。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>新松在竞争格局中的核心定位是"中国最全产品线的工业机器人龙头企业"——这一定位决定了其核心取舍是"广度优先"而非"深度优先"。与专注单一品类的企业相比（如埃斯顿聚焦工业机器人核心部件、宇树聚焦四足与人形硬件），新松选择了一条更像"发那科式"的全产品线道路。在具身智能领域，新松的取舍同样鲜明：不同于智元、宇树等新创企业以"大脑"（大模型）为核心差异化的路线，新松更倾向于从"身体"（本体硬件+运动控制）出发，渐进式叠加AI能力。这一策略的优势在于工业场景中的可靠性和客户信任壁垒，风险在于可能在AI能力上落后于以软件和算法为核心的竞争对手。此外，新松的"中科院国资"背景使其在国防安全、重大工程等场景具有独占性优势，但也在消费级和海外市场化方面面临更复杂的合规与政治风险。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-6">
+        <h4>2.6 其他重要观察与分析</h4>
+        <p>第一，新松2025年营收41亿元但净利润亏损3.98亿元、毛利率仅12.48%的财务表现值得警惕——在营收规模持平的情况下亏损翻倍，说明公司面临显著的结构性盈利压力。第二，"各类机器人销量增长65%"与"营收基本持平"的组合，暗示单价在下降或产品组合在向低附加值方向偏移，这可能与行业价格战加剧有关。第三，移动机器人（AGV）占营收近60%的业务结构使公司具有强大的工业场景入口优势——AGV是工厂中数据采集最密集的节点之一，也是具身智能落地的天然载体，这是新松较纯粹的人形机器人创业公司的独特优势。第四，半导体装备作为国产替代的核心受益者，如果中美科技博弈持续升级，这一业务线可能成为新松的第二增长曲线。第五，上海新松机器人（独立实体，估值80亿元）与沈阳新松（上市公司）的双实体结构可能在未来产生协同或竞争关系，值得持续关注。</p>
+      </div>
+
+      <h2 id="references">3 参考资料</h2>
+      <div class="references">
+      <ol>
+        <li><a href="https://finance.eastmoney.com/a/202604243718184210.html" target="_blank">新松机器人2025年实现营收41亿元 各类机器人销量增长65% — 东方财富网</a></li>
+        <li><a href="https://stcn.com/article/detail/3803140.html" target="_blank">新松机器人2025年营收41亿元 创新投入助力国产机器人产业升维 — 证券时报</a></li>
+        <li><a href="https://m.163.com/dy/article/KR7UF28H05568W0A.html" target="_blank">机器人一季度营收6.30亿元同比降8.42% — 网易</a></li>
+        <li><a href="https://www.laoyaoba.com/n/1022800" target="_blank">机器人2025年营收41.22亿元但净利润亏损3.98亿，多领域发力谋发展 — 老杳吧</a></li>
+        <li><a href="http://m.eepw.com.cn/article/202511/475237.html" target="_blank">新松：注重人形机器人实用化探索 — 电子产品世界</a></li>
+        <li><a href="https://finance.eastmoney.com/a/202509113511171917.html" target="_blank">机器人：公司发布新松智能类人双臂平台、"松羿"轮式人形机器人、"松行"双足人形机器人 — 东方财富网</a></li>
+        <li><a href="https://www.siasun.com/index.php/news-detail824.html" target="_blank">用创新之手摘取制造业"皇冠明珠" — 新松官网/辽宁日报</a></li>
+        <li><a href="https://www.siasun.com/news-detail916.html" target="_blank">新松机器人自动化股份有限公司：为了让中国机器人屹立于世界之林 — 新松官网</a></li>
+        <li><a href="https://www.siasun.com/index.php/news-detail952.html" target="_blank">从东方启航，向未来智造：新松与亚太合作伙伴的创新故事 — 新松官网</a></li>
+        <li><a href="https://www.siasun.com/index.php/news-detail955.html" target="_blank">机器人让世界更美好——新松携手全球伙伴闪耀亚太舞台 — 新松官网</a></li>
+        <li><a href="https://en.siasun.com/siasun-singapore-wins-technology-innovation-award-ceo-zhao-chen-discusses-a-new-blueprint-for-asean-cooperation.html/" target="_blank">SIASUN Singapore Wins Technology Innovation Award — 新松英文官网</a></li>
+        <li><a href="http://www.news.cn/app/20250905/04e51a34b4c143f997ab72c811967955/c.html" target="_blank">新松：以全产业价值链布局机器人领域 激发产业升级澎湃动能 — 新华网</a></li>
+        <li><a href="https://www.workercn.cn/papers/grrb/2019/04/20/1/news-3.html" target="_blank">新松机器人18年创造百余项行业第一 — 工人日报</a></li>
+        <li><a href="https://capco.org.cn/hyzl/zthd/shangshigszxd/202509/20250918/j_2025091808511300017581567937707351.html" target="_blank">机器人：紧抓战略机遇，加速向"世界机器人一流企业"迈进 — 中国上市公司协会</a></li>
+        <li><a href="http://new.chinareports.org.cn/index.php/index/news/48543.html" target="_blank">新松机器人："智造"出海 闪耀国际 — 中国报道</a></li>
+        <li><a href="https://cngoesglobal.com/brand/6472.html" target="_blank">新松机器人出海记：深度参与全球智能化转型 — 出海全球化</a></li>
+        <li><a href="https://www.ducorobots.cn/newsinfo/251.html" target="_blank">3国5城，辐射东南亚和欧洲，新松多可机器人全速出海 — 中科新松</a></li>
+        <li><a href="https://www.cnstock.com/commonDetail/686648" target="_blank">新松机器人2025年实现营收41亿元 各类机器人销量增长65% — 中国证券网</a></li>
+        <li><a href="http://vip.stock.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?stockid=300024&id=12171947" target="_blank">机器人：2025年年度报告 — 新浪财经</a></li>
+        <li><a href="https://www.p5w.net/roll/finance/202604/t20260424_6459550.htm" target="_blank">新松机器人2025年营收41亿元 国产替代与全球化布局成效显著 — 全景网</a></li>
+        <li><a href="https://www.donews.com/news/detail/4/5884508.html" target="_blank">工业机器人加速向人形进化，具身智能迈入规模化应用阶段 — DoNews</a></li>
+        <li><a href="https://www.9fzt.com/detail/sz_300024_1_534786997.html" target="_blank">机器人：公司成立智能研究院，发布多款机器人产品 — 九方智投</a></li>
+      </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">本页面为具身智能Wiki项目内容，遵循学术引用规范。最后更新：2026年5月4日。数据来源均为公开报道与公司官方披露。</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

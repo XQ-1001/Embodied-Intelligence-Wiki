@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>珞石机器人 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a><span class="breadcrumb-sep"> › </span><span>珞石机器人</span></div>
+  <div class="wiki-header"><h1>珞石机器人</h1><div class="subtitle">ROKAE · 拟港交所上市 · 2015年成立 · 中国柔性协作机器人市占率第一</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#team">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financials">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#analysis1">2.1 团队背景与场景选择的匹配度</a></li>
+        <li class="toc-lvl4"><a href="#analysis2">2.2 技术路线与场景的适配性</a></li>
+        <li class="toc-lvl4"><a href="#analysis3">2.3 股东/资本结构对战略的影响</a></li>
+        <li class="toc-lvl4"><a href="#analysis4">2.4 试错过程与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#analysis5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#analysis6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#references">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">珞石机器人</div>
+        <div class="ib-section">公司信息</div>
+        <div class="ib-row"><div class="ib-label">英文名称</div><div class="ib-value">ROKAE Robotics</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2015年</div></div>
+        <div class="ib-row"><div class="ib-label">注册地</div><div class="ib-value">山东济宁（总部），北京（研发中心）</div></div>
+        <div class="ib-row"><div class="ib-label">创始人/CEO</div><div class="ib-value">庹华</div></div>
+        <div class="ib-row"><div class="ib-label">上市状态</div><div class="ib-value">拟港股上市（已获证监会备案）</div></div>
+        <div class="ib-row"><div class="ib-label">官网</div><div class="ib-value"><a href="https://www.rokae.com" target="_blank">rokae.com</a></div></div>
+        <div class="ib-section">财务数据（2025年）</div>
+        <div class="ib-row"><div class="ib-label">营业收入</div><div class="ib-value">5.22亿元</div></div>
+        <div class="ib-row"><div class="ib-label">同比增长</div><div class="ib-value">+60.4%</div></div>
+        <div class="ib-row"><div class="ib-label">毛利率</div><div class="ib-value">21.9%</div></div>
+        <div class="ib-row"><div class="ib-label">净亏损</div><div class="ib-value">1.79亿元</div></div>
+        <div class="ib-section">估值/市值</div>
+        <div class="ib-row"><div class="ib-label">IPO前估值</div><div class="ib-value">约53亿元</div></div>
+        <div class="ib-row"><div class="ib-label">累计融资</div><div class="ib-value">超15亿元（10轮）</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">全球客户</div><div class="ib-value">1000+</div></div>
+        <div class="ib-row"><div class="ib-label">全球覆盖</div><div class="ib-value">40+国家/地区</div></div>
+        <div class="ib-row"><div class="ib-label">确认订单</div><div class="ib-value">超4.2万台</div></div>
+        <div class="ib-row"><div class="ib-label">员工规模</div><div class="ib-value">约800人（研80%+硕博）</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">产品类别</div><div class="ib-value"><span class="tag">工业机器人</span><span class="tag">协作机器人</span><span class="tag tag-info">具身智能</span></div></div>
+      </aside>
+
+      <p class="article-intro">珞石机器人（ROKAE Robotics）成立于2015年，是中国少数同时具备工业机器人与柔性协作机器人双品类量产能力的企业。公司以自研xCore控制系统为核心技术底座，构建了覆盖"工业+协作+具身智能"的全系列产品矩阵，2025年在中国柔性协作机器人市场以47%的市占率位居第一。2025年9月递表港交所，2026年3月完成证监会IPO备案，有望成为"全系列智能机器人第一股"。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper">
+      <table class="wikitable infotable">
+        <tr><th>项目</th><th>内容</th></tr>
+        <tr><td>公司全称</td><td>珞石（山东）机器人集团股份有限公司</td></tr>
+        <tr><td>英文名称</td><td>ROKAE (Shandong) Robot Group Co., Ltd.</td></tr>
+        <tr><td>成立时间</td><td>2015年</td></tr>
+        <tr><td>注册地</td><td>山东省济宁市邹城市</td></tr>
+        <tr><td>总部/研发中心</td><td>总部济宁；北京、日本东京设研发中心</td></tr>
+        <tr><td>上市状态</td><td>拟港交所主板上市，2026年3月完成证监会备案</td></tr>
+        <tr><td>保荐人</td><td>中金公司、国泰君安国际</td></tr>
+        <tr><td>官方网站</td><td>www.rokae.com</td></tr>
+        <tr><td>员工人数</td><td>约800人（截至2025年末）</td></tr>
+      </table>
+      </div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>时间</th><th>事件</th></tr>
+        <tr><td>2015年</td><td>庹华创立珞石（北京）科技有限公司</td></tr>
+        <tr><td>2016年</td><td>获Pre-A轮融资1,500万元；首款工业机器人XB系列推出</td></tr>
+        <tr><td>2018年</td><td>B轮获顺为资本（小米系）领投1.6亿元；开始布局协作机器人</td></tr>
+        <tr><td>2019年</td><td>xMate柔性协作机器人系列发布；日本东京研发中心成立</td></tr>
+        <tr><td>2020年</td><td>C轮1亿元（襄禾资本），山东邹城生产基地投产</td></tr>
+        <tr><td>2022年</td><td>获新希望集团领投4亿元战略融资</td></tr>
+        <tr><td>2023年</td><td>发布NB/xMate系列18款新品，支持220kg大负载</td></tr>
+        <tr><td>2024年</td><td>获国家制造业转型升级基金领投超5亿元</td></tr>
+        <tr><td>2025年</td><td>9月29日递表港交所（18C章）；发布AR系列人形力控臂、Helios轮式双臂机器人</td></tr>
+        <tr><td>2026年3月</td><td>完成证监会IPO备案，转8.05规则主板上市路径</td></tr>
+        <tr><td>2026年4月</td><td>与舍弗勒签署战略合作协议；参展汉诺威工业博览会</td></tr>
+      </table>
+      </div>
+
+      <h3 id="team">1.2 创始人及核心团队</h3>
+      <p>珞石机器人创始人团队以技术研发为核心驱动，核心成员多来自东京大学、加州理工、北京大学、清华大学等海内外名校，研究生及以上学历占比超80%。整体团队结构为典型的"学术+产业混合型"，兼具深厚学术背景与大厂工程经验。</p>
+
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+        <tr><td>创始人/CEO</td><td>庹华</td><td>1983年生，山东济宁人；哈尔滨理工大学测控技术与仪器学士、北京大学电子与通信工程硕士；曾任职爱立信工程师，后进入机器人研究院；直接持股13.46%，合计控制约38.78%投票权</td></tr>
+        <tr><td>联合创始人/CTO</td><td>曹华</td><td>毕业于法国鲁昂高等电子工程学院（ESIGELEC）；机器人行业超10年研发与管理经验，主导xCore控制系统开发</td></tr>
+        <tr><td>前联合创始人</td><td>韩峰涛</td><td>浙江大学硕士，2023年底离开珞石，现任千寻智能（Spirit AI）创始人</td></tr>
+      </table>
+      </div>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+
+      <h4>融资历史</h4>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>时间</th><th>轮次</th><th>金额</th><th>主要投资方</th></tr>
+        <tr><td>2016.03</td><td>Pre-A轮</td><td>1,500万元</td><td>德联资本</td></tr>
+        <tr><td>2017.11</td><td>A轮</td><td>4,000万元</td><td>清控银杏、德联资本</td></tr>
+        <tr><td>2018.09</td><td>B轮</td><td>1.6亿元</td><td>顺为资本（领投）、金沙江联合资本、梅花创投、清控银杏</td></tr>
+        <tr><td>2020.08</td><td>C轮</td><td>1亿元</td><td>襄禾资本</td></tr>
+        <tr><td>2021.05</td><td>C+轮</td><td>2亿元</td><td>深创投、远翼投资（联合领投）</td></tr>
+        <tr><td>2022.02</td><td>战略融资</td><td>4亿元</td><td>新希望集团（领投）</td></tr>
+        <tr><td>2024.04</td><td>战略+轮</td><td>超5亿元</td><td>国家制造业转型升级基金（领投）、邹城市新动能产业投资基金</td></tr>
+      </table>
+      </div>
+
+      <h4>主要股东结构</h4>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>股东</th><th>持股比例</th><th>类型</th><th>备注</th></tr>
+        <tr><td>庹华（创始人）</td><td>13.46%（直接）</td><td>创始人/实控人</td><td>合计控制约38.78%投票权</td></tr>
+        <tr><td>国家制造业转型升级基金</td><td>9.67%</td><td>国家队</td><td>IPO前最大外部股东，投资4亿元</td></tr>
+        <tr><td>顺为资本（小米系）</td><td>—</td><td>VC</td><td>2018年B轮领投</td></tr>
+        <tr><td>梅花创投</td><td>合计4.94%</td><td>VC</td><td>早期投资者</td></tr>
+        <tr><td>深创投</td><td>—</td><td>国资VC</td><td>C+轮联合领投</td></tr>
+        <tr><td>襄禾资本</td><td>—</td><td>VC</td><td>C轮领投，领航资深独立投资者</td></tr>
+        <tr><td>清控银杏</td><td>—</td><td>VC</td><td>早期持续跟投</td></tr>
+        <tr><td>新希望集团</td><td>—</td><td>产业资本</td><td>领航资深独立投资者</td></tr>
+      </table>
+      </div>
+
+      <div class="callout"><div class="callout-title">上市进展</div>2025年9月29日以港交所18C章特专科技公司规则首次递表；因2025年营收突破5亿元满足主板第8.05(3)条市值/收益测试，2026年3月转为8.05规则主板上市路径；2026年3月26日完成证监会备案，拟发行不超过3,049.97万股境外上市普通股，备案通知书有效期12个月。</div>
+
+      <h3 id="tech">1.4 技术路线</h3>
+
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>技术维度</th><th>详情</th></tr>
+        <tr><td>总体AI架构</td><td>自研xCore机器人控制平台为核心，兼容工业/协作/具身智能多类型机器人；集成Optimotion与TrueMotion运动控制技术、力位混合控制框架</td></tr>
+        <tr><td>力控技术</td><td>全关节力控，十余年产业化验证；碰撞检测灵敏度≤3N（相较电流环方案灵敏度提升5倍），恒力控制精度优于1N</td></tr>
+        <tr><td>数据方案</td><td>具身AI模型训练平台：力觉、视觉、定位全谱系传感感知与柔顺交互；模仿学习/遥操作数据采集</td></tr>
+        <tr><td>全栈/专用路线</td><td><strong>全栈路线</strong>：自研控制系统+关节模组+本体+AI平台+生态平台，覆盖从底层控制到上层应用的完整技术栈</td></tr>
+        <tr><td>差异化技术</td><td>HSA集成力控关节（扭矩密度最高48Nm/kg，扭矩传感分辨率≤0.05Nm）；AR系列1:2负载自重比；十字腕仿人七自由度结构</td></tr>
+        <tr><td>生态开放</td><td>ROKAE+开放生态平台，标准化接口、AI服务智能体支持预测性维护</td></tr>
+      </table>
+      </div>
+
+      <p>珞石的技术路线以"全栈自研+平台开放"为核心理念。xCore控制系统是其技术的底座，2023年伴随NB/xMate系列18款新品同步发布总体选型校核方法，标志着控制平台的成熟度达到新高度。公司在力控技术上有深厚积累，是少数能够将关节扭矩传感器分辨率做到≤0.05Nm级别的中国企业，这一能力直接支撑了其从传统工业机器人向具身智能的延伸。</p>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <p>珞石目前已建立"工业+协作+具身智能"三大产品线，覆盖3kg至220kg全负载范围，是国内唯一同时具备该三品类量产能力的企业。</p>
+
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>产品类别</th><th>系列</th><th>代表型号</th><th>负载范围</th><th>核心参数</th><th>2025年收入</th><th>毛利率</th></tr>
+        <tr><td>工业机器人</td><td>NB系列</td><td>NB12-NB500</td><td>12-220kg</td><td>重复定位±0.015mm，6.3m/s</td><td>2.25亿元（43.1%）</td><td>21.6%</td></tr>
+        <tr><td>柔性协作机器人</td><td>xMate CR/ER/SR</td><td>CR7/CR12/CR18/CR20</td><td>3-20kg</td><td>±0.02-0.03mm，IP67</td><td>1.38亿元（26.5%）</td><td>34.8%</td></tr>
+        <tr><td>具身智能机器人</td><td>AR系列/Helios</td><td>AR3/AR5/AR10</td><td>3-10kg</td><td>7自由度，1:2负载自重比</td><td>约0.47亿元（9.0%）</td><td>正值</td></tr>
+        <tr><td>轮式双臂机器人</td><td>Helios</td><td>—</td><td>—</td><td>43自由度，±0.1mm操作精度</td><td>（包含于具身智能）</td><td>—</td></tr>
+        <tr><td>力控关节模组</td><td>HSA系列</td><td>—</td><td>—</td><td>48Nm/kg扭矩密度，≤0.05Nm传感分辨率</td><td>（核心部件）</td><td>—</td></tr>
+      </table>
+      </div>
+
+      <p>2023年9月珞石一次性发布18款新品：NB系列工业机器人12款（含NB300/NB500重负载系列面向汽车焊接/新能源锂电池，预计2026年底商业化），xMate CR系列6款。2025年发布AR系列人形力控臂（出货量已破3,000台）和Helios轮式双臂机器人。AR系列支持内置相机线缆、高阶SDK算法和丰富末端接口，适配人形机器人和轮式双臂机器人等多种形态。</p>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>场景类别</th><th>具体应用</th><th>代表客户/生态伙伴</th></tr>
+        <tr><td>汽车制造</td><td>发动机装配、螺丝锁附、弧焊、打磨、焊装车间</td><td>法雷奥、福田康明斯、一汽丰田、小米汽车（YU7焊装车间）</td></tr>
+        <tr><td>3C电子</td><td>精密零部件组装、检测、上下料</td><td>歌尔股份、小米</td></tr>
+        <tr><td>新能源</td><td>锂电池制造、光伏组件装配</td><td>—</td></tr>
+        <tr><td>金属加工</td><td>打磨、抛光、去毛刺</td><td>—</td></tr>
+        <tr><td>具身智能/人形</td><td>模仿学习、遥操作数据采集、人形机器人关节与末端</td><td>智元机器人、舍弗勒、国内近半数头部具身智能公司</td></tr>
+        <tr><td>教育科研</td><td>机器人算法研究、自动化工艺研发</td><td>高校及研究机构</td></tr>
+        <tr><td>仓储物流</td><td>料箱搬运、复杂物料分拣</td><td>—</td></tr>
+      </table>
+      </div>
+
+      <p>珞石的场景布局呈现出"传统工业为基本盘、具身智能为新增长极"的双轮驱动格局。汽车和3C电子是收入主力，而具身智能领域增长迅猛——2025年具身智能收入占比已达9%，中国十大具身智能机器人公司中有近半数使用或已改用珞石人形机械臂。2026年4月与德国百年工业巨头舍弗勒签署战略合作协议，将其关节模组和机械臂嵌入舍弗勒的智能制造和人形机器人体系中。</p>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>指标</th><th>数据</th><th>说明</th></tr>
+        <tr><td>全球确认订单</td><td>超4.2万台</td><td>截至IPO招股书披露</td></tr>
+        <tr><td>潜在订单</td><td>超1.9万台</td><td>在手+意向</td></tr>
+        <tr><td>具身智能机器人订单</td><td>超1万台</td><td>截至2026年3月</td></tr>
+        <tr><td>AR系列出货量</td><td>超3,000台</td><td>截至2026年4月</td></tr>
+        <tr><td>月出货量预估</td><td>超1,500台</td><td>2026年3月预计</td></tr>
+        <tr><td>全球覆盖</td><td>40+国家/地区</td><td>—</td></tr>
+        <tr><td>累计客户</td><td>1,000+</td><td>—</td></tr>
+        <tr><td>柔性协作机器人市占率</td><td>中国第1（47%）</td><td>灼识咨询2025年按销量计</td></tr>
+        <tr><td>轻负载工业机器人市占率</td><td>中国第1（5.8%）</td><td>灼识咨询2025年按销量计</td></tr>
+      </table>
+      </div>
+
+      <p>珞石是国内首个进入小米YU7焊装车间的国产工业机器人品牌，标志着国产机器人在汽车主机制造核心工艺中的重要突破。公司连续三年蝉联国内主要厂商销量增速第一。2025年9月与智元机器人签约，为其提供人形机械臂。2026年4月参展汉诺威工业博览会（HANNOVER MESSE），展示HSA力控关节、AR人形力控臂和Helios轮式双臂机器人，加速全球化布局。</p>
+
+      <h3 id="financials">1.8 财务数据</h3>
+
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>指标</th><th>2023年</th><th>2024年</th><th>2025年</th></tr>
+        <tr><td>营业收入</td><td>2.67亿元</td><td>3.25亿元</td><td>5.22亿元</td></tr>
+        <tr><td>同比增速</td><td>+74.8%</td><td>+21.8%</td><td>+60.4%</td></tr>
+        <tr><td>毛利</td><td>3,057万元</td><td>7,119万元</td><td>1.14亿元</td></tr>
+        <tr><td>毛利率</td><td>11.4%</td><td>21.9%</td><td>21.9%</td></tr>
+        <tr><td>净亏损</td><td>1.57亿元</td><td>1.92亿元</td><td>1.79亿元</td></tr>
+        <tr><td>经调整净亏损</td><td>1.01亿元</td><td>7,247万元</td><td>4,167万元</td></tr>
+        <tr><td>研发开支</td><td>5,937万元</td><td>5,422万元</td><td>6,551万元</td></tr>
+        <tr><td>研发占比</td><td>22.2%</td><td>16.7%</td><td>12.5%</td></tr>
+        <tr><td>应收账款</td><td>—</td><td>—</td><td>约2.26亿元</td></tr>
+        <tr><td>存货</td><td>—</td><td>—</td><td>1.95亿元（同比+125%）</td></tr>
+      </table>
+      </div>
+
+      <div class="callout"><div class="callout-title">资金状况</div>截至2025年末，现金及现金等价物1,480万元，但含定期存款等可随时变现金融资产超5亿元；剔除赎回负债后经营层面真实资产负债率约28.3%，财务结构健康。</div>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>珞石是<a href="https://www.rokae.com/cn/news/show/2464/">2026年汉诺威工业博览会</a>（HANNOVER MESSE）中国机器人代表企业之一，作为大会官方合作伙伴展出人形机器人相关产品。</li>
+        <li>公司在北京、山东邹城、日本东京设有研发中心，在山东邹城拥有自主生产基地。</li>
+        <li>珞石曾于2024年12月启动A股IPO辅导（国泰君安），后转港交所，体现其对上市地的灵活策略选择。</li>
+        <li>"ROKAE"品牌名源自"Robot"+"OK"+"AE"的组合，寓意机器人自动化解决方案。</li>
+        <li>珞石拥有TÜV功能安全认证（22项），xMate CR系列达到IP67防护等级。</li>
+        <li>公司前五大供应商采购占比从2023年25.1%升至2025年中期的50.6%，供应商集中度呈上升趋势，需要关注供应链风险。</li>
+        <li>2026年4月，珞石机器人以"做具身智能时代的机器人全栈技术赋能与生态建设者"为主题亮相多个行业展会。</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="analysis1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>创始人庹华的履历高度契合珞石的技术和场景路径。北大电子与通信工程硕士出身，曾任职爱立信和机器人研究院，具备"通信+机器人大厂+独立研发"三层背景。技术上，他带领团队自研xCore控制系统，体现出对底层技术的深刻理解；场景上，从工业机器人起步逐步延伸到协作机器人和具身智能，路径符合技术积累的自然外溢逻辑。CTO曹华在法国接受高等工程教育，为团队的国际化视野和多关节机器人核心技术攻关提供了支撑。团队整体"北大/清华/东京大学/加州理工"等名校背景、80%以上硕博比例，属于典型的学术驱动的技术密集型团队。然而，团队能力集中在传统机器人控制和力控领域，在AI大模型、多模态感知等具身智能前沿领域的积累相对薄弱，这可能是公司从"力控臂供应商"走向"具身智能平台级公司"面临的核心人才挑战。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>珞石的"全栈自研+平台开放"技术路线与其"工业+协作+具身智能"全场景覆盖战略是匹配的。xCore作为统一控制平台可以同时驱动工业机器人（高精度、高速度）和协作机器人（柔顺、安全），这在技术架构上避免了多套系统的维护成本和兼容性问题。在具身智能领域，珞石选择了"以力控关节和机械臂为核心硬件、开放AI接口给生态伙伴"的路径，避免了与人形机器人整机厂商的直接竞争，同时抓住了产业链上游的关键卡位。HSA力控关节模组以48Nm/kg扭矩密度和≤0.05Nm传感分辨率达到国际一流水平，使得珞石成为人形机器人供应链中稀缺的力控部件供应商。但公司在AI算法层面的积累相对有限，具身AI模型训练平台目前仍以力觉/视觉传感和基础柔顺交互为主，距离"感知-决策-执行"闭环的完整智能体还有差距。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>珞石的股东结构呈现出"国家队+小米系+产业资本"的多元格局，这是其竞争壁垒的重要组成部分。国家制造业转型升级基金（9.67%）是国务院批复设立的"航母级"产业基金，其背书效应在政企合作、重大项目获取和上市审批中具有实质性价值。顺为资本（小米系）的早期投资（2018年B轮领投）直接为珞石打开了小米及小米生态链的供应链通道——珞石是首个进入小米汽车YU7焊装车间的国产工业机器人品牌，这一突破与小米系的股东资源密不可分。新希望集团作为产业资本领投4亿元，虽然新希望在机器人领域的协同效应尚待观察，但跨行业的产业资本注入增强了公司的财务稳定性。值得关注的是，珞石选择从A股转港股上市，可能反映了其国际化战略——港股更有利于吸引海外合作伙伴和客户，也与公司"覆盖40+国家"的全球化布局相呼应。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>珞石的发展历程中有几次关键的路径调整：(1) 从北京到山东邹城——公司最初注册在北京，后将总部迁至山东济宁邹城，这一调整既响应了地方产业政策（邹城是国家级机器人产业基地），也降低了制造和运营成本。(2) 从A股到港股的上市地切换——2024年12月启动A股IPO辅导，2025年9月转递港交所，体现了公司对资本市场环境的灵活判断。港股18C章为未盈利特专科技公司提供了通道，而公司营收突破5亿后又可转8.05规则，上市路径更加顺畅。(3) 从工业机器人到协作再到具身智能的渐进式扩张——珞石没有在初创期就贸然进入人形机器人，而是在工业机器人领域积累近十年后才于2023-2025年推出具身智能产品线，这种稳扎稳打的节奏降低了技术跳跃风险。(4) 值得注意的是原联合创始人韩峰涛于2023年底离开并创立千寻智能（Spirit AI），这一核心人员流失是否对公司技术方向产生长远影响值得持续关注。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>珞石在具身智能产业链中做出了明确的战略取舍：不走人形机器人整机路线，而是定位为"全栈技术赋能与生态建设者"，即为各类具身智能公司提供核心力控关节模组和人形机械臂。这一策略类似"卖铲子"逻辑，既避免了与宇树、智元、优必选等整机厂商的直接竞争，又能在上游形成标准化、规模化的供应链优势。在传统机器人领域，珞石通过与ABB、发那科、库卡等国际巨头的差异化竞争——在协作机器人品类上以47%的国内市占率建立了本土优势，在工业机器人上以轻负载细分市场为切入点。然而，这种"既要又要"的全品类策略也带来资源分散的风险：公司同时推进工业、协作、具身智能三条产品线，但整体仍处于亏损状态，研发占比从2022年的44%降至2025年12.5%，销售开支已超过研发开支，反映出公司在规模化扩张过程中对短期增长的倾斜。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis6">
+        <h4>2.6 其他重要观察</h4>
+        <p>(1) <strong>盈利拐点悬念</strong>：公司经调整净亏损从2023年1.01亿元收窄至2025年4,167万元，毛利率稳定在22%左右，核心产品（协作机器人）毛利率已达34.8%，盈利拐点可能在2026-2027年出现。但存货同比增长125%至1.95亿元，应收账款周转天数仍处高位（165天），如宏观经济下行或将延迟盈利时间。(2) <strong>供应链集中度风险</strong>：前五大供应商采购占比一年内从25%升至50%，对核心零部件（如减速器、伺服电机）的依赖度上升，在地缘政治风险背景下需关注国产替代进展。(3) <strong>具身智能赛道的估值溢价</strong>：珞石当前约53亿元估值对应2025年5.22亿元营收的PS约10倍，其中具身智能业务收入仅占9%但贡献了主要的估值溢价。如果具身智能业务增速不及预期，估值可能面临回调压力。(4) <strong>国际化的双刃剑</strong>：珞石已覆盖40+国家，但与舍弗勒等欧洲巨头的深度绑定既带来供应链和技术背书，也可能在部分市场受到贸易政策波动的冲击。</p>
+      </div>
+
+      <h2 id="references">3 参考资料</h2>
+      <div class="references">
+      <ol>
+        <li><a href="https://www.rokae.com" target="_blank">珞石机器人官方网站 (ROKAE.com)</a></li>
+        <li><a href="https://www.rokae.com/cn/news/show/2464/" target="_blank">Hannover Messe：珞石机器人，洞见全球制造业的未来 — 珞石官网</a></li>
+        <li><a href="https://www.rokae.com/cn/news/show/2453/" target="_blank">珞石：做具身智能时代的机器人全栈技术赋能与生态建设者 — 珞石官网</a></li>
+        <li><a href="https://www.rokae.com/cn/news/show/2455/" target="_blank">珞石机器人与舍弗勒达成战略合作 — 珞石官网</a></li>
+        <li><a href="https://dxpress.gelonghui.com/news/5207548" target="_blank">营收两年翻倍破5亿、具身智能订单超万台，珞石机器人转8.05规则冲刺港股 — 格隆汇</a></li>
+        <li><a href="https://www.thepaper.cn/newsDetail_forward_31727605" target="_blank">完成10轮融资，山东这家机器人公司赴港IPO — 澎湃新闻</a></li>
+        <li><a href="https://36kr.com/p/3759602138481412" target="_blank">融资15亿，北大80后要IPO：年入5亿 — 36氪</a></li>
+        <li><a href="https://m.pedaily.cn/news/562602" target="_blank">融资15亿，北大80后要IPO — 投资界</a></li>
+        <li><a href="https://zhengguannews.cn/zghnews/395899.html" target="_blank">珞石机器人冲刺港股：国家制造业基金重仓，三年累亏5.28亿 — 正观新闻</a></li>
+        <li><a href="http://caijing.subaoxw.com/cjyw/2025/1010/234453.html" target="_blank">珞石机器人冲刺港交所 总部位于济宁 — 财经网</a></li>
+        <li><a href="http://caijing.subaoxw.com/cjyw/2026/0403/260716.html" target="_blank">珞石机器人获证监会备案 营收逐年攀升但亏损未止 — 财经网</a></li>
+        <li><a href="http://m.qlwb.com.cn/detail/27430858.html" target="_blank">珞石机器人冲刺H股，2025年营收增六成仍亏近1.8亿元 — 齐鲁晚报</a></li>
+        <li><a href="https://cj.sina.com.cn/articles/view/5182171545/134e1a999020028jow" target="_blank">营收增长50%仍亏损，珞石机器人冲刺港股 — 新浪财经</a></li>
+        <li><a href="http://stock.stockstar.com/IG2025102200013542.shtml" target="_blank">国内唯一实现工业+协作量产，珞石机器人IPO营收与毛利率表现大好 — 证券之星</a></li>
+        <li><a href="http://www.sd.chinanews.com.cn/2/2026/0410/101141.html" target="_blank">超5亿营收+转主板上市：珞石机器人具身智能订单破万台 — 中新网山东</a></li>
+        <li><a href="https://shunwei.com/news/2070" target="_blank">新一代智能机器人专家「珞石机器人」获4亿元战略轮融资｜顺为系 — 顺为资本</a></li>
+        <li><a href="http://sd.xinhuanet.com/20260409/07e0072aa7b44de3bbe926144a006ecb/c.html" target="_blank">珞石机器人：以硬核技术夯实具身智能产业底座 — 新华网山东</a></li>
+        <li><a href="https://www.cet.com.cn/itpd/itxw/10342902.shtml" target="_blank">珞石机器人登陆德国汉诺威工业博览会 — 中国经济时报</a></li>
+        <li><a href="https://cinic.org.cn/zgzz/qy/1628825.html" target="_blank">珞石机器人发布新款AR人形力控臂 硬核力控赋能具身智能产业化 — 中国工业报</a></li>
+        <li><a href="http://sdenews.com/html/2025/10/378869.shtml" target="_blank">完成10轮融资，珞石机器人赴港IPO — 山东财经网</a></li>
+        <li><a href="https://www.mei.net.cn/jqr/202604/615513629470529429.html" target="_blank">舍弗勒与珞石机器人签订战略合作协议 — 中国机电网</a></li>
+        <li><a href="https://www.gate.com/zh-tw/post/status/20294902" target="_blank">珞石機器人衝刺港股：2025年營收5.2億 虧損1.79億 — Gate</a></li>
+        <li><a href="https://www.cls.cn/detail/1902315" target="_blank">获国家制造业基金入股！珞石机器人启动A股IPO辅导 — 财联社</a></li>
+        <li><a href="https://www.rokae.com/cn/news/show/2308/" target="_blank">珞石机器人亮相 IROS 2025，具身智能"三件套"备受瞩目 — 珞石官网</a></li>
+      </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">本页面内容基于公开信息整理，数据截止至2026年5月。珞石机器人 — 具身智能Wiki</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

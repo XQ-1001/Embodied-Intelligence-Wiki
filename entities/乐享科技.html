@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>乐享科技 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> <span class="breadcrumb-sep">›</span> <span>乐享科技</span></div>
+  <div class="wiki-header"><h1>乐享科技</h1><div class="subtitle">ZEROTH元点智能 · 非上市 · 2024年12月成立 · 天使轮融资近5亿元 · 估值约25亿元 · 团队约200人</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#team">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#finance">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#a1">2.1 团队背景与场景选择的匹配度</a></li>
+        <li class="toc-lvl4"><a href="#a2">2.2 技术路线与场景的适配性</a></li>
+        <li class="toc-lvl4"><a href="#a3">2.3 股东/资本结构对战略的影响</a></li>
+        <li class="toc-lvl4"><a href="#a4">2.4 试错过程与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#a5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#a6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#refs">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">乐享科技</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">苏州乐享智能科技有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">品牌</div><div class="ib-value">ZEROTH 元点智能</div></div>
+        <div class="ib-row"><div class="ib-label">成立</div><div class="ib-value">2024年12月</div></div>
+        <div class="ib-row"><div class="ib-label">注册地</div><div class="ib-value">苏州吴中经开区</div></div>
+        <div class="ib-row"><div class="ib-label">上市状态</div><div class="ib-value">非上市</div></div>
+        <div class="ib-section">财务数据</div>
+        <div class="ib-row"><div class="ib-label">累计融资</div><div class="ib-value">近5亿元人民币（天使轮系列）</div></div>
+        <div class="ib-row"><div class="ib-label">估值</div><div class="ib-value">约25亿元（天使++轮后）</div></div>
+        <div class="ib-section">估值/市值</div>
+        <div class="ib-row"><div class="ib-label">最新轮次</div><div class="ib-value">天使++轮（2025.09）</div></div>
+        <div class="ib-row"><div class="ib-label">投资方</div><div class="ib-value">IDG资本、钟鼎资本、锦秋基金、经纬创投、真格基金、红杉种子基金、Monolith、绿洲资本</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">员工数</div><div class="ib-value">约200人</div></div>
+        <div class="ib-row"><div class="ib-label">研发占比</div><div class="ib-value">超80%</div></div>
+        <div class="ib-row"><div class="ib-label">产品线</div><div class="ib-value">6款已发布</div></div>
+        <div class="ib-row"><div class="ib-label">2025营收</div><div class="ib-value">约1,000万元</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label"><span class="tag">消费级</span><span class="tag">家庭</span><span class="tag">全栈自研</span></div><div class="ib-value"><span class="tag tag-info">追觅系</span><span class="tag tag-info">天使轮3轮</span></div></div>
+      </aside>
+      <p class="article-intro"><strong>乐享科技（ZEROTH元点智能）</strong>是一家成立于2024年12月的消费级具身智能机器人企业，由前追觅科技中国区执行总裁、1997年出生的「天才少年」郭人杰创立。公司在成立9个月内完成三轮天使轮系列融资，累计近5亿元人民币，估值从6亿元飙升至约25亿元，投资方集结IDG、钟鼎、经纬、真格、红杉等顶级VC。乐享科技旗下品牌「ZEROTH元点智能」定位为全球最全面的消费级具身智能产品线，已发布6款产品，涵盖家庭协作机器人N1、陪伴机器人M1、户外机器人W1、全尺寸人形Jupiter、迪士尼授权IP机器人小瓦力等。公司以「镜像伙伴」为核心理念，主打VLA全栈自研技术路线，2026年初已拿下行业首个消费级亿元订单并开始交付。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper">
+        <table class="wikitable infotable">
+          <tr><th>项目</th><th>内容</th></tr>
+          <tr><td>公司全称</td><td>苏州乐享智能科技有限公司</td></tr>
+          <tr><td>旗下品牌</td><td>ZEROTH 元点智能</td></tr>
+          <tr><td>成立时间</td><td>2024年12月19日</td></tr>
+          <tr><td>注册地</td><td>苏州吴中经济技术开发区</td></tr>
+          <tr><td>上市情况</td><td>非上市</td></tr>
+          <tr><td>创始人/CEO</td><td>郭人杰</td></tr>
+          <tr><td>行业定位</td><td>消费级具身智能机器人（家庭场景）</td></tr>
+          <tr><td>品牌理念</td><td>「不为替代，而为共生」——镜像伙伴</td></tr>
+        </table>
+      </div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>时间</th><th>事件</th></tr>
+          <tr><td>2024年11月</td><td>郭人杰从追觅科技离职，结束近4年追觅中国区总裁生涯</td></tr>
+          <tr><td>2024年12月19日</td><td>苏州乐享智能科技有限公司正式注册成立</td></tr>
+          <tr><td>2025年2月6日</td><td>完成近2亿元天使轮融资，IDG资本领投，投后估值约6亿元</td></tr>
+          <tr><td>2025年5月26日</td><td>完成亿元级天使+轮融资，锦秋基金领投，投后估值约12亿元</td></tr>
+          <tr><td>2025年9月28日</td><td>完成2亿元天使++轮融资，钟鼎资本领投，投后估值约25亿元</td></tr>
+          <tr><td>2025年10月</td><td>与迪士尼达成正式授权合作，推出瓦力IP机器人</td></tr>
+          <tr><td>2025年12月</td><td>与春光科技签署战略合作协议，获4,326万元OEM/ODM订单</td></tr>
+          <tr><td>2026年1月</td><td>CES 2026全球首秀，发布ZEROTH元点智能品牌及5款核心产品，披露获亿元级订单</td></tr>
+          <tr><td>2026年3月12日</td><td>AWE 2026「元点·共生」春季新品首秀，N1协作机器人全球首发</td></tr>
+          <tr><td>2026年4月</td><td>携M1、W1亮相第六届消博会</td></tr>
+          <tr><td>2026年5月（计划）</td><td>M1家庭守护机器人计划量产</td></tr>
+          <tr><td>2026年底（计划）</td><td>N1协作机器人进入量产准备</td></tr>
+        </table>
+      </div>
+
+      <h3 id="team">1.2 创始人及核心团队</h3>
+      <p>乐享科技由郭人杰单人创立并担任CEO，团队约200人，研发人员占比超过80%。公司的核心人才结构具有强烈的「消费电子+AI」跨界特征：管理核心来自追觅科技（消费电子/家电领域的头部玩家），技术团队具备VLA模型、电机、机械臂等多领域自研能力。</p>
+
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+          <tr><td>创始人/CEO</td><td>郭人杰</td><td>1997年出生，15岁进入西安交通大学少年班（能源与动力工程+金禾经济研究中心），硕士毕业于伦敦政治经济学院经济学专业。毕业后入职宝洁，一年内晋升品牌总监。2021年加入追觅科技，26岁任追觅中国区执行总裁，三年带队将中国区年营收从0做到60亿元，管理超1,500人团队，将追觅推至中国清洁电器市占率第一。2024年11月离职创业。被称为「天生卷王」「97年扫地机总裁」。</td></tr>
+        </table>
+      </div>
+      <p>团队特点：公司核心管理团队有较强的追觅系基因（消费电子+家电大规模量产经验），技术团队覆盖VLA模型、自研电机、机械臂、灵巧手等关键模块。整体人才结构偏向「产业实干派」而非纯学术派——创始人无博士/教授背景，但有极强的大规模消费电子商业化和团队管理实战经验。这种背景在具身智能赛道中较为稀缺。</p>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <h4>融资历史</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>轮次</th><th>时间</th><th>金额</th><th>投后估值</th><th>主要投资方</th></tr>
+          <tr><td>天使轮</td><td>2025.02</td><td>近2亿元</td><td>约6亿元</td><td>IDG资本（领投）、Monolith、经纬创投、真格基金、红杉种子基金、绿洲资本</td></tr>
+          <tr><td>天使+</td><td>2025.05</td><td>亿元级</td><td>约12亿元</td><td>锦秋基金（领投）、经纬创投、绿洲资本、Monolith（超额加投）</td></tr>
+          <tr><td>天使++</td><td>2025.09</td><td>2亿元</td><td>约25亿元</td><td>钟鼎资本（领投）、IDG资本（持续加投）</td></tr>
+        </table>
+      </div>
+      <p>天使轮系列累计融资近5亿元人民币。9个月内估值从6亿→12亿→25亿元，增长超4倍。值得注意的是，锦秋基金为字节跳动创始人张一鸣旗下的投资平台，IDG资本从天使轮持续加投至天使++轮。</p>
+
+      <h4>股东结构</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>类型</th><th>股东</th><th>特征</th></tr>
+          <tr><td>顶级美元/双币VC</td><td>IDG资本、钟鼎资本、经纬创投、真格基金、红杉种子基金</td><td>中国早期投资最头部机构队列，为后续融资和IPO提供信用背书</td></tr>
+          <tr><td>产业链关联资本</td><td>锦秋基金（字节系）</td><td>字节系基金参与天使+轮，可能关联AI/内容/交互生态协同</td></tr>
+          <tr><td>科技VC</td><td>Monolith、绿洲资本</td><td>专注科技赛道，Monolith从天使轮超额加投至天使+轮</td></tr>
+        </table>
+      </div>
+      <p>资本结构以顶级财务VC为主导，附加字节系产业链关联资本。尚未出现明确产业资本（如小米、车企、家电企业）的战略入股。公司成立仅9个月即聚集了中国早期投资的「全明星阵容」，在消费级具身智能赛道中融资速度和规模均属前列。</p>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>维度</th><th>内容</th></tr>
+          <tr><td>AI技术架构</td><td>VLA（视觉-语言-动作）模型为核心，构建「感知-决策-执行」一体化机器人大脑。另自研ZerothSoul情感交互大模型，支持视觉/听觉/触觉多维度自然交互</td></tr>
+          <tr><td>运动控制</td><td>传统算法+强化学习双重路线。M1为全球首款采用强化学习控制的舵机机器人</td></tr>
+          <tr><td>硬件自研</td><td>自研小型高性能电机（关节模组）、自研异构机械臂组结构、自研三指夹爪和柔性绳驱灵巧手</td></tr>
+          <tr><td>安全系统</td><td>自研PPS物理空间安全系统，碰撞预测技术</td></tr>
+          <tr><td>数据方案</td><td>开放umi数据采集硬件社区，开发者可分享功能模块；产品端实现「越用越懂你」的个性化记忆适配</td></tr>
+          <tr><td>全栈/专用</td><td>走全栈自研路线：覆盖电机→机械臂→灵巧手→VLA大脑→交互模型→安全系统的完整技术栈，构建「灵魂、大脑、心脏」三位一体能力</td></tr>
+        </table>
+      </div>
+      <p>乐享科技的技术路线以VLA模型为中枢，叠加全栈硬件自研，形成软硬一体化的消费级具身智能体系。与纯算法公司（只做大脑）或纯硬件公司（只做本体）不同，乐享追求类似大疆的全栈整合模式——从底层硬件到上层AI全部自主可控。其自研电机和异构机械臂组（N1的左右手不对称设计）体现了产品定义驱动的工程创新能力。</p>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>产品</th><th>形态/参数</th><th>定位</th><th>状态</th></tr>
+          <tr><td>N1（小恩）</td><td>协作机器人，30kg自重，0.2㎡占地，0转弯半径，肩部升降63-128cm，异构机械臂组（左手伸缩夹取+右手灵巧抓握），续航2-3h</td><td>家庭协作：夹取搬运、拧瓶盖、开抽屉、多步骤任务</td><td>2026.03 AWE首发，2026年底量产准备</td></tr>
+          <tr><td>M1</td><td>约50cm高，双足+平衡车底座（自动上下平衡车），激光雷达+深度传感器导航，全球首款RL控制舵机机器人</td><td>家庭守护陪伴：跌倒检测（10秒确认→自动拨紧急联系人）、老人看护、宠物陪伴、儿童互动</td><td>计划2026.05量产</td></tr>
+          <tr><td>W1</td><td>履带式全地形机器人，28kg自重，承载超50kg</td><td>户外全能：安防、储能、旅拍、户外伴侣</td><td>已发布</td></tr>
+          <tr><td>Jupiter</td><td>1.65m全尺寸人形机器人，搭载Zeroth World训练环境</td><td>技术旗舰平台</td><td>已发布（技术验证）</td></tr>
+          <tr><td>小瓦力</td><td>IP陪伴机器人，迪士尼正版授权</td><td>情感交互、陌生人识别、异常检测与紧急呼叫</td><td>已发布</td></tr>
+          <tr><td>A1</td><td>1.2m小型人形机器人</td><td>轻量级人形交互</td><td>已发布</td></tr>
+        </table>
+      </div>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>场景分类</th><th>具体应用</th><th>对应产品</th></tr>
+          <tr><td>家庭协作（核心）</td><td>物品搬运、收纳整理、拧瓶盖/开抽屉、多步骤家务串联</td><td>N1</td></tr>
+          <tr><td>家庭看护</td><td>老人跌倒检测与紧急呼叫、用药提醒、儿童陪伴与教育、宠物监护</td><td>M1、小瓦力</td></tr>
+          <tr><td>户外场景</td><td>户外安防巡逻、移动储能、旅行拍摄、户外运动伴侣</td><td>W1</td></tr>
+          <tr><td>商业/公共服务</td><td>零售、安防、体育赛事（苏超首位机器人领队）、展会互动</td><td>W1（前期W-Bot）</td></tr>
+          <tr><td>未来扩展</td><td>康养、医疗、服务业（N1技术延伸）</td><td>N1（未来）</td></tr>
+        </table>
+      </div>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>指标</th><th>数据</th></tr>
+          <tr><td>2025年营收</td><td>约1,000万元</td></tr>
+          <tr><td>消费级订单</td><td>行业首个亿元级消费级具身智能订单（2026年1月CES披露），已陆续交付</td></tr>
+          <tr><td>OEM/ODM订单</td><td>春光科技4,326万元采购合同（2025年12月签署，2026年4月30日前交货），预计贡献约600万元净利润</td></tr>
+          <tr><td>W-Bot拍卖</td><td>京东拍卖以29,799元成交</td></tr>
+          <tr><td>产品定价策略</td><td>小具身机器人对标手机价格：高配约1万元，标配约5,000元</td></tr>
+          <tr><td>迪士尼合作</td><td>2025年10月正式授权合作，推出瓦力IP机器人</td></tr>
+          <tr><td>量产时间表</td><td>M1计划2026年5月初量产；N1计划2026年底进入量产准备</td></tr>
+        </table>
+      </div>
+
+      <h3 id="finance">1.8 财务数据</h3>
+      <div class="callout">
+        <div class="callout-title">⚠️ 数据说明</div>
+        <p>乐享科技为非上市企业，成立仅一年有余，未公开披露完整年报财务数据。以下仅基于公开报道整理。</p>
+      </div>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>指标</th><th>数据</th><th>来源/时间</th></tr>
+          <tr><td>累计融资总额</td><td>近5亿元人民币</td><td>天使轮+天使++（至2025.09）</td></tr>
+          <tr><td>最新估值</td><td>约25亿元人民币</td><td>天使++轮后（2025.09）</td></tr>
+          <tr><td>2025年营收</td><td>约1,000万元</td><td>公开报道</td></tr>
+          <tr><td>年营收（2024）</td><td>不适用（12月成立）</td><td>—</td></tr>
+          <tr><td>毛利率</td><td>未公开披露</td><td>—</td></tr>
+          <tr><td>账面现金</td><td>未公开披露（估算：融资近5亿扣除运营支出）</td><td>—</td></tr>
+        </table>
+      </div>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>郭人杰明确表示想成为「机器人行业的大疆」，强调全栈整合和消费级市场定位。</li>
+        <li>苏州市吴中区将乐享科技纳入「百千万」行动——引育100家整机企业、打造1,000个应用场景、部署10,000台智能机器人。</li>
+        <li>乐享科技在2026年4月消博会上已达成多个合作意向，推动生态合作链延伸。</li>
+        <li>M1将接入OpenClaw「小龙虾」AI智能体框架，使机器人从语言交互升级为行动执行。</li>
+        <li>公司计划建立智能体开发者生态，做机器人原生应用，开放N1技术接口与开发平台。</li>
+        <li>郭人杰的创业故事被《涌现36人》专栏、播客《晚点LatePost》等深度报道，被称为「95后卷王」。</li>
+        <li>2025年7月，W-Bot（W1前身）作为苏州超级联赛（苏超）首位机器人领队亮相体育赛事。</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="a1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>郭人杰的背景在具身智能赛道中具有极高的跨领域匹配度。他既非纯学术派（无博士/教授头衔），也非纯制造派——其核心能力是「消费电子大规模商业化的全链条操盘」：在追觅四年，他从0到60亿建立了中国区业务，深刻理解消费品从产品定义、供应链管理、渠道建设到品牌营销的完整闭环。选择消费级家庭机器人赛道，本质上是将其已验证的「高端消费电子产品打法」迁移至具身智能领域。家庭机器人面临的挑战——定价策略、用户教育、渠道铺设、售后服务——恰好是郭人杰的核心能力圈。但团队在底层AI算法（尤其是VLA/世界模型的前沿研究）方面的深度，与许华哲（破壳机器人）等学术派创始人相比，可能存在结构性差距。</p>
+      </div>
+
+      <div class="analysis-block" id="a2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>乐享科技选择VLA模型+全栈硬件自研的技术路线，与消费级家庭场景具有较好的适配性。VLA模型在「听懂人话→执行动作」这一环节具有天然优势——家庭用户不需要理解机器人内部工作机制，只需自然语言交互即可完成任务。这与B端工业场景（需要精确编程和标准化接口）形成鲜明对比。自研电机和机械臂（而非外购集成）虽然在短期内增加研发成本和复杂度，但长期看能够更好地控制BOM成本（消费级定价的关键约束）和产品体验（异构成型设计的自由度）。M1采用强化学习控制舵机这一创新点，如果跑通，可能大幅降低家庭机器人的硬件成本——舵机比伺服电机便宜一个数量级。但RL控制舵机在精度和可靠性方面能否达到家庭场景的安全要求，是技术路线中最大的不确定性。</p>
+      </div>
+
+      <div class="analysis-block" id="a3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>乐享科技的股东结构呈现「顶级VC全明星阵容+字节系关联」的格局。IDG资本从天使轮持续加投至天使++轮，表明老股东对公司进展的强烈信心；锦秋基金（字节系）的参与则可能为公司在AI大模型接入、内容生态协同、C端流量获取等方面提供战略资源。值得注意的是，乐享科技暂无产业资本（如家电巨头、车企）的战略入股，这使得公司在场景选择（家庭而非工厂）和定价策略上保持较高的独立性。但缺少产业资本也意味着缺少自然绑定的渠道和供应链资源——所有环节都需要自身从零搭建。25亿元估值的天使轮定价在行业中偏高，这意味着公司需要在较短时间内实现规模化营收以支撑下一轮估值提升。</p>
+      </div>
+
+      <div class="analysis-block" id="a4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>乐享科技成立仅16个月，目前尚未经历重大的战略转向，但产品线的演进已体现出一定的试错调整。早期W-Bot以履带式户外机器人形态试水（参展WAIC/WRC、京东拍卖、苏超领队），更多是品牌曝光和市场验证；随后公司快速将重心转向M1（家庭陪伴）和N1（家庭协作），形成「户外引流→家庭扎根」的产品演进路径。迪士尼瓦力IP的合作是一个巧妙的品牌杠杆——借助迪士尼IP降低消费者对机器人的陌生感和恐惧感，培养早期用户的接受度。这种「IP先行、功能跟进」的策略在消费电子领域已被验证（如扫地机器人的APP控制、语音交互等功能逐步叠加），但在机器人领域是否有效，尚待市场验证。</p>
+      </div>
+
+      <div class="analysis-block" id="a5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>乐享科技的核心取舍在于三条线上同时做出的明确选择。第一，场景取舍：纯C端消费级家庭场景，彻底放弃B端工业和商业服务——与智元、银河通用等「B端起家」的企业形成赛道区隔。第二，产品策略取舍：多品类覆盖（从50cm陪伴机器人到1.65m全尺寸人形均有布局），而非单品极致——这与DJI早期「先做单一品类做到极致再扩展」的策略有所不同，更像是「以品牌认知覆盖多价格带」的消费电子打法。第三，路线取舍：坚持全栈自研（电机+机械臂+大脑+安全系统），而非做产业链一环——这在早期增加了资源投入压力，但长期可能形成类似大疆在无人机领域的「全栈壁垒」。这三个取舍叠加，定义了乐享科技的竞争身份：它是一个「具身智能赛道中的消费电子公司」，而非「消费电子公司做的机器人项目」。</p>
+      </div>
+
+      <div class="analysis-block" id="a6">
+        <h4>2.6 其他重要观察</h4>
+        <p>乐享科技与破壳机器人在2026年中国C端家庭机器人赛道上形成了两个极具代表性的对比样本。乐享代表「消费电子打法」：97年消费品操盘手创业、全栈自研多品类、VLA主流路线、迪士尼IP加持、天使轮即冲25亿估值；破壳代表「学术前沿打法」：清华教授创业、自研世界模型替代VLA、纯家庭场景、天使轮4亿美元估值。二者的终局对决将是2027-2028年C端具身智能赛道最值得关注的叙事线之一。另外值得注意的是乐享科技的苏州吴中区政策加持——「百千万」行动为企业提供了早期场景落地的政策保障，这在地方政府争抢具身智能企业的竞赛中是一项重要加分项。最后，郭人杰的年龄（28岁）和履历（追觅从0到60亿）使其成为具身智能赛道最年轻的「老兵型」创始人，这种「年轻但经验丰富」的组合在VC市场上具有天然的叙事优势，但也意味着外界对其期待值极高，后续执行压力不小。</p>
+      </div>
+
+      <h2 id="refs">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://www.21jingji.com/article/20250928/herald/e7c17766d637d05d95670473b4f63d76.html" target="_blank">21世纪经济报道：乐享科技完成2亿元天使++轮融资（2025.09）</a></li>
+          <li><a href="https://tech.cnr.cn/techgd/20250929/t20250929_527379982.shtml" target="_blank">央广网：乐享科技官宣完成2亿元新一轮融资，投后估值约25亿元（2025.09）</a></li>
+          <li><a href="https://www.163.com/dy/article/KAIMA3PK05199NPP.html" target="_blank">网易：97年学霸入局具身智能机器人，9个月融资近5亿（2025.05）</a></li>
+          <li><a href="https://www.chinastarmarket.cn/detail/2159905" target="_blank">科创板日报："95后"创业消费级具身智能，天使轮融了近5亿（2025.09）</a></li>
+          <li><a href="https://egs.stcn.com/news/detail/2144497.html" target="_blank">证券时报：乐享科技天使轮融资近5亿元，聚焦消费级具身智能赛道（2025）</a></li>
+          <li><a href="https://www.chinaventure.com.cn/news/108-20250928-388227.html" target="_blank">投中网：乐享科技官宣完成2亿元天使++轮融资（2025.09）</a></li>
+          <li><a href="https://www.chinaventure.com.cn/news/108-20250206-384970.html" target="_blank">投中网：前追觅中国区执行总裁郭人杰创业，乐享科技完成近2亿元天使轮融资（2025.02）</a></li>
+          <li><a href="https://www.thecover.cn/news/toN8gwoBk6+H90qSdq8Jkw==" target="_blank">封面新闻：人形机器人即将进入普通家庭？乐享科技完成亿元天使+轮融资（2025.05）</a></li>
+          <li><a href="https://www.cnfin.com/cmjj-lb/detail/20260416/4400703_1.html" target="_blank">中国金融新闻网：苏州吴中机器人"潮品"亮相消博会（2026.04）</a></li>
+          <li><a href="https://stock.stockstar.com/IG2026031200038589.shtml" target="_blank">证券之星：乐享科技旗下具身智能品牌ZEROTH元点智能亮相AWE 2026（2026.03）</a></li>
+          <li><a href="https://www.itheat.com/view/59836.html" target="_blank">ITHeat：ZEROTH元点智能AWE重磅首发N1等新品，全栈技术积累带来产品涌现（2026.03）</a></li>
+          <li><a href="https://www.cena.com.cn/smartt/20260313/128411.html" target="_blank">中国电子报：具身智能品牌ZEROTH元点智能家庭机器人新品集体亮相AWE2026（2026.03）</a></li>
+          <li><a href="https://topics.gmw.cn/2026-03/12/content_38644790.htm" target="_blank">光明网：元点智能发布家庭具身机器人新品（2026.03）</a></li>
+          <li><a href="https://stcn.com/article/detail/3580242.html" target="_blank">证券时报：元点智能迎来CES全球首秀（2026.01）</a></li>
+          <li><a href="http://m.nbd.com.cn/articles/2025-12-24/4194295.html" target="_blank">每日经济新闻：春光科技拿下价值超4000万元合同（2025.12）</a></li>
+          <li><a href="https://www.sohu.com/a/1010328108_377096" target="_blank">搜狐科技：从机器人瓦力到情感伙伴，乐享抢占下一代情感入口（2026）</a></li>
+          <li><a href="https://app.cb.com.cn/api/home/article_h5/302324" target="_blank">中国经营报：对话乐享科技创始人郭人杰：想做机器人行业的"大疆"（2026.03）</a></li>
+          <li><a href="http://jjckb.xinhuanet.com/20260320/279a21ca62c84815a6519ad86bfe437a/c.html" target="_blank">经济参考报：元点智能全栈技术驱动具身智能"家庭化"落地（2026.03）</a></li>
+          <li><a href="https://www.163.com/dy/article/JO1E3QDO0511B6FU.html" target="_blank">网易/真格基金Z Talk：曾把扫地机卖到百亿，一位95后站在了AI硬件赛道的起跑线上（2025）</a></li>
+          <li><a href="https://podcast.latepost.com/118" target="_blank">晚点LatePost：天生卷王郭人杰——从97年的扫地机总裁到创业做家庭通用机器人（2025）</a></li>
+          <li><a href="https://k.sina.com.cn/article_5541173342_14a47985e00101hdgc.html" target="_blank">新浪科技：97年小伙苏州创业，起步50天狂揽2亿，经纬、红杉、IDG都来了（2025.02）</a></li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">本页面由具身智能Wiki自动分发器生成 · 数据截至2026年5月 · 内容仅供参考，不构成投资建议</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

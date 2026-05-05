@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>艾利特机器人 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> › <span>艾利特机器人</span></div>
+  <div class="wiki-header"><h1>艾利特机器人</h1><div class="subtitle">ELITE ROBOTS · 2018年成立 · D+轮6亿元融资 · 估值约80亿元 · 累计出货超2万台</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#founders">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financials">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#an1">2.1 团队背景与场景选择的匹配度</a></li>
+        <li class="toc-lvl4"><a href="#an2">2.2 技术路线与场景的适配性</a></li>
+        <li class="toc-lvl4"><a href="#an3">2.3 股东/资本结构对战略的影响</a></li>
+        <li class="toc-lvl4"><a href="#an4">2.4 试错过程与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#an5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#an6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#references">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">艾利特机器人</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">艾利特智能机器人股份有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">英文名</div><div class="ib-value">ELITE ROBOTS</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2016年（北京）/ 2018年2月（股份制）</div></div>
+        <div class="ib-row"><div class="ib-label">注册地</div><div class="ib-value">苏州</div></div>
+        <div class="ib-row"><div class="ib-label">创始人/CEO</div><div class="ib-value">曹宇男（北航博士）</div></div>
+        <div class="ib-row"><div class="ib-label">总部</div><div class="ib-value">苏州（全球总部）+ 郑州（中原总部）</div></div>
+        <div class="ib-row"><div class="ib-label">上市状态</div><div class="ib-value">未上市</div></div>
+        <div class="ib-section">估值/市值</div>
+        <div class="ib-row"><div class="ib-label">最新估值</div><div class="ib-value">约80亿元（2026年3月D+轮后）</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">D+轮融资</div><div class="ib-value">6亿元（2026.3）</div></div>
+        <div class="ib-row"><div class="ib-label">2025年1-9月营收</div><div class="ib-value">2.39亿元</div></div>
+        <div class="ib-row"><div class="ib-label">累计出货</div><div class="ib-value">超2万台</div></div>
+        <div class="ib-row"><div class="ib-label">全球覆盖</div><div class="ib-value">50+国家，100+经销商</div></div>
+        <div class="ib-row"><div class="ib-label">AI业务占比</div><div class="ib-value">50%</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">赛道</div><div class="ib-value">协作机器人 · 复合机器人 · 具身智能</div></div>
+        <div class="ib-row"><div class="ib-label">官网</div><div class="ib-value"><a href="https://www.elibot.com" target="_blank">elibot.com</a></div></div>
+      </aside>
+
+      <p class="article-intro">艾利特机器人（ELITE ROBOTS）成立于2016年（北京），2018年2月正式股份制注册，总部位于苏州，由北航机器人研究所博士曹宇男创立。公司从协作机器人起家，经历了"工业机器人→协作机器人→具身智能平台"的三级跃迁，以"一脑多形"战略和"VLA+T"技术架构为差异化核心。2026年3月完成6亿元D+轮融资，估值约80亿元。公司是全国出货量领先的协作机器人企业之一，全球累计出货超2万台。财务数据（来自A股上市公司山东威达公告披露）显示2025年1-9月营收2.39亿元，亏损大幅收窄，有望接近盈亏平衡。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper">
+      <table class="wikitable infotable">
+        <tr><th>项目</th><th>内容</th></tr>
+        <tr><td>公司全称</td><td>艾利特智能机器人股份有限公司</td></tr>
+        <tr><td>英文名称</td><td>ELITE ROBOTS</td></tr>
+        <tr><td>成立时间</td><td>2016年9月（北京公司）/ 2018年2月7日（股份制公司注册）</td></tr>
+        <tr><td>注册地</td><td>苏州工业园区</td></tr>
+        <tr><td>创始人/CEO</td><td>曹宇男（北京航空航天大学机器人研究所博士）</td></tr>
+        <tr><td>总部</td><td>苏州全球总部 + 郑州中原总部（双总部格局）</td></tr>
+        <tr><td>研发中心</td><td>北京中关村、上海张江</td></tr>
+        <tr><td>上市状态</td><td>未上市；山东威达（002026.SZ）持股约0.78%</td></tr>
+        <tr><td>官网</td><td><a href="https://www.elibot.com">www.elibot.com</a></td></tr>
+        <tr><td>赛道定位</td><td>协作机器人起家，向"一脑多形"具身智能平台转型</td></tr>
+      </table>
+      </div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>时间</th><th>事件</th></tr>
+        <tr><td>2016年</td><td>北京艾利特科技有限公司成立，初期探索工业机器人</td></tr>
+        <tr><td>2018年</td><td>股份制公司注册；苏州全球生产基地投产；战略收敛、专注协作机器人赛道；A轮5000万元融资</td></tr>
+        <tr><td>2019年</td><td>EC全系列量产；深圳分公司成立</td></tr>
+        <tr><td>2020年</td><td>上海张江研创中心成立；CS系列样机试制成功；B1轮2亿元融资</td></tr>
+        <tr><td>2021年</td><td>美国分公司成立；B2轮融资</td></tr>
+        <tr><td>2022年</td><td>CS系列正式量产；日本、德国分公司设立；C1轮数亿元融资</td></tr>
+        <tr><td>2023年</td><td>海内外双轮驱动，海外销量占比提升；全年发布29-36款新机型</td></tr>
+        <tr><td>2025年</td><td>产品进入全球100+国家，海外销量占比达47%；500+经销商；山东威达战投（1,372.2万元）</td></tr>
+        <tr><td>2025年</td><td>复合机器人（迈幸）单订单近200台批量交付某全球知名3C科技公司；AI产业链业务占比达50%</td></tr>
+        <tr><td>2026年3月</td><td>完成6亿元D+轮融资，估值约80亿元；深化"一脑多形"战略和VLA+T具身智能布局</td></tr>
+      </table>
+      </div>
+
+      <h3 id="founders">1.2 创始人及核心团队</h3>
+      <p>艾利特创始人兼CEO曹宇男为北京航空航天大学机器人研究所博士，师从国家机器人方向首席科学家王田苗教授，拥有17年以上工控自动化领域产学研经验。创始团队融合北航机器人所和清华大学精密仪器系背景，在机器人底层控制、伺服驱动、运动规划等核心领域积累深厚。团队整体呈现"北航+清华学术双核、产业深耕17年、全栈技术自研"的特征。公司经历了从工业机器人到协作机器人再到具身智能平台的三次战略转型，团队在每次转型中均展现出较强的技术迁移和学习能力。</p>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+        <tr><td>创始人/CEO</td><td>曹宇男</td><td>北京航空航天大学机器人研究所博士，师从王田苗教授（国家机器人方向首席科学家）；17年以上工控自动化产、学、研经验</td></tr>
+        <tr><td>核心技术团队</td><td>北航+清华系</td><td>融合北航机器人研究所和清华大学精仪系双重技术背景</td></tr>
+      </table>
+      </div>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <h4>融资历史</h4>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>时间</th><th>轮次</th><th>金额</th><th>主要投资方</th></tr>
+        <tr><td>2018年</td><td>A轮</td><td>5,000万元</td><td>联想创投等</td></tr>
+        <tr><td>2019年</td><td>B轮</td><td>1亿元</td><td>未公开</td></tr>
+        <tr><td>2020-2021年</td><td>B1/B2轮</td><td>2亿元（B1）</td><td>联想创投、张江科投领投B1轮</td></tr>
+        <tr><td>2022年</td><td>C1轮</td><td>数亿元</td><td>达晨财智、尚珹投资联合领投</td></tr>
+        <tr><td>2025年12月</td><td>战略增资</td><td>1,372.2万元</td><td>山东威达（002026.SZ），认购约0.44%股份，合计持股0.78%</td></tr>
+        <tr><td>2026年3月</td><td>D+轮</td><td>6亿元</td><td>多家AIDC产业链CVC基金、LHCP、达晨财智、元禾控股、园丰资本、郑州具身智能产业基金；估值约80亿元</td></tr>
+      </table>
+      </div>
+
+      <h4>股东结构（关键股东）</h4>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>类别</th><th>股东</th><th>性质</th></tr>
+        <tr><td>创始人</td><td>曹宇男及创始团队</td><td>创始人/管理层持股</td></tr>
+        <tr><td>AI产业链CVC</td><td>多家AIDC产业链CVC基金（含英伟达产业链相关）</td><td>战略产业资本，深度绑定客户场景</td></tr>
+        <tr><td>A股上市公司</td><td>山东威达（002926.SZ）</td><td>战略投资，持股约0.78%</td></tr>
+        <tr><td>国资/政府引导</td><td>园丰资本（苏州工业园区）、郑州具身智能产业基金</td><td>双总部地方国资绑定</td></tr>
+        <tr><td>头部VC</td><td>达晨财智、元禾控股、联想创投、张江科投</td><td>老牌机构持续押注</td></tr>
+        <tr><td>国际资本</td><td>Lavender Hill Capital Partners (LHCP)</td><td>跨境机构</td></tr>
+      </table>
+      </div>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>技术维度</th><th>详情</th></tr>
+        <tr><td>AI架构</td><td>"VLA+T"具身智能模型：在视觉-语言-动作（VLA）框架中融入实时力矩感知（Torque）与高精度力控优化。250Hz高频推理，超98%精度亚毫米/牛顿级精确执行。核心理念："大脑管认知，小脑管执行"</td></tr>
+        <tr><td>数据方案</td><td>亿级工业力控数据积累，已落地机器人在高复杂度场景中持续积累操作数据→反哺模型迭代→扩大部署。数据飞轮效应已初步显现</td></tr>
+        <tr><td>自研程度</td><td>除减速机外全栈自研：底层操作系统、嵌入式硬软件、关节模组、工艺包、驱控一体单元、六维力传感器、多传感器融合技术</td></tr>
+        <tr><td>"一脑多形"战略</td><td>以统一Elite Physical AI大模型平台为"大脑"，驱动协作机器人、复合机器人、通用智能机器人等多种"身体"形态。实现"智力"与"躯干"解耦，从硬件销售走向平台化智能服务</td></tr>
+        <tr><td>技术特色</td><td>一体化控制器：将驱动、运动控制、感知融合与安全管理深度集成于复合机器人，摒弃传统分布式架构。任务响应时间缩短约50%，部署调试周期减少40%-60%</td></tr>
+      </table>
+      </div>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>产品分类</th><th>子类/系列</th><th>代表型号</th><th>负载范围</th><th>工作半径</th><th>主要适用场景</th></tr>
+        <tr><td rowspan="2">协作机器人</td><td>EC系列（中端）</td><td>EC63/EC66/EC612等</td><td>3kg-20kg</td><td>—</td><td>3C装配、汽车零部件、金属加工、包装、医疗、新零售</td></tr>
+        <tr><td>CS系列（高端）</td><td>CS3-CS30系列；衍生CSF/CSR/CSH/CSA等</td><td>3kg-30kg</td><td>624mm-2000mm</td><td>高端制造、海外市场、精密装配；对标UR e系列</td></tr>
+        <tr><td>复合机器人</td><td>迈幸系列</td><td>"手脑眼脚"一体化智能体</td><td>—</td><td>—</td><td>晶圆流转、光模块测试、3C物料搬运</td></tr>
+        <tr><td>通用智能机器人</td><td>EA系列</td><td>新型态产品</td><td>—</td><td>—</td><td>非工业2C场景探索中</td></tr>
+        <tr><td>小型工业机器人</td><td>EI系列/SCARA</td><td>EI43/EI45</td><td>—</td><td>—</td><td>轻量级工业应用</td></tr>
+      </table>
+      </div>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>场景分类</th><th>具体场景</th><th>对应产品</th><th>合作方/客户</th></tr>
+        <tr><td>AI基础设施（核心）</td><td>光模块生产、AI服务器组装、数据中心设备制造</td><td>协作机器人、复合机器人</td><td>英伟达产业链龙头、果链制造龙头</td></tr>
+        <tr><td>精密制造</td><td>智能手机精密制造、3C装配</td><td>EC/CS系列、复合机器人</td><td>果链制造龙头（数十个场景）</td></tr>
+        <tr><td>半导体</td><td>晶圆流转、芯片激光改质、超声剥离</td><td>迈幸复合机器人</td><td>半导体产业链客户（生产效率提升超30%）</td></tr>
+        <tr><td>新能源汽车</td><td>汽车零部件装配、检测</td><td>协作机器人</td><td>比亚迪等新能源汽车巨头</td></tr>
+        <tr><td>AI for Science</td><td>高通量化合物筛选</td><td>协作机器人</td><td>AI药物研发企业</td></tr>
+      </table>
+      </div>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <p>艾利特全球累计出货超2万台协作机器人，覆盖50+国家。复合机器人（迈幸）实现国内单笔最大订单——某全球知名3C科技公司供应链工厂近200台批量交付。AI产业链业务占比已达50%，深度嵌入光模块、AI服务器、智能手机、AI药物筛选等场景。海外销量占比达47%，在欧洲、北美、东南亚等关键市场已建立渠道。拥有100+经销商和系统集成商。公司拒绝低价竞争，坚持价值定价策略，在行业价格战中维持稳健价格体系。定位为"AI母机"——AI基础设施扩张中的制造自动化核心提供商。</p>
+
+      <h3 id="financials">1.8 财务数据</h3>
+      <p>以下数据来自A股上市公司山东威达（002026.SZ）公告披露的艾利特机器人经审计/审阅财务数据：</p>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>指标</th><th>2024年（全年）</th><th>2025年1-9月</th></tr>
+        <tr><td>营业收入</td><td>1.88亿元</td><td>2.39亿元（已超2024全年）</td></tr>
+        <tr><td>营业利润</td><td>-8,772万元</td><td>-1,807万元（亏损大幅收窄）</td></tr>
+        <tr><td>净利润</td><td>-8,775万元</td><td>-1,801万元</td></tr>
+        <tr><td>资产总额</td><td>—</td><td>3.45亿元</td></tr>
+        <tr><td>负债总额</td><td>—</td><td>2.44亿元</td></tr>
+        <tr><td>应收款项</td><td>—</td><td>1.47亿元</td></tr>
+      </table>
+      </div>
+      <p>2025年前9个月营收已达2.39亿元，超过2024年全年（1.88亿元），同比增长显著。亏损从2024年的8,775万元大幅收窄至2025年前9个月的1,801万元。公司虽尚未整体盈利，但亏损快速收窄趋势明确，按此节奏2025年全年有望接近盈亏平衡。</p>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>2023年全年发布29-36款新机型，迭代速度行业领先，体现极强的产品工程化能力。</li>
+        <li>曹宇男师从王田苗教授——王田苗是中国机器人领域最具影响力的学者之一，被誉为"中国机器人教父"，其门下已走出多家知名机器人创业公司。</li>
+        <li>复合机器人的一体化控制器方案将任务响应时间缩短约50%，部署调试周期减少40%-60%，单工程师即可完成整机调试。</li>
+        <li>公司明确拒绝行业低价竞争，在协作机器人价格战（部分厂家将价格压至2万以内）中保持价格体系稳健。</li>
+        <li>"一脑多形"战略的核心商业逻辑是摊薄AI研发成本、形成跨场景数据飞轮、实现从硬件销售到平台服务的商业模式升级。</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <h4 id="an1">2.1 团队背景与场景选择的匹配度</h4>
+      <div class="analysis-block">
+        <h4>团队背景与场景选择的匹配度</h4>
+        <p>曹宇男及其团队17年的工控自动化经验与艾利特选择的"AI产业链制造场景"高度匹配。团队源自北航机器人所（王田苗门下），在伺服驱动、运动控制、关节模组等底层技术上积累深厚，这与AI产业链（光模块、服务器、半导体）对高精度力控和亚毫米级执行的要求天然适配。与纯AI/软件背景的具身智能团队相比，艾利特更理解工业制造场景的可靠性、一致性和安全标准。双总部格局（苏州+郑州）也精准卡位了中国两大制造业集群——长三角精密制造和中部智能终端制造。但团队向"具身智能大脑"转型时需要补充AI/大模型人才，这可能是一个能力缺口。</p>
+      </div>
+
+      <h4 id="an2">2.2 技术路线与场景的适配性</h4>
+      <div class="analysis-block">
+        <h4>技术路线与场景的适配性</h4>
+        <p>艾利特的"VLA+T"架构（加入力矩感知）与工业精密制造场景的适配度极高。在光模块插拔、晶圆流转等工序中，单纯的视觉-语言模型无法感知力的变化，而力矩反馈恰恰是精密操作的核心。250Hz高频推理和98%精度保证了工业场景的实时性和可靠性。"一脑多形"平台化策略在工业场景中也有天然优势——同一AI大脑驱动不同硬件形态（固定臂、移动复合、类人形），使客户可以在不同工序间复用AI能力，降低部署和培训成本。但"一脑多形"的理想在现实中面临一个关键挑战：不同形态的机器人产生的物理交互数据是否真正能互相增强（正迁移），还是会相互干扰（负迁移），这需要在实践中验证。</p>
+      </div>
+
+      <h4 id="an3">2.3 股东/资本结构对战略的影响</h4>
+      <div class="analysis-block">
+        <h4>股东/资本结构对战略的影响</h4>
+        <p>艾利特的股东结构体现了"场景绑定型资本"的典型特征。AIDC产业链CVC基金（含英伟达产业链相关方）的入股直接绑定了AI基础设施制造这一高增长场景——英伟达GPU出货量每增加1%，对光模块和服务器组装的需求就同比例增长，艾利特的协作和复合机器人作为"AI母机"自然受益。山东威达（电动工具精密制造龙头）的战投则可能带来精密制造领域的协同订单。苏州园丰资本和郑州具身智能产业基金的参与分别绑定了长三角和中原两大制造基地的政策资源。但这种产业资本主导的结构也可能意味着公司受限于已有场景的路径依赖，在探索全新场景时缺乏灵活性。</p>
+      </div>
+
+      <h4 id="an4">2.4 试错过程与路径调整</h4>
+      <div class="analysis-block">
+        <h4>试错过程与路径调整</h4>
+        <p>艾利特经历了三次关键的战略取舍：2016-2018年从"泛工业机器人"收敛至"协作机器人"，放弃了传统工业机器人的红海竞争；2020-2022年推出CS高端系列，从"中端国内"升级至"高端海外"，与UR正面竞争；2025-2026年推出"一脑多形"和"VLA+T"，从"硬件公司"向"平台公司"转型。最关键的试错是2023-2024年复合机器人（迈幸）的推出——初期市场接受度不确定，但2025年单订单近200台的突破验证了"协作臂+移动底盘一体化"在3C制造场景的刚需。2025年山东威达入股时公司仍亏损近8800万，但仅9个月后亏损已大幅收窄至1800万，说明规模化效应正在显现。</p>
+      </div>
+
+      <h4 id="an5">2.5 竞争定位与取舍</h4>
+      <div class="analysis-block">
+        <h4>竞争定位与取舍</h4>
+        <p>艾利特在行业中的核心取舍是：<strong>做"AI产业链的精密手"而非"通用大脑"</strong>。与智元、银河通用等以"具身智能大模型"为核心的公司不同，艾利特的差异化在于真实的工业场景落地能力和精密力控技术。选择深入AI基础设施制造（光模块、服务器组装）而非更热门的"家庭服务"或"养老陪伴"，本质上是"赚确定性的钱"——跟随英伟达/果链的确定性增长做"铲子"生意。从产品维度，公司选择做"一脑多形"（全栈平台）而非做单一爆款（如越疆Dobot的桌面级机械臂），反映的是"从工业协作自然延伸到具身智能"而非"从消费端切入"的路径选择。核心风险在于工业场景的定制化需求可能导致产品碎片化，规模效应难以完全释放。</p>
+      </div>
+
+      <h4 id="an6">2.6 其他重要观察</h4>
+      <div class="analysis-block">
+        <h4>其他重要观察</h4>
+        <p>艾利特2025年前9个月2.39亿元营收（已超2024全年）和亏损从8,775万收窄至1,801万的财务表现，在国产协作机器人企业中属于第一梯队。山东威达的入股（仅0.78%）虽然金额不大，但其作为A股上市公司披露的经审计财务数据，为艾利特的商业化进程提供了难得的公开验证——这在大多数未上市的具身智能公司中是稀缺信息。"复合机器人"作为增长引擎值得关注：在半导体和3C领域，单纯的固定式协作臂或移动底盘都无法满足"移动+操作"的复合需求，艾利特以一体化控制器方案解决了这一痛点，单订单近200台说明产品-市场匹配（PMF）已经达标。另一个值得跟踪的指标是海外销量占比从2023年的上升趋势到2025年的47%——几乎一半收入来自海外，说明产品力已获国际客户认可，这对未来可能的海外上市或跨境并购具有战略意义。</p>
+      </div>
+
+      <h2 id="references">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://www.elibot.com/tideflow/yOFsuKSo.html">艾利特官网 - 国产协作机器人如何突围？艾利特6亿融资背后的技术密码与全球化布局</a></li>
+          <li><a href="https://www.elibot.com/tideflow/C1S8hNaY.html">艾利特官网 - 艾利特机器人完成6亿元D+轮融资，一脑多形战略引领具身智能新时代</a></li>
+          <li><a href="https://dzrb.dzng.com/general/0/NEWS3013538OXFDHEXRQUMRR">大众日报 - 手握18亿现金！山东威达参股未盈利机器人公司，剑指第二主业</a></li>
+          <li><a href="https://agent.ren/2026/0325/10720.shtml">Agent Ren - 艾利特完成6亿元D+轮融资，核心优势何在</a></li>
+          <li><a href="https://www.163.com/dy/article/KPHB5LR60516EPQ9.html">网易 - 清华系团队又获6亿融资，估值80亿：从协作臂到具身智能大脑</a></li>
+          <li><a href="http://www.sh.chinanews.com.cn/swzx/2026-03-25/145510.shtml">中新社上海 - 布局AI产业链，艾利特机器人完成6亿元D+轮融资</a></li>
+          <li><a href="https://news.ca168.com/202603/142796.html">中国自动化网 - 艾利特机器人完成6亿元D+轮融资，加速全球战略落地</a></li>
+          <li><a href="https://news.pedaily.cn/202603/562059.shtml">投资界 - 布局AI产业链，艾利特机器人完成6亿元D+轮融资</a></li>
+          <li><a href="https://nuxt.cyzone.cn/article/828410.html">创业邦 - 艾利特拿下6亿D+轮融资</a></li>
+          <li><a href="https://i.gasgoo.com/news/70451384.html">盖世汽车 - Seeds：艾利特机器人完成6亿元D+轮融资</a></li>
+          <li><a href="https://www.donews.com/news/detail/4/6482342.html">DoNews - 艾利特机器人完成6亿元D+轮融资，推进"一脑多形"战略</a></li>
+          <li><a href="https://finance.eastmoney.com/a/202603253684438022.html">东方财富 - 押注机器人"大脑"，艾利特机器人完成6亿元D+轮融资</a></li>
+          <li><a href="http://www.sipac.gov.cn/kjzszx/jqhd/202603/b5bbcb080f674eeabf75e8ad5b360d1e.shtml">苏州工业园区 - 艾利特机器人完成6亿元D+轮融资，加速全球战略落地</a></li>
+          <li><a href="https://news.pedata.cn/656103.html">投中数据 - 艾利特机器人2亿元B1轮融资</a></li>
+          <li><a href="https://baike.baidu.com/item/艾利特智能机器人股份有限公司/67131195">百度百科 - 艾利特智能机器人股份有限公司</a></li>
+          <li><a href="https://www.eeworld.com.cn/robot/hisic586680.html">电子工程世界 - 艾利特机器人完成2亿元B1轮融资</a></li>
+          <li><a href="https://gongkong.ofweek.com/2020-09/ART-310058-8470-30460142.html">OFweek工控 - 艾利特曹宇男：五年内协作机器人将达百万台级体量</a></li>
+          <li><a href="https://letschuhai.com/xiezuojiqirengongsiailitejiqirenwancheng2yiyuanb1lunrongzichanpinyuanxiaozhimeiguoriai">出海 - 协作机器人公司艾利特机器人完成2亿元B1轮融资</a></li>
+          <li><a href="https://www.sohu.com/a/1000918292_439726">搜狐 - 布局AI产业链，艾利特机器人完成6亿元D+轮融资</a></li>
+          <li><a href="https://www.qiche365.org.cn/index.php/index/article/detail/id/41478.html">汽车365 - 艾利特机器人完成6亿元D+轮融资</a></li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">本页面由具身智能Wiki自动分发器于2026年5月4日生成。数据来源截至当日公开信息。如有更新或纠错，请提交至维护团队。</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>ABB — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> <span class="breadcrumb-sep">›</span> <span>ABB</span></div>
+  <div class="wiki-header"><h1>ABB</h1><div class="subtitle">ASEA Brown Boveri · SIX:ABBN · Nasdaq:ABB · 1988年由瑞典ASEA与瑞士BBC合并成立 · 全球机器人四大家族之一 · 安装量超50万台 · 机器业务部正以54亿美元出售给软银</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#founders">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#finance">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#analysis1">2.1 团队背景与场景选择的匹配度</a></li>
+        <li class="toc-lvl4"><a href="#analysis2">2.2 技术路线与场景的适配性</a></li>
+        <li class="toc-lvl4"><a href="#analysis3">2.3 股东/资本结构对战略的影响</a></li>
+        <li class="toc-lvl4"><a href="#analysis4">2.4 试错过程与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#analysis5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#analysis6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#refs">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+
+      <aside class="infobox">
+        <div class="infobox-title">ABB</div>
+        <div class="ib-row"><div class="ib-label">英文全称</div><div class="ib-value">ABB Ltd (ASEA Brown Boveri)</div></div>
+        <div class="ib-row"><div class="ib-label">股票代码</div><div class="ib-value">SIX: ABBN / Nasdaq: ABB</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">1988年1月5日（ASEA 1883 + BBC 1891合并）</div></div>
+        <div class="ib-row"><div class="ib-label">总部</div><div class="ib-value">瑞士苏黎世</div></div>
+        <div class="ib-row"><div class="ib-label">CEO</div><div class="ib-value">Morten Wierod（2024年8月起）</div></div>
+        <div class="ib-row"><div class="ib-label">董事长</div><div class="ib-value">Peter Voser</div></div>
+        <div class="ib-row"><div class="ib-label">员工人数</div><div class="ib-value">约11万人（2024年，含机器人7,000人）</div></div>
+        <div class="ib-section">财务数据（2024）</div>
+        <div class="ib-row"><div class="ib-label">集团营收</div><div class="ib-value">328.5亿美元</div></div>
+        <div class="ib-row"><div class="ib-label">集团净利润</div><div class="ib-value">39.3亿美元</div></div>
+        <div class="ib-row"><div class="ib-label">机器人业务营收</div><div class="ib-value">约23亿美元</div></div>
+        <div class="ib-row"><div class="ib-label">机器人EBITA利润率</div><div class="ib-value">12.1%</div></div>
+        <div class="ib-section">估值/并购</div>
+        <div class="ib-row"><div class="ib-label">集团市值</div><div class="ib-value">约699亿美元（2024年）</div></div>
+        <div class="ib-row"><div class="ib-label">机器人业务出售价</div><div class="ib-value">53.75亿美元（软银，预计2026年中完成）</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">机器人安装量</div><div class="ib-value">超50万台</div></div>
+        <div class="ib-row"><div class="ib-label">RobotStudio用户</div><div class="ib-value">超6万名</div></div>
+        <div class="ib-row"><div class="ib-label">首台机器人</div><div class="ib-value">IRB 6（1974年，ASEA）</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">行业</div><div class="ib-value"><span class="tag tag-info">工业机器人</span><span class="tag tag-info">电力自动化</span><span class="tag tag-info">协作机器人</span><span class="tag tag-info">物理AI</span></div></div>
+        <div class="ib-row"><div class="ib-label">官网</div><div class="ib-value"><a href="https://global.abb/" target="_blank">global.abb</a></div></div>
+      </aside>
+
+      <p class="article-intro"><strong>ABB</strong>（ABB Ltd，原ASEA Brown Boveri）是一家瑞士-瑞典跨国电气工程与自动化技术公司，1988年由瑞典<strong>ASEA</strong>（1883年创立）与瑞士<strong>Brown Boveri</strong>（1891年创立）合并成立，总部位于瑞士苏黎世。ABB与发那科、安川、库卡并称全球工业机器人"四大家族"，机器人全球累计安装量超50万台。2024年集团营收328.5亿美元，员工约11万人。2025年10月，ABB宣布以53.75亿美元将机器人业务部出售给日本软银集团（预计2026年中完成），从而聚焦电气化和工业自动化核心业务。2026年GTC大会上，ABB与NVIDIA宣布物理AI战略合作，推出RobotStudio HyperReality数字孪生平台。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper"><table class="wikitable infotable">
+        <tr><th>项目</th><th>内容</th></tr>
+        <tr><td>公司全称</td><td>ABB Ltd（原ASEA Brown Boveri Ltd.）</td></tr>
+        <tr><td>成立时间</td><td>1988年1月5日（瑞典ASEA与瑞士Brown Boveri合并，双方各占50%）</td></tr>
+        <tr><td>前身历史</td><td>ASEA（瑞典通用电气，1883年成立）+ BBC Brown Boveri（瑞士勃朗-鲍威利，1891年成立）</td></tr>
+        <tr><td>注册地/总部</td><td>瑞士苏黎世（Affolternstrasse 44）</td></tr>
+        <tr><td>上市</td><td>SIX瑞士交易所（ABBN）/ 纳斯达克斯德哥尔摩（ABB）/ 美国OTC（ABBNY）</td></tr>
+        <tr><td>CEO</td><td>Morten Wierod（2024年8月起，前Motion业务负责人）</td></tr>
+        <tr><td>董事长</td><td>Peter Voser（2015年4月起）</td></tr>
+        <tr><td>官网</td><td>https://global.abb/</td></tr>
+        <tr><td>员工</td><td>约11万人（2024年）；其中机器人业务部约7,000人</td></tr>
+        <tr><td>业务板块</td><td>电气化、运动控制、过程自动化、机器人与离散自动化（已划分为终止经营）</td></tr>
+      </table></div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>时间</th><th>事件</th></tr>
+        <tr><td>1883年</td><td>ASEA（瑞典通用电气）在瑞典韦斯特罗斯成立</td></tr>
+        <tr><td>1891年</td><td>Brown, Boveri & Cie（BBC）在瑞士巴登成立</td></tr>
+        <tr><td>1974年</td><td>ASEA推出全球首台全电动微处理器控制工业机器人IRB 6</td></tr>
+        <tr><td>1988年</td><td>ASEA与BBC合并，ABB正式成立；当时员工约16万人</td></tr>
+        <tr><td>1990年代</td><td>ABB大举收购全球电气和自动化企业，业务覆盖100个国家</td></tr>
+        <tr><td>2015年</td><td>推出YuMi双臂协作机器人，开创人性化人机协作时代</td></tr>
+        <tr><td>2021年</td><td>推出GoFa和SWIFTI新一代协作机器人系列</td></tr>
+        <tr><td>2022年</td><td>推出OmniCore新一代控制器平台（1.7亿美元研发投入）</td></tr>
+        <tr><td>2024年</td><td>CEO换帅（Morten Wierod接替Björn Rosengren）</td></tr>
+        <tr><td>2025年4月</td><td>ABB宣布计划将机器人业务分拆独立上市</td></tr>
+        <tr><td>2025年9月</td><td>推出OmniCore EyeMotion视觉自主平台</td></tr>
+        <tr><td>2025年10月</td><td>宣布以53.75亿美元将机器人业务部出售给软银（预计2026年中完成）</td></tr>
+        <tr><td>2026年1月</td><td>与亚信科技、阿里云联合成立"具身智能实验室"（北京）</td></tr>
+        <tr><td>2026年3月</td><td>GTC大会上与NVIDIA宣布物理AI合作，推出RobotStudio HyperReality</td></tr>
+      </table></div>
+
+      <h3 id="founders">1.2 创始人及核心团队</h3>
+      <p>ABB是瑞典ASEA与瑞士BBC合并的产物，无传统意义上的单一创始人。ASEA创始人<strong>Ludvig Fredholm</strong>（1883年），BBC创始人<strong>Charles Eugene Lancelot Brown</strong>和<strong>Walter Boveri</strong>（1891年）。合并后的首任CEO为<strong>Percy Barnevik</strong>（1988-1996），他主导了ABB早期的全球扩张战略，被视为ABB现代企业精神的缔造者。</p>
+      <p>当前管理层以<strong>产业运营型</strong>为主：CEO Morten Wierod由内部晋升（前Motion业务负责人），CFO Christian Nilsson于2026年2月新任。集团约11万名员工，在100个国家运营。机器人业务部即将转入软银集团，届时管理层和战略将面临根本性重塑。</p>
+
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+        <tr><td>CEO</td><td>Morten Wierod</td><td>2024年8月就任；ABB内部晋升，曾任Motion业务区总裁；专注电气化和自动化核心业务</td></tr>
+        <tr><td>董事长</td><td>Peter Voser</td><td>2015年起；前壳牌CFO和CEO；推动ABB聚焦化战略</td></tr>
+        <tr><td>CFO</td><td>Christian Nilsson</td><td>2026年2月1日新任</td></tr>
+        <tr><td>前CEO</td><td>Björn Rosengren</td><td>2020-2024；主导了ABB"四业务部"架构；推动机器人业务分拆</td></tr>
+      </table></div>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <p>ABB为SIX瑞士交易所和纳斯达克斯德哥尔摩双重上市公司，股东以全球机构投资者为主。最大单一股东为瑞典<strong>Investor AB</strong>（Wallenberg家族旗下投资公司），持股约10-12%。ABB机器人业务部的重大资本事件是2025年10月宣布的出售给软银的交易。</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>事件</th><th>金额</th><th>时间</th><th>详情</th></tr>
+        <tr><td>ABB机器人业务出售给软银</td><td>53.75亿美元（企业价值）</td><td>2025年10月宣布，2026年中预计完成</td><td>全现金交易；ABB账面税前收益约24亿美元；此前分拆IPO估值不足40亿美元</td></tr>
+        <tr><td>收购西门子在华开关插座业务</td><td>未披露</td><td>2025年3月完成</td><td>成立上海ABB电气技术有限公司</td></tr>
+        <tr><td>南京江宁开发区双超级工厂</td><td>各约15亿元人民币</td><td>2025年12月签约</td><td>输配电产品超级工厂+驱动产品超级工厂</td></tr>
+      </table></div>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>维度</th><th>详情</th></tr>
+        <tr><td>控制器平台</td><td>OmniCore（1.7亿美元研发投入）：V250XT(高载)/C30(紧凑)/C90XT(工业级)/E10(节能)五款；TrueMove&QuickMove运动引擎精度0.6mm；SafeMove 3数字安全区取代物理围栏(节省30%空间)</td></tr>
+        <tr><td>AI/视觉</td><td>OmniCore EyeMotion（2025.9中国工博会发布）：硬件无关视觉系统，拖拽式Web界面，调试时间减90%；Automatic Path Planning Online实现实碰无撞路径规划(周期缩减50%)</td></tr>
+        <tr><td>数字孪生</td><td>RobotStudio（全球6万+用户的离线编程仿真平台）；RobotStudio HyperReality（2026年H2发布）：集成NVIDIA Omniverse库+Isaac仿真，仿真-现实相关性达99%，绝对精度从8-15mm降至~0.5mm，调试时间减80%</td></tr>
+        <tr><td>NVIDIA合作</td><td>GTC 2026确立物理AI战略：Omniverse数孪+Isaac仿真+评估Jetson集成至OmniCore控制器实现边缘AI推理；作为NVIDIA四大工业机器人伙伴之一（合计装机200万+台）</td></tr>
+        <tr><td>具身智能实验室</td><td>2026.1与亚信科技、阿里云在北京成立，聚焦工业仿真与物理AI的研发与规模化部署</td></tr>
+        <tr><td>差异化特色</td><td>唯一覆盖"电气化+自动化+机器人"三大维度的公司；AVR™(Autonomous Versatile Robotics)自主多样机器人愿景；电力电子与运动控制的深厚积淀向机器人领域技术溢出</td></tr>
+      </table></div>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>产品线</th><th>系列/型号</th><th>关键参数</th><th>定位</th></tr>
+        <tr><td>大型工业机器人</td><td>IRB 6700/7600/8700等</td><td>负载最高800kg，臂展3.5m</td><td>汽车点焊/搬运/重型物料搬运</td></tr>
+        <tr><td>中型工业机器人</td><td>IRB 4600/2600/1600等</td><td>负载6-60kg，弧焊/切割/装配</td><td>通用制造</td></tr>
+        <tr><td>协作机器人YuMi</td><td>IRB 14000/14050</td><td>单臂/双臂，0.5kg，软垫包裹，无夹点，固有安全</td><td>小件精密装配</td></tr>
+        <tr><td>协作机器人GoFa</td><td>CRB 15000</td><td>5kg，2.2m/s，6关节力矩传感，接触即停</td><td>人机连续协作</td></tr>
+        <tr><td>工业协作SWIFTI</td><td>CRB 1100/1300</td><td>4-11kg，最高6.2m/s(CRB1300)，IP67，SafeMove+激光扫描</td><td>间歇性人机协作，工业速度</td></tr>
+        <tr><td>控制器</td><td>OmniCore全系列</td><td>V250XT/C30/C90XT/E10，支持Python/PROFINET/EtherNet/IP/EtherCAT</td><td>全产品线统一控制底座</td></tr>
+        <tr><td>软件平台</td><td>RobotStudio</td><td>离线编程+仿真+RobotStudio HyperReality数字孪生</td><td>全球6万+用户</td></tr>
+      </table></div>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>场景分类</th><th>具体应用</th><th>代表客户</th></tr>
+        <tr><td>汽车制造</td><td>点焊、弧焊、涂装、搬运、动力总成装配</td><td>全球主流车企（传统核心市场）</td></tr>
+        <tr><td>电子制造</td><td>精密组装、物料搬运、测试上下料</td><td>Foxconn(富士康) — 精密组装试点</td></tr>
+        <tr><td>中小制造</td><td>快速部署AI驱动机器人，无需编程</td><td>WORKR（美国中小制造商平台）</td></tr>
+        <tr><td>仓储物流</td><td>码垛、拆垛、分拣、订单履行</td><td>电商/3PL物流</td></tr>
+        <tr><td>食品饮料</td><td>拣选、包装、码垛</td><td>食品加工企业</td></tr>
+        <tr><td>具身智能R&D</td><td>工业仿真、物理AI研究</td><td>亚信科技+阿里云（北京具身智能实验室）</td></tr>
+        <tr><td>电气化基础设施</td><td>输配电、充电桩、数据中心供电</td><td>OpenAI/Meta数据中心基建（ABB电气化业务）</td></tr>
+      </table></div>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>指标</th><th>数据</th></tr>
+        <tr><td>全球机器人累计安装量</td><td>超50万台（53个国家100+个地点）</td></tr>
+        <tr><td>RobotStudio用户数</td><td>超6万名（全球最流行的机器人编程仿真工具）</td></tr>
+        <tr><td>机器人业务部员工</td><td>约7,000人</td></tr>
+        <tr><td>机器人业务2024营收</td><td>约23亿美元（占ABB集团7%）</td></tr>
+        <tr><td>软银收购价</td><td>53.75亿美元（企业价值），约2.3x PS</td></tr>
+        <tr><td>富士康AI精密组装试点</td><td>合成数据虚拟训练→99%精度迁移至真实产线</td></tr>
+        <tr><td>RobotStudio HyperReality</td><td>预计2026年下半年发布；部署成本降40%，上市时间加速50%</td></tr>
+        <tr><td>NVIDIA GR00T全栈集成</td><td>与发那科、安川、库卡共四家核心伙伴</td></tr>
+      </table></div>
+
+      <h3 id="finance">1.8 财务数据</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>（亿美元）</th><th>FY2022</th><th>FY2023</th><th>FY2024</th><th>FY2025（预计）</th></tr>
+        <tr><td>ABB集团总营收</td><td>~294</td><td>~322</td><td>328.5</td><td>~330</td></tr>
+        <tr><td>ABB集团净利润</td><td>~25</td><td>~37</td><td>39.3</td><td>—</td></tr>
+        <tr><td>机器人业务营收</td><td>22.58</td><td>24.52</td><td>22.79</td><td>~23（持平）</td></tr>
+        <tr><td>机器人业务EBITA</td><td>1.86</td><td>3.49</td><td>2.77</td><td>—</td></tr>
+        <tr><td>机器人EBITA利润率</td><td>8.2%</td><td>14.2%</td><td>12.1%</td><td>~9%（Q2）</td></tr>
+      </table></div>
+      <p>集团整体财务状况健康，2024年净利润39.3亿美元。机器人业务虽然营收规模可观（全球前四），但利润率持续走低（2025年Q2降至9.1%），远低于集团电气化和过程自动化部门（18%+利润率），这是ABB决定出售该部门的核心财务逻辑。</p>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>ABB机器人业务即将从ABB集团中剥离，被软银集团整合进<strong>Robo Holdings</strong>（软银旗下机器人控股公司，已整合Berkshire Grey、AutoStore、Skild AI等约20家机器人子公司）。软银创始人<strong>孙正义</strong>将此称为"物理AI"与"人工超级智能"融合的关键一步。</li>
+        <li>ABB在中国市场的电气化布局持续增强：2025年收购西门子在华开关插座业务，投资南京双超级工厂（各15亿元），体现了对<strong>中国电气化基础设施市场</strong>的长期信心。</li>
+        <li>2025年Q3财报显示机器人业务的汽车和电子两大终端市场需求持续低迷，叠加<strong>中国本土品牌市占率升至58%</strong>（2024年），竞争加剧。</li>
+        <li>2026年GTC大会上，NVIDIA黄仁勋宣布ABB、发那科、安川、库卡四大巨头合计全球装机量<strong>超200万台</strong>。</li>
+        <li>OmniCore EyeMotion的硬件无关特性使其可兼容<strong>任何第三方摄像头或传感器</strong>，体现了ABB的开放性战略。</li>
+        <li>ABB机器人业务1974年推出全球首台<strong>全电动微处理器控制工业机器人IRB 6</strong>，是全球工业机器人产业的先驱。</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="analysis1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>ABB管理层的核心背景是<strong>电气化和工业自动化运营</strong>，而非机器人原生技术——CEO Morten Wierod此前长期领导Motion业务（电机和变频器），这表明ABB集团的战略重心始终在电气化和自动化而非机器人。机器人业务部的技术团队以<strong>产业工程师型</strong>为主，长于高可靠性工业产品开发（OmniCore控制器、SafeMove安全系统），但在AI/软件领域缺乏原生基因——这正是ABB需要通过NVIDIA合作和软银收购来补齐的短板。ABB的场景选择高度集中于<strong>传统制造（汽车/电子/食品）</strong>，与其工业工程基因高度匹配，但也导致对新兴场景（医疗、零售、家庭）的渗透力不足。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>ABB的技术路线呈现出明显的<strong>"硬件深厚、软件追赶"</strong>特征。OmniCore控制器平台（1.7亿美元研发）和SafeMove安全系统代表了世界级的工业硬件能力；但AI/视觉/自主规划等软件能力更多依赖外部——OmniCore EyeMotion的视觉系统定位为"硬件无关"（即ABB不提供摄像头），NVIDIA提供数字孪生底座。这种路线在<strong>结构化制造场景</strong>（汽车焊接、码垛）中表现优异——精准度和可靠性是第一优先级，AI泛化能力重要性较低。但当客户需求向<strong>非结构化自主决策</strong>（如自主路径规划、多品类分拣）迁移时，ABB对NVIDIA生态的依赖程度将不断加深。软银收购后，ABB机器人与Skild AI（通用机器人智能层）的协同值得关注。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>ABB机器人业务即将经历的<strong>所有权转换</strong>（从ABB集团→软银Robo Holdings）是该业务史上最重大的结构性变化。在ABB集团内，机器人是利润率最低的业务板块，长期面临集团内部的资源竞争压力——集团将资本更多投向电气化（数据中心基建等高速增长领域）而非机器人。转入软银后，<strong>约束条件将彻底改变</strong>：软银的Robo Holdings拥有约20家机器人公司，孙正义明确将机器人定义为"人工超级智能"的核心载体——这意味着资金将不再是约束，但软银可能推动更激进的AI融合和更快的商业化节奏，而非ABB时期的稳健利润导向。投资者AB（Wallenberg家族）作为ABB大股东，对机器人出售的支持反映了传统产业资本对机器人业务"长周期、低利润"的耐心耗竭。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>ABB机器人业务经历了几次重要的路径调整：（1）<strong>2015年YuMi→2021年GoFa/SWIFTI</strong>：YuMi作为双臂精密装配机器人技术惊艳但市场狭小（0.5kg负载限制），ABB随后推出更实用的GoFa/SWIFTI系列，从"技术炫技"转向"实用协作"，体现了对市场真实需求的校准。（2）<strong>2025年分拆IPO→软银出售</strong>：ABB原计划将机器人独立上市，但最终选择全现金出售——表明ABB对机器人业务独立运营的长期竞争力信心不足，或更看重短期现金确定性（软银出价53.75亿 vs IPO估值不足40亿）。（3）<strong>2026年软银过渡期</strong>：当前处于"交易已宣布但未完成"的尴尬阶段，客户和员工存在不确定性——富士康等关键客户合作可能面临重新评估。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>ABB在四大家族中的核心定位是<strong>"最完整的自动化+电气化+机器人组合"</strong>——唯一横跨电力基础设施和工业机器人的公司。但随着机器人业务被出售，这一独特定位即将消失。后出售时代的ABB将聚焦电气化和工业自动化（与施耐德电气、西门子直接竞争），而ABB机器人（软银旗下）将与发那科、安川、库卡在软银生态框架下重新定义竞争关系——软银同时持有这些公司的部分业务（通过Robo Holdings整合），可能形成<strong>"软银系机器人联邦"</strong>。ABB机器人的核心取舍是：相比发那科（机器人部署量第一）和安川（伺服电机根基），ABB的差异化在于<strong>RobotStudio生态（6万+用户）和NVIDIA深度整合</strong>——这是其从硬件制造商向软件+AI平台转型的依仗。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis6">
+        <h4>2.6 其他重要观察</h4>
+        <p>（1）<strong>中国的双面挑战</strong>：ABB在中国既是大赢家（电气化业务在南京扩产），也是大输家——中国本土机器人品牌市占率2024年已达58%，ABB机器人在中国的市场份额被快速侵蚀。（2）<strong>软银"机器人大联邦"的协同效应尚待验证</strong>：Robo Holdings整合了Berkshire Grey（仓储）、AutoStore（立方体存储）、Skild AI（通用智能层）、ABB机器人（工业机器人）等约20家公司——理论上可形成"从仓储到工厂到AI"的闭环，但实际上这些公司在客户群、技术栈和地域上差异巨大，整合难度极高。（3）<strong>ABB机器人品牌溢价能否维持</strong>：被软银收购后，"ABB Robotics"品牌虽被保留，但脱离ABB集团的品牌背书，可能影响部分保守客户（尤其欧洲制造企业）的采购决策。（4）<strong>富士康试点的战略意义</strong>：如果富士康ABB合作的AI精密组装试点成功（99%仿真→现实迁移精度），将验证OmniCore EyeMotion+RobotStudio HyperReality组合在消费电子制造中的可行性——这是对抗中国本土品牌价格战的关键差异化路径。</p>
+      </div>
+
+      <h2 id="refs">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://global.abb/" target="_blank">ABB官方网站</a></li>
+          <li><a href="https://new.abb.com/news/zh-CHS/detail/134030/prsrl-abb-robotics-partners-with-nvidia-to-deliver-industrial-grade-physical-ai-at-scale-cn" target="_blank">ABB机器人携手NVIDIA，加速物理AI落地以重塑工业智造 (ABB官方, 2026.3)</a></li>
+          <li><a href="https://group.softbank/en/news/press/20251008" target="_blank">Acquisition of ABB Ltd's Robotics Business — SoftBank Group (2025.10.8)</a></li>
+          <li><a href="https://www.bloomberg.com/news/articles/2025-10-08/softbank-to-buy-abb-s-robotics-arm-in-5-4-billion-deal" target="_blank">SoftBank to Buy ABB's Robotics Arm in $5.4 Billion Deal — Bloomberg (2025.10.8)</a></li>
+          <li><a href="https://www.therobotreport.com/abb-group-sells-abb-robotics-softbank-5-3b/" target="_blank">ABB Group to sell ABB Robotics to SoftBank for $5.375B — The Robot Report</a></li>
+          <li><a href="https://investor.nvidia.com/news/press-release-details/2026/NVIDIA-and-Global-Robotics-Leaders-Take-Physical-AI-to-the-Real-World/default.aspx" target="_blank">NVIDIA and Global Robotics Leaders Take Physical AI to the Real World — NVIDIA (GTC 2026)</a></li>
+          <li><a href="https://www.rockingrobots.com/abb-robotics-generated-2-3-billion-in-revenue-in-2025/" target="_blank">ABB Robotics generated $2.3 billion in revenue in 2025 — Rockingrobots</a></li>
+          <li><a href="https://www.rockingrobots.com/abb-q3-results-highlight-pressure-on-robotics-division-amid-shifting-automation-market/" target="_blank">ABB Q3 Results Highlight Pressure on Robotics Division — Rockingrobots</a></li>
+          <li><a href="https://www.automation.com/en-us/products/september-2025/abb-robotics-omnicore-eyemotion-autonomy" target="_blank">ABB Robotics Launches OmniCore EyeMotion for Vision-Powered Autonomy — Automation.com (2025.9)</a></li>
+          <li><a href="https://finance.eastmoney.com/news/1354,202510093529788474.html" target="_blank">软银孙正义豪掷53亿美元 收购ABB机器人业务 — 东方财富 (2025.10.9)</a></li>
+          <li><a href="https://m.jiemian.com/article/13448524.html" target="_blank">380亿，孙正义买走了 — 界面新闻</a></li>
+          <li><a href="https://www.eenewseurope.com/en/abb-to-sell-robotics-division-to-softbank-for-5-4b/" target="_blank">ABB to sell robotics division to SoftBank for $5.4B — eeNews Europe</a></li>
+          <li><a href="https://techfundingnews.com/softbank-to-acquire-abbs-industrial-robotic-arm-for-5-4b-in-2026/" target="_blank">SoftBank Group to acquire ABB's industrial robotics business for $5.4B — TFN</a></li>
+          <li><a href="https://www.media-outreach.vn/news/hong-kong/2026/01/26/445685/asiainfo-and-abb-robotics-launch-embodied-intelligence-laboratory/" target="_blank">AsiaInfo and ABB Robotics Launch "Embodied Intelligence Laboratory" (2026.1.26)</a></li>
+          <li><a href="https://aei.dempa.net/archives/12496" target="_blank">ABB Bridges Gap of Industrial, Collaborative Robot with New SWIFTI — AEI</a></li>
+          <li><a href="https://www.marketwatch.com/story/softbank-to-pay-5-4-billion-for-robotics-producer-one-of-four-areas-its-investing-to-realize-artificial-super-intelligence-df5b737b" target="_blank">SoftBank to pay $5.4 billion for robotics producer — MarketWatch</a></li>
+          <li><a href="https://www.manufacturingdive.com/news/industrial-robotics-companies-everywhere-says-nvidia-ceo-gtc-2026-abb-fanuc-ai/815042/" target="_blank">Nvidia CEO says 'every industrial company will become a robotics company' — Manufacturing Dive</a></li>
+          <li><a href="https://wapbaike.baidu.com/item/阿西布朗勃法瑞/6306338" target="_blank">ABB (阿西布朗勃法瑞) — 百度百科</a></li>
+          <li><a href="https://aiwiki.ai/wiki/abb" target="_blank">ABB — AI Wiki</a></li>
+          <li><a href="https://www.supplychain247.com/company/abb_robotics" target="_blank">ABB Robotics — SupplyChain247 Company Profile</a></li>
+          <li><a href="https://www.vaneck.com/us/en/blogs/thematic-investing/top-robotics-companies/" target="_blank">Top Robotics Companies Transforming the Industry in 2025 — VanEck</a></li>
+          <li><a href="https://blockchain.news/news/nvidia-cosmos-3-groot-n2-robotics-partnerships-gtc-2026" target="_blank">NVIDIA Unveils Cosmos 3 and GR00T N2 as Robotics Giants Adopt Physical AI Stack — Blockchain.news</a></li>
+        </ol>
+      </div>
+
+    </article>
+  </div>
+  <div class="page-footer">页面生成于2026年5月4日 · 数据截至2026年4月 · 具身智能Wiki项目</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

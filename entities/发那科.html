@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>发那科 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> › <span>发那科</span></div>
+  <div class="wiki-header"><h1>发那科</h1><div class="subtitle">FANUC Corporation · TYO: 6954 · 1958年创立 · 全球最大工业机器人制造商 · 市值约$400亿</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#team">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financials">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#a2-1">2.1 团队背景与场景匹配度</a></li>
+        <li class="toc-lvl4"><a href="#a2-2">2.2 技术路线与场景适配性</a></li>
+        <li class="toc-lvl4"><a href="#a2-3">2.3 股东/资本结构影响</a></li>
+        <li class="toc-lvl4"><a href="#a2-4">2.4 试错与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#a2-5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#a2-6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#references">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">发那科</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">FANUC Corporation（ファナック株式会社）</div></div>
+        <div class="ib-row"><div class="ib-label">上市代码</div><div class="ib-value">TYO: 6954（东证Prime）</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">1958年（Fujitsu全资子公司）；1972年独立</div></div>
+        <div class="ib-row"><div class="ib-label">创始人</div><div class="ib-value">稻叶清右卫门（Seiuemon Inaba）</div></div>
+        <div class="ib-row"><div class="ib-label">现任CEO</div><div class="ib-value">稻叶善治（Yoshiharu Inaba，2003年起）</div></div>
+        <div class="ib-row"><div class="ib-label">总部</div><div class="ib-value">日本山梨县忍野村（富士山麓）</div></div>
+        <div class="ib-section">财务状况（FY2025）</div>
+        <div class="ib-row"><div class="ib-label">营收</div><div class="ib-value">¥8,578亿（~$57亿）▲7.6%</div></div>
+        <div class="ib-row"><div class="ib-label">营业利润</div><div class="ib-value">¥1,838亿（~$12亿）▲15.7%</div></div>
+        <div class="ib-row"><div class="ib-label">营业利润率</div><div class="ib-value">21.4%</div></div>
+        <div class="ib-row"><div class="ib-label">净利润</div><div class="ib-value">¥1,665亿（~$11亿）▲12.9%</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">员工</div><div class="ib-value">~8,256人（合并）</div></div>
+        <div class="ib-row"><div class="ib-label">R&D占比</div><div class="ib-value">~1/3员工</div></div>
+        <div class="ib-row"><div class="ib-label">全球布局</div><div class="ib-value">46+国家/240+合资公司</div></div>
+        <div class="ib-section">市场地位</div>
+        <div class="ib-row"><div class="ib-label">市值</div><div class="ib-value">~$400-420亿</div></div>
+        <div class="ib-row"><div class="ib-label">CNC全球份额</div><div class="ib-value">~65%</div></div>
+        <div class="ib-row"><div class="ib-label">指数成分</div><div class="ib-value">TOPIX Core 30 / Nikkei 225</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-value" style="width:100%;padding:6px"><span class="tag">工业机器人</span><span class="tag">CNC全球第一</span><span class="tag">NVIDIA生态</span><span class="tag">日本制造</span><span class="tag">全栈自动化</span><span class="tag">上市公司</span></div></div>
+        <div class="ib-section">官网</div>
+        <div class="ib-row"><div class="ib-value" style="width:100%;padding:4px"><a href="https://www.fanuc.co.jp" target="_blank">fanuc.co.jp</a></div></div>
+      </aside>
+
+      <p class="article-intro"><strong>发那科（FANUC）</strong>是全球最大的工业机器人制造商和CNC数控系统供应商，由"日本机器人之父"稻叶清右卫门于1958年创立（原为富士通全资子公司，1972年独立）。公司总部位于日本山梨县富士山麓，以标志性黄色涂装闻名。FANUC掌握从CNC控制器、伺服电机到工业机器人的全栈自动化技术，全球CNC市场份额约65%。2026年GTC大会上与NVIDIA达成战略联盟，加速从传统工业机器人向"实体AI基础设施提供商"转型。FY2025营收¥8,578亿（约$57亿），营业利润率21.4%。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper"><table class="wikitable infotable">
+        <tr><th>项目</th><th>内容</th></tr>
+        <tr><td>公司全称</td><td>FANUC Corporation（ファナック株式会社）</td></tr>
+        <tr><td>中文名称</td><td>发那科（源自FANUC音译）</td></tr>
+        <tr><td>前身</td><td>富士通Fanuc（Fujitsu Fanuc Ltd.）</td></tr>
+        <tr><td>成立时间</td><td>1958年（作为Fujitsu子公司）；1972年独立为Fujitsu Fanuc Ltd.；1982年更名为FANUC Ltd.</td></tr>
+        <tr><td>注册地</td><td>日本</td></tr>
+        <tr><td>上市交易所</td><td>东京证券交易所Prime市场（TYO: 6954）</td></tr>
+        <tr><td>总部地址</td><td>日本山梨县南都留郡忍野村（富士山麓）</td></tr>
+        <tr><td>官网</td><td>https://www.fanuc.co.jp</td></tr>
+      </table></div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>时间</th><th>事件</th></tr>
+        <tr><td>1955年</td><td>Fujitsu决定进入工厂自动化领域，指派稻叶清右卫门负责</td></tr>
+        <tr><td>1958年</td><td>Fujitsu Fanuc作为Fujitsu全资子公司正式成立，初始500名工程师</td></tr>
+        <tr><td>1972年</td><td>从Fujitsu独立，成为Fujitsu Fanuc Ltd.（Fujitsu保留少数股权）</td></tr>
+        <tr><td>1975年</td><td>稻叶清右卫门出任总裁</td></tr>
+        <tr><td>1982年</td><td>与通用汽车成立50:50合资公司GMFanuc Robotics；同年更名为FANUC Ltd.</td></tr>
+        <tr><td>1986年</td><td>与通用电气（GE）合资成立GE Fanuc Automation</td></tr>
+        <tr><td>1992年</td><td>收购GM在合资公司的全部股权，更名为Fanuc Robotics Corporation</td></tr>
+        <tr><td>2003年</td><td>稻叶善治（创始人长子）接任社长兼CEO</td></tr>
+        <tr><td>2020年10月</td><td>创始人稻叶清右卫门逝世，享年95岁</td></tr>
+        <tr><td>2025年底</td><td>破例开放机器人开发平台，支持ROS 2和Python编程</td></tr>
+        <tr><td>2026年3月</td><td>GTC大会宣布与NVIDIA深度战略合作，推进物理AI+数字孪生</td></tr>
+      </table></div>
+
+      <h3 id="team">1.2 创始人及核心团队</h3>
+      <p>FANUC由稻叶清右卫门（1925-2020）创立并塑造其核心文化。稻叶被誉为"日本机器人之父"（The Emperor of Robots），以"黄色王国"（工厂、机器、员工制服均为统一黄色）和高度集权的管理风格闻名。其子稻叶善治于2003年接任CEO至今，延续家族控制+工程导向的经营传统。公司约1/3员工从事研发工作，人才结构以日本本土精密制造工程师为核心，属于典型的"传统工业制造派"。</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+        <tr><td>创始人 / 前社长（1975-2003）</td><td>稻叶清右卫门（Seiuemon Inaba）</td><td>1925年生，2020年卒。东京工业大学工学博士。1946年加入Fujitsu，1955年被选中领导NC数控项目。1975-2003年任社长，2000年起任名誉会长。被称为"日本机器人之父"，以独裁式管理将FANUC打造为全球CNC和工业机器人霸主。签名色：FANUC Yellow。</td></tr>
+        <tr><td>现任社长/CEO（2003-）</td><td>稻叶善治（Yoshiharu Inaba）</td><td>创始人长子。工学博士。2003年接任社长兼CEO至今，延续"One FANUC"战略，推动FA+Robot+Robomachine三线整合。</td></tr>
+        <tr><td>团队特点</td><td>—</td><td>日本精密制造工程师为核心；约1/3员工从事R&D；在富士山麓的"黄色工厂"中由机器人日夜生产机器人（100名员工完成500人产量）。</td></tr>
+      </table></div>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <p>FANUC为东京证券交易所Prime市场上市公司，作为成熟工业巨头不需外部融资。公司以极高利润率（21-23%）和强劲现金流著称，基本无有息负债。</p>
+      <div class="table-wrapper"><table class="wikitable infotable">
+        <tr><th>项目</th><th>内容</th></tr>
+        <tr><td>上市时间</td><td>1972年独立时即上市</td></tr>
+        <tr><td>股票代码</td><td>TYO: 6954（东证Prime）</td></tr>
+        <tr><td>主要指数</td><td>TOPIX Core 30、TOPIX 100、Nikkei 225</td></tr>
+        <tr><td>主要机构股东</td><td>日本生命保险、贝莱德、Vanguard等大型机构</td></tr>
+        <tr><td>历史合资关系</td><td>通用汽车（GMFanuc, 1982-1992）、通用电气（GE Fanuc, 1986年起）</td></tr>
+        <tr><td>市值</td><td>约¥6.4-6.9兆（约$400-420亿，2026年初）</td></tr>
+      </table></div>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <div class="table-wrapper"><table class="wikitable infotable">
+        <tr><th>维度</th><th>内容</th></tr>
+        <tr><td>核心技术栈</td><td>CNC数控系统（全球~65%份额）→ 伺服电机 → 工业机器人 → 智能工厂（One FANUC全栈整合）</td></tr>
+        <tr><td>AI架构</td><td>传统精密运动控制基础 + NVIDIA Isaac平台实体AI层：Jetson边缘计算 + Isaac Sim数字孪生 + GR00T人形模型</td></tr>
+        <tr><td>软件平台</td><td>ROBOGUIDE仿真软件 + ROS 2开源支持 + Python编程接口（2025年底开放）；数字孪生虚拟工厂</td></tr>
+        <tr><td>人形相关布局</td><td>以五轴联动加工中心（TH-200U、V-350U）为产业上游——为人形机器人关节壳体、灵巧手等异形结构件提供高精度加工方案</td></tr>
+        <tr><td>数据方案</td><td>基于40+年工业机器人运行数据积累（全球最大安装基数之一），结合NVIDIA Omniverse虚拟仿真数据</td></tr>
+        <tr><td>全栈/专用</td><td>传统全栈（CNC+伺服+机器人三位一体）；正向"开放生态"转型（ROS 2+Python+NVIDIA），但仍以硬件销售为核心</td></tr>
+        <tr><td>差异化</td><td>"用机器人造机器人"的超自动化工厂；全球安装基数第一（累计约百万台级）；日本本土全制造（非离岸外包）</td></tr>
+      </table></div>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>业务板块</th><th>核心产品</th><th>说明</th><th>收入占比（FY2025估计）</th></tr>
+        <tr><td>FA（工厂自动化）</td><td>CNC数控系统、伺服电机、激光器</td><td>全球CNC份额~65%；覆盖车床、铣床、加工中心</td><td>~30%</td></tr>
+        <tr><td>ROBOT</td><td>工业机器人（弧焊/点焊/搬运/喷涂/协作/SCARA/Delta等）</td><td>全球最大工业机器人制造商之一；载荷0.5-2,300kg；最新CRX协作系列+实体AI版</td><td>~43%</td></tr>
+        <tr><td>ROBOMACHINE</td><td>小型加工中心、注塑机、电火花线切割机</td><td>ROBODRILL（钻孔攻牙）、ROBOSHOT（注塑成型）、ROBOCUT（线切割）</td><td>~20%</td></tr>
+        <tr><td>SERVICE</td><td>维护服务、备件、培训、ROBOGUIDE仿真软件</td><td>全生命周期服务收入</td><td>~7%</td></tr>
+      </table></div>
+      <p>2026年重点新品：搭载NVIDIA Jetson的实体AI协作机器人（已收到约1,000台订单）；TN-200U/V-350U五轴联动加工中心（面向人形机器人零部件加工）。</p>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>场景类别</th><th>具体场景</th><th>典型客户/合作方</th></tr>
+        <tr><td>汽车制造</td><td>白车身焊接、喷漆、动力总成装配、电池Pack</td><td>丰田、本田、通用汽车、大众、特斯拉、BYD等全球主要车企</td></tr>
+        <tr><td>电子制造</td><td>半导体晶圆搬运、PCB组装、手机零部件加工</td><td>松下、三星、台积电相关供应链</td></tr>
+        <tr><td>金属加工</td><td>CNC车铣复合加工、模具制造</td><td>全球机床用户（FANUC CNC系统客户）</td></tr>
+        <tr><td>新能源/AI</td><td>EV电池产线、AI服务器/数据中心零部件制造</td><td>中国EV厂商（BYD等）、数据中心供应链</td></tr>
+        <tr><td>食品/医药</td><td>食品分拣包装、药品搬运</td><td>食品饮料、制药行业</td></tr>
+        <tr><td>人形机器人上游</td><td>关节壳体、灵巧手异形件精密加工</td><td>人形机器人整机制造商（间接服务）</td></tr>
+      </table></div>
+      <p>FANUC的场景覆盖呈现"横向全覆盖+纵向向上游延伸"特征。在传统工业场景打满的前提下，2026年通过NVIDIA合作进入单任务AI化（自适应焊接、语音控制搬运），同时以零部件加工能力切入人形机器人产业链上游。</p>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <p>FANUC已进入成熟商业化阶段数十年。最新进展：</p>
+      <ul>
+        <li><strong>中国增长引擎：</strong>FY2025中国市场营收¥1,662亿（+23% YoY），占集团总营收约19%。驱动因素为EV电池产线投资、AI半导体制造设备需求、数据中心电力和冷却相关设备投资。</li>
+        <li><strong>美国扩产：</strong>2026年3月宣布$9,000万投资新建美国机器人制造工厂和配送中心，响应制造业回流趋势。</li>
+        <li><strong>AI订单：</strong>搭载NVIDIA实体AI的机器人已收到约1,000台订单，另有数千台在洽谈中，预计对FY2026业绩有积极贡献。</li>
+        <li><strong>机器人订单增速：</strong>前9个月机器人订单同比增长38%（北美回流、欧洲投资、中国新能源驱动）。</li>
+        <li><strong>全球安装基数：</strong>累计全球安装工业机器人约百万台级别（全球第一梯队），构成服务收入的稳定基础。</li>
+      </ul>
+
+      <h3 id="financials">1.8 财务数据</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>项目（亿日元）</th><th>FY2022</th><th>FY2023</th><th>FY2024</th><th>FY2025</th><th>FY2026（预测）</th></tr>
+        <tr><td>营收</td><td>7,406</td><td>7,848</td><td>7,970</td><td>8,578</td><td>9,096</td></tr>
+        <tr><td>营业利润</td><td>1,506</td><td>1,462</td><td>1,588</td><td>1,838</td><td>2,122</td></tr>
+        <tr><td>营业利润率</td><td>20.3%</td><td>18.6%</td><td>19.9%</td><td>21.4%</td><td>23.3%</td></tr>
+        <tr><td>净利润</td><td>1,301</td><td>1,228</td><td>1,473</td><td>1,665</td><td>1,849</td></tr>
+        <tr><td>净利率</td><td>17.6%</td><td>15.6%</td><td>18.5%</td><td>19.4%</td><td>20.3%</td></tr>
+        <tr><td>中国市场营收</td><td>—</td><td>—</td><td>~1,350</td><td>1,662</td><td>—</td></tr>
+      </table></div>
+      <p>注：FANUC财年为4月至次年3月。FY2025指2024.04-2025.03。FY2026预测基于公司指引。FY2025营收创历史新高，利润率持续改善，FY2026预计再创历史纪录。分设2030年营收目标为1兆日元（¥10,000亿→约$67亿）。</p>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li><strong>"黄色王国"文化：</strong>FANUC的一切——工厂外墙、机器人外壳、员工制服、甚至公司内部装饰——均为统一黄色（FANUC Yellow），体现创始人稻叶清右卫门的极致集权和品牌偏执。</li>
+        <li><strong>超自动化工厂：</strong>富士山麓的FANUC工厂由机器人24小时不间断生产机器人，约100名员工完成正常500人的产量。松下Amagasaki工厂使用FANUC机器人以25人实现月产200万台电视。</li>
+        <li><strong>"Weniger Teile"理念：</strong>公司座右铭为德文"Weniger Teile"（更少零件），强调通过精密工程减少零组件数量来提升可靠性——这一哲学与人形机器人的万件级零件数量形成有趣张力。</li>
+        <li><strong>NVIDIA GTC 2026联盟：</strong>FANUC与ABB、KUKA、安川电机共同加入NVIDIA实体AI生态，这是工业机器人四巨头历史上首次齐聚同一AI平台，标志着行业从"封闭竞争"向"开放协作"的范式转变。</li>
+        <li><strong>"神秘主义"终结：</strong>FANUC历史上以封闭系统闻名（专用控制器、专有编程语言），2025年底同时开放ROS 2和Python是大客户（特别是科技制造业客户）长期施压的结果。</li>
+        <li><strong>人形机器人间接布局：</strong>FANUC并非直接造人形机器人，而是通过精密加工设备（五轴联动加工中心）为产业提供基础设施——这是一种"卖铲子"策略，无论哪家人形公司最终胜出，都需要FANUC的加工能力。</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="a2-1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>FANUC的"纯工业基因"高度匹配其长期深耕的制造场景，但也决定了其难以直接进入"通用人形机器人"赛道。创始人家族均为工学博士，以精密制造和运动控制为信仰，在机床→伺服→机器人这条链路上拥有最深的护城河。然而，这种"工业原教旨主义"在面对AI时代时需要文化适应：FANUC历史上以封闭系统自豪（类似苹果早期的"全栈封闭"），但实体AI的本质是"开放、数据驱动、快速迭代"，这与稻叶式的精密计划文化存在张力。2025年底的开放平台转型和NVIDIA深度绑定，表明管理层已经意识到这一结构性矛盾，但组织基因的改变需要时间。</p>
+      </div>
+
+      <div class="analysis-block" id="a2-2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>FANUC的"CNC→伺服→机器人→智能工厂"技术栈在传统工业制造场景中是最优解：对精度、可靠性和全生命周期的极致控制，使其在汽车产线等场景获得了近乎不可撼动的地位。但当场景从"结构化制造"扩展到"非结构化自主操作"（人形机器人），其技术路线的适配性开始显现短板：FANUC的核心竞争力在于"确定性运动控制"（已知工件、已知路径、已知力），而人形机器人需要的是"不确定性适应"（未知物体、动态环境、语义理解）。与NVIDIA的合作本质上是FANUC用自身硬件/运动控制优势换取NVIDIA的AI不确定性处理能力——这种互补结构在理论上是合理的，但在实践上面临"两个不同频率组织如何协同"的现实挑战。</p>
+      </div>
+
+      <div class="analysis-block" id="a2-3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>FANUC的公众持股+家族控制的双重结构使其获得了独特的战略灵活性：既不需要向VC汇报季度估值，也没有激进投资者施压拆分，稻叶家族可以按照自己的节奏做长期投入。但这种"安逸"在实体AI浪潮中也可能是劣势——缺乏外部压力可能导致转型速度慢于竞争对手。值得关注的是FANUC近年在资本市场的表现：FY2025业绩发布当天股价大涨约16%，反映了市场对"保守者的觉醒"（开放平台+AI合作）给予积极定价。如果FANUC能持续展现转型诚意（而非仅仅发布新闻稿），其"低估值+高质量+新增长故事"的组合可能吸引更多成长型投资者。</p>
+      </div>
+
+      <div class="analysis-block" id="a2-4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>FANUC在2025-2026年展现了一次罕见的"组织开放"：从封闭专有系统到支持ROS 2/Python，从"我就是标准"到"我愿意适配NVIDIA的标准"。这一转变的触发因素可能是双重压力：一是大客户（特别是消费电子和EV制造商）要求机器人能与现有AI基础设施联通；二是中国竞争对手（埃斯顿、汇川等）在性价比+开放生态方面正在蚕食中低端市场份额。在人形机器人领域，FANUC选择了"卖铲子"（精密加工设备）而非"造人"的策略——从技术能力和组织基因来看，这可能是最优解：与其在非优势领域消耗资源，不如成为所有人形公司的上游必需品。</p>
+      </div>
+
+      <div class="analysis-block" id="a2-5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>FANUC的核心取舍是"做产业链基础设施，还是做终端产品"——在人形机器人浪潮中，FANUC明确选择了前者。这是一个极为理性的战略决策：人形机器人整机赛道已经拥挤（Tesla、Figure、1X、宇树、智元等），但无论谁最终胜出，它们都需要高精度关节、减速器、伺服电机和加工设备——而FANUC在这些领域的优势是经过数十年验证的。FANUC的"One FANUC"全栈策略在传统工业中是无敌的，但在实体AI时代面临"是否应该解耦"的拷问：如果竞争对手可以单独采购最好的CNC（来自FANUC）而搭配不同的AI（来自NVIDIA或其他），FANUC的"全栈溢价"还存在吗？与NVIDIA的战略绑定可以视为对这一问题的回答——用外部AI能力补全自身全栈中的AI层。</p>
+      </div>
+
+      <div class="analysis-block" id="a2-6">
+        <h4>2.6 其他重要观察</h4>
+        <p>其一，FANUC在企业文化上面临代际转型挑战：2020年创始人的去世和第二代领导人的在位（已20+年）意味着公司正处在"从创始人独裁到制度化治理"的过渡期——这对日本家族企业的典型挑战在实体AI时代可能被加速。其二，中国市场对FANUC而言既是增长引擎（FY2025贡献+23%增长），又是地缘政治风险集中区——中美日三角博弈可能随时影响其在中国的业务连续性。其三，FANUC的"卖铲子"策略在人形机器人赛道有一个隐藏优势：五轴联动加工中心的技术壁垒极高（全球仅少数企业能做出高精度产品），而人形机器人关节壳体的异形加工正是五轴加工的天然应用场景——这种"不可替代性"可能使FANUC在人形机器人浪潮中获得超出预期的收益。</p>
+      </div>
+
+      <h2 id="references">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://www.fanuc.co.jp/eindex.html" target="_blank">FANUC Corporation官方网站</a></li>
+          <li><a href="https://www.nasdaq.com/articles/fanuc-fy25-profit-rises-sees-higher-results-h1-fy26" target="_blank">Nasdaq: Fanuc FY25 Profit Rises; Sees Higher Results In H1, FY26</a></li>
+          <li><a href="https://zh.cn.nikkei.com/industry/manufacturing/61226-2026-01-27-08-57-17.html" target="_blank">日经中文网：发那科净利润增长14%，中国拉动</a></li>
+          <li><a href="https://en.wikipedia.org/?curid=1430758" target="_blank">Wikipedia: FANUC</a></li>
+          <li><a href="https://www.morningstar.com/company-reports/1473137-fanuc-earnings-strong-orders-and-margin-uplift-support-midterm-outlook-fair-value-estimate-up-7" target="_blank">Morningstar: FANUC Earnings — Strong Orders and Margin Uplift</a></li>
+          <li><a href="https://www.shanghaiamts.com.cn/press/exhibitor-news/3168.html" target="_blank">上海工博会：发那科携手英伟达，共推物理AI与数字孪生技术发展</a></li>
+          <li><a href="https://www.engineering.com/fanuc-links-robotics-platform-with-nvidia-ai-tools/" target="_blank">Engineering.com: FANUC links robotics platform with NVIDIA AI tools</a></li>
+          <li><a href="https://www.operationsengineer.org.uk/content/news/fanuc-and-nvidia-forge-new-era-of-physical-ai-for-robotics" target="_blank">Operations Engineer: Fanuc and NVIDIA forge new era of physical AI for robotics</a></li>
+          <li><a href="https://www.163.com/money/article/KQKISN5F00259I71.html" target="_blank">网易：发那科五轴联动赋能，破解人形机器人关节异形结构加工难题</a></li>
+          <li><a href="https://www.pandct.com/news/fanuc-uk-top-3-robotic-trends-for-2026" target="_blank">P&C Today: FANUC UK Top 3 robotic trends for 2026</a></li>
+          <li><a href="https://iotm2mcouncil.org/iot-library/news/connected-industries-news/fanuc-partners-nvidia-on-industrial-robotics-ai/" target="_blank">IoT M2M Council: FANUC partners NVIDIA on industrial robotics AI</a></li>
+          <li><a href="https://sg.finance.yahoo.com/news/fanuc-corp-fanuy-strengthens-position-194009425.html" target="_blank">Yahoo Finance: FANUC Strengthens Position in AI-Enabled Industrial Robotics</a></li>
+          <li><a href="https://japanir.jp/en/company/company-6954/ir/6954-20260424-02_wp_financial_summary/" target="_blank">FANUC FY2025 Earnings Presentation Materials（Japan IR）</a></li>
+          <li><a href="https://www.macrotrends.net/stocks/charts/FANUY/fanuc/financial-activities-other" target="_blank">Macrotrends: FANUC Financial Activities 2012-2025</a></li>
+          <li><a href="https://ictrade.cn/news/article-details/2510419" target="_blank">IC贸易：NVIDIA携手四大机器人制造商，推动实体AI应用落地</a></li>
+          <li><a href="https://www.referenceforbusiness.com/history2/32/Fanuc-Ltd.html" target="_blank">Reference for Business: Fanuc Ltd. Company History</a></li>
+          <li><a href="https://balkanengineer.com/pr-articles/fanuc-supports-swiss-university-supsi-in-optimizing-human-machine-compatability" target="_blank">BalkanEngineer: FANUC supports SUPSI in optimizing human-machine compatibility</a></li>
+          <li><a href="https://www.pesmedia.com/top-three-robotic-trends-for-2026" target="_blank">PES Media: Top three robotic trends for 2026 (FANUC UK)</a></li>
+          <li><a href="https://en.wikipedia.org/wiki/Seiuemon_Inaba" target="_blank">Wikipedia: Seiuemon Inaba（稻叶清右卫门）</a></li>
+          <li><a href="https://www.encyclopedia.com/social-sciences-and-law/economics-business-and-labor/businesses-and-occupations/fanuc-ltd" target="_blank">Encyclopedia.com: Fanuc Ltd. Company Profile</a></li>
+          <li><a href="https://www.forbes.com/profile/brett-adcock/" target="_blank">Forbes: Brett Adcock Profile（FANUC对比参考）</a></li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">本页面为具身智能Wiki项目自动生成 · 数据截至2026年5月 · 由Cowork调度系统维护</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

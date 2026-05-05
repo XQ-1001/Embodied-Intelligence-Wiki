@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>松延动力 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> <span class="breadcrumb-sep">›</span> <span>松延动力</span></div>
+  <div class="wiki-header"><h1>松延动力</h1><div class="subtitle">Noetix Robotics · 2023年9月成立 · 估值约50亿元 · 9轮融资累计约18亿元 · B轮近10亿元</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#founders">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#technology">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financials">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#analysis1">2.1 团队背景与场景选择的匹配度</a></li>
+        <li class="toc-lvl4"><a href="#analysis2">2.2 技术路线与场景的适配性</a></li>
+        <li class="toc-lvl4"><a href="#analysis3">2.3 股东/资本结构对战略的影响</a></li>
+        <li class="toc-lvl4"><a href="#analysis4">2.4 试错过程与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#analysis5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#analysis6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl3"><a href="#references">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">松延动力</div>
+        <div class="ib-row"><div class="ib-label">英文名称</div><div class="ib-value">Noetix Robotics</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2023年9月</div></div>
+        <div class="ib-row"><div class="ib-label">注册地</div><div class="ib-value">中国北京</div></div>
+        <div class="ib-row"><div class="ib-label">总部</div><div class="ib-value">北京昌平区未来科学城</div></div>
+        <div class="ib-row"><div class="ib-label">创始人</div><div class="ib-value">姜哲源</div></div>
+        <div class="ib-row"><div class="ib-label">员工规模</div><div class="ib-value">约100人</div></div>
+        <div class="ib-section">财务数据</div>
+        <div class="ib-row"><div class="ib-label">2025年合同销售额</div><div class="ib-value">突破1亿元</div></div>
+        <div class="ib-row"><div class="ib-label">累计订单</div><div class="ib-value">2500+台</div></div>
+        <div class="ib-section">估值/市值</div>
+        <div class="ib-row"><div class="ib-label">最新估值</div><div class="ib-value">约50亿元（2025年11月）</div></div>
+        <div class="ib-row"><div class="ib-label">融资总额</div><div class="ib-value">累计约18亿元（9轮）</div></div>
+        <div class="ib-row"><div class="ib-label">B轮融资</div><div class="ib-value">近10亿元（2026年3月）</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">月交付峰值</div><div class="ib-value">105台（2025年7月）</div></div>
+        <div class="ib-row"><div class="ib-label">生产基地</div><div class="ib-value">北京·常州·东莞</div></div>
+        <div class="ib-row"><div class="ib-label">专利数量</div><div class="ib-value">30+项</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">领域</div><div class="ib-value"><span class="tag">人形机器人</span><span class="tag">仿生机器人</span></div></div>
+        <div class="ib-row"><div class="ib-label">技术路线</div><div class="ib-value"><span class="tag tag-info">强化学习</span><span class="tag tag-info">全栈自研</span></div></div>
+        <div class="ib-section">官网</div>
+        <div class="ib-row"><div class="ib-label">官网</div><div class="ib-value"><a href="https://www.noetixrobotics.com" target="_blank">noetixrobotics.com</a></div></div>
+      </aside>
+
+      <p class="article-intro"><strong>松延动力</strong>（Noetix Robotics），全称松延动力（北京）科技有限公司，是一家成立于2023年9月的中国人形机器人与仿生机器人研发企业，由时年25岁的清华电子工程系博士肄业生姜哲源创立。公司以「高动态双足人形机器人」和「仿生人形机器人」双产品线为核心，已推出N2（"小顽童"）、E1、Bumi（"小布米"）、仿生机器人"小诺"等多款产品。截至2026年4月，累计完成9轮融资约18亿元人民币，估值约50亿元。2025年实现合同销售额突破1亿元、累计订单超2500台。2026年3月完成由宁德时代系晨道资本领投的近10亿元B轮融资，并与京东签署三年战略合作协议，目标覆盖百万用户。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper">
+      <table class="wikitable infotable">
+        <tr><th>项目</th><th>内容</th></tr>
+        <tr><td>公司全称</td><td>松延动力（北京）科技有限公司</td></tr>
+        <tr><td>英文名称</td><td>Noetix Robotics</td></tr>
+        <tr><td>成立时间</td><td>2023年9月</td></tr>
+        <tr><td>注册地</td><td>中国北京</td></tr>
+        <tr><td>总部地址</td><td>北京市昌平区未来科学城</td></tr>
+        <tr><td>上市状态</td><td>未上市（2026年3月已完成股份制改革）</td></tr>
+        <tr><td>官网</td><td>www.noetixrobotics.com</td></tr>
+        <tr><td>创始人</td><td>姜哲源（董事长兼CTO）</td></tr>
+        <tr><td>员工规模</td><td>约100人（平均年龄约25-30岁，以95后为主）</td></tr>
+        <tr><td>主营业务</td><td>人形机器人整机研发、仿生机器人、具身智能</td></tr>
+      </table>
+      </div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>时间</th><th>事件</th></tr>
+        <tr><td>2023年9月</td><td>公司正式成立，启动资金100万元，43天内完成N1原型机</td></tr>
+        <tr><td>2023年11月</td><td>完成种子轮融资</td></tr>
+        <tr><td>2024年3月</td><td>完成天使轮，金沙江创投进入</td></tr>
+        <tr><td>2024年下半年</td><td>技术路线从MPC全面转向深度强化学习</td></tr>
+        <tr><td>2024年12月</td><td>与虚拟动点成立「具身智能联合实验室」</td></tr>
+        <tr><td>2025年3月</td><td>N2机器人正式发布</td></tr>
+        <tr><td>2025年4月</td><td>北京亦庄人形机器人半马亚军，"小顽童"队一夜爆火</td></tr>
+        <tr><td>2025年5月</td><td>生态战略启动大会，单场签约超5000万元</td></tr>
+        <tr><td>2025年7月</td><td>单月交付105台，成为国内第二家"千台交付俱乐部"成员</td></tr>
+        <tr><td>2025年10月</td><td>发布万元级消费机器人Bumi，N2登上《时代周刊》</td></tr>
+        <tr><td>2025年11月</td><td>与盛视科技签署战略合作协议</td></tr>
+        <tr><td>2026年1月</td><td>携N2亮相CES 2026，公布海外五大核心市场及Q2千台交付计划</td></tr>
+        <tr><td>2026年2月</td><td>央视春晚小品首秀，N2/Bumi/仿生机器人集体亮相</td></tr>
+        <tr><td>2026年3月</td><td>完成B轮近10亿元融资（晨道资本领投），完成股份制改革</td></tr>
+        <tr><td>2026年4月</td><td>与京东签署三年战略合作协议，目标覆盖百万用户</td></tr>
+      </table>
+      </div>
+
+      <h3 id="founders">1.2 创始人及核心团队</h3>
+      <p>松延动力由<strong>姜哲源</strong>（1998年生）于2023年创立。姜哲源出身清华学术世家，父亲姜开利为清华大学物理系教授、长江学者特聘教授。姜哲源2017年以北京市第28名考入清华电子工程系，2021年本科毕业后进入清华交叉信息研究院攻读博士，研究方向为深度强化学习足式机器人运动控制。2023年博士第三年毅然辍学创业。联合创始人兼首席科学家<strong>胡晨旭</strong>为姜哲源高中同学，浙江大学竺可桢学院本科，清华交叉信息研究院MARS Lab博士，师从赵行教授，专注「人脸+语音」多模态融合。<strong>韩深任</strong>任CFO。核心团队成员来自清华、浙大、中科院、港大等顶尖院校，团队平均年龄不足30岁，以95后为主，呈现典型的学术派+年轻化特征。公司整体约100人，研发人员占比高。</p>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+        <tr><td>创始人/董事长/CTO</td><td>姜哲源</td><td>1998年生，清华电子工程系本科，清华交叉信息研究院博士（肄业），研究方向为强化学习与足式机器人运动控制。福布斯U30、胡润U30。父亲姜开利为清华物理系教授。</td></tr>
+        <tr><td>联合创始人/首席科学家</td><td>胡晨旭</td><td>浙大竺可桢学院本科，清华交叉信息研究院MARS Lab博士，师从赵行教授，专注多模态融合（人脸+语音）。</td></tr>
+        <tr><td>CFO</td><td>韩深任</td><td>负责公司财务与融资事务，2025年8月公开阐述出海与量产策略。</td></tr>
+        <tr><td>联合创始人</td><td>张世璞</td><td>CES 2026上公布海外五大核心市场与千台交付时间表。</td></tr>
+      </table>
+      </div>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <h4>融资历史</h4>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>时间</th><th>轮次</th><th>金额</th><th>领投方/重要投资方</th></tr>
+        <tr><td>2023年11月</td><td>种子轮</td><td>760万元</td><td>SEE Fund无限基金等清华系</td></tr>
+        <tr><td>2024年3月</td><td>天使轮</td><td>—</td><td>金沙江创投（张予彤）、英诺天使</td></tr>
+        <tr><td>2024年9月</td><td>种子轮（追加）</td><td>1,400万美元</td><td>—</td></tr>
+        <tr><td>2025年1月</td><td>A轮</td><td>—</td><td>北京机器人产业基金等</td></tr>
+        <tr><td>2025年3月</td><td>A+轮</td><td>—</td><td>—</td></tr>
+        <tr><td>2025年8月</td><td>A++轮</td><td>数亿元</td><td>金浦投资、北汽产投、中金资本、晶科能源</td></tr>
+        <tr><td>2025年10月</td><td>Pre-B轮</td><td>近3亿元</td><td>方广资本（华为前副总裁洪天峰创立）</td></tr>
+        <tr><td>2025年11月</td><td>Pre-B+轮</td><td>近2亿元</td><td>中金资本、允泰资本、厚为资本</td></tr>
+        <tr><td>2026年3月</td><td>B轮</td><td>近10亿元</td><td>晨道资本（宁德时代产业投资平台）领投，中科投资、北京国盛基金、九合创投跟投</td></tr>
+      </table>
+      </div>
+
+      <h4>股东结构特征</h4>
+      <p>松延动力股东呈现「产业资本+财务投资+国资」三重结构。</p>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>股东类型</th><th>代表机构</th><th>战略意义</th></tr>
+        <tr><td>产业资本</td><td>晨道资本（宁德时代系）、北汽产投、晶科能源</td><td>绑定新能源/汽车制造产业资源，可能导向工业场景</td></tr>
+        <tr><td>国资/政府基金</td><td>北京机器人产业基金、北京国盛基金</td><td>地方政府背书，绑定北京昌平产业基地</td></tr>
+        <tr><td>头部VC</td><td>金沙江创投、方广资本、中金资本、九合创投</td><td>早期财务投资，金沙江后退出</td></tr>
+        <tr><td>清华系资本</td><td>SEE Fund无限基金、水木清华校友种子基金</td><td>学术网络支持</td></tr>
+      </table>
+      </div>
+
+      <h4>估值演进</h4>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>时间节点</th><th>估值</th><th>背景</th></tr>
+        <tr><td>2024年（金沙江进入时）</td><td>约2亿元</td><td>公司最低估值阶段</td></tr>
+        <tr><td>2024年底（金沙江退出时）</td><td>约3亿元</td><td>朱啸虎卖出老股</td></tr>
+        <tr><td>2025年4月</td><td>约5亿元</td><td>马拉松前</td></tr>
+        <tr><td>2025年5月</td><td>约20亿元</td><td>马拉松赛后爆火</td></tr>
+        <tr><td>2025年11月</td><td>约50亿元</td><td>Pre-B+轮完成后</td></tr>
+      </table>
+      </div>
+
+      <p>公司于2026年3月完成股份制改革，正推进上市筹备工作。</p>
+
+      <h3 id="technology">1.4 技术路线</h3>
+      <div class="table-wrapper">
+      <table class="wikitable infotable">
+        <tr><th>技术维度</th><th>路线选择</th><th>说明</th></tr>
+        <tr><td>AI运动控制</td><td>深度强化学习（DRL）</td><td>2024年从MPC全面转向DRL，采用课程学习+Sim2Real迁移</td></tr>
+        <tr><td>VLA大模型</td><td>审慎布局，"先本体后大脑"</td><td>暂未大规模投入VLA；招聘显示对标OpenVLA/Pi系列模型</td></tr>
+        <tr><td>多模态交互</td><td>端侧+云端协同</td><td>仿生线已部署情感交互大模型，端侧RK3588+云端京东JoyInside</td></tr>
+        <tr><td>数据方案</td><td>真机采集为主，仿真为辅</td><td>反对纯仿真路线，发布低成本数据采集计划</td></tr>
+        <tr><td>执行器</td><td>全栈自研伺服电机</td><td>供应链高度国产化，扭矩150-360N·m</td></tr>
+        <tr><td>硬件本体</td><td>全栈自研</td><td>覆盖结构设计、域控制器、仿生人脸驱动</td></tr>
+      </table>
+      </div>
+      <p>松延动力技术路线的核心特征是<strong>「以硬件本体为基石、以强化学习运动控制为护城河」</strong>。创始人姜哲源明确表示公司当前阶段定位是"先做好硬件本体，再考虑具身大脑"，采取"敢为天下后"策略。运动控制层面，公司于2024年经历从MPC到深度强化学习的重大转型，通过课程学习+Sim2Real实现走→跑→跳→空翻→连续空翻的技术跃迁，其N2是全球首个实现连续后空翻的量产人形机器人。数据层面，公司坚定真机采集路线，已发布低成本数据采集设备，2025年目标采集10万小时，2026年目标100万小时。仿生线已部署自研Audio2Face和D2P表情驱动算法，实现50+种微表情和字级唇形同步。</p>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>产品分类</th><th>子类/型号</th><th>关键参数</th><th>售价</th><th>主要适用场景</th></tr>
+        <tr><td rowspan="3">双足人形机器人</td><td>N1（初代原型）</td><td>概念验证机，43天从设计到成型</td><td>—</td><td>内部研发验证</td></tr>
+        <tr><td>N2（"小顽童"）</td><td>身高1.2m、体重30kg、18关节、扭矩≥150N·m、速度3.5m/s、续航70-80min</td><td>3.99万元起</td><td>教育科研、商业演出、文旅导览</td></tr>
+        <tr><td>E1（通用型）</td><td>全尺寸、23-28自由度、膝关节峰值扭矩150N·m</td><td>待公布</td><td>家庭服务、工业巡检</td></tr>
+        <tr><td>消费级人形机器人</td><td>Bumi（"小布米"）</td><td>身高94cm、体重12kg、21+自由度、脚部扭矩10N·m</td><td>9,998元</td><td>家庭教育、情感陪伴、编程启蒙</td></tr>
+        <tr><td rowspan="2">仿生人形机器人</td><td>"小诺"仿生人</td><td>面/颈部54个自由度，50+微表情，字级唇形同步</td><td>定制报价</td><td>品牌代言、文旅、展览、接待</td></tr>
+        <tr><td>Hobbs Mini1平台</td><td>标准化仿生人头核心模块，降低研发门槛</td><td>待公布</td><td>产业基础设施，赋能第三方开发</td></tr>
+        <tr><td>轮式机器人</td><td>W1</td><td>轮式移动平台</td><td>待公布</td><td>室内服务、巡检</td></tr>
+      </table>
+      </div>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>场景分类</th><th>具体场景</th><th>对应产品</th><th>合作方/渠道</th></tr>
+        <tr><td rowspan="3">教育科研</td><td>K12编程教育</td><td>Bumi、N2</td><td>编程猫（覆盖7万余所学校、4300万+用户）</td></tr>
+        <tr><td>高校科研平台</td><td>N2</td><td>各高校实验室</td></tr>
+        <tr><td>机器人竞赛</td><td>N2</td><td>北京亦庄半马等赛事</td></tr>
+        <tr><td rowspan="3">商业服务</td><td>文旅展览/导览接待</td><td>N2、小诺</td><td>文旅机构</td></tr>
+        <tr><td>商业演出</td><td>N2、小诺</td><td>央视春晚等</td></tr>
+        <tr><td>零售/品牌营销</td><td>小诺、N2</td><td>海外零售展示（CES验证场景）</td></tr>
+        <tr><td rowspan="3">消费级C端</td><td>家庭教育/陪伴</td><td>Bumi</td><td>京东主站、京东MALL</td></tr>
+        <tr><td>智慧养老</td><td>Bumi、E1</td><td>逐步渗透中</td></tr>
+        <tr><td>编程启蒙</td><td>Bumi</td><td>编程猫、喜马拉雅等内容合作</td></tr>
+        <tr><td rowspan="2">工业/安防</td><td>工业巡检</td><td>W1、E1</td><td>逐步渗透中</td></tr>
+        <tr><td>安防巡检</td><td>W1</td><td>—</td></tr>
+        <tr><td>公共服务</td><td>政务接待/科普宣教</td><td>N2、小诺</td><td>政府机构</td></tr>
+      </table>
+      </div>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <h4>订单与出货</h4>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>指标</th><th>数据</th><th>时间</th></tr>
+        <tr><td>累计订单</td><td>2500+台</td><td>截至2026年初</td></tr>
+        <tr><td>合同销售额</td><td>突破1亿元</td><td>截至2025年6月</td></tr>
+        <tr><td>单场签约（生态大会）</td><td>5000+万元，1000+台人形+20+台仿生</td><td>2025年5月</td></tr>
+        <tr><td>月交付峰值</td><td>105台（N2 92台 + E1 13台）</td><td>2025年7月</td></tr>
+        <tr><td>Bumi首发</td><td>1小时百台售罄，48小时500台，1月内数千台</td><td>2025年10月</td></tr>
+        <tr><td>毛利率（N2）</td><td>约20%</td><td>2025年</td></tr>
+      </table>
+      </div>
+      <h4>产能布局</h4>
+      <p>三大生产基地：北京昌平（3000㎡厂房）、常州、东莞。2025年7月月产约105台，8月目标200台。2026年全年目标交付万台。</p>
+      <h4>海外拓展</h4>
+      <p>锁定北美、欧洲、中东、东南亚、日韩五大核心市场。2026年Q2计划完成首批千台海外交付。渠道方面：京东国际（Joybuy）海外电商平台、盛视科技全球50国销售网络、代理商模式。策略为"场景先行→案例复制→品牌深化"。</p>
+
+      <h3 id="financials">1.8 财务数据</h3>
+      <p>松延动力为非上市公司，以下数据来自公开报道：</p>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>指标</th><th>2024年</th><th>2025年</th><th>2026年（计划）</th></tr>
+        <tr><td>合同销售额</td><td>—</td><td>突破1亿元</td><td>—</td></tr>
+        <tr><td>年交付量</td><td>少量原型</td><td>数百台（7月单月105台）</td><td>目标万台</td></tr>
+        <tr><td>毛利率（N2）</td><td>—</td><td>约20%</td><td>—</td></tr>
+        <tr><td>融资总额（累计）</td><td>约1亿元</td><td>约8亿元</td><td>约18亿元</td></tr>
+        <tr><td>估值</td><td>2-3亿元</td><td>20-50亿元</td><td>—</td></tr>
+        <tr><td>员工数</td><td>—</td><td>约100人</td><td>—</td></tr>
+      </table>
+      </div>
+      <p>B轮融资近10亿元（2026年3月）为公司提供了较强的账面资金储备。公司处于早期高速增长阶段，营收主要来自N2机器人销售及Bumi消费级产品。</p>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>松延动力是<strong>国内第二家进入人形机器人"千台交付俱乐部"</strong>的企业（继宇树科技之后）。</li>
+        <li>公司被称为<strong>"价格屠夫"</strong>，N2定价仅为国际同类产品的1/5，Bumi是<strong>全球首款万元以内的高性能人形机器人</strong>。</li>
+        <li>2025年4月北京亦庄人形机器人半马，N2以"小顽童"队名<strong>无领航员完赛获得亚军</strong>，此后一夜爆火，订单爆发。</li>
+        <li>仿生机器人"小诺"在2026年央视春晚小品中<strong>复刻演员蔡明面孔</strong>同台演出，成为春晚历史上首个人形机器人小品演员。</li>
+        <li>公司曾经历严重资金危机——因早期无序扩张，账上资金一度仅够维持10个月，姜哲源形容公司"多器官衰竭"，后通过重建强化学习算法团队实现技术翻盘。</li>
+        <li>姜哲源认为<strong>"具身智能最大的短板是数据"</strong>，公司反对纯仿真路线，坚持真机采集，并发布了低成本数据采集设备。</li>
+        <li>2026年4月与京东战略合作中，京东推出<strong>"机器人救护车"维修服务</strong>，全国布局8大机器人维修中心。</li>
+        <li>公司已申请<strong>30+项专利</strong>，包括仿生人脸与硬质结构卡合方案等核心专利。</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="analysis1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>松延动力创始团队具有鲜明的「清华系学术+运动控制」基因。姜哲源在清华交叉信息研究院的博士研究方向即为深度强化学习足式机器人运动控制，这一学术背景与其选择的高动态人形机器人路线高度匹配。其联合创始人胡晨旭的多模态融合（人脸+语音）背景则直接支撑了仿生人形机器人产品线。团队整体以95后为主、平均年龄不足30岁，这种年轻化的团队结构与公司选择的「教育科研+消费级C端」场景天然契合——年轻人更理解消费级产品的用户需求和市场传播逻辑。然而，团队缺乏制造业和工业场景经验，这也解释了为何公司在工业巡检等场景上「逐步渗透」而非主力推进。创始人出身学术世家（父为清华物理系教授），在清华学术网络中的资源优势明显，有利于早期技术人才招募和高校科研场景开拓。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>松延动力以强化学习运动控制为核心技术路线，这一选择与其主攻的教育科研、文旅演出、消费娱乐场景高度适配——这些场景对机器人运动能力（奔跑、空翻、舞蹈）有强需求，而对复杂操作（如抓取、装配）的需求相对有限。公司"先本体后大脑"的策略在实践中证明有效：通过运动能力的极致打磨建立品牌和流量优势，再逐步探索VLA大模型。然而，强化学习路线在泛化性和精确操作方面存在天然局限，公司未来向工业场景延伸时将面临技术路线调整压力。数据路线上，公司坚持真机采集、反对纯仿真的立场虽然正确，但真机数据采集成本高昂，2026年100万小时的目标可能面临工程可行性挑战。Bumi等消费级产品的端侧算力（RK3588/6 TOPS）有限，未来更复杂的多模态交互可能需要云端依赖更强的方案。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>松延动力的股东结构经历了从「纯财务投资」到「产业资本深度绑定」的演变。早期金沙江创投的进入和退出（朱啸虎在低估值时卖出老股）反映了财务投资者对人形机器人赛道的短期判断分歧。2026年3月B轮由宁德时代系晨道资本领投，是一个标志性转向——产业资本的进入可能意味着松延动力未来的场景会向新能源/汽车制造的工业场景延伸。北汽产投的入股同样暗示汽车制造场景的合作可能。北京机器人产业基金和北京国盛基金的参与则绑定了地方政府资源（昌平未来科学城），有利于获取政策支持和产业用地。但多元化的股东结构可能在未来产生战略张力：消费级路线与工业级路线在资源分配上存在竞争，国资背景可能影响海外某些市场的进入策略。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>松延动力的发展历程中有几个关键的战略调整。首先是技术路线的重大转向：2023-2024年初采用MPC（模型预测控制），遭遇技术瓶颈后，于2024年全面转向深度强化学习。这一转变虽然带来了短期痛苦（资金危机、团队重建），但最终成就了N2的连续空翻能力，成为公司最核心的差异化优势。其次是产品策略的扩展：从最初聚焦高动态双足机器人，到2025年10月推出万元级消费产品Bumi，再到仿生线产品"小诺"，公司正在从「单一品类」走向「多产品矩阵」。第三是商业化节奏的把握：2025年4月半马赛后从"炫技"转向"接单"，2026年初从"国内量产"转向"全球化"，节奏清晰。但公司尚未经历从B端到大规模C端的真正跨越——Bumi虽然定价万元内，但家庭场景的刚需程度和用户留存仍是未经验证的假设。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>松延动力在国内人形机器人格局中做出了几个清晰的取舍。第一，走"iPod式专用务实路线"而非"iPhone式全栈平台路线"：优先做好运动能力这一单项极致体验，而非试图一步到位做通用家用机器人。第二，以硬件为核心而非以大脑模型为核心：在宇树、智元等对手纷纷布局VLA大模型时，松延选择"敢为天下后"，先用性价比极致的硬件本体占领市场。第三，重视消费级入口：Bumi定价9,998元打破了人形机器人的价格底线，意图以消费级产品建立品牌和用户基础，再向高端延伸。这一策略与宇树科技（侧重工业和开发者市场）和智元（侧重全栈平台）形成差异化。但潜在风险在于：消费级人形机器人的真实市场需求尚未被验证，如果C端起量不及预期，公司可能面临"高估值、低营收"的困境。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis6">
+        <h4>2.6 其他重要观察</h4>
+        <p>松延动力的崛起路径高度依赖「事件驱动」——2025年半马亚军、2026年春晚亮相、CES首秀，每一次重大曝光都直接拉动订单和估值跃升。这种模式在早期有效率极高，但也意味着公司需要持续制造「爆点」来维持增长动量，一旦流量效应衰减，订单转化可能放缓。其次，公司与京东的三年战略合作是一个值得关注的结构性变化：京东不仅提供销售渠道，还布局了8大机器人维修中心和JoyInside交互能力，这意味着京东正在将机器人视为继家电之后的下一代品类战略，松延动力作为其合作方将深度受益于这一基础设施。另外，盛视科技（收购法国Aldebaran/Nao品牌）的合作对接了全球50国渠道，但Aldebaran自身的商业化历史并不算成功（Nao/Pepper销售有限），这一渠道的实际转化能力有待观察。最后，创始人姜哲源年仅28岁，其能否在从"技术天才"到"百亿企业管理者"的跨越中持续成长，是公司长期发展的最大变量。</p>
+      </div>
+
+      <h2 id="references">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://www.noetixrobotics.com" target="_blank">松延动力官方网站</a></li>
+          <li><a href="https://www.jiemian.com/article/12802622.html" target="_blank">对话松延动力：被朱啸虎卖掉后，估值翻了6倍 — 界面新闻</a></li>
+          <li><a href="https://www.36kr.com/p/3411998314073476" target="_blank">松延动力，半年融三轮 — 36氪</a></li>
+          <li><a href="https://www.chinastarmarket.cn/detail/2108123" target="_blank">松延动力半年连融三轮 单月交付破百台 — 科创板日报</a></li>
+          <li><a href="https://m.mp.oeeee.com/a/BAAFRD0000202505301091115.html" target="_blank">清华博士辍学造人形机器人：销售额已过亿 — 南方都市报</a></li>
+          <li><a href="https://www.nbd.com.cn/articles/2025-08-11/4008575.html" target="_blank">亿元大单后，交付是一道"鬼门关" — 每日经济新闻</a></li>
+          <li><a href="https://www.chinaventure.com.cn/news/114-20260302-390287.html" target="_blank">刚上完春晚，这家机器人企业融了10个亿 — 投中网</a></li>
+          <li><a href="https://www.21jingji.com/article/20260302/herald/a841d6f40284b3b63928165e419244aa.html" target="_blank">带机器人登上春晚，松延动力募资10亿 — 21世纪经济报道</a></li>
+          <li><a href="https://pandaily.com/noetix-robotics-secures-nearly-rmb-1-billion-in-series-b-funding-led-by-catl-backed-cd-capital" target="_blank">Noetix Robotics Secures Nearly RMB 1 Billion in Series B — Pandaily</a></li>
+          <li><a href="https://www.bbtnews.com.cn/2025/0525/557941.shtml" target="_blank">2025深蓝智库：松延动力"小孩哥"的千台订单 — 北京商报</a></li>
+          <li><a href="https://www.ee.tsinghua.edu.cn/info/1076/4958.htm" target="_blank">AI时代的清华电子力量｜松延动力姜哲源 — 清华大学电子工程系</a></li>
+          <li><a href="https://www.donews.com/news/detail/4/5234477.html" target="_blank">清华博士辍学创业，松延动力的起伏历程 — DoNews</a></li>
+          <li><a href="https://36kr.com/p/3301602546948873" target="_blank">我，25岁清华博士辍学，融资超2亿 — 36氪</a></li>
+          <li><a href="https://www.globalpeople.com.cn/n4/2025/0618/c305917-21625401.html" target="_blank">姜哲源，带机器人"跑"出亿元订单 — 环球人物</a></li>
+          <li><a href="https://www.chnfund.com/article/AR2365857f-95a6-5556-1d55-3a1d1e8ac085" target="_blank">松延动力发布人形机器人Bumi，售价仅9998元</a></li>
+          <li><a href="https://www.ithome.com/0/837/928.htm" target="_blank">3.99万元起，全球首个连续空翻人形机器人N2发布 — IT之家</a></li>
+          <li><a href="https://www.bjnews.com.cn/detail/1776916714129024.html" target="_blank">京东携手松延动力开启人形机器人全场景战略合作 — 新京报</a></li>
+          <li><a href="https://egs.stcn.com/news/detail/2276687.html" target="_blank">松延动力与京东达成战略合作 三年覆盖用户突破百万 — 证券时报</a></li>
+          <li><a href="https://www.21jingji.com/article/20250810/herald/3d9f79615b3ac47ad91fa9e3b853a6b4.html" target="_blank">松延动力CFO：机器人量产已跑通，四季度开启出海 — 21世纪经济报道</a></li>
+          <li><a href="https://finance.eastmoney.com/a/202601083612611411.html" target="_blank">"小顽童N2"亮相CES2026 松延动力开启生态全球化拓展 — 东方财富</a></li>
+          <li><a href="https://auto.gasgoo.com/news/202601/8I70441542C601.shtml" target="_blank">CES 2026：松延动力公布海外首批千台交付时间表 — 盖世汽车</a></li>
+          <li><a href="https://m.bjnews.com.cn/detail/1771922632129276.html" target="_blank">春晚首秀定调未来，盛视松延携手解锁具身智能产业 — 新京报</a></li>
+          <li><a href="https://www.zhenweiexpo.com/cn/news/exhibitions/2025/1024/1957.html" target="_blank">从空翻到共情：松延动力以全栈自研引领人形机器人革命</a></li>
+          <li><a href="https://tracxn.com/d/companies/noetixrobotics/" target="_blank">Noetix Robotics Company Profile — Tracxn</a></li>
+          <li><a href="https://pitchbook.com/profiles/company/550917-82" target="_blank">Noetix Robotics Company Profile — PitchBook</a></li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">本页面由具身智能Wiki自动分发器于2026年5月4日生成。数据来源为公开报道与官方公告，仅供参考。<br>页面内容遵循知识共享署名-相同方式共享协议。</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body>
+</html>

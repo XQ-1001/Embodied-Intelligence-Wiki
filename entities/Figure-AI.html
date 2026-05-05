@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>Figure AI — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> › <span>Figure AI</span></div>
+  <div class="wiki-header"><h1>Figure AI</h1><div class="subtitle">Figure AI, Inc. · 2022年成立 · 估值$395亿 · 全球最高估值私人人形机器人公司 · BMW核心供应商</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#team">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financials">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#a2-1">2.1 团队背景与场景匹配度</a></li>
+        <li class="toc-lvl4"><a href="#a2-2">2.2 技术路线与场景适配性</a></li>
+        <li class="toc-lvl4"><a href="#a2-3">2.3 股东/资本结构影响</a></li>
+        <li class="toc-lvl4"><a href="#a2-4">2.4 试错与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#a2-5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#a2-6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#references">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">Figure AI</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">Figure AI, Inc.</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2022年5月</div></div>
+        <div class="ib-row"><div class="ib-label">总部</div><div class="ib-value">美国加州Sunnyvale</div></div>
+        <div class="ib-row"><div class="ib-label">创始人/CEO</div><div class="ib-value">Brett Adcock</div></div>
+        <div class="ib-row"><div class="ib-label">上市状态</div><div class="ib-value">未上市（私人公司）</div></div>
+        <div class="ib-section">估值与融资</div>
+        <div class="ib-row"><div class="ib-label">最新估值</div><div class="ib-value">$395亿（2025.05）</div></div>
+        <div class="ib-row"><div class="ib-label">累计融资</div><div class="ib-value">~$23亿</div></div>
+        <div class="ib-row"><div class="ib-label">最新轮次</div><div class="ib-value">Series C / $15亿（2025.05）</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">员工</div><div class="ib-value">~400-500人（2026）</div></div>
+        <div class="ib-row"><div class="ib-label">产品代际</div><div class="ib-value">Figure 01(2024)→02(2024)→03(2025)</div></div>
+        <div class="ib-row"><div class="ib-label">量产目标</div><div class="ib-value">4年累计10万台</div></div>
+        <div class="ib-row"><div class="ib-label">AI模型</div><div class="ib-value">Helix VLA（自研）</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-value" style="width:100%;padding:6px"><span class="tag">人形机器人</span><span class="tag">全栈自研</span><span class="tag">工业+家庭</span><span class="tag">最高估值独角兽</span><span class="tag">VLA模型</span><span class="tag">美国</span></div></div>
+        <div class="ib-section">官网</div>
+        <div class="ib-row"><div class="ib-value" style="width:100%;padding:4px"><a href="https://www.figure.ai" target="_blank">figure.ai</a></div></div>
+      </aside>
+
+      <p class="article-intro"><strong>Figure AI</strong>是全球估值最高的私人人形机器人公司，由连续创业者Brett Adcock于2022年创立。公司致力于开发通用型人形机器人，已推出Figure 01、02、03三代产品，搭载自研Helix VLA（Vision-Language-Action）端到端AI模型。Figure是首个在第三方工厂（BMW Spartanburg）实现大规模商业验证的人形机器人企业：截至2025年底已完成超9万次零件装载、支持3万辆汽车生产，效率提升400%。2025年2月与OpenAI终止合作转向全自研AI，同年10月发布面向家庭场景的Figure 03，目标四年累计量产10万台。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper"><table class="wikitable infotable">
+        <tr><th>项目</th><th>内容</th></tr>
+        <tr><td>公司全称</td><td>Figure AI, Inc.</td></tr>
+        <tr><td>中文参考名</td><td>Figure人工智能</td></tr>
+        <tr><td>成立时间</td><td>2022年5月</td></tr>
+        <tr><td>注册地</td><td>美国特拉华州</td></tr>
+        <tr><td>总部地址</td><td>Sunnyvale, California, United States</td></tr>
+        <tr><td>上市状态</td><td>未上市（私人公司）</td></tr>
+        <tr><td>创始人/CEO</td><td>Brett Adcock</td></tr>
+        <tr><td>官网</td><td>https://www.figure.ai</td></tr>
+      </table></div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>时间</th><th>事件</th></tr>
+        <tr><td>2022年5月</td><td>Brett Adcock创立Figure AI，目标"打造通用型人形机器人"</td></tr>
+        <tr><td>2023年5月</td><td>Series A融资$7,000万，估值~$1.7亿</td></tr>
+        <tr><td>2024年2月</td><td>Series B融资$6.75亿（Microsoft、NVIDIA、OpenAI、Jeff Bezos参投），估值$26亿；宣布与OpenAI合作</td></tr>
+        <tr><td>2024年3月</td><td>Figure 01首次展示：OpenAI模型加持下完成语音交互与自主抓取</td></tr>
+        <tr><td>2024年8月</td><td>Figure 02发布：外骨骼机身、16-DOF灵巧手、6个RGB摄像头</td></tr>
+        <tr><td>2025年1月</td><td>与BMW之外的"美国最大企业之一"签署第二份商业合同，计划四年交付10万台</td></tr>
+        <tr><td>2025年2月</td><td>CEO宣布终止与OpenAI合作，转向全自研Helix端到端AI模型</td></tr>
+        <tr><td>2025年5月</td><td>Series C融资$15亿（Align Ventures/Parkway Venture领投），估值飙升至$395亿</td></tr>
+        <tr><td>2025年10月</td><td>Figure 03正式发布：织物外覆、Helix AI、无线充电、掌中摄像头，目标2026年家庭部署</td></tr>
+        <tr><td>2025年底</td><td>BMW Spartanburg部署达成里程碑：9万零件装载、3万辆汽车生产、效率提升400%</td></tr>
+      </table></div>
+
+      <h3 id="team">1.2 创始人及核心团队</h3>
+      <p>Figure AI由Brett Adcock于2022年创立，团队核心成员来自Boston Dynamics、Tesla、Google DeepMind、Apple等顶尖机构。公司规模约400-500人，整体属于产业深度+AI技术混合型团队，Adcock本人为连续创业者（此前成功退出Vettery和Archer Aviation），这种"深度硬件创业"背景在人形机器人赛道中较为独特——大多数同行创始人为学术背景。</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+        <tr><td>创始人/CEO</td><td>Brett Adcock</td><td>1986年生于伊利诺伊州农场家庭。佛罗里达大学BBA。16岁起创业，创立AI招聘平台Vettery（2018年被Adecco以~$1亿收购）、eVTOL公司Archer Aviation（NYSE: ACHR，2021年SPAC上市估值$27亿）。2022年退出Archer董事会全职投入Figure。持有Figure约50%股权，2026年身价约$190亿。</td></tr>
+        <tr><td>CTO</td><td>Jerry Pratt（推测仍任资深技术领导）</td><td>前Florida Institute for Human & Machine Cognition（IHMC）资深科学家，DARPA人形机器人挑战赛团队成员。在双足运动控制领域有20+年研究积累。</td></tr>
+        <tr><td>核心团队来源</td><td>—</td><td>吸纳Boston Dynamics（运动控制）、Tesla（制造工程）、Google DeepMind（AI/ML）、Apple（消费硬件设计）等顶级人才。</td></tr>
+      </table></div>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <p>Figure AI在三年内完成三轮总计~$23亿融资，估值从$1.7亿飙升至$395亿（增长超230倍），为机器人史上最快估值增长曲线之一。投资者阵容横跨科技巨头、芯片厂商、汽车企业和顶级风投，构成极为多元的股东基础。</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>轮次</th><th>时间</th><th>金额</th><th>投后估值</th><th>核心投资方</th></tr>
+        <tr><td>Series A</td><td>2023.05</td><td>$7,000万</td><td>~$1.7亿</td><td>Parkway Venture Capital等</td></tr>
+        <tr><td>Series B</td><td>2024.02</td><td>$6.75亿</td><td>$26亿</td><td>Microsoft、NVIDIA、Intel Capital、Jeff Bezos（Bezos Expeditions）、OpenAI Startup Fund、ARK Invest、a16z、Sequoia、LG、Qualcomm等</td></tr>
+        <tr><td>Series C</td><td>2025.05</td><td>$15亿</td><td>$395亿</td><td>Align Ventures、Parkway Venture Capital领投；跟投方含Thrive Capital、T-Mobile、Salesforce Ventures等</td></tr>
+      </table></div>
+      <p>关键股东生态特征：Microsoft和NVIDIA提供算力与AI基础设施支持；Intel Capital和Qualcomm指向芯片战略合作；LG和T-Mobile暗示家庭和通信场景入口；Jeff Bezos的个人参与赋予物流/仓储想象空间。创始人Adcock持有约50%股权，对公司保持强控制力。</p>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <div class="table-wrapper"><table class="wikitable infotable">
+        <tr><th>维度</th><th>内容</th></tr>
+        <tr><td>AI架构</td><td>自研Helix VLA（Vision-Language-Action）端到端模型，模拟人脑三层架构：System 0（反射层/毫秒级）、System 1（模式识别/亚秒级）、System 2（推理规划/秒级）</td></tr>
+        <tr><td>数据方案</td><td>真实工厂运行数据（BMW部署积累）+ 遥操作示教 + 仿真数据混合训练；10 Gbps毫米波支持全舰队持续学习</td></tr>
+        <tr><td>计算平台</td><td>Figure 03搭载3倍于前代的板载算力，支持Large Vision Model（LVM）实时环境处理</td></tr>
+        <tr><td>运动控制</td><td>电机控制器集成至关节内部，消除外部线束（Figure 02的可靠性瓶颈）；16-DOF第4代灵巧手</td></tr>
+        <tr><td>感知系统</td><td>6 RGB摄像头 + 掌中嵌入式摄像头（主摄遮挡时保持视觉）+ 指尖触觉传感（感知3g力/回形针级）</td></tr>
+        <tr><td>能源与通信</td><td>足底2kW无线感应充电；满电续航~5小时；10 Gbps毫米波数据卸载</td></tr>
+        <tr><td>全栈/专用</td><td>全栈自研（2025.02与OpenAI分手后明确方向）：硬件+AI+制造全链垂直整合，拒绝"外包大脑"</td></tr>
+      </table></div>
+      <p>Figure AI的技术路线经历了从"OpenAI赋能"到"全自研"的重大转型。核心逻辑是"不能外包AI，就像不能外包硬件一样"。Helix VLA的端到端设计（视觉直接映射到电机指令）减少了传统机器人堆栈中的模块间延迟和误差累积，三层脑架构则为安全关键操作（System 0毫秒级反射）提供了技术保障。</p>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>产品</th><th>发布时间</th><th>核心参数</th><th>主要特点</th></tr>
+        <tr><td>Figure 01</td><td>2024.03</td><td>基础双足行走；OpenAI模型驱动；基础抓取</td><td>首次展示语音交互+自主操作；OpenAI大模型赋能"一炮而红"</td></tr>
+        <tr><td>Figure 02</td><td>2024.08</td><td>外骨骼机身；16-DOF灵巧手（抓取力25kg）；6 RGB摄像头；续航~5h</td><td>首次在BMW产线执行端到端零件装载；工业验证先锋</td></tr>
+        <tr><td>Figure 03</td><td>2025.10</td><td>织物外覆（可拆卸可清洗）；比02轻9%、体积更小；16-DOF第4代手（人类级力量）；掌中摄像头+指尖3g触觉；2kW无线充电；10 Gbps毫米波数据；3x板载算力；视野扩大60%；延迟降低75%</td><td>面向家庭+工业双场景；织物"穿衣服的机器人"；Helix AI全自研驱动；目标2026年家庭自主使用</td></tr>
+      </table></div>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>场景类别</th><th>具体场景</th><th>部署进度</th><th>合作方/备注</th></tr>
+        <tr><td>汽车制造</td><td>钣金零件装载至焊接夹具（精度±5mm）；物料搬运；质量巡检</td><td>已在BMW Spartanburg工厂商业部署（2024-2025：9万+零件装载/3万辆X3）</td><td>BMW Group（核心客户）；计划扩展至BMW Leipzig及"Neue Klasse"EV工厂</td></tr>
+        <tr><td>其他工业</td><td>航空制造、物流仓储、精密装配</td><td>规划中</td><td>第二家未公开"美国最大企业之一"客户（2025.01签约，4年10万台）</td></tr>
+        <tr><td>家庭服务</td><td>端茶送水、洗碗、扫地、整理、烹饪辅助</td><td>Figure 03已展示原型；目标2026年实现全天候自主家务</td><td>家庭场景被Adcock视为"最大市场"；与LG等消费电子股东存在场景协同</td></tr>
+        <tr><td>医疗健康</td><td>辅助护理、康复支持</td><td>远期布局</td><td>尚未披露具体合作方</td></tr>
+      </table></div>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <p><strong>当前阶段：</strong>Figure是全球唯一在第三方工厂实现大规模商业验证的人形机器人公司。BMW Spartanburg部署数据（2024-2025）：装载90,000+钣金零件、支持30,000+辆BMW X3生产、累计运行~1,250小时、放置精度>99%（5mm公差）、单循环时间37秒、效率较初期提升400%。验证了人形机器人在现有"棕地"工厂布局中无需昂贵改造即可部署的独特价值。</p>
+      <p><strong>制造体系：</strong>自建BotQ专属制造工厂，首期年产能12,000台，目标四年累计生产100,000台。采用"人形机器人即服务"（HaaS）租赁模式探索中，若按每台年租金~$12,000、运营10万台估算，远期年经常性收入可达$12亿。</p>
+      <p><strong>竞争性里程碑：</strong>Figure率先实现了Tesla Optimus尚未达成的目标——在第三方工厂而非自有工厂获得商业验证和客户背书。</p>
+
+      <h3 id="financials">1.8 财务数据</h3>
+      <p>Figure AI为未上市公司，财务数据不公开。已知信息如下：</p>
+      <div class="table-wrapper"><table class="wikitable infotable">
+        <tr><th>项目</th><th>数据</th></tr>
+        <tr><td>累计融资总额</td><td>~$23亿</td></tr>
+        <tr><td>最新估值</td><td>$395亿（2025.05 Series C）</td></tr>
+        <tr><td>创始人持股估算</td><td>~50%（Brett Adcock）</td></tr>
+        <tr><td>收入状态</td><td>已产生收入（BMW合同），具体金额未公开</td></tr>
+        <tr><td>远期收入潜力</td><td>10万台×$12,000/年租金 = ~$12亿年经常性收入（分析师估算模型）</td></tr>
+        <tr><td>员工数</td><td>~400-500人（2026年初）</td></tr>
+        <tr><td>投资者数量</td><td>约120家机构</td></tr>
+      </table></div>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li><strong>与OpenAI分手：</strong>2025年2月是Figure历史上最具标志性的战略转折。CEO Adcock的理由：OpenAI业务庞大，具身智能非其核心；"外包AI就像外包硬件"不可持续。分手后仅8个月，Figure 03即搭载全自研Helix VLA发布，证明独立路线的执行力。</li>
+        <li><strong>Adcock的独特背景：</strong>与大多数机器人公司创始人为学术背景（如Boston Dynamics的Marc Raibert、Agility的Jonathan Hurst）不同，Adcock是纯创业者背景——从AI SaaS（Vettery）到eVTOL（Archer Aviation）再到人形机器人——这种"从软件到硬件的连续跨越"在人形机器人赛道中十分罕见。</li>
+        <li><strong>"We're building a new species, not robots"：</strong>Adcock在接受Forbes India采访时提出的核心叙事——将Figure定位为"新物种创造者"而非传统机器人公司。</li>
+        <li><strong>时代杂志封面：</strong>Figure 03登上《时代》杂志封面，成为Figure从行业认知走向公众认知的标志性事件。</li>
+        <li><strong>BMW之外的第二客户：</strong>未公开身份，仅透露为"美国最大企业之一"，签约规模为4年10万台——若属实，将是人形机器人史上最大单笔订单。</li>
+        <li><strong>二级市场交易：</strong>2025年5月起，Figure AI股份通过SeedBlink面向合格投资者开放二级市场交易。</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="a2-1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>Adcock的连续创业者背景（AI SaaS→eVTOL→人形机器人）为Figure带来了独特的"精益创业+深度硬件"双基因。与学术派创始人不同，Adcock在融资节奏把控、市场叙事和资本运作方面展现出成熟的创业者直觉——三年$23亿融资、$1.7亿→$395亿的估值跨越，在机器人史上前所未有。同时，Archer Aviation的经历为他积累了对FAA认证、供应链管理和硬件规模化的第一手经验，这些在Figure的BotQ工厂建设中已有所体现。团队从Boston Dynamics（运动控制）、Tesla（制造工程）等机构的招聘策略，使其在运动学和量产工程两个关键维度获得了顶级人才密度。工业优先→家庭扩展的场景策略与团队的产业背景高度一致：先用BMW验证工业可行性，积累数据和收入，再以消费者硬件经验切入家庭市场。</p>
+      </div>
+
+      <div class="analysis-block" id="a2-2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>Helix VLA的端到端路线（视觉→电机指令）和三层脑架构（反射/模式/推理）在理论上适配Figure的双场景战略：毫秒级System 0确保工业操作安全（如钣金装载的精确力控），System 2则为复杂的家庭交互（理解"给我一杯咖啡"并规划子任务）提供推理能力。与OpenAI分手后，自研路线消除了外部API延迟和依赖风险，但也意味着Figure需要在模型迭代上独立承担全部资源投入。Figure 03的硬件升级（掌中摄像头、指尖触觉、无线充电）精准解决了前代产品的实际痛点：主摄像头遮挡、力觉反馈缺失、线缆可靠性。技术上最大的未验证风险是"从工厂到家庭"的泛化能力——BMW的零件装载是高度结构化的单任务，而家庭环境要求动态场景理解和多任务切换，两者对AI模型的要求存在量级差异。</p>
+      </div>
+
+      <div class="analysis-block" id="a2-3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>Figure的股东阵容是一幅精密构建的战略生态图：Microsoft/NVIDIA提供算力和AI基础设施；Intel/Qualcomm为芯片长期供应铺路；LG暗示家庭消费电子场景（家电+机器人协同）；T-Mobile指向通信连接；Salesforce可能关联企业服务；Jeff Bezos个人投资带来Amazon物流/仓储的想象空间。这种"每个投资者即潜在场景入口"的布局，比单纯财务投资更具战略纵深。但也存在潜在矛盾：当Figure需要在不同场景（工业vs家庭）间分配资源时，不同战略投资者的利益优先级可能冲突。Adcock持有~50%股权的强控制力在此是双刃剑——确保决策独立性的同时，也意味着后续融资空间和股权激励空间受限。</p>
+      </div>
+
+      <div class="analysis-block" id="a2-4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>Figure成立三年来的关键调整：第一，从"与OpenAI深度绑定"（2024）到"全面自研AI"（2025.02）——这一转变在短期内被外界解读为重大风险，但Figure 03的快速发布证明了内部AI能力的储备深度。第二，Figure 02→03的产品迭代体现了从"工业验证机"到"工业+家庭通用平台"的定位升级：织物外覆取代硬壳不仅是美学选择，更是对家庭场景（安全、清洁、亲和力）的工程回应。第三，自建BotQ工厂而非外包制造，体现了Adcock对"制造即壁垒"的理解——这在eVTOL创业中有过深刻教训。第四，2025年实际产出远高于2024年（从零到BMW部署数千小时），但距离10万台目标仍有巨大的制造规模鸿沟需要跨越。</p>
+      </div>
+
+      <div class="analysis-block" id="a2-5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>Figure与Tesla Optimus构成人形机器人赛道最直接的"双巨头"竞争。核心差异：Figure走"外部验证→场景反哺→规模扩张"路线（先拿下BMW，再推家庭），Tesla走"内需拉动→产线驱动→百万台规模"路线（先在自己的工厂用，再造百万台）。Figure的"第三方工厂先发优势"在信任和商业验证维度领先，但Tesla的制造规模和汽车供应链复用能力在生产成本端构成降维压力。Figure的另一个关键取舍是"不做专用工业机器人"——与FANUC/ABB等传统玩家不同，Figure坚定走通用人形路线，这意味着需要在更多场景证明"人形"比"专用机械臂"更具性价比优势，否则可能陷入"万能但都不精"的困境。</p>
+      </div>
+
+      <div class="analysis-block" id="a2-6">
+        <h4>2.6 其他重要观察</h4>
+        <p>其一，Figure的$395亿估值与当前几乎为零的收入之间存在巨大鸿沟——这在2025-2026年的人形机器人赛道是普遍现象，但Figure的估值/收入比在同类中最极端。其二，Adcock"新物种"叙事虽具传播力，但也可能带来过高的公众期望——当Figure 03在实际家庭使用中暴露出局限性时，叙事反弹的风险不容忽视。其三，Figure 03的"穿衣服"设计虽然提升了家庭亲和力，但织物外覆的耐用性、清洁维护和防护等级（IP等级）在工业环境中的表现尚不清楚——这可能在双场景策略中造成"两头不讨好"的风险。其四，Figure团队仅400-500人的精简规模与10万台量产目标之间存在显著的工程资源缺口——要么大幅扩招（稀释人才密度），要么严重依赖外包（与"全栈自研"理念冲突），这是Adcock接下来必须解决的执行悖论。</p>
+      </div>
+
+      <h2 id="references">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://www.figure.ai/news/introducing-figure-03" target="_blank">Figure AI官方：Introducing Figure 03</a></li>
+          <li><a href="https://www.financialcontent.com/article/tokenring-2026-1-21-the-humanoid-inflection-point-figure-ai-achieves-400-efficiency-gain-at-bmws-spartanburg-plant" target="_blank">Financial Content: Figure AI Achieves 400% Efficiency Gain at BMW Spartanburg Plant</a></li>
+          <li><a href="https://investor.wedbush.com/wedbush/article/tokenring-2026-1-28-the-era-of-physical-ai-figure-02-completes-record-breaking-deployment-at-bmw" target="_blank">Wedbush: The Era of Physical AI — Figure 02 Completes Record-Breaking Deployment at BMW</a></li>
+          <li><a href="https://pitchbook.com/profiles/company/521074-54" target="_blank">PitchBook: Figure AI 2026 Company Profile</a></li>
+          <li><a href="https://www.premieralts.com/companies/figure-ai/valuation" target="_blank">PremierAlts: Figure AI Valuation $39B (2026)</a></li>
+          <li><a href="https://ng.Investing.com/news/stock-market-news/figure-ai-in-discussions-for-15-billion-funding-round-395-billion-valuation--bloomberg-93CH-1763801" target="_blank">Investing.com / Bloomberg: Figure AI $1.5B funding round, $39.5B valuation</a></li>
+          <li><a href="https://m.36kr.com/p/3470598725686658" target="_blank">36氪：Figure获10亿美元押注，人形机器人量产时代将至？</a></li>
+          <li><a href="https://news.ca168.com/202502/135889.html" target="_blank">CA168: Figure弃OpenAI单飞，转向全自研机器人AI模型</a></li>
+          <li><a href="https://m.jiemian.com/article/12310283_microcontent.html" target="_blank">界面新闻：曾获OpenAI投资的人形机器人公司Figure决定与其终止合作</a></li>
+          <li><a href="https://www.stcn.com/article/detail/1522050.html" target="_blank">证券时报：人形机器人独角兽Figure AI"抛弃"OpenAI CEO宣布30天内要惊艳世界</a></li>
+          <li><a href="https://www.forbes.com/profile/brett-adcock/" target="_blank">Forbes: Brett Adcock Profile</a></li>
+          <li><a href="https://www.forbesindia.com/article/ai-tracker/were-building-a-new-species-not-robots-figure-ais-brett-adcock/2988612/1" target="_blank">Forbes India: "We're building a new species, not robots" — Figure AI's Brett Adcock</a></li>
+          <li><a href="https://www.advisorperspectives.com/commentaries/2025/11/15/1-billion-musks-1-trillion-xpengs-iron" target="_blank">Advisor Perspectives: Humanoids Rise — Figure's $1 Billion, Musk's $1 Trillion, XPENG's IRON</a></li>
+          <li><a href="https://www.thepaper.cn/newsDetail_forward_31749988" target="_blank">澎湃新闻：Figure 03正式发布，目标四年量产10万台</a></li>
+          <li><a href="https://gigazine.net/gsc_news/en/20251010-figure-03/" target="_blank">Gigazine: The third-generation humanoid robot 'Figure 03' has been released</a></li>
+          <li><a href="https://www.iceo.com.cn/realtimedata/artical/2025-02-05/14:34:09" target="_blank">中国企业家：Figure AI与OpenAI终止合作，人形机器人公司与大模型公司重新划定边界</a></li>
+          <li><a href="https://seedblink.com/press-room/2025-05-16-figure-ai-shares-now-available-to-accredited-investors-via-seedblinks-secondary-market" target="_blank">SeedBlink: Figure AI shares available to accredited investors via secondary market</a></li>
+          <li><a href="https://cliptics.com/blog/humanoid-robots-working-factories-2026" target="_blank">Cliptics: Humanoid Robots 2026 — They're Now Working in Factories</a></li>
+          <li><a href="https://www.theissueten.com/brett-adcock-net-worth/" target="_blank">The Issue Ten: Brett Adcock Net Worth In 2026 — How Figure AI Made Him Billions</a></li>
+          <li><a href="https://en.wikipedia.org/?curid=73481948" target="_blank">Wikipedia: Brett Adcock</a></li>
+          <li><a href="https://baike.baidu.com/item/Figure%20AI/66805097" target="_blank">百度百科: Figure AI</a></li>
+          <li><a href="https://stcn.com/article/detail/3372238.html" target="_blank">证券时报：Figure发布"穿衣服"的家庭机器人，竞争对手公开呛声</a></li>
+          <li><a href="https://cbgc.scol.com.cn/news/6832056" target="_blank">川观新闻：既能端茶送水，又能进厂打工！Figure 03人形机器人发布</a></li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">本页面为具身智能Wiki项目自动生成 · 数据截至2026年5月 · 由Cowork调度系统维护</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>
