@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>深穹星核 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style></head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> › <span>深穹星核</span></div>
+  <div class="wiki-header"><h1>深穹星核</h1><div class="subtitle">NovaCore · 2025年成立 · VLIA大模型 · "灵巧脸"全栈技术 · 三轮密集融资</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#founders">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financials">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#a1">2.1 团队背景与场景选择</a></li>
+        <li class="toc-lvl4"><a href="#a2">2.2 技术路线与场景适配性</a></li>
+        <li class="toc-lvl4"><a href="#a3">2.3 股东结构对战略影响</a></li>
+        <li class="toc-lvl4"><a href="#a4">2.4 试错与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#a5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#a6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#sources">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">深穹星核</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">上海深穹星核科技有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">英文名</div><div class="ib-value">NovaCore</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2025年8月</div></div>
+        <div class="ib-row"><div class="ib-label">总部</div><div class="ib-value">上海张江</div></div>
+        <div class="ib-row"><div class="ib-label">创始人/CEO</div><div class="ib-value">郁振波</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">累计融资</div><div class="ib-value">约1亿元人民币（三轮）</div></div>
+        <div class="ib-row"><div class="ib-label">融资轮次</div><div class="ib-value">天使轮→天使+→天使++</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">赛道</div><div class="ib-value">情感交互/灵巧脸</div></div>
+        <div class="ib-row"><div class="ib-label">技术路线</div><div class="ib-value">VLIA大模型+仿生交互</div></div>
+        <div class="ib-row"><div class="ib-label">创始人背景</div><div class="ib-value">上海交大AI博士班</div></div>
+      </aside>
+      <p class="article-intro"><strong>深穹星核</strong>（NovaCore），全称上海深穹星核科技有限公司，成立于2025年8月，总部位于上海张江。公司定位为具身智能体研发企业，以"灵巧脸"这一差异化赛道为锚点，聚焦人机交互与情感陪伴。创始团队来自上海交大和清华大学，创始人郁振波为上海交大吴文俊人工智能荣誉博士班毕业生。公司在2026年1-3月间完成三轮密集天使系列融资，累计约亿元人民币，并首创VLIA（视频-语言-意图-行动）具身智能大模型。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper"><table class="wikitable infotable">
+        <tr><th>项目</th><th>内容</th></tr>
+        <tr><td>公司全称</td><td>上海深穹星核科技有限公司</td></tr>
+        <tr><td>英文名称</td><td>NovaCore</td></tr>
+        <tr><td>成立时间</td><td>2025年8月</td></tr>
+        <tr><td>注册地</td><td>上海浦东新区（张江）</td></tr>
+        <tr><td>上市情况</td><td>未上市</td></tr>
+        <tr><td>创始人/CEO</td><td>郁振波</td></tr>
+        <tr><td>定位</td><td>具身智能体研发，聚焦情感交互与陪伴</td></tr>
+      </table></div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>时间</th><th>事件</th></tr>
+        <tr><td>2025年8月</td><td>公司成立，总部设于上海张江</td></tr>
+        <tr><td>2025年Q4</td><td>与3家头部机器人厂商达成合作，应用于养老陪伴和商业服务场景</td></tr>
+        <tr><td>2026年1月初</td><td>完成天使轮融资，零以创投独家投资数千万元</td></tr>
+        <tr><td>2026年1月（两周内）</td><td>完成天使+轮融资，友谊时光、元禾原点联合领投</td></tr>
+        <tr><td>2026年3月</td><td>完成天使++轮融资，ACCF Capital领投；提出"灵巧脸"全栈技术体系</td></tr>
+      </table></div>
+
+      <h3 id="founders">1.2 创始人及核心团队</h3>
+      <p>深穹星核创始团队来自上海交大、清华大学及头部AI企业，覆盖计算机视觉、机器人控制、NLP、多模态大模型等领域。团队呈现"顶尖学术+产业经验"混合型结构。</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+        <tr><td>创始人&CEO</td><td>郁振波</td><td>上海交通大学吴文俊人工智能荣誉博士班，师从张文军院士；蝉联ImageNet国际大赛三届世界冠军；入选福布斯U30、2025年苏州市外十大青年科学家</td></tr>
+      </table></div>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>轮次</th><th>时间</th><th>金额</th><th>投资方</th></tr>
+        <tr><td>天使轮</td><td>2026年1月</td><td>数千万元</td><td>零以创投（独家）</td></tr>
+        <tr><td>天使+轮</td><td>2026年1月（两周内）</td><td>数千万元</td><td>友谊时光、元禾原点联合领投；中科元创跟投</td></tr>
+        <tr><td>天使++轮</td><td>2026年3月</td><td>数千万元</td><td>ACCF Capital领投；至华投资、零以创投、元禾原点跟投</td></tr>
+      </table></div>
+      <p>三轮融资累计约亿元人民币，融资节奏极为密集（3个月3轮），估值未公开披露。九云资本为多轮融资的独家财务顾问。</p>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>技术维度</th><th>说明</th></tr>
+        <tr><td>VLIA大模型</td><td>视频-语言-意图-行动统一模型；业内首次提出基于"意图理解"的具身智能大模型；意图理解准确率超92%；具备长期记忆与持续学习能力</td></tr>
+        <tr><td>快慢脑架构</td><td>快脑处理实时交互，慢脑处理深层认知任务；同步运行不冲突</td></tr>
+        <tr><td>灵巧脸技术体系</td><td>覆盖"材料—结构—算法—控制—模型—内核"全栈自研；从仿生材料、仿真算法到闭环控制的全链路正向设计</td></tr>
+        <tr><td>超高仿真人脸</td><td>基于仿生学原理的微表情控制；突破传统"预设表情包"局限；支持自然打断的拟人化对话</td></tr>
+        <tr><td>人格稳态</td><td>端侧实时运行大模型；突破"人格稳态"难题，避免人设漂移；实现"心里想的、嘴上说的、脸上表现的"三位一体</td></tr>
+      </table></div>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>产品方向</th><th>类型</th><th>关键特征</th><th>状态</th></tr>
+        <tr><td>灵巧脸机器人</td><td>超高仿真人脸交互机器人</td><td>接近真人质感与细微表情；端侧实时大模型驱动对话+表情+语音同步</td><td>研发阶段</td></tr>
+      </table></div>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>场景分类</th><th>具体应用</th><th>进展</th></tr>
+        <tr><td>情感陪伴</td><td>家庭场景2C陪伴、辅助增强（娱乐游戏）</td><td>短期优先落地场景</td></tr>
+        <tr><td>养老服务</td><td>养老陪伴</td><td>中长期目标；与3家机器人厂商合作验证</td></tr>
+        <tr><td>商业服务</td><td>商业场景接待交互</td><td>与机器人厂商合作</td></tr>
+        <tr><td>工业自动化</td><td>人机协作中的交互界面</td><td>中长期拓展方向</td></tr>
+      </table></div>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <p>公司处于研发阶段，尚未实现规模商业化收入。2025年Q4已与3家头部机器人厂商达成合作，应用于养老陪伴和商业服务场景。友谊时光（港股上市公司）在AI陪伴相关场景与深穹星核展开深度合作，共同推进技术落地与早期商业化验证。</p>
+
+      <h3 id="financials">1.8 财务数据</h3>
+      <p>公司成立不足一年，无公开财务数据。累计融资约亿元人民币。</p>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>创始人郁振波蝉联ImageNet国际大赛三届世界冠军，在计算机视觉领域具备国际级学术影响力</li>
+        <li>灵巧脸与灵巧手形成行业差异化：灵巧手是操作执行的工具臂膀，灵巧脸是情感交互的入口</li>
+        <li>相较海外同类产品，方案成本低30%-40%，交付周期缩短50%</li>
+        <li>竞品对标：Google DeepMind、波士顿动力、商汤、科大讯飞、优必选等</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="a1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>郁振波的学术背景（ImageNet世界冠军、视觉识别）与深穹星核选择的"灵巧脸"情感交互赛道存在有机联系。计算机视觉的顶级能力可以迁移到表情识别、微表情生成、多模态情感理解等方向。但情感交互不仅是视觉问题，还涉及NLP、语音合成、心理建模等更广泛的交叉领域——团队在这些方面的积累需要通过产业合作伙伴（如友谊时光在游戏/社交的情感计算经验）来补足。整体来看，创始人的视觉AI强项为灵巧脸的视觉层提供了坚实底座，但全栈情感交互能力尚需验证。</p>
+      </div>
+
+      <div class="analysis-block" id="a2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>VLIA大模型的"意图理解"定位精准命中了情感交互场景的核心需求——用户不只需要机器人"听见"和"看见"，更需要它"理解"。快慢脑架构的设计源于实时交互（表情、口型同步）和深层认知（对话理解、情感推理）的不同时延要求，架构选择合理。灵巧脸的全栈自研（从材料到算法到控制）表明公司对仿生交互的品质有极致追求，但全栈策略也意味着更高的研发投入和更长的验证周期。</p>
+      </div>
+
+      <div class="analysis-block" id="a3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>友谊时光（港股上市游戏/社交公司）的投资具有明显产业协同价值——其在虚拟角色情感交互、用户行为建模方面的积累可以为深穹星核提供真实的训练数据和场景验证。元禾原点在具身智能领域的长期布局使其能提供产业资源对接。零以创投依托硬科技生态网络提供深度绑定。整体股东结构偏向"技术VC+场景产业方"组合，有利于技术验证和早期场景落地，但缺乏大规模制造或渠道类股东，后续量产可能面临挑战。</p>
+      </div>
+
+      <div class="analysis-block" id="a4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>公司成立不到一年，但产品定位经历了从泛"具身智能体"到聚焦"灵巧脸"的逐步收窄。2026年3月天使++轮时明确提出的"灵巧脸全栈技术体系"是一个重要的战略聚焦信号——将公司从宽泛的"情感交互"赛道锚定到具体的硬件-软件-算法全栈方案上。这一聚焦有助于在拥挤的具身智能赛道中建立清晰辨识度。</p>
+      </div>
+
+      <div class="analysis-block" id="a5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>深穹星核最关键的取舍是"舍灵巧手，取灵巧脸"。在行业普遍关注操作执行能力（Manipulation）的背景下，深穹星核选择了一条少有人走的路——"灵巧脸"作为情感交互入口。这一取舍的逻辑类似于"iPhone先做好屏幕和多点触控，而非先做好摄像头"——先定义人与机器交互的核心界面。但风险在于，灵巧脸的市场天花板可能远小于灵巧手（工业场景），且AI陪伴/情感交互的商业化路径（付费意愿、隐私顾虑、社会接受度）尚不清晰。</p>
+      </div>
+
+      <div class="analysis-block" id="a6">
+        <h4>2.6 其他重要观察、分析</h4>
+        <p>深穹星核3个月内完成3轮天使系列融资的节奏极为罕见，反映了资本市场对"情感交互+灵巧脸"这一差异化方向的强烈兴趣。但快速密集的融资也可能意味着烧钱速度快、对资金依赖度高。公司的核心命题是证明"灵巧脸"可以成为一个独立且有商业价值的技术品类，而非人形机器人的一个附属模块。友谊时光的合作是重要验证信号——游戏和社交场景中的情感交互需求最为真实和迫切。</p>
+      </div>
+
+      <h2 id="sources">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://www.donews.com/news/detail/4/6395462.html" target="_blank">深穹星核完成数千万元天使轮融资，聚焦VLIA具身智能大模型研发 — DoNews</a></li>
+          <li><a href="https://media.qimingpian.cn/2026/03/20/222106f1edd6bfbf74b75fa10273eeed.html" target="_blank">深穹星核完成天使++轮融资，全栈自研灵巧脸技术 — 企名片</a></li>
+          <li><a href="https://q.futunn.com/feed/115959085138324" target="_blank">友谊时光、元禾原点领投深穹星核天使+轮 — 富途牛牛</a></li>
+          <li><a href="https://www.cyzone.cn/article/821634.html" target="_blank">融资丨具身智能大脑公司深穹星核完成天使轮融资 — 创业邦</a></li>
+          <li><a href="https://nuxt.cyzone.cn/article/822473.html" target="_blank">深穹星核天使+轮落地，两周内再获数千万元融资 — 创业邦</a></li>
+          <li><a href="https://www.sohu.com/a/979281748_439726" target="_blank">创始人来自上海交大，深穹星核完成数千万元天使轮融资 — 搜狐</a></li>
+          <li><a href="https://www.donews.com/news/detail/8/6475713.html" target="_blank">深穹星核完成天使++轮数千万元融资 — DoNews</a></li>
+          <li><a href="https://www.robot-china.com/news/202603/25/95295.html" target="_blank">张江机器人企业，完成数千万元融资 — 中国机器人网</a></li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">本页面由具身智能Wiki维护，最后更新于2026年5月。内容基于公开资料整理，仅供参考。</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>里工 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style></head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> <span class="breadcrumb-sep">›</span> <span>里工</span></div>
+  <div class="wiki-header"><h1>里工</h1><div class="subtitle">Li-Gong · 1985年成立 · 国家级专精特新"小巨人" · 工业人形机器人 · A+轮</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#team">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#product">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenario">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financial">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#analysis1">2.1 团队背景与场景选择的匹配度</a></li>
+        <li class="toc-lvl4"><a href="#analysis2">2.2 技术路线与场景的适配性</a></li>
+        <li class="toc-lvl4"><a href="#analysis3">2.3 股东/资本结构对战略的影响</a></li>
+        <li class="toc-lvl4"><a href="#analysis4">2.4 试错过程与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#analysis5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#analysis6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#refs">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">里工</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">广州里工实业有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">英文名称</div><div class="ib-value">Li-Gong (Guangzhou Li-Gong Industry Co., Ltd.)</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">1985年</div></div>
+        <div class="ib-row"><div class="ib-label">总部地址</div><div class="ib-value">广州市白云区</div></div>
+        <div class="ib-row"><div class="ib-label">创始人/董事长</div><div class="ib-value">李庆光</div></div>
+        <div class="ib-row"><div class="ib-label">CEO/总裁</div><div class="ib-value">李卫铳</div></div>
+        <div class="ib-row"><div class="ib-label">员工人数</div><div class="ib-value">约218人（2025年）</div></div>
+        <div class="ib-section">融资信息</div>
+        <div class="ib-row"><div class="ib-label">最新轮次</div><div class="ib-value">A+轮（2025年7月）</div></div>
+        <div class="ib-row"><div class="ib-label">累计融资</div><div class="ib-value">2轮（A轮/A+轮）</div></div>
+        <div class="ib-row"><div class="ib-label">投资方</div><div class="ib-value">白云基金、湾区资管（广州国资背景）</div></div>
+        <div class="ib-section">财务数据</div>
+        <div class="ib-row"><div class="ib-label">研发投入占比</div><div class="ib-value">连续多年约30%</div></div>
+        <div class="ib-row"><div class="ib-label">盈利状态</div><div class="ib-value">机器人业务持续盈利</div></div>
+        <div class="ib-row"><div class="ib-label">星海工厂投资</div><div class="ib-value">约6.1亿元</div></div>
+        <div class="ib-row"><div class="ib-label">规划年产值</div><div class="ib-value">约10亿元（达产后）</div></div>
+        <div class="ib-section">核心产品</div>
+        <div class="ib-row"><div class="ib-label">人形机器人</div><div class="ib-value">里掂D1、里掂F1</div></div>
+        <div class="ib-row"><div class="ib-label">复合机器人</div><div class="ib-value">高寻、高侍</div></div>
+        <div class="ib-row"><div class="ib-label">数据采集平台</div><div class="ib-value">ChiroSync如意数采套件</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">赛道</div><div class="ib-value"><span class="tag tag-info">工业人形机器人</span> <span class="tag tag-info">智能制造</span></div></div>
+        <div class="ib-row"><div class="ib-label">资质</div><div class="ib-value"><span class="tag tag-warn">专精特新小巨人</span></div></div>
+        <div class="ib-section">官网</div>
+        <div class="ib-row"><div class="ib-label">官网</div><div class="ib-value"><a href="https://www.li-gong.com" target="_blank">li-gong.com</a></div></div>
+      </aside>
+
+      <p class="article-intro"><strong>里工</strong>（全称：广州里工实业有限公司，英文：Li-Gong），是一家从传统精密制造转型具身智能机器人的广州企业，创立于1985年。公司前身为橡塑五金厂，历经两代人近40年发展，已从啤酒灌装线密封圈制造商成长为国家级专精特新"小巨人"企业和工信部智能制造"揭榜挂帅"单位。现任CEO李卫铳于2003年接手家族工厂，推动企业完成从传统制造到智能制造的转型。公司目前拥有里掂D1（全尺寸人形机器人）、里掂F1（轮式人形机器人）等核心产品，并行推进人形机器人量产与ChiroSync数据采集平台建设，是行业中少数已实现批量交付和持续盈利的企业之一。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper"><table class="wikitable infotable">
+        <tr><th>项目</th><th>内容</th></tr>
+        <tr><td>公司全称</td><td>广州里工实业有限公司</td></tr>
+        <tr><td>英文名称</td><td>Guangzhou Li-Gong Industry Co., Ltd.</td></tr>
+        <tr><td>成立时间</td><td>1985年</td></tr>
+        <tr><td>总部地址</td><td>广州市白云区</td></tr>
+        <tr><td>创始人/董事长</td><td>李庆光</td></tr>
+        <tr><td>CEO/总裁</td><td>李卫铳</td></tr>
+        <tr><td>员工人数</td><td>约218人（PitchBook 2025年数据）</td></tr>
+        <tr><td>企业资质</td><td>国家级专精特新"小巨人"企业、工信部智能制造系统解决方案"揭榜挂帅"单位</td></tr>
+        <tr><td>上市情况</td><td>未上市</td></tr>
+        <tr><td>官网</td><td>li-gong.com</td></tr>
+      </table></div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>时间</th><th>事件</th></tr>
+        <tr><td>1985年</td><td>创始人李庆光在广州白云区创立橡塑五金厂，仅5人，生产啤酒灌装线橡胶密封圈</td></tr>
+        <tr><td>2003年</td><td>李卫铳从华南农业大学毕业后接手家族工厂，从学徒做起开始推动转型</td></tr>
+        <tr><td>2004年</td><td>在13家竞标者中胜出（其他竞标者规模是里工的50倍以上），成为ABB动力总成供应商</td></tr>
+        <tr><td>2007年</td><td>成为英国Domino公司最佳供应商</td></tr>
+        <tr><td>2015年</td><td>引进第一台ABB机器人，开始智能化探索</td></tr>
+        <tr><td>2017年</td><td>成为AstroNova（波音二级供应商），供应飞机发动机叶轮精密配件</td></tr>
+        <tr><td>2018年</td><td>成立"X部门"，探索智能制造与深度学习融合</td></tr>
+        <tr><td>2023年</td><td>入选国家级专精特新"小巨人"企业、亚太区先进制造解决方案提供商TOP10</td></tr>
+        <tr><td>2024年8月</td><td>发布首款全尺寸人形机器人"里掂D1"，实现广州该赛道"零的突破"</td></tr>
+        <tr><td>2025年1月</td><td>完成A轮融资（白云基金）</td></tr>
+        <tr><td>2025年7月</td><td>完成A+轮融资（白云基金+湾区资管）</td></tr>
+        <tr><td>2025年9月</td><td>与腾讯云签署战略合作协议，聚焦航空航天、汽车零部件、智慧实验室场景</td></tr>
+        <tr><td>2025年11月</td><td>里工星海智能工厂在番禺正式动工，总投资约6.1亿元</td></tr>
+        <tr><td>2026年4月</td><td>第139届广交会全球首发ChiroSync"如意数采套件"，荷兰客商追到工厂考察</td></tr>
+      </table></div>
+
+      <h3 id="team">1.2 创始人及核心团队</h3>
+      <p>里工的团队呈现出鲜明的<strong>家族传承+多元专业融合</strong>特征。创始人李庆光奠定了精密制造的根基，第二代接班人李卫铳完成了从传统制造到智能制造的跨越。团队成员来自无人机、自动驾驶、语义分析、深度学习、农用机器人等多元背景，推动传统家族企业向平台型科技企业转型。</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+        <tr><td>创始人/董事长</td><td>李庆光</td><td>1985年在广州白云创立橡塑五金厂（里工前身），从5人作坊起步，为啤酒灌装线生产橡胶密封圈。经过数十年经营，将一个小作坊发展为精密制造企业，为后续转型奠定了制造基因。</td></tr>
+        <tr><td>CEO/总裁</td><td>李卫铳</td><td>1979年出生，2003年毕业于华南农业大学动物科学学院（生物专业）。本拟赴法国留学，因非典疫情导致法语考试受阻而放弃。2003年从工厂底层学徒起步（开车床、钻床、打扫卫生），业余自学全英文《精密机械加工技术》和机械英语。以独特方式开拓海外客户——从德甲/英超/意甲广告牌上搜集企业信息，每发500封邮件获1封回复，最终拿下ABB订单。信奉"进化论"经营哲学，坚持"从不下车间、不进场景的研发就是空中楼阁"的务实理念。</td></tr>
+        <tr><td>研发部经理</td><td>李卫燊</td><td>据推测为李卫铳的兄弟，负责研发管理工作。</td></tr>
+        <tr><td>运营总监</td><td>黄元园</td><td>负责公司运营管理。</td></tr>
+      </table></div>
+      <p>CEO李卫铳注重吸纳多元背景人才，团队整体从"家族制造型"向"技术驱动型"过渡。公司现有员工约218人，研发人员占比和具体构成未公开披露。</p>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <h4>融资历史</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>轮次</th><th>日期</th><th>投资方</th><th>金额</th></tr>
+        <tr><td>A轮</td><td>2025年1月22日</td><td>白云基金</td><td>未披露</td></tr>
+        <tr><td>A+轮</td><td>2025年7月7日</td><td>白云基金、湾区资管</td><td>未披露</td></tr>
+      </table></div>
+
+      <h4>股东结构</h4>
+      <p>公司股权由创始人李氏家族（控股）与两家广州国资背景机构（白云基金、湾区资管）共同持有。白云基金为广州市白云区政府引导基金旗下投资平台，湾区资管聚焦粤港澳大湾区科创企业投资。目前融资轮次较少（仅2轮）、金额均未披露，PitchBook将其归类为"Later Stage VC"阶段。融资规模相对同赛道其他玩家偏小，可能因为公司自身已实现盈利，对外部资金的迫切性相对较低。</p>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>技术维度</th><th>具体方案</th></tr>
+        <tr><td>AI架构</td><td>自研工业大模型，聚焦工业作业场景；与腾讯云联合训练专用具身智能模型，整合TRTC实时音视频与大语言模型能力</td></tr>
+        <tr><td>具身智能体系</td><td>感知模块（摄像头/雷达/力矩传感器）→ 环境感知 → 决策规划 → 精准执行</td></tr>
+        <tr><td>数据方案</td><td>ChiroSync如意数采套件——全球首个分布式多模态数据采集平台，将全球每个真实工作场景变为数据采集节点，综合成本降低90%以上</td></tr>
+        <tr><td>运动控制</td><td>高载荷（42kg双臂）、高精度（±0.05mm重复定位）的工业级运动控制；自研关节（峰值扭矩320N·m）</td></tr>
+        <tr><td>操作系统</td><td>自研零代码操作系统，车间师傅通过平板点击即可下发任务</td></tr>
+        <tr><td>AI积累</td><td>2018年成立"X部门"，已有近10年AI/深度学习技术积累；工业大模型准确率约85%（喷漆工艺可达90%）</td></tr>
+        <tr><td>核心指标</td><td>场景自动化效率提升35%，不良品率下降66%</td></tr>
+        <tr><td>产品哲学</td><td>"三高一低"：高载荷、高精度、高可靠性、低风险</td></tr>
+      </table></div>
+      <p>里工的技术路线具有鲜明的<strong>工业实用主义</strong>特征。不同于许多具身智能创业公司以"通用AI"为核心叙事，里工的技术栈围绕工业场景的实际需求构建：自研工业大模型而非通用大模型，强调精度和载荷而非泛化能力，自研零代码操作系统降低一线工人使用门槛。2025年与腾讯云的战略合作则为其引入了云端AI能力和生态资源。在数据采集方面，ChiroSync以5.6万元的颠覆性价格对标进口20-50万元的方案，试图解决行业发展最大的瓶颈——"数据荒"。</p>
+
+      <h3 id="product">1.5 产品形态</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>产品名称</th><th>产品类别</th><th>产品子类</th><th>关键参数</th><th>适用场景</th></tr>
+        <tr><td>里掂D1</td><td>人形机器人</td><td>全尺寸双足人形</td><td>身高1.7m/体重55kg；22-28个自由度；双臂载荷42kg；重复定位精度±0.05mm；续航4h+；步速5km/h；关节峰值扭矩320N·m</td><td>航空航天装配、汽车零部件制造、模具加工</td></tr>
+        <tr><td>里掂F1</td><td>人形机器人</td><td>全尺寸轮式人形</td><td>20个自由度；双臂载荷12-40kg（不同报道有差异）；续航6h+；重复定位精度±0.05mm</td><td>工业制造、商业服务、安防巡逻</td></tr>
+        <tr><td>高寻</td><td>复合机器人</td><td>自主移动复合机器人</td><td>集成AMR底盘+机械臂，可协同数控机床完成上下料作业，支持24小时无人值守</td><td>CNC机床上下料、物料搬运、实验室自动化</td></tr>
+        <tr><td>高侍</td><td>协作机器人</td><td>无人值守机器人</td><td>适配各类机床，满足柔性化自动上下料需求</td><td>离散制造、柔性产线</td></tr>
+        <tr><td>ChiroSync如意数采套件</td><td>数据采集平台</td><td>分布式多模态数据采集</td><td>触感手套（单只42g/162个采集点/0.01N精度）；深度摄像头；采集头盔；背包式主控；售价5.6万元</td><td>机器人遥操作示教、技能数据采集、产线规模化部署</td></tr>
+      </table></div>
+      <p>里掂系列名称源自粤语"掂"（意为"搞定、没问题"），体现了公司的实用主义基因。D1定位为高载荷工业场景，42kg的双臂载荷在行业中处于领先水平（行业普遍约10kg级）。F1以轮式形态实现更长续航（6h+），兼顾工业与商业服务场景。ChiroSync如意数采套件于2026年广交会全球首发，以进口方案四分之一的价格打破海外技术垄断，是其"数据飞轮"战略的核心基础设施。</p>
+
+      <h3 id="scenario">1.6 应用场景</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>场景分类</th><th>具体场景</th><th>代表产品</th><th>落地状态</th><th>合作方/客户</th></tr>
+        <tr><td>航空航天</td><td>飞机发动机叶轮精密配件加工、装配</td><td>里掂D1、高寻</td><td>已批量交付</td><td>AstroNova（波音二级供应商）</td></tr>
+        <tr><td>汽车制造</td><td>核心零部件制造、喷漆、装配</td><td>里掂D1、里掂F1</td><td>已批量交付</td><td>汽车零部件制造商、4S店</td></tr>
+        <tr><td>模具加工</td><td>精密模具CNC上下料</td><td>高寻、高侍</td><td>已批量交付</td><td>离散制造企业</td></tr>
+        <tr><td>实验室自动化</td><td>智慧实验室样本处理</td><td>高寻</td><td>合作中</td><td>腾讯云（智慧实验室场景）</td></tr>
+        <tr><td>商业服务</td><td>安防巡逻、商业服务</td><td>里掂F1</td><td>探索阶段</td><td>—</td></tr>
+      </table></div>
+      <p>里工明确采取"先深耕工业场景 → 扩展商业场景 → 远期全能住家保姆"的三步走战略。当前阶段高度聚焦工业制造场景，以航空航天和汽车制造为核心阵地，利用自身近40年的精密制造经验积累的场景理解，形成竞争壁垒。海外市场占半壁江山，荷兰等欧洲客户已出现主动追单。</p>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <ul>
+        <li><strong>批量交付</strong>：人形机器人已实现批量交付，非Demo或演示阶段，这在行业中较为稀缺</li>
+        <li><strong>持续盈利</strong>：机器人业务持续盈利，在行业普遍亏损的背景下表现突出</li>
+        <li><strong>订单排期</strong>：2026年计划交付超1000台，订单已排至下半年</li>
+        <li><strong>产能规划</strong>：星海智能工厂（总建筑面积24万㎡）于2025年11月动工，预计2027年全面投产，年产具身智能机器人约5000台套，达产后年产值约10亿元</li>
+        <li><strong>2028年目标</strong>：完成5000台机器人交付量，完成三个龙头医疗企业订单</li>
+        <li><strong>海外进展</strong>：国内外市场各占半壁江山，东南亚和欧洲订单持续增长。2026年广交会上荷兰客商追到番禺工厂考察</li>
+        <li><strong>数据平台</strong>：ChiroSync如意数采套件定价5.6万元，以进口方案四分之一的价格开拓数据采集市场</li>
+      </ul>
+
+      <h3 id="financial">1.8 财务数据</h3>
+      <p>里工未上市，未公开披露完整的财务报告。根据公开信息整理的关键财务指标如下：</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>指标</th><th>数据</th><th>备注</th></tr>
+        <tr><td>研发投入占比</td><td>连续多年约30%</td><td>行业中上水平</td></tr>
+        <tr><td>盈利状态</td><td>机器人业务持续盈利</td><td>行业普遍亏损背景下较为罕见</td></tr>
+        <tr><td>星海工厂总投资</td><td>约6.1亿元</td><td>2025年11月动工</td></tr>
+        <tr><td>规划年产值（达产后）</td><td>约10亿元</td><td>2027年后</td></tr>
+        <tr><td>市场分布</td><td>海内外各半</td><td>东南亚、欧洲订单增长</td></tr>
+        <tr><td>融资总额</td><td>未披露（A/A+两轮）</td><td>国资背景投资方</td></tr>
+        <tr><td>营收、利润、估值</td><td>未公开</td><td>PitchBook标注为"Generating Revenue"</td></tr>
+      </table></div>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>"里工"一名取自李姓家族"深耕工业"的谐音，蕴含了企业的制造基因和家族传承</li>
+        <li>"里掂"在粤语中意为"搞定、没问题"，体现广东制造的务实文化</li>
+        <li>李卫铳信奉进化论经营哲学（受其生物专业背景影响），以"渐进进化"的思维迭代企业</li>
+        <li>他开拓ABB客户的方式颇具传奇色彩——从德甲/英超/意甲联赛广告牌上搜集欧洲企业信息，每发500封邮件获1封回复</li>
+        <li>公司从2018年设立的"X部门"是其AI技术储备的源头，这一架构类似于Google X的探索性定位</li>
+        <li>与腾讯云的合作不仅是技术层面——整合了TRTC实时音视频与大语言模型能力，还涉及"技术-场景-人才"三维协同</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="analysis1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>里工的团队背景与其选择的工业制造场景高度匹配，甚至可以说是一种"基因型匹配"。创始人李庆光从橡塑密封圈起家，40年精密制造积累使公司对工业场景的工艺要求、质量标准和客户痛点有深入骨髓的理解。李卫铳虽然学的是动物科学而非机械工程，但他从工厂底层学徒干起、自学精密机械加工技术的经历，使其对"车间里真正需要什么"有第一手认知——这正是许多纯学术背景的AI创业团队所欠缺的。团队成员的多元背景（无人机、自动驾驶、语义分析、深度学习、农用机器人）则为技术跨界融合提供了可能性。这种"产业老兵+多元技术人才"的组合，使其选择聚焦航空航天和汽车制造等高价值工业场景是顺理成章的，而非追热点式地进入消费级或通用机器人赛道。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>里工的"三高一低"技术路线（高载荷、高精度、高可靠性、低风险）与工业场景高度适配。在航空航天和汽车制造场景中，42kg的双臂载荷和±0.05mm的重复定位精度是解决真实产线痛点的硬指标，而非单纯追求技术参数。自研工业大模型（而非用通用大模型进行微调）的选择也体现了场景优先的思路——喷漆工艺90%的准确率在通用AI标准下不够亮眼，但在特定工业工序中已具备实用价值。但值得关注的是，工业场景的数据获取天然存在壁垒——每个工厂的产线、工艺、环境都不同，通用性受到挑战。ChiroSync如意数采套件的推出正是为了解决这一瓶颈，试图通过低成本分布式采集将"每个工作场景变成数据节点"，但这一策略能否真正形成数据飞轮效应，取决于客户的付费意愿和部署规模。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>里工目前的股东结构以广州国资背景（白云基金、湾区资管）为主，这对其战略有多重影响。积极方面：国资背书有助于获取政府订单和产业政策支持（尤其是在航空航天等敏感领域），广州本地的制造业生态也为产能扩张提供了土地和配套资源（星海工厂落户番禺即为例证）。约束方面：国资投资方的估值逻辑和退出路径与市场化VC不同，可能导致公司在融资节奏和估值上较为保守（两轮融资金额均未披露），在与北上深等VC密集区域的竞争者在资金储备上可能存在差距。此外，缺乏头部市场化VC或产业资本（如车企、3C制造商）的参与，意味着在供应链整合和场景拓展上可能更多依赖自身积累而非资本杠杆。不过，公司自身盈利意味着对外部资金的依赖度相对较低，这在一定程度上对冲了融资规模偏小的劣势。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>里工的发展历程本身就构成了一次漫长的"试错与迭代"。从1985年的橡塑密封圈到2004年的ABB精密零部件供应商，再到2015年引进第一台工业机器人、2018年成立X部门探索AI、2024年发布人形机器人——每一步都是在原有能力基础上向邻近领域延伸，而非激进跳跃。这种渐进式转型与李卫铳信奉的"进化论"经营哲学一致。在AI路径上，公司从"使用ABB机器人"到"自研机器人+AI"，从云端合作（腾讯云）到自建数据管道（ChiroSync），体现了一条"应用驱动研发"的务实路径。不过，从精密制造到具身智能的跨越仍然巨大——人形机器人的AI决策、通用操作能力和安全性验证都是全新的挑战，2025年之前公司在AI领域的积累主要来自2018年设立的X部门，相比纯AI创业团队在模型能力和数据规模上可能存在差距。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>里工的核心取舍在于：选择做"工业场景的实干家"而非"通用AI的梦想家"。这体现在多个层面：产品形态上选择了非双足即轮式、非通用即专用的路线；技术路线上自研工业大模型而非追逐百亿参数通用模型；商业化策略上优先服务既有精密制造客户而非烧钱开拓新市场。在市场定位上，里工似乎选择了"专用务实派"路线（类比iPod策略）：在一个足够大的细分市场（工业制造人形机器人）中，以可控的产品复杂度、可验证的商业价值建立立足点。与优必选、智元等瞄准通用人形的企业相比，里工的差异化在于40年的制造业积淀和"场景先行"的务实打法。劣势在于品牌声量和资本储备可能不及一线玩家，需要在产品交付和数据积累上持续证明自己。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis6">
+        <h4>2.6 其他重要观察</h4>
+        <p>第一，里工的"家族企业转型科技公司"叙事在中国制造业升级背景下具有样本价值。从5人作坊到人形机器人，两代人40年的积累构成了难以复制的竞争壁垒——这种"慢公司"模式在新兴的具身智能赛道中是与"快公司"（如成立3年即估值百亿的玩家）形成鲜明对比的另一种路径。第二，2026年被行业称为"工业人形机器人量产元年"（IDC预测中国市场规模突破110亿美元），里工的星海工厂恰好卡位2027年投产，时间窗口有利，但能否在量产爬坡期保证产品质量和交付节奏是关键考验。第三，ChiroSync如意数采套件的"数据管道"定位极为重要——它不仅是硬件产品，更是具身智能"GPT时刻"的数据基础设施，如果大规模铺开，可能使里工从"机器人制造商"升级为"具身智能数据平台商"，从而彻底改变其估值逻辑和行业定位。</p>
+      </div>
+
+      <h2 id="refs">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://paper.cnstock.com/html/2025-09/10/content_2119218.htm" target="_blank">上海证券报 — 机器人得下车间、进场景 里工实业"从不做空中楼阁式的技术研发"</a></li>
+          <li><a href="https://zggszzs.com/newsinfo/10689929.html" target="_blank">中国工业报 — 典型报道：里工实业剑指通用型人形机器人</a></li>
+          <li><a href="http://www.21jingji.com/article/20241202/herald/936e36d93c7af325c777cbe45d6cbf76.html" target="_blank">21世纪经济报道 — 里工实业：从橡塑作坊起步，40年间两代人接力筑梦人形机器人</a></li>
+          <li><a href="https://www.21jingji.com/article/20260421/herald/733e588bf36e1b55d04762cabcdf5e05.html" target="_blank">21世纪经济报道 — 入厂门、进家门、出国门！广州机器人被全球采购商"追着跑"</a></li>
+          <li><a href="https://ep.ycwb.com/epaper/ycwb/html/2025-07/01/content_2983_714397.htm" target="_blank">羊城晚报 — "穗字号"首台人形机器人突围记</a></li>
+          <li><a href="https://www.21jingji.com/article/20260418/herald/209bcf9d3a50b9c1aaadb5c7327aa23e.html" target="_blank">21世纪经济报道 — 广交会客商追到番禺，看广州人形机器人"下产线"奥秘</a></li>
+          <li><a href="https://gz.gov.cn/ysgz/xwdt/ysdt/content/post_10458519.html" target="_blank">广州市政府 — 里工实业与腾讯云签署战略合作协议</a></li>
+          <li><a href="http://www.panyu.gov.cn/fzzs/jjdt/content/post_10553232.html" target="_blank">番禺区政府 — 年产约5000台套！里工星海智能工厂动工</a></li>
+          <li><a href="https://www.thepaper.cn/newsDetail_forward_31996478" target="_blank">澎湃新闻 — 年产5000台套机器人！里工星海智能工厂动工</a></li>
+          <li><a href="https://www.sfccn.com/2025/11-27/0MMDE0NzNfMjA4MzU0Mg.html" target="_blank">南方财经 — 广州里工李卫铳：产业是科技的土壤，机器人腾飞需要更多场景</a></li>
+          <li><a href="https://www.163.com/dy/article/KQL8OG1B0556LVOG.html" target="_blank">网易 — 从数据荒到数据飞轮：里工ChiroSync撬动产线规模化</a></li>
+          <li><a href="https://www.leiphone.com/category/gypractice/FX7vjfGTl0i2nZxE.html" target="_blank">雷锋网 — 从橡胶圈生产跃升机器人研发：一家珠三角家族工厂的数智化进化</a></li>
+          <li><a href="https://www.innohere.com/ir/159587/finance.html" target="_blank">InnoHere — 里工实业融资历史</a></li>
+          <li><a href="https://pitchbook.com/profiles/company/804470-59" target="_blank">PitchBook — Li-Gong Company Profile</a></li>
+          <li><a href="https://www.163.com/dy/article/DGTIVS4K0525JO75.html" target="_blank">网易 — 五四青年节：听听他们青春奋斗的故事</a></li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">此页面最后编辑于2026年5月4日 · 内容基于公开信息整理，仅供参考 · <a href="../index.html">具身智能Wiki</a></div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

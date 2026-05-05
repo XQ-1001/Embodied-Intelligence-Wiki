@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>灵生科技 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style></head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> <span class="breadcrumb-sep">›</span> <span>灵生科技</span></div>
+  <div class="wiki-header"><h1>灵生科技</h1><div class="subtitle">LingSheng Tech · 成立于2023年 · 清华系具身智能 · 预计2026年营收1-2亿元</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#team">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financial">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#others">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#analysis-1">2.1 团队背景与场景匹配度</a></li>
+        <li class="toc-lvl4"><a href="#analysis-2">2.2 技术路线与场景适配性</a></li>
+        <li class="toc-lvl4"><a href="#analysis-3">2.3 股东/资本对战略的影响</a></li>
+        <li class="toc-lvl4"><a href="#analysis-4">2.4 试错过程与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#analysis-5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#analysis-6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#refs">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">灵生科技</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">北京灵生科技有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">英文</div><div class="ib-value">LingSheng Tech</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2023年2月14日</div></div>
+        <div class="ib-row"><div class="ib-label">注册地</div><div class="ib-value">北京市海淀区</div></div>
+        <div class="ib-row"><div class="ib-label">创始人</div><div class="ib-value">杨洪兵</div></div>
+        <div class="ib-row"><div class="ib-label">核心定位</div><div class="ib-value">人形机器人通用大脑</div></div>
+        <div class="ib-section">财务数据</div>
+        <div class="ib-row"><div class="ib-label">2026预计营收</div><div class="ib-value">1亿-2亿元</div></div>
+        <div class="ib-row"><div class="ib-label">天使轮</div><div class="ib-value">千万级（2024.10）</div></div>
+        <div class="ib-row"><div class="ib-label">Pre-A/Pre-A+</div><div class="ib-value">亿元级（2025.12）</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">机器人自由度</div><div class="ib-value">26-28个</div></div>
+        <div class="ib-row"><div class="ib-label">操作精度</div><div class="ib-value">±0.03mm</div></div>
+        <div class="ib-row"><div class="ib-label">数据交易增长</div><div class="ib-value">同比10倍（2026）</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">赛道</div><div class="ib-value">人形机器人·具身智能</div></div>
+        <div class="ib-row"><div class="ib-label">技术路线</div><div class="ib-value">端到端VLA·世界模型</div></div>
+        <div class="ib-row"><div class="ib-label">团队背景</div><div class="ib-value">清华系</div></div>
+        <div class="ib-section">官网</div>
+        <div class="ib-row"><div class="ib-label">官网</div><div class="ib-value"><a href="https://www.ls-robot.com" target="_blank">ls-robot.com</a></div></div>
+      </aside>
+      <p class="article-intro"><strong>灵生科技</strong>（北京灵生科技有限公司）是一家成立于2023年的清华系具身智能机器人公司，以打造人形及具身智能机器人的"通用大脑"为核心目标。公司自研端到端具身大模型、灵巧手世界模型（LWM）、虚实融合数据平台（LDP）及开源VLA框架，并推出L系列人形机器人。2025年完成亿元级Pre-A/Pre-A+轮融资后，公司加速从技术验证迈向规模化商业落地，预计2026年全年营收1-2亿元。灵生科技因参与2026全国两会AI观察员、与智谱及腾讯云达成战略合作而获得广泛关注。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper"><table class="wikitable infotable">
+        <tr><th>项目</th><th>内容</th></tr>
+        <tr><td>公司全称</td><td>北京灵生科技有限公司</td></tr>
+        <tr><td>英文名称</td><td>LingSheng Tech / Beijing Lingsheng Technology Co., Ltd.</td></tr>
+        <tr><td>成立时间</td><td>2023年2月14日</td></tr>
+        <tr><td>注册地</td><td>北京市海淀区中关村</td></tr>
+        <tr><td>注册资本</td><td>50万元人民币</td></tr>
+        <tr><td>法定代表人</td><td>杨立来</td></tr>
+        <tr><td>实际控制人</td><td>杨洪兵（持股99.82%）</td></tr>
+        <tr><td>上市状态</td><td>未上市</td></tr>
+        <tr><td>官方网站</td><td>ls-robot.com</td></tr>
+        <tr><td>核心定位</td><td>人形及具身智能机器人通用大脑平台</td></tr>
+      </table></div>
+      <h4>发展沿革</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>时间</th><th>事件</th></tr>
+        <tr><td>2023年2月</td><td>公司成立，清华系团队创立</td></tr>
+        <tr><td>2024年10月</td><td>完成千万级天使轮融资（天容海色、万物为创投、夸克电力）</td></tr>
+        <tr><td>2025年9月</td><td>与鸿瑞达投资达成超亿元产投合作及订单；与腾讯云达成战略合作</td></tr>
+        <tr><td>2025年11月</td><td>与宁波方正（SZ.300998）产投合作，"北京研发+宁波制造"模式落地</td></tr>
+        <tr><td>2025年12月</td><td>完成亿元级Pre-A及Pre-A+轮融资；入驻清华大学具身智能实验室</td></tr>
+        <tr><td>2026年1月</td><td>亮相新疆国际春晚，机器人表演魔术与书法</td></tr>
+        <tr><td>2026年3月</td><td>联合智谱打造AI观察员，亮相全国两会报道，全网播放量2400万+</td></tr>
+        <tr><td>2026年4月</td><td>发布LivUMI万元级数据采集方案；开放数据集至Hugging Face平台</td></tr>
+        <tr><td>2026年4月</td><td>创始人披露2026年预计营收1-2亿元，数据交易规模同比增10倍</td></tr>
+      </table></div>
+
+      <h3 id="team">1.2 创始人及核心团队</h3>
+      <p>灵生科技创始团队核心成员多来自清华大学、西安交通大学、哈尔滨工业大学等顶尖院校及机器人产业头部企业，在AI、机器人感知与控制、多模态融合等领域拥有平均10年以上研发从业经验。创始人杨洪兵兼具"AI算法+机器人硬件"双栖背景，横跨智能与实体的复合履历在行业内极为稀缺。</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+        <tr><td>创始人/实际控制人</td><td>杨洪兵</td><td>清华大学毕业；曾于腾讯等互联网大厂担任高管，带领大规模产研团队完成AI及大模型产品研发与商业化落地；后担任某头部人形整机厂VP兼AGI负责人，具备人形与具身智能机器人批量交付经验；持股99.82%</td></tr>
+        <tr><td>法定代表人</td><td>杨立来</td><td>工商登记法定代表人</td></tr>
+        <tr><td>核心团队</td><td>清华/西交大/哈工大背景</td><td>团队成员来自清华大学、西安交大、哈工大等顶尖院校及机器人产业头部企业，覆盖AI算法、机器人控制、多模态融合等领域，平均10年以上研发经验</td></tr>
+      </table></div>
+      <p>团队人才结构属于<strong>学术派与产业派混合型</strong>：创始人为清华毕业的产业老兵，核心研发来自顶尖高校，整体兼具前沿学术视野和大规模产品化交付能力。公司目前处于早期扩张阶段，公开渠道未披露具体员工总数及研发人员占比。</p>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>轮次</th><th>时间</th><th>金额</th><th>主要投资方</th><th>用途</th></tr>
+        <tr><td>天使轮</td><td>2024年10月</td><td>千万级人民币</td><td>天容海色、万物为创投（朗科投资）、夸克电力</td><td>灵生类脑产品线研发</td></tr>
+        <tr><td>产投合作</td><td>2025年9月</td><td>超亿元（含订单）</td><td>鸿瑞达投资（鸿瑞集团）</td><td>矿产能源、景区服务、生产产线大规模部署机器人</td></tr>
+        <tr><td>Pre-A + Pre-A+</td><td>2025年12月</td><td>亿元级（两轮合计）</td><td>宁波方正（SZ.300998）领投，鸿瑞集团、万物为创投跟投</td><td>L系列规模化量产、LDP数据平台迭代、LWM世界模型迭代、生态拓展</td></tr>
+      </table></div>
+      <h4>股东结构</h4>
+      <p>实际控制人杨洪兵持股99.82%，拥有绝对控制权。产业投资方宁波方正（上市公司，精密制造领域）与鸿瑞集团（综合产业集团）以产投形式入股，既提供资金也输出制造产能和场景资源。万物为创投（朗科投资）作为早期财务投资方持续跟投。</p>
+      <p>公司尚未进行上市辅导或披露IPO计划。</p>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>技术维度</th><th>具体路线</th><th>说明</th></tr>
+        <tr><td>AI架构</td><td>端到端具身大模型 + VLA（视觉-语言-动作）</td><td>自研RealDualVLA异步框架，业内首个开源异步VLA；Ling Cybrain云-边-端一体化类脑系统</td></tr>
+        <tr><td>世界模型</td><td>LWM（LivWorld）灵巧手世界模型</td><td>被行业称为"具身Sora"，视频生成式预演+实时执行架构，将操作精度从0.05mm提升至±0.03mm</td></tr>
+        <tr><td>数据方案</td><td>LDP真实场景数采治理平台 + LivUMI硬件方案</td><td>"采-训-推"全链路闭环；万元级数据采集硬件，毫秒级多传感器同步；全民采集模式降低数据获取门槛</td></tr>
+        <tr><td>全栈/专用</td><td>通用大脑平台（本体不绑定）</td><td>模块化夹爪设计，适配主流机器人本体；不依赖特定硬件平台</td></tr>
+        <tr><td>开源策略</td><td>部分开源（RealDualVLA）</td><td>开源VLA框架吸引全球数千名开发者，沉淀1000+场景化技能包；数据集开放至Hugging Face</td></tr>
+        <tr><td>自研特色</td><td>多模态硬同步 + 高精度触觉感知</td><td>1ms级多传感器同步，空间定位精度3mm，末端夹爪检测0.1mm，灵巧手握力15N</td></tr>
+      </table></div>
+      <p>灵生科技的技术路线以<strong>"大脑优先、本体兼容"</strong>为特征。公司不追求从零自研机器人本体，而是聚焦于通用AI大脑（具身大模型/世界模型）的研发，通过模块化夹爪和标准化接口适配市场主流机器人本体。数据方面，公司采用"自采数据+全民采集+开源数据"三位一体策略，以LDP平台和万元级LivUMI硬件降低数据采集门槛，构建数据飞轮。</p>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <p>灵生科技产品矩阵覆盖"硬件机器人+数据平台+AI大脑"三个层次：</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>产品/平台</th><th>分类</th><th>核心参数</th><th>适用场景</th></tr>
+        <tr><td>L0 多功能人形机器人</td><td>轮式人形</td><td>26自由度，6自由度单臂，深度相机，麦克风阵列</td><td>轻量级工业操作、商业服务</td></tr>
+        <tr><td>L1 多功能人形机器人</td><td>轮式人形（升级版）</td><td>28自由度，身高1560mm，体重120kg，负载80-100kg，续航&gt;8h，升降行程1000mm，行走速度0.6-1.2m/s</td><td>3C制造、物流仓储、重型搬运</td></tr>
+        <tr><td>Ling Cybrain（类脑系统）</td><td>AI大脑平台</td><td>云-边-端一体化，本体使能层+动作执行层+技能规划层</td><td>跨本体部署，适配主流机器人</td></tr>
+        <tr><td>LDP数采治理平台</td><td>数据平台</td><td>数据采集→标注→质检→训练→推理全链路</td><td>机器人数据闭环、模型训练</td></tr>
+        <tr><td>LivUMI数据采集方案</td><td>数据硬件</td><td>万元级，1ms硬同步，空间定位3mm，夹爪检测0.1mm</td><td>低成本规模化数据采集</td></tr>
+        <tr><td>RealDualVLA</td><td>开源框架</td><td>异步视觉-语言-动作框架，1000+场景技能包</td><td>产学研协同、开发者生态</td></tr>
+        <tr><td>LWM（LivWorld）</td><td>世界模型</td><td>灵巧手操作预演与执行，精度±0.03mm</td><td>精细操作、动作泛化</td></tr>
+      </table></div>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>场景领域</th><th>细分方向</th><th>落地情况</th><th>合作方/客户</th></tr>
+        <tr><td>智能制造</td><td>3C电子、物流仓储、分拣搬运</td><td>已落地十余个标杆项目，工业场景任务成功率&gt;96%</td><td>制造业企业客户</td></tr>
+        <tr><td>商业服务</td><td>无人零售</td><td>已签约订单</td><td>零售业客户</td></tr>
+        <tr><td>医疗康养</td><td>康复辅助、康养服务</td><td>已签约订单</td><td>医疗机构客户</td></tr>
+        <tr><td>文旅</td><td>景区表演、AI茶艺师</td><td>西安大唐不夜城"长安十二时辰"落地</td><td>文旅景区</td></tr>
+        <tr><td>高校科研</td><td>教学设备、实验室平台</td><td>入驻清华大学具身智能实验室，成为核心教学设备</td><td>清华大学</td></tr>
+        <tr><td>能源矿产</td><td>矿产能源场景机器人部署</td><td>与鸿瑞集团签约，未来三年大规模部署</td><td>鸿瑞集团</td></tr>
+        <tr><td>媒体传播</td><td>两会报道、春晚表演</td><td>2026全国两会AI观察员（联合智谱）、新疆春晚魔术书法</td><td>央视、智谱华章</td></tr>
+      </table></div>
+      <p>场景合作方资源方面，灵生科技通过产业投资绑定场景：鸿瑞集团提供矿产能源和景区场景、宁波方正提供精密制造供应链、腾讯云提供算力基础设施、智谱提供大模型能力、清华大学提供学术资源和人才通道。</p>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <p>灵生科技目前处于<strong>从技术验证向规模化商业落地跃迁</strong>的关键阶段。主要商业化数据包括：</p>
+      <ul>
+        <li>2026年具身数据交易规模同比增长10倍，呈爆发式增长</li>
+        <li>预计2026年全年营收1-2亿元（创始人公开披露）</li>
+        <li>数据采集为当前主要收入来源之一，正推进"全民采集"模式</li>
+        <li>L系列人形机器人正推进规模化量产交付</li>
+        <li>与鸿瑞达投资达成超亿元产投合作及订单，未来三年在矿产能源、景区服务、生产产线大规模部署机器人</li>
+        <li>已与国内外多个头部厂商及央企签约订单</li>
+        <li>产品获得海外客户认可，工博会中不规则物品抓取误差&lt;0.5mm</li>
+      </ul>
+
+      <h3 id="financial">1.8 财务数据</h3>
+      <p>公司为非上市企业，尚未披露完整财务报告。以下是基于公开采访及融资信息的已知财务维度：</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>财务指标</th><th>2024年</th><th>2025年</th><th>2026年（预测）</th></tr>
+        <tr><td>营收</td><td>未披露（天使阶段）</td><td>未披露（Pre-A阶段）</td><td>1亿-2亿元（创始人预测）</td></tr>
+        <tr><td>融资总额</td><td>千万级（天使轮）</td><td>亿元级（Pre-A/Pre-A+ + 产投）</td><td>—</td></tr>
+        <tr><td>数据交易规模增长</td><td>—</td><td>—</td><td>同比增长10倍</td></tr>
+        <tr><td>账面现金</td><td colspan="3">尚未公开披露</td></tr>
+      </table></div>
+
+      <h3 id="others">1.9 其他信息</h3>
+      <ul>
+        <li>2026年政府工作报告连续两年提及"具身智能"，被列为重点培育未来产业，灵生科技作为海淀区代表企业受益于政策红利</li>
+        <li>德州市委书记田卫东2025年12月赴京招商，与杨洪兵座谈推动地企合作</li>
+        <li>公司机器人参与2026机器人马拉松担任赛事服务官</li>
+        <li>RealDualVLA开源框架发布三个月吸引全球数千名开发者入驻，沉淀1000余个场景化技能包</li>
+        <li>LivUMI数据集已开放至Hugging Face平台</li>
+        <li>公司以"北京研发+宁波制造"双城模式布局，利用宁波方正的精密制造产能降低量产成本</li>
+        <li>北京市海淀区政府官网及北京市科委多次以灵生科技为例报道区内具身智能产业发展</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="analysis-1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>杨洪兵的"清华学术+腾讯AI产品+头部人形整机厂VP"三位一体背景，为灵生科技的场景选择提供了天然支撑。腾讯系的产品化和商业化经验使公司快速理解"什么样的场景需要什么样的机器人"，而非从纯学术出发定义产品。其人形整机厂AGI负责人经历则确保了对机器人硬件量产痛点的深刻认知。灵生科技选取的"3C制造+物流仓储+文旅"场景矩阵体现了务实策略——既非纯C端消费（需要极致的成本控制和品牌营销），也非重工业（需要更长的安全认证周期），而是处于当前人形机器人技术能力"够得到但又有商业价值"的交叉地带。团队选择从数据采集作为早期变现手段（数据交易同比增长10倍），也说明创始人的产品商业化直觉：在行业缺乏标准化数据的阶段，"卖铲子"比直接"挖金子"更具确定性的收益。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>灵生科技"大脑优先、本体兼容"的技术路线与其多场景铺开的商业策略高度适配。选择不绑定特定机器人本体，使其Ling Cybrain系统和LWM世界模型可跨本体部署，避免了"先有鸡还是先有蛋"的困境——本体厂商也可以成为客户而非竞争对手。LWM灵巧手世界模型的定位聚焦"精细操作"这一当前人形机器人最薄弱环节，而非追求全运动能力（行走、奔跑等），体现了对技术成熟度的清醒判断。万元级LivUMI数据采集方案的发布更是直接切中行业痛点：具身智能公司普遍受困于高质量操作数据匮乏，而传统数据采集方案成本高昂。不过，公司同时铺开智能制造、文旅、医疗、零售等多个场景，可能面临技术资源分散的风险——每个场景的"最后一公里"调优都需要大量工程投入。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>杨洪兵持股99.82%的绝对控股结构赋予公司极高的战略自主性，避免被单一产业资本绑架方向。但产业投资方的引入已经开始塑造公司的发展轨迹：宁波方正的参股直接绑定了精密制造产能和供应链资源（"北京研发+宁波制造"），使公司在量产阶段拥有比纯算法公司更强的落地能力；鸿瑞集团的投资附带了矿产能源、景区服务等场景的订单承诺，实质上是"以投资换场景"。腾讯云的合作虽非股权投资，但提供了GPU算力和云-边-端架构基础设施。值得注意的是，投资方中没有典型的纯财务VC（如红杉、高瓴等），说明灵生科技更倾向于引入能带来产业资源的战略投资者，而非单纯追求估值。这一结构在早期有助于加速产品-市场匹配，但长期可能限制场景独立性和估值弹性。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>从公开信息看，灵生科技的路径调整主要体现在产品线扩展和数据战略升级上。早期以L0轮式人形机器人和灵生类脑系统（Ling Cybrain）为核心产品，主打"通用大脑赋能本体"的定位。2025年下半年后，公司明显加大了数据侧的投入，将LDP平台从内部工具升级为对外服务产品，并于2026年4月推出独立的硬件产品LivUMI。这一调整的逻辑是：在行业普遍缺乏高质量操作数据的背景下，与其等待数据生态自然成熟，不如主动构建数据基础设施并从中获利。创始人杨洪兵关于"数据交易同比增长10倍"的表态表明这一战略已初见成效——灵生科技正从"机器人公司"部分转向"机器人数据基础设施公司"。此外，L0到L1的升级（从26自由度到28自由度，新增升降和腰部自由度）也反映了从"能用"到"好用"的产品迭代思路。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>灵生科技的竞争定位可概括为"大脑平台+数据基础设施"的双轮驱动策略，与行业内的本体全栈路线（如智元机器人）、纯本体路线（如宇树科技）、纯大脑路线（如Physical Intelligence）均形成差异化。公司的核心取舍是：<strong>不做全栈自研本体，而是做"通用大脑+普惠数据方案"的赋能者</strong>。这一策略类似Android之于手机行业——不做手机但赋能所有手机厂商。灵生科技开源RealDualVLA、开放数据集、模块化适配主流本体的动作，都在强化这一定位。相较于全栈玩家，灵生科技在硬件成本控制和量产经验上不占优势，但在AI能力开放性和数据生态构建上更具想象空间。不过，从L0/L1两款自研机器人来看，公司并未完全放弃本体，而是采取了"自研本体验证大脑+开放平台服务行业"的并行策略。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-6">
+        <h4>2.6 其他重要观察</h4>
+        <p>灵生科技最为突出的特点是其品牌和公共传播能力。从2026年新疆春晚魔术表演，到全国两会联合智谱打造AI观察员（全网播放量2400万+），再到唐不夜城茶艺师、机器人马拉松服务官，公司在2026年上半年密集完成了一系列高曝光事件。这在具身智能创业公司中十分少见，大多数同行仍专注于技术打磨和B端客户拓展。这一策略的优势是快速建立公众认知、吸引政策关注（海淀区政府多次以灵生科技为典型案例报道），但也有风险——如果产品实际交付能力跟不上品牌叙事，可能造成期望落差。另一个值得关注的点是"全民采集"模式的潜力：让普通工人穿戴采集设备完成数据采集，若规模化成功，可能成为具身数据领域的颠覆性方案。该模式能否解决数据质量一致性和隐私合规问题，将是下一步的关键观察点。</p>
+      </div>
+
+      <h2 id="refs">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://finance.eastmoney.com/a/202604293725124440.html" target="_blank">灵生科技创始人杨洪兵：公司具身数据交易规模爆发式增长，预计今年实现营收1亿—2亿元 — 东方财富</a></li>
+          <li><a href="https://invest.beijing.gov.cn/tcgz/mjtz/202604/t20260407_4575567.html" target="_blank">海淀企业灵生科技发布数据采集新方案LivUMI — 北京市投资促进服务中心</a></li>
+          <li><a href="https://kw.beijing.gov.cn/xwdt/kcyx/xwdtyqqy/202512/t20251211_4335580.html" target="_blank">具身智能机器人公司灵生科技完成亿元融资 — 北京市科委</a></li>
+          <li><a href="https://36kr.com/p/3585493555952768" target="_blank">36氪首发｜「灵生科技」完成亿元融资，系清华系具身智能机器人公司 — 36氪</a></li>
+          <li><a href="https://www.bbtnews.com.cn/2025/1208/577938.shtml" target="_blank">具身智能机器人公司灵生科技完成亿元融资 — 北京商报</a></li>
+          <li><a href="https://m.pedaily.cn/news/558292" target="_blank">清华系团队创立，灵生科技完成Pre-A、Pre-A+两轮亿元融资 — 投资界</a></li>
+          <li><a href="https://vc.pedaily.cn/company/711305.html" target="_blank">灵生科技 — 投资界公司页</a></li>
+          <li><a href="https://news.bjd.com.cn/2026/03/09/11621311.shtml" target="_blank">具身智能赋能两会报道 人形机器人创新应用实现新突破 — 北京日报</a></li>
+          <li><a href="https://www.bjhdnet.cn/wap/xwbd/5302246/index.html" target="_blank">海淀机器人搭档央视评论员 全国两会报道迎来"具身智能"新面孔 — 海淀网</a></li>
+          <li><a href="https://www.thepaper.cn/newsDetail_forward_29190802" target="_blank">灵生科技天使轮融资千万，创始人曾任腾讯系高管 — 澎湃新闻</a></li>
+          <li><a href="https://www.163.com/dy/article/JFJ047LT05198R3E.html" target="_blank">灵生科技获千万级天使轮融资，创始人来自清华 — 网易</a></li>
+          <li><a href="https://www.sohu.com/a/821091447_114778" target="_blank">「灵生科技」获千万级天使轮融资 — 搜狐/36氪</a></li>
+          <li><a href="https://m.jiemian.com/article/13695231.html" target="_blank">灵生科技与宁波方正联手，产投合作重塑具身智能价值链 — 界面新闻</a></li>
+          <li><a href="http://new.chinareports.org.cn/index/index/news/63092.html" target="_blank">灵生科技与宁波方正联手 — 中国报道</a></li>
+          <li><a href="https://news.10jqka.com.cn/20251128/c672834004.shtml" target="_blank">宁波方正牵手灵生科技 — 同花顺</a></li>
+          <li><a href="http://ex.chinadaily.com.cn/exchange/partners/82/rss/channel/cn/columns/sz8srm/stories/WS68cbc18ba310f07257749303.html" target="_blank">灵生科技与腾讯云达成战略合作 — 中国日报</a></li>
+          <li><a href="https://www.horeal.com/a/2645.html" target="_blank">鸿瑞达投资与灵生科技达成超亿元产投合作及订单 — 鸿瑞集团</a></li>
+          <li><a href="https://www.leaderobot.com/news/7343" target="_blank">从春晚到亮相两会：这家机器人凭什么再次出圈？ — 立德机器人</a></li>
+          <li><a href="https://www.leaderobot.com/news/7028" target="_blank">加速具身智能量产落地，灵生科技完成亿元融资 — 立德机器人</a></li>
+          <li><a href="https://www.worldrobotconference.com/expo/company/422.html" target="_blank">北京灵生科技有限公司 — 世界机器人大会</a></li>
+          <li><a href="https://36kr.com/newsflashes/3750612021723909" target="_blank">灵生科技发布LivUMI数据采集方案 — 36氪快讯</a></li>
+          <li><a href="https://m.hexun.com/news/2026-04-04/223943034.html" target="_blank">GEN-1 带火无本体数据，灵生开放 LivUMI数据集样例 — 和讯</a></li>
+          <li><a href="https://www.aibangbots.com/a/5896" target="_blank">灵生科技与宁波方正联手 — 爱帮机器人</a></li>
+          <li><a href="https://www.zidonghua.com.cn/news/program/84988.html" target="_blank">机器人马拉松开跑，灵生机器人化身服务官 — 中国自动化网</a></li>
+          <li><a href="https://agent.ren/2026/0108/4367.shtml" target="_blank">灵生科技获亿元融资，加速具身智能量产进程 — Agent.ren</a></li>
+        </ol>
+      </div>
+
+      <div class="page-footer">
+        <p>本页面最后更新于2026年5月 · 具身智能Wiki · 内容基于公开信息整理</p>
+      </div>
+    </article>
+  </div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>清宝机器人 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> <span class="breadcrumb-sep">›</span> <span>清宝机器人</span></div>
+  <div class="wiki-header">
+    <h1>清宝机器人</h1>
+    <div class="subtitle">上海清宝引擎机器人有限公司 · 成立2022年 · 上海 · Pre-A+轮 · 2025年销售额突破5000万元</div>
+  </div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 公司基本信息</a></li>
+        <li class="toc-lvl3"><a href="#team">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financial">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#analysis-1">2.1 团队背景与场景选择匹配度</a></li>
+        <li class="toc-lvl4"><a href="#analysis-2">2.2 技术路线与场景适配性</a></li>
+        <li class="toc-lvl4"><a href="#analysis-3">2.3 股东/资本结构对战略的影响</a></li>
+        <li class="toc-lvl4"><a href="#analysis-4">2.4 试错过程与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#analysis-5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#analysis-6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#references">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">清宝机器人</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">上海清宝引擎机器人有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2022年8月26日</div></div>
+        <div class="ib-row"><div class="ib-label">注册地</div><div class="ib-value">上海市宝山区上大路668号</div></div>
+        <div class="ib-row"><div class="ib-label">法定代表人</div><div class="ib-value">徐丹（工商）/王磊（实控）</div></div>
+        <div class="ib-row"><div class="ib-label">注册资本</div><div class="ib-value">2229.79万元</div></div>
+        <div class="ib-row"><div class="ib-label">创始人/CEO</div><div class="ib-value">王磊</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">2025年销售额</div><div class="ib-value">突破5000万元</div></div>
+        <div class="ib-row"><div class="ib-label">2025H1营收</div><div class="ib-value">314万元</div></div>
+        <div class="ib-row"><div class="ib-label">净资产</div><div class="ib-value">-569.8万元（2025H1）</div></div>
+        <div class="ib-row"><div class="ib-label">专利</div><div class="ib-value">52项（发明28项）</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">赛道</div><div class="ib-value">人形机器人</div></div>
+        <div class="ib-row"><div class="ib-label">技术特色</div><div class="ib-value">微表情系统/拟人化交互</div></div>
+        <div class="ib-row"><div class="ib-label">地区</div><div class="ib-value">上海/成都</div></div>
+        <div class="ib-section">官网</div>
+        <div class="ib-row"><div class="ib-label">官网</div><div class="ib-value">信息未公开</div></div>
+      </aside>
+
+      <p class="article-intro"><strong>清宝机器人</strong>（全称上海清宝引擎机器人有限公司），是一家由清华大学团队创立的人形机器人研发与商业化企业。公司成立于2022年8月，总部位于上海宝山，由前西门子研发工程师、前新时达集团副总裁王磊创办。清宝机器人以"拟人化"为技术核心差异化，自研19自由度微表情系统与柔性运动控制技术，覆盖文旅导览、教育科研、工业制造、直播电商等多元场景。公司2025年5个月内完成两轮数千万元融资，累计落地场景超200个，2025年全年销售额突破5000万元，并设立西南总部布局"一带一路"海外市场。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper">
+        <table class="wikitable infotable">
+          <tr><th>项目</th><th>内容</th></tr>
+          <tr><td>公司全称</td><td>上海清宝引擎机器人有限公司</td></tr>
+          <tr><td>成立时间</td><td>2022年8月26日（团队前身2019年起运作）</td></tr>
+          <tr><td>注册地</td><td>上海市宝山区上大路668号1幢5层B区</td></tr>
+          <tr><td>总部</td><td>上海市浦东新区张江机器人谷</td></tr>
+          <tr><td>注册资本</td><td>2229.79万元人民币</td></tr>
+          <tr><td>法定代表人</td><td>徐丹（工商登记）；王磊（实际控制人/董事长/总经理）</td></tr>
+          <tr><td>上市状态</td><td>未上市</td></tr>
+        </table>
+      </div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>时间</th><th>事件</th></tr>
+          <tr><td>2019年</td><td>团队前身开始运作，王磊从新时达离职后启动人形机器人创业</td></tr>
+          <tr><td>2022年8月</td><td>上海清宝引擎机器人有限公司正式注册成立</td></tr>
+          <tr><td>2025年3月</td><td>完成数千万元Pre-A轮融资，汉理资本独家投资</td></tr>
+          <tr><td>2025年6月</td><td>西南总部落户四川天府新区，辐射"一带一路"市场</td></tr>
+          <tr><td>2025年8月</td><td>世界机器人大会发布全球首个19自由度共情头部系统</td></tr>
+          <tr><td>2025年9月</td><td>完成数千万元Pre-A+轮融资，浙江德创领投，宝山技术跟投（5个月内两轮）</td></tr>
+          <tr><td>2025年10月</td><td>与明新旭腾（605068）合资设立"旭清灵动"，聚焦灵巧手研发制造</td></tr>
+          <tr><td>2025年全年</td><td>销售额突破5000万元，中标华南700万元订单，年底收到1000台意向订单</td></tr>
+          <tr><td>2026年1月</td><td>宣布产能扩张为2026年核心战略，第二条自动化产线安装中</td></tr>
+        </table>
+      </div>
+
+      <h3 id="team">1.2 创始人及核心团队</h3>
+      <p>清宝机器人由清华系技术与管理人才组成核心团队，呈现出"学术领军+产业经验"的混合型人才结构。创始人王磊兼具清华学术背景与上市公司高管经历，为公司提供了技术与商业的双轮驱动力。</p>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+          <tr><td>创始人/CEO/董事长</td><td>王磊</td><td>清华大学电子工程系学士、经管硕士、领军工程博士（大模型与具身智能方向）。前西门子研发工程师，前A股上市公司上海新时达电气集团副总裁，深耕工业自动化与机器人领域多年。2021年创立清宝机器人，导师包括清华沈阳教授、王生进教授。</td></tr>
+          <tr><td>联合创始人</td><td>沈阳</td><td>清华大学人工智能学院与新闻学院双聘教授，AI大模型领域专家，为公司大模型与交互智能方向提供学术支撑。</td></tr>
+          <tr><td>首席科学家</td><td>王生进</td><td>清华大学电子工程系长聘教授、博士生导师，国家科技进步二等奖获得者，在计算机视觉与模式识别领域有深厚积累。</td></tr>
+          <tr><td>董事</td><td>钱学锋</td><td>汉理资本董事长、耶鲁大学博士，Pre-A轮领投方代表，为公司提供资本战略与全球资源对接。</td></tr>
+          <tr><td>软件算法负责人</td><td>罗志竞</td><td>电子科技大学硕士，专注表情捕捉、动作克隆、灵巧手控制等核心算法研发。</td></tr>
+        </table>
+      </div>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <h4>融资历史</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>轮次</th><th>时间</th><th>金额</th><th>投资方</th></tr>
+          <tr><td>Pre-A轮</td><td>2025年3月</td><td>数千万元</td><td>汉理资本（独家）</td></tr>
+          <tr><td>Pre-A+轮</td><td>2025年9月</td><td>数千万元</td><td>浙江德创企业管理有限公司（领投），宝山技术跟投</td></tr>
+        </table>
+      </div>
+      <p>公司5个月内完成两轮融资闭环，成为人形机器人赛道融资速度最快的企业之一。此外，2025年10月与上市公司明新旭腾（605068）共同出资设立合资公司"旭清灵动（上海）具身智能科技有限公司"，注册资本1200万元（明新旭腾现金出资780万元占65%，清宝以知识产权出资420万元占35%），专注灵巧手设计制造。</p>
+      <p>公司目前未上市，创始人王磊曾提及计划推进Pre-IPO，但截至2026年5月尚无明确上市时间表或申报记录。</p>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>技术维度</th><th>具体路线</th></tr>
+          <tr><td>总体AI架构</td><td>成长型AI大模型——多任务泛化认知引擎，机器人可从环境中学习并自主优化服务流程，实现"有记忆的服务体验"；云端大脑+边缘计算协同系统</td></tr>
+          <tr><td>微表情系统</td><td>全球首个19自由度共情头部系统，语音驱动算法生成高拟真情绪化表情；支持微表情识别、语境分析和情感共鸣；2025年世界机器人大会发布</td></tr>
+          <tr><td>运动控制</td><td>独创FOC算法与柔性关节执行器技术；双足行走系统支持多地形自主导航；工业6轴柔性关节精度达0.02mm（比行业平均提升30%）</td></tr>
+          <tr><td>灵巧手</td><td>多自由度驱动+触觉感知，通过与明新旭腾合资加速产业化；明新旭腾同时布局仿生电子皮肤与轻量化材料</td></tr>
+          <tr><td>数据方案</td><td>200+真实场景、超10亿条场景数据积累，场景数据壁垒形成正向循环</td></tr>
+          <tr><td>自研程度</td><td>全栈自研——从微表情、运动控制到AI大模型均为自主开发；硬件采用"自主设计+多供应商制造"模式，单台成本较竞品降低40-60%</td></tr>
+          <tr><td>知识产权</td><td>52项专利（其中发明专利28项）</td></tr>
+        </table>
+      </div>
+      <p>清宝机器人的技术路线以"拟人化"为核心标签：在行业普遍聚焦"能干活"的背景下，清宝另辟蹊径，将情感交互和拟人化表现作为技术壁垒，通过19自由度微表情系统和FOC柔性运动控制实现高度类人的交互体验。</p>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>产品</th><th>目标场景</th><th>关键参数/特点</th></tr>
+          <tr><td>清宝文旅版</td><td>景区、商业综合体、博物馆</td><td>身高1.6m，亲和力外观设计；方言讲解、舞蹈表演、AR导览功能</td></tr>
+          <tr><td>清宝教创版</td><td>中小学/高校</td><td>编程教学模块、AR教学模块、项目式学习支持；已落地全国200+所学校</td></tr>
+          <tr><td>清宝工业版</td><td>汽车制造、产线装配</td><td>IP65防护等级，碰撞检测，6轴柔性关节精度0.02mm；防爆防尘设计</td></tr>
+          <tr><td>IP卡通机器人</td><td>电商直播、连锁咖啡、酒店</td><td>拟人化外观与交互，支持直播带货；单场直播最高观看170万人次</td></tr>
+          <tr><td>自动驾驶座舱测试系统</td><td>汽车行业</td><td>全球首个，7x24小时自动化测试（DMS/语音/触控验证）；客户包括理想汽车</td></tr>
+          <tr><td>家庭陪伴机器人</td><td>儿童教育/家庭互动</td><td>计划2026年上市，聚焦C端家庭场景</td></tr>
+          <tr><td>轻量化工业机器人</td><td>中小企业制造</td><td>定价5万元以内，面向中小制造企业降本需求</td></tr>
+        </table>
+      </div>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>场景分类</th><th>具体场景</th><th>落地状态</th><th>代表客户/合作方</th></tr>
+          <tr><td>文旅商业</td><td>景区导览、博物馆讲解、商业综合体接待、展会演出</td><td>已落地运营</td><td>国内多个文旅景区、迪拜文旅集团</td></tr>
+          <tr><td>教育科研</td><td>AI编程教学、机器人实验平台、高校科研合作</td><td>已落地200+所学校</td><td>清华大学、全国中小学</td></tr>
+          <tr><td>汽车工业</td><td>智能座舱测试、产线装配、车载人机交互验证</td><td>已交付</td><td>理想汽车</td></tr>
+          <tr><td>直播电商</td><td>电商直播带货、品牌互动营销</td><td>已运营</td><td>自营直播账号（场均10万+曝光）</td></tr>
+          <tr><td>酒店交通</td><td>自助入住办理、交通枢纽问询、客服引导</td><td>已落地</td><td>连锁酒店、机场等</td></tr>
+          <tr><td>医疗养老</td><td>医院陪护、养老助老、精准搀扶</td><td>试点推广中</td><td>医疗机构</td></tr>
+          <tr><td>海外市场</td><td>文旅出口、一带一路国家定制</td><td>已出口</td><td>韩国、印度、柬埔寨、迪拜</td></tr>
+        </table>
+      </div>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <p>清宝机器人是人形机器人赛道中商业化落地速度较快的企业之一，已形成相当规模的场景覆盖：</p>
+      <ul>
+        <li><strong>场景覆盖</strong>：累计落地200+真实场景，涵盖文旅、教育、工业、商业、交通等多元领域。</li>
+        <li><strong>订单与营收</strong>：2025年上半年订单量同比增长4-10倍（不同口径），2025年全年销售额突破5000万元；下半年中标华南700万元订单，年底收到1000台人形机器人意向订单。</li>
+        <li><strong>海外出口</strong>：已出口至韩国、印度、柬埔寨等国家，通过西南总部辐射"一带一路"市场；已完成迪拜文旅集团对接，输出"机器人+文旅"模式。</li>
+        <li><strong>直播验证</strong>：自营"清宝机器人"直播账号，单场最高观看170万人次，场均曝光10万+，验证了机器人在C端内容场景的商业潜力。</li>
+        <li><strong>产能扩张</strong>：2026年第二条自动化产线安装中，为大规模订单做准备。</li>
+        <li><strong>央视曝光</strong>：产品三次登上央视报道，品牌知名度持续提升。</li>
+      </ul>
+
+      <h3 id="financial">1.8 财务数据</h3>
+      <p>以下财务数据综合自明新旭腾（605068）2025年10月合资公告中披露的清宝机器人审计数据，以及创始人王磊在媒体采访中的公开表述：</p>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>指标</th><th>2025年1-6月</th><th>2025年全年（估算）</th></tr>
+          <tr><td>营业收入</td><td>314.34万元</td><td>突破5000万元（创始人披露）</td></tr>
+          <tr><td>净利润</td><td>-813.09万元</td><td>—</td></tr>
+          <tr><td>总资产</td><td>1081万元</td><td>—</td></tr>
+          <tr><td>总负债</td><td>1651万元</td><td>—</td></tr>
+          <tr><td>净资产</td><td>-569.80万元</td><td>—</td></tr>
+          <tr><td>资产负债率</td><td>152.70%</td><td>—</td></tr>
+        </table>
+      </div>
+      <div class="callout">
+        <div class="callout-title">财务提示</div>
+        <p>清宝机器人2025年上半年仍处于亏损状态，净资产为负。全年销售额5000万元的数据为创始人公开表述，未经审计。上半年度仅314万元营收与全年5000万元的差距暗示下半年营收爆发式增长，可能与订单集中交付有关。公司资产负债率较高，需关注其后续融资能力与现金流状况。</p>
+      </div>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>清宝机器人定位"不做全能型机器人，做场景专家"，以文旅、教育等情感刚需场景切入，避免与工业机器人巨头正面竞争。</li>
+        <li>创始人王磊强调"不做实验室花瓶"理念——先找到真实需求场景，再反向定义产品形态，"场景驱动技术，技术反哺场景"。</li>
+        <li>公司通过汉理资本的A轮学堂（培训+陪跑+投资三位一体）获得资本与全球资源赋能，包括迪拜考察、中东市场拓展等。</li>
+        <li>华扬联众参与投资清宝母公司——上海清芸机器人有限公司，双方在文旅场景推广方面深度合作。</li>
+        <li>江苏长河投资有限公司与清宝签约批量采购数百台机器人用于商业服务场景落地。</li>
+        <li>机器人支持泰语、马来语等6种语言，适配东南亚及"一带一路"市场。</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="analysis-1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>清宝机器人的创始团队呈现出"清华学术+产业高管"的独特组合。王磊在西门子的研发经历赋予了工程落地能力，新时达集团VP的产业背景则提供了对工业自动化市场需求的深刻理解。然而，公司实际选择的核心场景——文旅导览、教育科研、直播电商——并非王磊传统工业自动化经验最直接的延伸领域。这种看似"错配"的选择实际上体现了一种务实的创业逻辑：工业场景对人形机器人的作业精度和可靠性要求极高，而文旅/教育等场景对"拟人化"交互的需求远大于对作业精度的要求，降低了商业化门槛。清华沈阳教授（大模型方向）和王生进教授（视觉方向）的学术资源则为公司的情感交互和AI能力提供了补强，使"场景专家"定位得以落地。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>清宝选择的"拟人化"技术路线——以19自由度微表情系统、FOC柔性运动控制和情感交互大模型为核心——与其文旅/教育/直播场景高度匹配。这些场景的核心价值在于"体验"而非"效率"，微表情和拟人化交互直接提升了用户的情感连接，这是工业机器人所不需要的能力。但在工业场景端，清宝工业版强调的是IP65防护、碰撞检测和0.02mm精度——与微表情系统几乎无关。这种"一套技术底座支撑两类场景"的模式存在内在张力：情感交互和工业精度两个技术方向需要的研发资源差异较大，同时推进可能造成资源分散。公司的解决策略似乎是让情感交互能力成为品牌标签，用文旅/教育场景创造现金流，再逐步渗透工业场景。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>清宝当前的股东结构以创始团队+财务投资者为主，缺少产业端战略投资者（如车企、文旅集团等）。汉理资本作为Pre-A轮领投方，其A轮学堂体系提供了资本之外的全链条赋能（培训、资源对接、海外拓展），但本质上仍是财务投资者逻辑。Pre-A+轮引入的浙江德创虽有一定产业背景（庄君新为明新旭腾实际控制人），但更多通过合资公司形式实现产业协同。公司与明新旭腾的合资（旭清灵动）是向产业链上游（灵巧手）延伸的尝试，这一纵向整合策略有助于降低核心零部件成本，但在产业链位置选择上——做灵巧手而非直接绑定下游场景方——体现出公司更倾向于"技术壁垒构建"而非"场景独占"的战略意图。缺少产业资本深度绑定既是风险（场景资源不稳固），也是灵活性（可多场景并行试错）。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>清宝的路径调整逻辑清晰可见：从最早的"全场景通用"设想到"场景专家"再聚焦，从纯B端到"C端内容验证"。公司早期产品线较为分散（文旅、工业、教育、直播、座舱测试同时推进），但2025年下半年开始显现收敛迹象——文旅和教育成为营收主力场景，工业场景通过合资形式（明新旭腾）寻求产业协同而非独立突破。直播电商的自营验证（170万单场观看）是一次低成本、高杠杆的C端触达实验，如果成功可开辟全新的D2C商业模式。海外从迪拜文旅切入而非制造业大国的策略，也体现了"先易后难"的务实路径选择。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>清宝机器人的核心定位取舍是：<strong>做"iPod"式的场景专用精品，而非"iPhone"式的通用平台</strong>。在宇树、智元、银河通用等头部玩家数百亿估值、十亿级融资的重压下，清宝选择了"小切口、深场景"的差异化策略——以拟人化交互能力为护城河，先占领文旅/教育/直播等对"亲和力"有刚需的细分市场。这一取舍的合理性在于：文旅场景对情感交互的需求是真实且可持续的，且与工业机器人巨头的主攻方向形成错位。风险在于：文旅/教育场景的市场天花板可能远低于工业场景，如果核心场景规模不足以支撑公司长期增长，清宝将面临"差异化有余、规模不足"的困境。2025年5000万元销售额虽增长迅猛，但与头部企业十亿级营收仍有数量级差距。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-6">
+        <h4>2.6 其他重要观察</h4>
+        <p>三个关键变量值得持续关注。其一，<strong>C端直播电商的验证结果</strong>——清宝自营直播账号已证明机器人可以成为内容IP，如果沿此路径发展出机器人MCN/直播电商服务模式，可能开辟全新收入曲线。其二，<strong>与明新旭腾合资的灵巧手业务</strong>能否独立商业化——如果旭清灵动的灵巧手能对外销售，清宝将从"本体厂商"延伸为"核心零部件供应商"，显著拓宽收入来源。其三，<strong>资产负债率152.7%的财务风险</strong>——净资产为负意味着公司高度依赖外部融资维持运营，在人形机器人资本热度可能波动的背景下，资金链韧性是最需关注的生存风险。总体而言，清宝以"拟人化"破局的差异化策略在文旅等场景已获得初步验证，但能否在资本效率上跑赢行业烧钱速度，将决定其能否穿越人形机器人的淘汰赛阶段。</p>
+      </div>
+
+      <h2 id="references">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://vc.pedaily.cn/company/715477.html">清宝机器人 — 投资界公司页</a></li>
+          <li><a href="https://media.qimingpian.cn/2025/03/25/a9e17cc30bb3d7aa54889c838b791228.html">汉理资本携手清宝机器人：以科技赋能未来 — 企名片（2025-03-25）</a></li>
+          <li><a href="https://www.innohere.com/information/299118.html">对话清宝机器人创始人王磊：以场景为核 — 人工智能圈子汇</a></li>
+          <li><a href="https://startup.aliyun.com/info/1093176.html">清宝机器人完成数千万元Pre-A轮融资 — 阿里云创业（2025-03）</a></li>
+          <li><a href="https://www.innohere.com/information/298127.html">重磅！清宝机器人再获数千万融资，5个月内完成两轮融资</a></li>
+          <li><a href="https://www.stcn.com/article/detail/3391555.html">明新旭腾参设合资公司布局人形机器人赛道 — 证券时报（2025-10）</a></li>
+          <li><a href="https://epaper.cs.com.cn/zgzqb/html/2025-10/22/nw.D110000zgzqb_20251022_2-B027.htm">明新旭腾关于与关联方共同投资设立合资公司的补充公告 — 中国证券报（2025-10-22）</a></li>
+          <li><a href="https://epaper.zqrb.cn/html/2026-01/22/content_1214806.htm">人形机器人企业积极规划产能扩张 — 证券日报（2026-01-22）</a></li>
+          <li><a href="https://sichuan.scol.com.cn/m/ggxw/202506/83073009.html">清宝机器人西南总部落户天府新区 — 四川在线（2025-06）</a></li>
+          <li><a href="https://www.x-techcon.com/article/52762.html">5个月连获两轮数千万级融资！订单暴涨4倍！ — 先进技术观察</a></li>
+          <li><a href="https://pitchhub.36kr.com/project/3227462078666888">清宝机器人 | 项目信息 — 36氪</a></li>
+          <li><a href="https://www.163.com/dy/article/JRR7DUNT05119596.html">上海新增一家融资成功的公司，汉理资本独家投资 — 网易（2025-03）</a></li>
+          <li><a href="https://www.sohu.com/a/935149146_489960">5个月完成两轮大额融资！25Q2订单量暴涨4倍 — 搜狐</a></li>
+          <li><a href="https://finance.eastmoney.com/a/202508113480731516.html">中国机器人"真干活"产业链条延伸"出海"在提速 — 东方财富（2025-08-11）</a></li>
+          <li><a href="http://epaper.zqrb.cn/html/2025-08/11/content_1171227.htm">中国机器人"真干活"产业链延伸 — 证券日报（2025-08-11）</a></li>
+          <li><a href="https://baijiahao.baidu.com/s?id=1821182691127128963">华扬联众：商业AI机器人赋能智慧文旅大产业 — 百家号</a></li>
+          <li><a href="https://share.shkp.org.cn/articles/2025/10/wx531224.html">上海清宝与明新旭腾（605068）合资设立公司 — 上海科创板报（2025-10）</a></li>
+          <li><a href="https://m.qixin.com/company/4fb8189b-eefc-4558-991c-5279d4bd818f">上海清宝引擎机器人有限公司 — 启信宝</a></li>
+          <li><a href="https://cbgc.scol.com.cn/news/6451245">清宝机器人西南总部落户天府新区 — 川观新闻（2025-06）</a></li>
+          <li><a href="https://cob.sufe.edu.cn/iMBA/Detail/26343">AI Robots: A Force for Good——2025上财iMBA行动学习走进清宝 — 上海财经大学</a></li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">本页面最后更新于2026年5月4日 · 信息来源截至各参考链接标注日期 · 具身智能Wiki</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body>
+</html>

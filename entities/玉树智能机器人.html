@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>玉树智能机器人 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style></head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> › <span>玉树智能机器人</span></div>
+  <div class="wiki-header"><h1>玉树智能机器人</h1><div class="subtitle">玉禾田(300815)旗下 · 2025年成立 · 智元机器人5%入股 · 智慧环卫+具身智能</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#team">1.2 核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financial">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#a1">2.1 团队背景与场景选择</a></li>
+        <li class="toc-lvl4"><a href="#a2">2.2 技术路线与场景适配</a></li>
+        <li class="toc-lvl4"><a href="#a3">2.3 股东资本对战略影响</a></li>
+        <li class="toc-lvl4"><a href="#a4">2.4 试错与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#a5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#a6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#refs">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">玉树智能机器人</div>
+        <div class="ib-row"><div class="ib-label">成立</div><div class="ib-value">2025年3月</div></div>
+        <div class="ib-row"><div class="ib-label">母公司</div><div class="ib-value">玉禾田(300815)</div></div>
+        <div class="ib-row"><div class="ib-label">注册资本</div><div class="ib-value">5263万元</div></div>
+        <div class="ib-row"><div class="ib-label">法定代表人</div><div class="ib-value">杨波</div></div>
+        <div class="ib-row"><div class="ib-label">董事长</div><div class="ib-value">周平</div></div>
+        <div class="ib-section">股东结构</div>
+        <div class="ib-row"><div class="ib-label">控股方</div><div class="ib-value">玉禾田集团</div></div>
+        <div class="ib-row"><div class="ib-label">战略股东</div><div class="ib-value">智元机器人(5%)</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">产业园投资</div><div class="ib-value">18亿元(兰州)</div></div>
+        <div class="ib-row"><div class="ib-label">智元出资</div><div class="ib-value">263万元</div></div>
+        <div class="ib-row"><div class="ib-label">中标项目</div><div class="ib-value">中国移动7800万元</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">赛道</div><div class="ib-value"><span class="tag tag-info">环卫机器人</span> <span class="tag tag-info">具身智能</span></div></div>
+        <div class="ib-row"><div class="ib-label">阶段</div><div class="ib-value"><span class="tag tag-warn">成长期</span></div></div>
+      </aside>
+
+      <p class="article-intro"><strong>玉树智能机器人</strong>是A股上市公司玉禾田环境发展集团（300815）旗下全资孙公司，成立于2025年3月，专注于人工智能应用开发和智能机器人研发。2025年8月获智元机器人（AgiBot）5%战略入股，形成"玉禾田(场景)+智元(技术)+蓝思(制造)"三方产业闭环，聚焦智慧环卫与具身智能融合。兰州人工智能产业园总投资18亿元，产品已出口美国市场。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper">
+        <table class="wikitable infotable">
+          <tr><th>项目</th><th>内容</th></tr>
+          <tr><td>公司全称</td><td>玉树智能机器人（深圳）有限公司（玉禾田全资孙公司）</td></tr>
+          <tr><td>成立时间</td><td>2025年3月</td></tr>
+          <tr><td>注册资本</td><td>5000万元 → 增至5263.16万元（2025年8月）</td></tr>
+          <tr><td>母公司</td><td>玉禾田环境发展集团（深交所:300815）</td></tr>
+          <tr><td>法定代表人</td><td>杨波（玉禾田副总裁、坎德拉智能科技总裁）</td></tr>
+          <tr><td>董事长</td><td>周平（玉禾田集团董事长）</td></tr>
+          <tr><td>上市情况</td><td>母公司玉禾田已上市</td></tr>
+        </table>
+      </div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>时间</th><th>事件</th></tr>
+          <tr><td>2025年3月</td><td>玉树智能机器人注册成立，注册资本5000万元</td></tr>
+          <tr><td>2025年6月</td><td>与智元机器人签署战略合作协议，揭牌成立深圳玉树具身机器人智创中心</td></tr>
+          <tr><td>2025年7月</td><td>联合智元中标中国移动人形双足机器人采购项目（总预算1.24亿元，智元中标7800万元）</td></tr>
+          <tr><td>2025年7月</td><td>与兰州政府签约，投资18亿元建设兰州人工智能产业园</td></tr>
+          <tr><td>2025年8月</td><td>智元机器人出资263.16万元认缴5%股份，注册资本增至5263万元</td></tr>
+          <tr><td>2025年底</td><td>发布天禾T2、灵玉L3、啸天D1 Ultra三款具身机器人</td></tr>
+          <tr><td>2026年1月</td><td>玉禾田29周年战略转型大会，玉树智能机器人产业集团正式亮相，发布"智慧大脑"</td></tr>
+          <tr><td>2026年2月</td><td>玉禾田与蓝思科技签署战略合作，三方闭环形成</td></tr>
+        </table>
+      </div>
+
+      <h3 id="team">1.2 核心团队</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>角色</th><th>姓名</th><th>背景</th></tr>
+          <tr><td>董事长</td><td>周平</td><td>玉禾田集团董事长，环境服务行业资深企业家</td></tr>
+          <tr><td>法定代表人/总裁</td><td>杨波</td><td>玉禾田副总裁、坎德拉智能科技总裁，兼具环卫行业与智能科技背景</td></tr>
+        </table>
+      </div>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>时间</th><th>事件</th><th>金额</th><th>投资方</th></tr>
+          <tr><td>2025年3月</td><td>公司设立</td><td>5000万元</td><td>玉禾田集团（全资控股）</td></tr>
+          <tr><td>2025年8月</td><td>战略入股</td><td>263.16万元（5%股权）</td><td>智元机器人</td></tr>
+        </table>
+      </div>
+      <p>智元机器人入股后，玉树智能形成"上市公司控股+技术龙头参股"的股权结构。智元累计对外投资19家产业链公司，玉树智能是其环卫场景的关键落子。</p>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>技术维度</th><th>详情</th></tr>
+          <tr><td>AI架构</td><td>"1个算力底座+N个智能引擎+1个赋能平台"智慧大脑，30P算力，20余种智能模型</td></tr>
+          <tr><td>核心模型</td><td>与智元联合开发智慧环卫垂域大模型，实现集群智能调度、环境风险预测、作业路径自主优化</td></tr>
+          <tr><td>数据方案</td><td>深圳大湾区具身机器人数据采集和训练中心（专注清扫保洁/环卫清洁场景），深圳玉树具身机器人智创中心</td></tr>
+          <tr><td>自动驾驶</td><td>L4级智能驾驶系统，融合激光雷达/毫米波雷达/机器视觉/高精定位</td></tr>
+          <tr><td>底层技术来源</td><td>依托智元启元通用具身大模型、智元灵渠OS、AgiBot World数据集</td></tr>
+        </table>
+      </div>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>类别</th><th>型号</th><th>核心参数/亮点</th></tr>
+          <tr><td>户外清扫</td><td>阳光S200Ultra/S300</td><td>S300清扫宽度2.2m，作业速度10km/h，双驾驶模式，充电1h工作8-10h</td></tr>
+          <tr><td>室内清洁</td><td>闪光M50</td><td>清洁效率1980㎡/h，自动加排水，污水箱自清洁除臭，可联动电梯闸机</td></tr>
+          <tr><td>具身交互</td><td>天禾T2</td><td>交互服务型具身机器人</td></tr>
+          <tr><td>具身操作</td><td>灵玉L3</td><td>具身操作型机器人</td></tr>
+          <tr><td>四足</td><td>啸天D1 Ultra</td><td>小型四足机器人</td></tr>
+          <tr><td>多功能</td><td>玉树Y680</td><td>135升流量，原地坦克掉头，可换百余种机具</td></tr>
+          <tr><td>无人环卫</td><td>L3000/C3000</td><td>L4级自动驾驶，自动避障，交通信号识别</td></tr>
+          <tr><td>智能模块</td><td>玉树智能魔盒</td><td>为非智能环卫设备加装智能化模块</td></tr>
+        </table>
+      </div>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>场景类别</th><th>具体场景</th><th>合作方/资源</th></tr>
+          <tr><td>智慧环卫</td><td>市政道路清扫、垃圾收集、高压冲洗、除雪</td><td>玉禾田市政环卫在手合同（全国数万个项目点）</td></tr>
+          <tr><td>商业清洁</td><td>商场、写字楼、医院室内清洁</td><td>闪光M50产品线、玉禾田物业清洁业务</td></tr>
+          <tr><td>具身服务</td><td>智慧城市运营、公共服务</td><td>智元机器人技术赋能</td></tr>
+          <tr><td>智能制造</td><td>兰州产业园机器人产线</td><td>兰州政府、蓝思科技（制造伙伴）</td></tr>
+          <tr><td>海外市场</td><td>美国市场清洁机器人出口</td><td>智元机器人海外渠道</td></tr>
+        </table>
+      </div>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <p>联合智元中标中国移动人形双足机器人采购项目（总预算1.24亿元，智元中标7800万元）。与智元合作成果已实现商业价值并销往美国市场。兰州人工智能产业园总投资18亿元（占地70.8亩），建设具身机器人、清扫机器人、无人扫地机及新能源环卫汽车产线。母公司玉禾田市政环卫板块在手合同金额持续增长，为机器人业务提供稳定场景和客户基础。计划全球布局超5000个销售网点及维修后市场。</p>
+
+      <h3 id="financial">1.8 财务数据</h3>
+      <p>玉树智能本身为2025年新设公司，无独立公开财务数据。母公司玉禾田(300815)2024年营收约53亿元，净利润约4.9亿元（环卫服务+物业清洁双主业），机器人业务处于战略投入期，尚未贡献显著利润。</p>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>2026年1月玉树智能机器人产业集团正式亮相，标志着玉禾田从传统环卫向"人机共生"战略转型</li>
+        <li>玉禾田、智元、蓝思科技三方形成"场景+技术+制造"产业闭环</li>
+        <li>与智元联合中标中国移动项目是具身机器人在运营商场景的标杆案例</li>
+        <li>兰州产业园同步建设机器人数据采集中心，解决环卫场景真实数据稀缺痛点</li>
+        <li>"玉树智能魔盒"体现了从存量设备智能化改造切入的市场策略</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="a1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>玉树智能的核心管理层来自玉禾田体系——董事长周平深耕环卫行业近30年，总裁杨波同时担任坎德拉智能科技总裁，兼具环卫运营经验与智能硬件理解。玉禾田在全国拥有数万个市政环卫和物业清洁项目点，为机器人导入提供了天然的"场景试验场"和第一客户。团队选择"环卫场景"而非通用场景，紧密依托母公司的行业积累，降低了市场开拓难度。智元机器人CTO彭志辉的技术能力补足了玉禾田在AI和具身智能方面的短板，形成"产业老炮+技术天才"的互补结构。</p>
+      </div>
+
+      <div class="analysis-block" id="a2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>环卫场景对机器人技术的要求有其特殊性：室外非结构化环境、全天候作业、低速安全行驶、人机协同。玉树智能依托智元的启元通用具身大模型和灵渠OS，结合自建环卫数据采集中心，走的是"通用基础模型+行业垂域数据微调"的路线。L4级自动驾驶在环卫场景（固定路线、低速、夜间作业）的落地难度远低于Robotaxi，是自动驾驶技术变现的务实选择。"玉树智能魔盒"对存量设备的智能化改造方案体现了场景驱动的技术务实主义——不追求全部替换现有设备，而是渐进式升级。</p>
+      </div>
+
+      <div class="analysis-block" id="a3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>玉禾田（上市公司）全资控股+智元（技术龙头）5%参股的股权结构具有独特优势：玉禾田提供了稳定资金和环卫订单资源，智元以少量股权换取一个真实环卫场景的"技术验证场"和数据采集入口。双方利益绑定程度适中——智元5%的股权不足以主导战略方向，但足够激励其持续输出技术。2026年2月蓝思科技的加入补上了制造短板，形成了少见的"传统产业公司+AI技术公司+精密制造公司"三方架构，降低了单个环节的依赖性。</p>
+      </div>
+
+      <div class="analysis-block" id="a4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>玉树智能成立仅一年，尚未观察到重大战略调整。但从产品矩阵的宽泛性（覆盖清扫、具身、四足、滑移机、智能模块等）可以看出，公司仍在多线尝试以寻找最优产品市场匹配。2026年1月"智慧大脑"的发布标志着公司从"卖硬件"向"硬件+AI能力"升级的战略意识。兰州18亿产业园的大手笔投资（对于一个成立不到一年的孙公司）让人联想到可能的模式转换——从轻资产技术服务走向重资产制造，这种转变是否合理将在2026-2027年得到验证。</p>
+      </div>
+
+      <div class="analysis-block" id="a5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>玉树智能的定位是"环卫场景专用机器人厂商"而非通用人形机器人平台。与宇树、智元等追求通用能力的路线不同，玉树聚焦一个垂直场景做深做透。这种策略的优势在于：依托母公司的环卫项目资源形成天然的"场景壁垒"（其他机器人公司难以进入市政环卫体系）；劣势在于环卫赛道的天花板相对较低。公司明确选择了"硬件+场景"路线——以清扫机器人等专业设备为核心，具身机器人作为辅助，而非以人形机器人为绝对重心。这一定位在当前行业阶段是务实且合理的。</p>
+      </div>
+
+      <div class="analysis-block" id="a6">
+        <h4>2.6 其他重要观察</h4>
+        <p>玉树智能的出现代表了具身智能行业的一种新范式——"传统产业上市公司+AI技术初创"的融合。玉禾田从一家环卫服务商转型为"机器人+服务"公司，与三晖电气+可派机器人的模式异曲同工。这种模式的核心逻辑是：传统产业公司拥有场景和客户，但缺乏AI能力；AI初创拥有人才和技术，但缺乏落地场景和资金。两者的结合能够快速跨越"技术-产品-商业"的鸿沟。玉树智能能否成功的关键不在于技术本身，而在于玉禾田传统业务团队与智元技术团队的组织融合效率。18亿兰州产业园的产能消化将是2026-2027年最重要的观察指标。</p>
+      </div>
+
+      <h2 id="refs">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://36kr.com/p/3419245602835846" target="_blank">左手投资右手拿大单，智元杀疯了 — 36氪</a></li>
+          <li><a href="https://www.chinastarmarket.cn/detail/2112128" target="_blank">密集对外投资、规模化商业签单！智元机器人的商业化新突破 — 科创板日报</a></li>
+          <li><a href="https://leaderobot.com/news/6080" target="_blank">智元机器人战略入股玉树智能 — 机器人大讲堂</a></li>
+          <li><a href="https://www.eit-sz.com/NewsStd_1230.html" target="_blank">智元战略投资玉树智能，价值协同驱动创新增长</a></li>
+          <li><a href="https://finance.ifeng.com/c/8qAuq01vWnc" target="_blank">从环境服务到人机共生，玉树智能机器人开启产业新纪元 — 凤凰财经</a></li>
+          <li><a href="https://www.guandian.hk/article/20260211/543397.html" target="_blank">从智元到蓝思 玉禾田又找了一个"科技靠山" — 观点网</a></li>
+          <li><a href="https://baijiahao.baidu.com/s?id=1840214248259450594" target="_blank">成立不到半年玉树智能凭何获智元机器人入股？ — 百度百家号</a></li>
+          <li><a href="https://xueqiu.com/8306989089/376947265" target="_blank">玉禾田在具身智能领域的布局 — 雪球</a></li>
+          <li><a href="http://stock.10jqka.com.cn/20260123/c674275963.shtml" target="_blank">玉禾田集团战略转型 以人工智能机器人为核心驱动智慧城市运营 — 同花顺</a></li>
+          <li><a href="https://www.cls.cn/detail/xk/99403ad586cb3cf1d2a41c1533940753" target="_blank">玉禾田：与智元机器人合作探索具身机器人在智慧环卫应用 — 财联社</a></li>
+          <li><a href="https://www.eit-sz.com/NewsStd_1242.html" target="_blank">玉禾田集团&玉树机器人二十九载战略转型发展大会</a></li>
+          <li><a href="https://www.jinantimes.com.cn/news-62-5207309.html" target="_blank">从环境服务到人机共生，玉树智能机器人开启产业新纪元 — 新黄河</a></li>
+          <li><a href="https://www.hkcd.com.hk/hkcdweb/content/2026/01/26/content_8737177.html" target="_blank">玉禾田二十九周年战略转型 — 香港商报</a></li>
+          <li><a href="https://m.chinastarmarket.cn/detail/2112128" target="_blank">智元机器人的商业化新突破 — 科创板日报</a></li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">本页面由具身智能Wiki项目自动生成 · 数据截至2026年5月 · 如有更新请参照最新来源</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

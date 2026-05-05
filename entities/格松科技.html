@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>格松科技 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> <span class="breadcrumb-sep">›</span> <span>格松科技</span></div>
+  <div class="wiki-header"><h1>格松科技</h1><div class="subtitle">Gesong Technology · 成立2025年8月 · 深圳 · 3个月两轮超亿元 · 速腾聚创前高管创业</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#founders">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#financing">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercialization">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financials">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#analysis1">2.1 团队背景与场景选择匹配度</a></li>
+        <li class="toc-lvl4"><a href="#analysis2">2.2 技术路线与场景适配性</a></li>
+        <li class="toc-lvl4"><a href="#analysis3">2.3 股东/资本结构对战略的影响</a></li>
+        <li class="toc-lvl4"><a href="#analysis4">2.4 试错过程与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#analysis5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#analysis6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#references">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">格松科技</div>
+        <div class="ib-section">基本信息</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">格松科技</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2025年8月</div></div>
+        <div class="ib-row"><div class="ib-label">总部</div><div class="ib-value">深圳"机器人谷"</div></div>
+        <div class="ib-row"><div class="ib-label">CEO</div><div class="ib-value">蔡优飞</div></div>
+        <div class="ib-row"><div class="ib-label">定位</div><div class="ib-value">消费级具身智能机器人</div></div>
+        <div class="ib-section">融资</div>
+        <div class="ib-row"><div class="ib-label">天使轮</div><div class="ib-value">亿元级（2025.12）</div></div>
+        <div class="ib-row"><div class="ib-label">天使+轮</div><div class="ib-value">超亿元（2026.3）</div></div>
+        <div class="ib-row"><div class="ib-label">核心投资方</div><div class="ib-value">深创投、英诺天使、昆仲资本等</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">核心技术</div><div class="ib-value">自研具身智能大模型+鹰眼感知+VLA</div></div>
+        <div class="ib-row"><div class="ib-label">灵巧手大赛</div><div class="ib-value">2025年12月深圳赛冠军</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">赛道</div><div class="ib-value"><span class="tag">消费级机器人</span><span class="tag">具身智能</span><span class="tag">灵巧操作</span></div></div>
+      </aside>
+      <p class="article-intro">格松科技（Gesong Technology），2025年8月成立于深圳"机器人谷"，由前速腾聚创研发副总裁蔡优飞创立，定位消费级具身智能机器人。核心团队来自大疆、华为、腾讯、小鹏、速腾聚创等头部企业，具备全栈整机研发能力。公司成立3个月内连续完成两轮超亿元融资，深创投连续两轮加注。技术路线覆盖自研具身智能大模型、鹰眼感知系统、V-SLAM及高自由度灵巧手，2025年12月获深圳智能机器人灵巧手大赛冠军。</p>
+      <h2 id="facts">1 事实层</h2>
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper"><table class="wikitable infotable">
+        <tr><th>项目</th><th>内容</th></tr>
+        <tr><td>公司全称</td><td>格松科技</td></tr>
+        <tr><td>成立时间</td><td>2025年8月</td></tr>
+        <tr><td>总部地点</td><td>深圳"机器人谷"</td></tr>
+        <tr><td>创始人/CEO</td><td>蔡优飞（前速腾聚创研发副总裁、前小鹏生态企业产品总监）</td></tr>
+        <tr><td>定位</td><td>消费级具身智能机器人研发公司</td></tr>
+        <tr><td>上市情况</td><td>未上市</td></tr>
+      </table></div>
+      <h4>发展沿革</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>时间</th><th>事件</th></tr>
+        <tr><td>2025年8月</td><td>公司成立</td></tr>
+        <tr><td>2025年12月</td><td>完成亿元级天使轮融资，英诺天使基金、昆仲资本联合领投</td></tr>
+        <tr><td>2025年12月</td><td>获深圳智能机器人灵巧手大赛冠军</td></tr>
+        <tr><td>2026年3月</td><td>完成超亿元天使+轮融资，深创投连续两轮加注，祥峰投资、前海方舟等跟投</td></tr>
+      </table></div>
+      <h3 id="founders">1.2 创始人及核心团队</h3>
+      <p>CEO蔡优飞为中国科学院工科硕士，师从机器人泰斗徐扬生院士。职业生涯横跨速腾聚创（研发副总裁）、小鹏生态企业（产品总监），拥有超10年机器人行业经验并主导过多款消费级机器人量产项目，是典型的"技术+产品+量产"三角能力兼具的连续创业者。CTO为北大本科、港大博士，曾任腾讯AI Lab技术负责人，专长多智能体、生成式AI、机器人视觉和异构计算。CPO为清华大学毕业，曾任多家头部机器人企业产品线负责人，操盘过多款现象级产品从定义到规模化量产。核心团队来自大疆、华为、腾讯、小鹏、速腾聚创，覆盖算法开发、本体开发、机电系统、软件平台等全链路模块。</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+        <tr><td>CEO</td><td>蔡优飞</td><td>中科院硕士（师从徐扬生院士）；前速腾聚创研发副总裁；前小鹏生态企业产品总监；10年+机器人行业经验；多款消费级机器人量产经验</td></tr>
+        <tr><td>CTO</td><td>未公开</td><td>北大本科、港大博士；前腾讯AI Lab技术负责人；专长多智能体、生成式AI、机器人视觉、异构计算</td></tr>
+        <tr><td>CPO</td><td>未公开</td><td>清华大学毕业；多家头部机器人企业产品线负责人；操盘多款现象级产品从定义到量产</td></tr>
+      </table></div>
+      <p>团队整体呈现"自动驾驶+AI+消费电子"跨界融合特征，成员均具备头部企业的核心岗位经验和完整的从0到1再到N的产品经历。</p>
+      <h3 id="financing">1.3 融资与股东</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>轮次</th><th>时间</th><th>金额</th><th>主要投资方</th></tr>
+        <tr><td>天使轮</td><td>2025年12月</td><td>亿元级</td><td>英诺天使基金、昆仲资本（联合领投）</td></tr>
+        <tr><td>天使+轮</td><td>2026年3月</td><td>超亿元</td><td>深创投（连续加注）、祥峰投资、前海方舟、元禾原点、微光创投、昆仑资本、容亿投资等</td></tr>
+      </table></div>
+      <p>成立仅3个月内完成两轮大额融资，深创投连续两轮加注。深创投评价格松科技"站在自动驾驶、人工智能与具身智能三大技术交汇的浪尖上，有望打造具身时代的超级硬件品类"。资金用于技术迭代、产品量产及市场拓展。</p>
+      <h3 id="tech">1.4 技术路线</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>维度</th><th>详情</th></tr>
+        <tr><td>具身智能大模型</td><td>自研，打通"感知→决策→执行"实时反馈链路</td></tr>
+        <tr><td>感知系统</td><td>鹰眼感知系统：高速动态3D感知+多模态语义分析；360°全域感知+远距离精准识别</td></tr>
+        <tr><td>定位导航</td><td>高精度V-SLAM定位</td></tr>
+        <tr><td>运动控制</td><td>智能规控算法；高功率密度电机+高速运动底盘</td></tr>
+        <tr><td>灵巧操作</td><td>高自由度灵巧手+VLA核心技术；2025年12月深圳智能机器人灵巧手大赛冠军</td></tr>
+        <tr><td>商业化模式</td><td>硬件端（高端消费市场品牌）+ 软件端（订阅服务）+ 内容端（PGC+UGC+AIGC生态）</td></tr>
+      </table></div>
+      <p>格松科技走"全栈自研+消费级定位"路线，强调打通从感知到执行的全链路闭环。与许多具身智能公司聚焦B端工业场景不同，格松自创立之初就定位消费级市场，商业模型采用"硬件+软件+内容"三层收入结构。</p>
+      <h3 id="products">1.5 产品形态</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>产品分类</th><th>关键特征</th><th>目标市场</th></tr>
+        <tr><td>新一代多功能消费级具身机器人</td><td>搭载自研具身智能大模型+鹰眼感知系统+V-SLAM+高自由度灵巧手；具体型号/参数尚未公开</td><td>高端消费市场</td></tr>
+      </table></div>
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>场景分类</th><th>具体应用</th><th>商业模型</th></tr>
+        <tr><td>家庭消费</td><td>家庭服务、陪伴、教育娱乐</td><td>硬件销售+软件订阅</td></tr>
+        <tr><td>内容生态</td><td>用户生成内容、开发者生态</td><td>PGC+UGC+AIGC平台</td></tr>
+      </table></div>
+      <h3 id="commercialization">1.7 商业化进展</h3>
+      <p>格松科技成立不足一年，产品尚未公开发布。当前阶段为"技术研发+团队搭建+融资蓄力"，商业化的关键验证节点在产品正式发布及市场反馈。</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>指标</th><th>数据</th></tr>
+        <tr><td>技术验证</td><td>灵巧手大赛冠军（2025.12）</td></tr>
+        <tr><td>融资</td><td>3个月两轮超2亿元</td></tr>
+        <tr><td>产品状态</td><td>研发中，具体发布时间未披露</td></tr>
+      </table></div>
+      <h3 id="financials">1.8 财务数据</h3>
+      <p>格松科技为成立不足一年的初创企业，暂无公开营收数据。</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>指标</th><th>数据</th></tr>
+        <tr><td>累计融资</td><td>超2亿元（天使+天使+两轮）</td></tr>
+        <tr><td>团队规模</td><td>未公开披露</td></tr>
+        <tr><td>产品状态</td><td>研发阶段</td></tr>
+      </table></div>
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>CEO蔡优飞师从机器人泰斗徐扬生院士（香港中文大学（深圳）校长、中国工程院院士），学术血统顶级</li>
+        <li>团队是典型的"自动驾驶+AI大厂+消费电子"跨界组合，核心技术栈覆盖感知、规控、AI、硬件全链路</li>
+        <li>商业模型设计为"硬件+软件+内容"三层收入，类似苹果/大疆的产品生态逻辑</li>
+        <li>深创投将其定位为"具身时代的超级硬件品类"，隐含对消费级机器人成为下一代计算平台的判断</li>
+        <li>公司在深圳"机器人谷"办公，与大疆、优必选等构成地域性产业协同</li>
+        <li>灵巧手大赛冠军的技术标签，暗示产品将有较强的操作能力（而非仅移动能力）</li>
+      </ul>
+      <h2 id="analysis">2 分析层</h2>
+      <div class="analysis-block" id="analysis1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>格松科技的创始团队是罕见的"自动驾驶感知+AI大模型+消费电子量产"跨界组合。蔡优飞在速腾聚创的激光雷达/感知经验、在小鹏生态的消费产品经验，使其对"将高端传感器和AI技术降维到消费级成本"有直接认知。CTO在腾讯AI Lab的多智能体和生成式AI经验为机器人"大脑"提供了技术储备。CPO的消费级产品量产经验则补上了从实验室到货架的关键一环。选择消费级而非工业级场景，与团队的大厂消费电子产品基因天然匹配。</p>
+      </div>
+      <div class="analysis-block" id="analysis2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>格松科技的"自研具身智能大模型+鹰眼感知+V-SLAM+灵巧手"技术栈，当前在消费级场景中属于"超配"——家庭场景对3D感知和灵巧操作的可靠性要求极高而容错率极低。消费级机器人历史上最大的失败模式就是技术过于超前、价格过高、用户需求不刚性（如Jibo、Anki）。格松需要在"技术先进性"和"消费级成本可及性"之间找到平衡点。灵巧手大赛冠军验证了技术能力，但能否在$500-2000的价格带内实现可靠量产，是技术路线与场景适配的核心考验。</p>
+      </div>
+      <div class="analysis-block" id="analysis3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>深创投连续两轮加注是格松最大的资本优势——深创投在中国硬科技投资领域有极高话语权，其加持不仅带来资金，更带来供应链资源和政策通道。英诺天使和昆仲资本的早期进入则提供了创业者社区的生态支持。目前股东结构偏"纯财务投资"，没有产业资本绑定，这给格松在场景选择上更大自由度，但也意味着产品上市时需要自己构建渠道和品牌——这在消费级市场是一笔巨大的投入。</p>
+      </div>
+      <div class="analysis-block" id="analysis4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>格松科技成立仅不到一年，试错样本有限。可观察的初始路径是从"技术先行"切入——先以灵巧手大赛冠军建立技术声誉，再以两轮融资储备资源，然后推出消费级产品。这与典型的"先做产品-再融资-再迭代"的消费硬件创业路径不同，更接近"以顶尖团队和技术叙事快速融资、再倒推产品落地"的资本驱动路径。这种策略的优势是起步即有充足资源，风险是如果产品不能按时交付或市场反馈不及预期，资本市场的耐心可能有限。</p>
+      </div>
+      <div class="analysis-block" id="analysis5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>格松科技的核心取舍是选择"消费级"而非"工业级"战场。在中国具身智能公司普遍瞄准B端工业场景（物流、制造、巡检）的大背景下，格松押注C端消费市场，这是一个差异化极大但风险也极高的选择。消费级机器人的历史上尸骨累累（Jibo、Anki、Vector），但也诞生了大疆这样的超级独角兽。格松的"硬件+软件+内容"生态模式显示其志向不在"卖一台硬件"而在"建一个平台"——这需要的不仅是技术能力，更是品牌、渠道和内容运营的综合能力。</p>
+      </div>
+      <div class="analysis-block" id="analysis6">
+        <h4>2.6 其他重要观察</h4>
+        <p>蔡优飞师从徐扬生院士的背景值得关注——徐扬生是香港中文大学（深圳）校长、中国工程院院士，在机器人和AI领域有深远影响力，其学术网络可能为格松提供独特的人才和技术资源。另一方面，格松的商业模型中"PGC+UGC+AIGC内容生态"的提法与中国当前具身智能企业中较为少见，暗示其产品可能具有开放式开发平台属性（类似iPhone的App Store逻辑）。如果格松能成为"具身智能时代的苹果"，其天花板将远高于单纯的硬件公司，但这一叙事能否兑现，取决于首款产品的市场表现。</p>
+      </div>
+      <h2 id="references">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://www.163.com/dy/article/KP4HLIQT05568W0A.html" target="_blank">格松科技再获超亿元融资，深创投连续加注 — 网易（2026.03）</a></li>
+          <li><a href="https://36kr.com/p/3740819266879494" target="_blank">格松科技获超亿元融资，深创投等多家资本投资 — 36氪</a></li>
+          <li><a href="https://m.zhidx.com/p/543748.html" target="_blank">深圳机器人创企，3个月连拿两笔亿元融资 — 智东西</a></li>
+          <li><a href="https://news.futunn.com/post/70752630" target="_blank">Seeds | 速腾聚创前高管创业，3个月连融两轮 — 富途牛牛</a></li>
+          <li><a href="https://www.donews.com/news/detail/4/6487410.html" target="_blank">格松科技3个月内完成两轮超亿元融资 — DoNews</a></li>
+          <li><a href="https://www.zidonghua.com.cn/news/Finance/84238.html" target="_blank">再获超亿元融资，格松领跑消费级具身机器人新时代 — 自动化网</a></li>
+          <li><a href="https://nuxt.cyzone.cn/article/828589.html" target="_blank">融资丨格松科技宣布完成新一轮超亿元融资 — 创业邦</a></li>
+          <li><a href="https://i.gasgoo.com/news/70451542.html" target="_blank">Seeds | 速腾聚创前高管创业，3个月连融两轮 — 盖世汽车</a></li>
+          <li><a href="https://data.iyiou.com/intelligence/details/7dc3df59d7edee478ab25c6286c0bbd7" target="_blank">深圳机器人创企，3个月连拿两笔亿元融资 — 亿欧数据</a></li>
+          <li>2025年12月深圳智能机器人灵巧手大赛：格松科技获冠军</li>
+          <li>深创投评价："站在自动驾驶、人工智能与具身智能三大技术交汇的浪尖上，有望打造具身时代的超级硬件品类"</li>
+          <li>CEO蔡优飞师从徐扬生院士（中国工程院院士、港中文（深圳）校长）</li>
+          <li>团队核心成员来自大疆、华为、腾讯、小鹏、速腾聚创</li>
+          <li>公司定位：消费级具身智能机器人，"硬件+软件+内容"三层商业模型</li>
+          <li>天使轮联合领投：英诺天使基金、昆仲资本</li>
+        </ol>
+      </div>
+      <div class="page-footer">本页面内容基于公开资料整理，最后更新于2026年5月4日 · <a href="../index.html">具身智能Wiki</a></div>
+    </article>
+  </div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

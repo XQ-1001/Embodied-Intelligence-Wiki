@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>穹彻智能 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> › <span>穹彻智能</span></div>
+  <div class="wiki-header"><h1>穹彻智能</h1><div class="subtitle">Noematrix · 上海穹彻智能科技有限公司 · 成立于2023年 · 具身智能"通用大脑" · 阿里/红杉/Prosperity7投资</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#team">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#finance">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#a21">2.1 团队背景与场景选择的匹配度</a></li>
+        <li class="toc-lvl4"><a href="#a22">2.2 技术路线与场景的适配性</a></li>
+        <li class="toc-lvl4"><a href="#a23">2.3 股东/资本结构对战略的影响</a></li>
+        <li class="toc-lvl4"><a href="#a24">2.4 试错过程与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#a25">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#a26">2.6 其他重要观察与分析</a></li>
+        <li class="toc-lvl2"><a href="#refs">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">穹彻智能</div>
+        <div class="ib-section">基本信息</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">上海穹彻智能科技有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">英文品牌</div><div class="ib-value">Noematrix</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2023年11月2日</div></div>
+        <div class="ib-row"><div class="ib-label">总部</div><div class="ib-value">上海市闵行区</div></div>
+        <div class="ib-row"><div class="ib-label">联合创始人</div><div class="ib-value">王世全（斯坦福博士）<br>卢策吾（上交大教授）</div></div>
+        <div class="ib-row"><div class="ib-label">战略孵化方</div><div class="ib-value">非夕科技（Flexiv）</div></div>
+        <div class="ib-section">融资数据</div>
+        <div class="ib-row"><div class="ib-label">最新轮次</div><div class="ib-value">A轮（2026.02）</div></div>
+        <div class="ib-row"><div class="ib-label">累计融资</div><div class="ib-value">数亿元人民币（多轮）</div></div>
+        <div class="ib-row"><div class="ib-label">核心投资方</div><div class="ib-value">阿里巴巴、红杉中国、Prosperity7、C资本、Sea Limited</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">赛道</div><div class="ib-value"><span class="tag">具身智能</span><span class="tag">通用大脑</span></div></div>
+        <div class="ib-row"><div class="ib-label">定位</div><div class="ib-value"><span class="tag">基础模型</span><span class="tag">"以力为中心"</span></div></div>
+        <div class="ib-section">官网</div>
+        <div class="ib-row"><div class="ib-label">官网</div><div class="ib-value"><a href="https://www.noematrix.ai" target="_blank">noematrix.ai</a></div></div>
+      </aside>
+
+      <p class="article-intro"><strong>穹彻智能</strong>（Noematrix）是中国具身智能"通用大脑"赛道的头部企业，由非夕科技（Flexiv）战略孵化，成立于2023年11月，总部位于上海。公司由斯坦福博士王世全与上海交通大学教授卢策吾联合创立，以"以力为中心"的具身智能技术路线为核心差异化，开发穹彻具身大脑Noematrix Brain（已迭代至2.0），实现从指令推理到全闭环操作的通用能力。截至2026年2月，已完成包括阿里巴巴战略投资在内的多轮融资，投资方涵盖红杉中国、Prosperity7 Ventures、C资本、Sea Limited（Shopee母公司）等。公司已实现智能药房、酒店洗衣房等场景的商业化落地，2026年4月与无锡共建工业交付能力中心，推动从"大脑"到产业应用的闭环。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper">
+        <table class="wikitable infotable">
+          <tr><th style="width:120px">项目</th><th>内容</th></tr>
+          <tr><td>公司全称</td><td>上海穹彻智能科技有限公司</td></tr>
+          <tr><td>英文品牌</td><td>Noematrix</td></tr>
+          <tr><td>成立时间</td><td>2023年11月2日</td></tr>
+          <tr><td>注册地</td><td>上海市闵行区</td></tr>
+          <tr><td>上市状态</td><td>未上市</td></tr>
+          <tr><td>官网</td><td><a href="https://www.noematrix.ai" target="_blank">https://www.noematrix.ai</a></td></tr>
+          <tr><td>战略孵化方</td><td>非夕科技集团（Flexiv）</td></tr>
+          <tr><td>定位</td><td>具身智能基础模型与系统研发商——"通用大脑"</td></tr>
+        </table>
+      </div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>时间</th><th>事件</th></tr>
+          <tr><td>2023年11月</td><td>上海穹彻智能科技有限公司成立，由非夕科技战略孵化</td></tr>
+          <tr><td>2024年3月</td><td>完成天使轮融资，See Fund、魔量资本、小苗朗程参投</td></tr>
+          <tr><td>2024年7月</td><td>WAIC世界人工智能大会首次发布穹彻具身大脑Noematrix Brain</td></tr>
+          <tr><td>2024年9月-12月</td><td>完成Pre-A及Pre-A+轮融资，红杉中国领投，Prosperity7 Ventures等跟投</td></tr>
+          <tr><td>2025年4月</td><td>完成Pre-A++轮，盛宇投资、清科创投、嘉御资本、云启资本等参投</td></tr>
+          <tr><td>2025年7月</td><td>WAIC 2025发布Noematrix Brain 2.0，引入实体概念学习和用户偏好机制</td></tr>
+          <tr><td>2025年10月</td><td>阿里巴巴集团完成战略投资</td></tr>
+          <tr><td>2026年1月</td><td>发布RoboPocket口袋机采系统</td></tr>
+          <tr><td>2026年2月</td><td>完成数亿元A轮融资，C资本领投，Sea Limited/普华资本跟投</td></tr>
+          <tr><td>2026年4月</td><td>与无锡数据集团、锡山开发区签约共建"穹彻智能工业交付能力中心"</td></tr>
+        </table>
+      </div>
+
+      <h3 id="team">1.2 创始人及核心团队</h3>
+      <p>穹彻智能的核心团队呈现出"AI学术前沿+机器人产业实战"的双螺旋结构。联合创始人王世全为斯坦福大学博士、非夕科技（Flexiv）创始人，深耕通用智能机器人领域多年，拥有丰富的产业化和产品化经验；联合创始人卢策吾为上海交通大学教授、博士生导师，师从AI领域传奇人物李飞飞（Fei-Fei Li）和Leonidas Guibas，在计算机视觉、机器人学习领域有深厚学术积累。团队整体以AI科学家和机器人工程师为主，学术派与产业派深度融合——这一组合在具身智能"大脑"赛道具有独特优势。</p>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+          <tr><td>联合创始人</td><td>王世全</td><td>斯坦福大学博士，非夕科技（Flexiv）创始人兼CEO。深耕力控机器人领域，领导非夕成为国内通用智能机器人头部企业，为穹彻智能提供原生力反馈数据和产业化支撑。</td></tr>
+          <tr><td>联合创始人</td><td>卢策吾</td><td>上海交通大学教授、博士生导师，师从李飞飞（Fei-Fei Li）和Leonidas Guibas。在计算机视觉、具身智能、机器人学习领域发表大量顶会论文，是穹彻智能技术路线的核心设计者。</td></tr>
+        </table>
+      </div>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <h4>融资历史</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>轮次</th><th>时间</th><th>金额</th><th>领投方</th><th>跟投/参投方</th></tr>
+          <tr><td>天使轮</td><td>2024年3月</td><td>未披露</td><td>—</td><td>See Fund、魔量资本、小苗朗程</td></tr>
+          <tr><td>Pre-A轮</td><td>2024年9月</td><td>数亿元</td><td>—</td><td>—</td></tr>
+          <tr><td>Pre-A+轮</td><td>2024年12月</td><td>数亿元</td><td>红杉中国</td><td>Prosperity7 Ventures、小苗朗程、璞跃中国</td></tr>
+          <tr><td>Pre-A++轮</td><td>2025年4月</td><td>数亿元</td><td>—</td><td>盛宇投资、清科创投、嘉御资本、云启资本、上海科创集团</td></tr>
+          <tr><td>战略融资</td><td>2025年10月</td><td>未披露</td><td>阿里巴巴集团</td><td>老股东追投</td></tr>
+          <tr><td>A轮</td><td>2026年2月</td><td>数亿元</td><td>C资本</td><td>Sea Limited（Shopee母公司）、普华资本，Prosperity7超额追投</td></tr>
+        </table>
+      </div>
+      <h4>股东结构特点</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>股东类别</th><th>代表机构</th><th>战略意义</th></tr>
+          <tr><td>互联网巨头</td><td>阿里巴巴、Sea Limited</td><td>阿里提供电商/物流/新零售场景入口；Sea/Shopee打通东南亚渠道</td></tr>
+          <tr><td>顶级VC</td><td>红杉中国、C资本、Prosperity7</td><td>资金实力+全球化资源（C资本覆盖欧亚澳，Prosperity7链接中东资本）</td></tr>
+          <tr><td>产业资本</td><td>非夕科技（战略孵化）、上海科创集团</td><td>非夕提供原生力反馈数据+硬件支撑；上海科创提供地方产业资源</td></tr>
+        </table>
+      </div>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>技术维度</th><th>具体方案</th></tr>
+          <tr><td>核心AI架构</td><td>"以力为中心"的具身大脑——Noematrix Brain（已迭代至2.0），实现"力—视觉—动作"深度耦合。引入实体概念学习（Object Concept Learning）和用户偏好机制，使机器人理解用户习惯、环境与人际关系</td></tr>
+          <tr><td>模型架构</td><td>端到端通用大模型路线，支持端到端3D模仿学习框架RISE和视-触觉快慢网络架构，具备指令推理、任务规划、环境感知、自主导航和通用技能操作全闭环能力</td></tr>
+          <tr><td>数据方案</td><td>"伴随式数据采集"理念（行业首创）→ CoMiner外骨骼数采设备+RoboPocket口袋机采系统（2026年1月发布）。具身数字基因结构化编码。已积累数十万小时高质量真机数据</td></tr>
+          <tr><td>技能体系</td><td>AnySkill原子技能库，可适配多种具身智能本体平台（轮式单臂、轮式双臂、人形双臂等）</td></tr>
+          <tr><td>自研程度</td><td>核心算法完全自研，由非夕科技提供力反馈硬件和数据底座，形成"软硬一体"但不做自有硬件的模式</td></tr>
+          <tr><td>差异化特色</td><td>国内极少数以"力觉"为核心维度的具身大模型，与主流纯视觉/语言路线形成差异化。力觉信息使机器人在接触式操作（抓取、装配、按摩等）中具备天然优势</td></tr>
+        </table>
+      </div>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>产品</th><th>形态</th><th>版本/发布时间</th><th>核心能力</th><th>适配平台</th></tr>
+          <tr><td>Noematrix Brain</td><td>具身大脑软件平台</td><td>1.0（2024.07）→ 2.0（2025.07）</td><td>指令推理、任务规划、环境感知、自主导航、通用技能操作全闭环</td><td>轮式单臂、轮式双臂、人形双臂</td></tr>
+          <tr><td>CoMiner</td><td>外骨骼数据采集设备</td><td>2024年</td><td>"伴随式"采集真人数采数据</td><td>多种机器人形态</td></tr>
+          <tr><td>RoboPocket</td><td>口袋式数据采集系统</td><td>2026年1月</td><td>轻量化、低成本真机数据采集</td><td>通用</td></tr>
+          <tr><td>AnySkill原子技能库</td><td>技能软件库</td><td>持续更新</td><td>可迁移的通用操作技能</td><td>跨本体平台</td></tr>
+        </table>
+      </div>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>场景分类</th><th>具体场景</th><th>合作方</th><th>进展</th></tr>
+          <tr><td rowspan="2">商业服务</td><td>智能药房（接收订单→取货→打包全流程）</td><td>头部医药零售企业</td><td>已全流程落地，2026年发布标准化方案</td></tr>
+          <tr><td>酒店洗衣房</td><td>酒店集团</td><td>已批量部署</td></tr>
+          <tr><td>物流仓储</td><td>物流分拣</td><td>物流企业</td><td>多元场景验证中</td></tr>
+          <tr><td>家庭服务</td><td>家庭整理</td><td>—</td><td>泛化能力打磨中</td></tr>
+          <tr><td>工业制造</td><td>工业具身操作</td><td>无锡数据集团、锡山开发区</td><td>2026年4月签约共建交付中心</td></tr>
+        </table>
+      </div>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <p>穹彻智能采用"大脑赋能硬件"的平台化商业模型，不直接制造机器人本体，而是将Noematrix Brain作为通用具身大脑输出给机器人整机厂商和终端场景方。2025-2026年间，智能药房和酒店洗衣房两大场景已实现商业化落地和批量部署。2026年4月，与无锡数据集团、锡山经济技术开发区三方签约共建"穹彻智能工业交付能力中心"，发起具身智能数据联盟，规划建设全国首个10万小时工业真实场景具身操作数据集，并面向无锡制造业上市公司提供大脑赋能服务。</p>
+
+      <h3 id="finance">1.8 财务数据</h3>
+      <p>穹彻智能作为初创企业，未公开披露具体营收及利润数据。公司自2023年成立以来已完成6轮融资，累计融资金额达数亿元人民币级别，资金主要用于基座大模型研发、数据采集体系建设和场景化解决方案落地。2026年A轮融资后资金储备充裕，可支撑未来2-3年的技术迭代和商业拓展。目前主要收入来自智慧药房、酒店洗衣房等场景的解决方案交付，以及AnySkill技能库的平台化授权。</p>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>2026年智源研究院行业报告将穹彻智能列为具身智能机器人领域第二梯队企业。</li>
+        <li>穹彻智能是无锡"工业交付能力中心"的核心技术供给方，该项目打出"数据联盟+模型共建+交付中心"三张王牌。</li>
+        <li>与优必选（UBTECH）等头部人形机器人企业达成大脑适配合作，服务多种本体平台。</li>
+        <li>Sea Limited（Shopee母公司）的战略投资为穹彻智能打开了东南亚电商物流场景的入口。</li>
+        <li>Prosperity7 Ventures（沙特阿美旗下）在Pre-A+轮和A轮两度追投，显示中东资本对中国具身智能"大脑"层的持续看好。</li>
+        <li>联合创始人卢策吾师从李飞飞，这一学术渊源被行业视为穹彻智能在具身智能领域的技术信任背书。</li>
+        <li>穹彻智能的"伴随式数据采集"理念在行业内具有首创意义——在人操作的同时由机器人同步采集数据，绕过了传统遥操作数据采集的效率瓶颈。</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="a21">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>穹彻智能的创始团队组合（斯坦福机器人产业博士+上交大AI学术教授）与其"通用大脑"定位高度匹配。王世全通过非夕科技积累了力控机器人的产业化经验——非夕的力反馈机械臂已经在3C制造、汽车零部件打磨等领域实现商业落地。这些场景中的"力觉"数据积累，为穹彻智能训练"以力为中心"的具身大脑提供了独特的真实数据源。卢策吾在李飞飞实验室的学术背景则提供了从感知到操作的端到端学习理论框架。穹彻选择智能药房作为首个规模化落地场景是一个务实决策——药房属于半结构化环境、操作对象标准化（药品包装）、ROI可通过替代人力清晰测算，非常适合具身大脑从实验室走向真实世界的"第一站"。</p>
+      </div>
+
+      <div class="analysis-block" id="a22">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>穹彻智能"以力为中心"的技术路线与其选择的商业服务场景之间存在强适配逻辑。传统纯视觉方案在抓取透明/反光/不规则物体时容易失效，而穹彻的力觉耦合方案在药房取药（不同形状的药品包装）、酒店洗衣（柔软织物的抓取）等场景中具有天然优势。引入"实体概念学习"和"用户偏好机制"进一步提升了场景适配性——例如药房机器人需要理解不同药品的存储要求（避光、冷藏），酒店机器人需要记住不同客人的偏好。但"力中心"路线也面临挑战：力觉数据的采集成本远高于视觉数据，穹彻依赖非夕硬件的原生力反馈数据，这既是壁垒也是约束——当需要适配非力控机器人本体时，模型的迁移效果尚待验证。</p>
+      </div>
+
+      <div class="analysis-block" id="a23">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>穹彻智能的股东结构呈现"互联网巨头+顶级VC+产业孵化方"的三维矩阵特征。阿里巴巴的战略投资不仅带来资金，更关键的是提供了新零售场景的超级入口——阿里旗下的盒马、大润发、菜鸟物流等均有可能成为穹彻大脑的试验场。Sea Limited（Shopee）的投资则为东南亚市场预留了想象力。红杉中国和C资本的加持赋予穹彻全球化布局的资本后盾。但值得注意的是，非夕科技作为战略孵化方，既是最亲密的产业伙伴，也可能构成路径依赖——穹彻的力觉数据主要来自非夕硬件，若未来非夕的市场份额受限，穹彻的数据优势可能同步受损。</p>
+      </div>
+
+      <div class="analysis-block" id="a24">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>穹彻智能在不到三年内的路径演进展现了从"技术展示"到"场景聚焦"的清晰调整。2024年WAIC发布Brain 1.0时，定位偏"通用平台"叙事；2025年Brain 2.0发布时，显著强化了实体概念学习和用户偏好机制等贴近真实场景的能力；2026年则明确将"智慧药房标准化方案"作为首款商业化产品推向市场。这一从"通用大脑赋能万物"到"先在一个场景做透"的战略收敛，符合具身智能行业从技术驱动到商业驱动的必然转变。同时，从上海单点到无锡工业交付中心的布局，显示穹彻开始构建"大脑+数据+交付"三位一体的区域落地模式。</p>
+      </div>
+
+      <div class="analysis-block" id="a25">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>穹彻智能的核心取舍非常清晰："不做硬件做大脑"。这是中国具身智能赛道中少数坚持纯"大脑"路线的企业之一，与地瓜机器人（做"大脑基座"含芯片/OS/算法工具链）和它石智航（做通用大模型但自研本体验证）形成差异化。穹彻不做硬件的决策意味着更低的资本开支和更快的迭代速度，但也面临一个核心挑战：在中国具身智能市场，大多数整机厂商倾向于自研大脑（如智元、宇树），独立"大脑"供应商需要证明其方案比整机厂自研方案更具性价比和泛化性。穹彻的应对策略是与优必选等非自研大脑的头部整机厂绑定，同时通过智慧药房等垂直场景直接触达终端客户，建立"场景-大脑-硬件"的闭环验证案例。</p>
+      </div>
+
+      <div class="analysis-block" id="a26">
+        <h4>2.6 其他重要观察与分析</h4>
+        <p>穹彻智能值得关注的几个战略特征：第一，"以力为中心"的技术路线在行业内独树一帜——当大多数具身智能企业追求"更大的视觉/语言模型"时，穹彻押注的是"力觉"这一被低估的维度。这一定位若被市场验证，可能形成不可替代的竞争壁垒。第二，与无锡共建工业交付能力中心体现了穹彻"用数据联盟撬动地方政府产业资源"的独特打法——通过"帮你建数据集"的逻辑锁定区域客户，这与云厂商早期的"帮你上云"策略异曲同工。第三，穹彻面临的潜在风险在于：当具身大模型向"大一统"架构收敛时（如VLA统一视觉+语言+动作），"以力为中心"的独立路线是否会被主流架构吸收而非替代，这是一个需要持续观察的技术演化问题。第四，联合创始人卢策吾与李飞飞的学术渊源，既是品牌资产，也可能在特定国际环境下成为地缘政治敏感的考量因素。</p>
+      </div>
+
+      <h2 id="refs">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://www.noematrix.ai/about" target="_blank">穹彻智能官网——关于公司</a></li>
+          <li><a href="https://www.iyiou.com/news/202602101121823" target="_blank">专攻机器人"通用大脑"，穹彻智能完成数亿元A轮融资（亿欧）</a></li>
+          <li><a href="https://www.stcn.com/article/detail/3386785.html" target="_blank">具身智能公司穹彻智能获阿里巴巴新一轮投资（证券时报）</a></li>
+          <li><a href="https://news.futunn.com/post/63439398" target="_blank">阿里投资，穹彻智能完成新一轮融资（富途牛牛）</a></li>
+          <li><a href="https://finance.sina.cn/stock/jdts/2026-02-10/detail-inhmhvwr8650447.d.html" target="_blank">穹彻智能完成A轮融资 金额达数亿元人民币（新浪财经）</a></li>
+          <li><a href="https://www.moomoo.com/hans/news/post/59860880" target="_blank">今天，阿里巴巴投了李飞飞学生（Moomoo）</a></li>
+          <li><a href="https://finance.sina.cn/2026-04-03/detail-inhtfvnt3588458.d.html" target="_blank">又一重量级项目，落地无锡！（新浪财经）</a></li>
+          <li><a href="https://www.163.com/dy/article/KPKF3ABR0514DR7N.html" target="_blank">无锡这里，打造更强"大脑"！（网易）</a></li>
+          <li><a href="http://www.puhuacapital.com/mobile/index.php/news/info/278" target="_blank">穹彻智能完成A轮融资——普华资本投资动态</a></li>
+          <li><a href="https://www.ne-time.cn/web/article/37895" target="_blank">数亿融资！具身大脑头部企业获海外基金加持（NE时代）</a></li>
+          <li><a href="https://baike.baidu.com/item/上海穹彻智能科技有限公司/64871743" target="_blank">上海穹彻智能科技有限公司（百度百科）</a></li>
+          <li><a href="https://www.taibo.cn/company/101455" target="_blank">上海穹彻智能科技有限公司（泰伯网）</a></li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">本页面内容基于公开信息整理，数据截至2026年5月。页面风格遵循具身智能Wiki统一模板。</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

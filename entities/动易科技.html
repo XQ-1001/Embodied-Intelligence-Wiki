@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>动易科技 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> <span class="breadcrumb-sep">›</span> <span>动易科技</span></div>
+  <div class="wiki-header"><h1>动易科技</h1><div class="subtitle">PHYBOT · 成立于2024年 · 天使轮累计融资超2亿元 · 全栈自研人形机器人</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#team">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financials">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#analysis-1">2.1 团队背景与场景选择的匹配度</a></li>
+        <li class="toc-lvl4"><a href="#analysis-2">2.2 技术路线与场景的适配性</a></li>
+        <li class="toc-lvl4"><a href="#analysis-3">2.3 股东/资本结构对战略的影响</a></li>
+        <li class="toc-lvl4"><a href="#analysis-4">2.4 试错过程与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#analysis-5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#analysis-6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#references">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">动易科技</div>
+        <div class="ib-section">基本信息</div>
+        <div class="ib-row"><div class="ib-label">公司全称</div><div class="ib-value">北京动易人工智能科技有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">英文品牌</div><div class="ib-value">PHYBOT</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2024年6月</div></div>
+        <div class="ib-row"><div class="ib-label">注册地</div><div class="ib-value">北京海淀区</div></div>
+        <div class="ib-row"><div class="ib-label">总部</div><div class="ib-value">北京（研发）+ 广州海珠（智造）</div></div>
+        <div class="ib-row"><div class="ib-label">创始人</div><div class="ib-value">任晓雨（CEO）</div></div>
+        <div class="ib-row"><div class="ib-label">联合创始人</div><div class="ib-value">毛书翰</div></div>
+        <div class="ib-row"><div class="ib-label">上市状态</div><div class="ib-value">未上市</div></div>
+        <div class="ib-section">融资概况</div>
+        <div class="ib-row"><div class="ib-label">累计融资</div><div class="ib-value">超2亿元人民币（天使轮）</div></div>
+        <div class="ib-row"><div class="ib-label">最新轮次</div><div class="ib-value">天使++轮（2026年1月）</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">团队规模</div><div class="ib-value">研发人员占比超85%</div></div>
+        <div class="ib-row"><div class="ib-label">年产能</div><div class="ib-value">整机400+台，关节数万台</div></div>
+        <div class="ib-row"><div class="ib-label">代表产品</div><div class="ib-value">PHYBOT M1 / C2 / D1</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">业务领域</div><div class="ib-value"><span class="tag">人形机器人</span><span class="tag">具身智能</span><span class="tag">关节模组</span></div></div>
+        <div class="ib-section">官网</div>
+        <div class="ib-row"><div class="ib-label">官网</div><div class="ib-value">暂未公开</div></div>
+      </aside>
+
+      <p class="article-intro"><strong>动易科技</strong>（英文品牌：PHYBOT），全称北京动易人工智能科技有限公司，是一家专注于通用具身智能体研发的人形机器人公司，成立于2024年。公司以"Robot for AI"为核心愿景，致力于打造软硬件原生协同的通用具身智能体。动易科技是全栈自研路线的代表企业之一，自研PhyArc一体化摆线关节模组及PhyCore端到端运动控制模型，已推出PHYBOT M1全尺寸人形机器人、PHYBOT C2灵动服务机器人及PHYBOT D1四轮足机器狗等产品矩阵。截至2026年1月，公司天使轮累计融资超2亿元人民币，投资方涵盖国资、头部VC及产业资本。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper">
+        <table class="wikitable infotable">
+          <tr><th>项目</th><th>内容</th></tr>
+          <tr><td>公司全称</td><td>北京动易人工智能科技有限公司</td></tr>
+          <tr><td>英文品牌</td><td>PHYBOT</td></tr>
+          <tr><td>成立时间</td><td>2024年6月（工商注册）/ 2024年9月（正式对外运营）</td></tr>
+          <tr><td>注册地</td><td>北京市海淀区</td></tr>
+          <tr><td>运营布局</td><td>北京（前沿算法研发）+ 广州海珠（智造中心，2026年2月投产）</td></tr>
+          <tr><td>法定代表人</td><td>任晓雨</td></tr>
+          <tr><td>上市状态</td><td>未上市</td></tr>
+          <tr><td>公司愿景</td><td>Robot for AI —— 打造软硬件原生协同的通用具身智能体</td></tr>
+        </table>
+      </div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>时间</th><th>事件</th></tr>
+          <tr><td>2024年6月</td><td>公司在北京海淀注册成立</td></tr>
+          <tr><td>2024年9月</td><td>完成数千万元天使轮融资，峰瑞资本、Z基金（智谱生态基金）领投；正式对外运营</td></tr>
+          <tr><td>2025年4月</td><td>完成天使+轮融资，累计融资超1亿元；清智资本领投，普超资本跟投</td></tr>
+          <tr><td>2025年5月</td><td>广州动易落地海珠区，入驻"琶洲模方"产业空间</td></tr>
+          <tr><td>2025年7月</td><td>携PHYBOT M1/C1及PhyArc关节模组亮相WAIC 2025世界人工智能大会</td></tr>
+          <tr><td>2026年1月</td><td>完成天使++轮融资，天使轮累计融资超2亿元；海珠城发、广州产投等入局</td></tr>
+          <tr><td>2026年2月</td><td>广州智造中心正式投产，PHYBOT C2量产上市，PhyCore 0.1运动控制大模型永久免费开源</td></tr>
+          <tr><td>2026年4月</td><td>首次参展第139届广交会，获多国客商关注，实现小批量产品出口</td></tr>
+        </table>
+      </div>
+
+      <h3 id="team">1.2 创始人及核心团队</h3>
+      <p>动易科技由任晓雨与毛书翰联合创立，二人为清华大学机械工程系本科室友，形成了"技术+商业"的互补组合。公司研发人员占比超过85%，核心团队成员来自清华大学、北京航空航天大学、南方科技大学、UCLA、UCSD等国内外知名院校。团队是国内少数能在全尺寸人形机器人中实现强化学习算法规模化落地的团队之一。</p>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+          <tr><td>创始人兼CEO</td><td>任晓雨</td><td>清华大学机械工程系本硕毕业，数字应用技术高级工程师。曾就职于优必选（UBTech）参与机器人算法研发，后任傅利叶（Fourier）算法主任工程师、运动控制算法负责人，主导过多款明星人形机器人的研发与量产落地，具备从技术开发到量产的完整流程经验；擅长足式人形机器人和强化学习开发。持股约40.09%。</td></tr>
+          <tr><td>联合创始人</td><td>毛书翰</td><td>物理竞赛保送清华大学机械工程系，获机械工程与工商管理双学士学位。曾任职于多家头部券商投行，兼具技术底层理解与商业运作能力，丰富的产业经验和金融背景为动易科技多轮融资提供专业支撑。持股约6.57%。</td></tr>
+        </table>
+      </div>
+      <p>团队整体呈现<strong>学术+产业混合型</strong>人才结构：创始人有清华学术背景及头部人形机器人企业的量产经验，研发团队汇集了国内机器人领域名校毕业生和海外归国人才，技术与工程落地能力并重。</p>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <h4>融资历史</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>轮次</th><th>时间</th><th>金额</th><th>估值</th><th>核心投资方</th></tr>
+          <tr><td>天使轮</td><td>2024年9月</td><td>数千万元</td><td>未披露</td><td>峰瑞资本、Z基金（智谱生态基金）领投；麟阁创投、清智资本、青锐创投、信雅达、银杏谷资本、水木清华校友种子基金跟投</td></tr>
+          <tr><td>天使+轮</td><td>2025年4月</td><td>累计超1亿元</td><td>未披露</td><td>清智资本领投，普超资本跟投；老股东峰瑞资本、Z基金超额追投</td></tr>
+          <tr><td>天使++轮</td><td>2026年1月</td><td>累计超2亿元</td><td>未披露</td><td>海珠城发、广州产投、金雨茂物、锡创投、金沙江联合、达泰资本、复琢投资；老股东普超资本超额追投</td></tr>
+        </table>
+      </div>
+      <h4>股东结构特点</h4>
+      <p>动易科技的股东阵容呈现<strong>多元均衡</strong>格局：早期以峰瑞资本、Z基金（智谱生态基金）为代表的科技VC领投，中期引入清智资本（产业背景）、普超资本等，后期加入海珠城发、广州产投等地方国资以及锡创投（无锡国资）、金沙江联合等产业投资方。国资入局与广州智造中心落地高度协同，体现了"产业落地+资本绑定"的打法。创始人任晓雨持股约40.09%，保持较高控制权。</p>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>技术维度</th><th>详情</th></tr>
+          <tr><td>总体AI架构</td><td>"通用运控模型 × 具身本体"双层架构：上层为多模态AI大模型（大脑），下层为PhyCore端到端运动控制模型（小脑），通过强化学习实现从感知到动作的端到端输出</td></tr>
+          <tr><td>运动控制方案</td><td>端到端强化学习运控模型，无需拆分子任务（如步态规划、平衡控制、路径规划），直接输出关节控制指令；是国内少数能在全尺寸人形机器人中实现RL规模化落地的团队</td></tr>
+          <tr><td>硬件方案</td><td>全栈自研PhyArc一体化摆线关节模组，采用准直驱+摆线减速器方案，覆盖PhyArc 150、PhyArc 102等6款规格；最轻型号仅0.2kg，峰值扭矩530+Nm，瞬时过载5倍以上，背隙1弧分，反驱扭矩&lt;1Nm</td></tr>
+          <tr><td>数据方案</td><td>通过PhyCore 0.1开源构建"应用-数据-模型"飞轮，以虚拟环境对抗训练实现模型自我进化；利用量产机器人部署获取真实场景数据反馈</td></tr>
+          <tr><td>开源策略</td><td>PhyCore 0.1运动控制大模型于2026年2月全球永久免费开源，降低行业进入门槛，构建开发者生态</td></tr>
+          <tr><td>差异化特色</td><td>行业首次实现大扭矩、高精度、低反驱三项能力在单个关节模组中融合；全尺寸人形机器人完成拟人态后空翻（全球首款电动全尺寸）；C2机器人在公开展会与人类实现羽毛球往返对打（全球首次双足人形）</td></tr>
+        </table>
+      </div>
+      <p>动易科技选择<strong>全栈自研</strong>路线，从关节模组硬件到运控算法软件全部自主开发，不依赖外部供应商。该路线前期投入大、周期长，但一旦跑通可形成深厚的技术护城河和成本优势。公司以"硬件为基座、软件为灵魂"的方式，将PhyCore开源作为生态杠杆，目标是成为具身智能时代的"基础设施型"企业。</p>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>产品</th><th>分类</th><th>子类型</th><th>核心参数</th><th>主要场景</th></tr>
+          <tr><td>PHYBOT M1</td><td>全尺寸人形机器人</td><td>双足人形</td><td>172cm / &lt;60kg；32+自由度；峰值关节扭矩530Nm；行走1.4m/s，奔跑2.8m/s；双臂负载10-20kg，背负50+kg；续航2+小时（双9Ah可更换电池72V）；计算平台NVIDIA Jetson Orin + Intel Core i7；传感器：3D LiDAR、立体RGB相机、IMU</td><td>特种应急、物流货运、工业搬运、科研教育</td></tr>
+          <tr><td>PHYBOT C2</td><td>灵动服务机器人</td><td>双足人形</td><td>135cm / 35kg；25+自由度；关节扭矩密度244Nm；双臂负载5kg（同尺寸领先66.7%）；移动速度4m/s（同级别领先100%）；头部双目RGB传感器+投影模块、情绪交互灯带</td><td>展馆导览、体育陪伴、智能教育、商业服务、家庭陪伴</td></tr>
+          <tr><td>PHYBOT D1</td><td>四轮足机器狗</td><td>轮足复合</td><td>12个PhyArc 150关节；最大负载500kg；动态负载210kg；越障45°斜坡、85cm高台；载人载物双重功能</td><td>野外运输、废墟救援、特种作业</td></tr>
+          <tr><td>PHYBOT C1</td><td>小型人形机器人</td><td>双足人形（原型机）</td><td>128cm / 28kg；25+自由度；峰值扭矩244Nm</td><td>商业表演、教学演示、家庭陪伴</td></tr>
+          <tr><td>PhyArc关节模组</td><td>核心零部件</td><td>一体化摆线关节</td><td>6款规格（PhyArc 150、102等）；最轻0.2kg；峰值扭矩530+Nm；瞬时过载5倍+；背隙1弧分；反驱扭矩&lt;1Nm</td><td>对外销售、自用配套</td></tr>
+        </table>
+      </div>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>场景分类</th><th>具体场景</th><th>对应产品</th><th>合作方/进展</th></tr>
+          <tr><td>工业制造</td><td>工业搬运、重型物料运输、生产线协作</td><td>PHYBOT M1、D1</td><td>已与生产制造领域头部客户达成合作意向，部分进入试点验证</td></tr>
+          <tr><td>特种作业</td><td>野外运输、废墟救援、极端环境作业</td><td>PHYBOT D1、M1</td><td>已与特种作业领域客户达成合作意向</td></tr>
+          <tr><td>商业服务</td><td>展馆导览、商业接待、智能导购</td><td>PHYBOT C2</td><td>已与商业服务领域头部客户达成合作意向；2026年广交会现场展示</td></tr>
+          <tr><td>科研教育</td><td>高校科研平台、机器人教学</td><td>PHYBOT C2、M1</td><td>多所海内外头部高校关注，开放硬件接口与软件平台</td></tr>
+          <tr><td>消费/陪伴</td><td>体育陪伴（羽毛球对打）、家庭陪伴</td><td>PHYBOT C2、C1</td><td>C2全球首次公开展会双足人形羽毛球对打</td></tr>
+        </table>
+      </div>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>维度</th><th>进展</th></tr>
+          <tr><td>产能</td><td>广州智造中心年产能：整机400+台，关节模组数万台</td></tr>
+          <tr><td>量产状态</td><td>PHYBOT C2于2026年2月正式量产上市</td></tr>
+          <tr><td>客户合作</td><td>已与生产制造、特种作业、商业服务等领域头部客户达成合作意向；部分产品进入试点验证阶段，反馈"远超预期"</td></tr>
+          <tr><td>海外拓展</td><td>2026年4月首次参展第139届广交会，获得来自德国、土耳其、欧美、日韩、东南亚、南美客户咨询；已实现小批量产品出口海外</td></tr>
+          <tr><td>2026年目标</td><td>推动5-10个服务/劳动/运载场景落地</td></tr>
+          <tr><td>目标价格</td><td>PHYBOT M1：&lt;42,000美元；PHYBOT C2：~22,000美元</td></tr>
+          <tr><td>科研生态</td><td>PhyCore 0.1永久免费开源，海内外多所高校关注科研教育平台</td></tr>
+        </table>
+      </div>
+
+      <h3 id="financials">1.8 财务数据</h3>
+      <p>动易科技目前处于天使轮阶段，未公开披露具体营收及利润数据。公司2026年2月广州智造中心才启动批量生产，仍处于商业化早期。以下为可获取的资金储备情况：</p>
+      <div class="table-wrapper">
+        <table class="wikitable infotable">
+          <tr><th>指标</th><th>状态</th></tr>
+          <tr><td>融资总额</td><td>超2亿元人民币（天使轮累计）</td></tr>
+          <tr><td>营收</td><td>未公开披露（2026年2月开始量产）</td></tr>
+          <tr><td>盈利状态</td><td>未盈利（研发+产能建设投入期）</td></tr>
+          <tr><td>资金用途</td><td>技术研发迭代、人才引进、广州智造中心建设、海外市场拓展</td></tr>
+        </table>
+      </div>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>任晓雨与毛书翰为清华大学机械工程系本科室友，"技术+商业"组合在具身智能创业领域较为少见</li>
+        <li>PHYBOT M1是全球首款完成拟人态后空翻的全尺寸电动人形机器人，展示了极强的运动控制能力和关节爆发力</li>
+        <li>PHYBOT C2在2026年广交会实现全球首次双足人形机器人与人类在公开展会完成稳定羽毛球往返对打</li>
+        <li>公司采用"北京+广州"双城布局：北京聚焦前沿算法研发，广州聚焦先进智造与量产交付</li>
+        <li>PhyCore 0.1选择永久免费开源而非有限开源，体现了动易科技"以开源换生态"的差异化策略，与多数闭源竞品形成对比</li>
+        <li>PhyArc摆线关节模组可对外独立销售，使公司同时具备整机厂商与核心零部件供应商的双重身份</li>
+        <li>2026年广交会期间，灵巧手产品售价约2万余元，体现公司零部件对外销售的商业化策略</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="analysis-1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>任晓雨在优必选和傅利叶的工作经历为其积累了人形机器人从算法研发到量产落地的全流程经验，特别是足式机器人和强化学习领域的深厚积累，直接支撑了动易科技在运动控制方面的技术优势——PHYBOT M1的后空翻和C2的羽毛球对打均源于此。毛书翰的投行背景则为公司在资本运作和资源整合方面提供了优势，帮助公司在天使轮阶段即完成超2亿元的融资。团队将首发场景锁定在工业搬运、特种应急和商业服务，这三个场景均对人形机器人的运动能力要求高、付费意愿强，与创始团队的技术长板高度匹配。值得注意的是，C2定位"有温度的服务生"而非纯工业工具，暗示团队对消费级市场的长期野心。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>动易科技选择端到端强化学习运控路线，而非传统的模型预测控制（MPC）或基于规则的分层控制，这一选择与人形机器人在非结构化环境中的需求高度适配——工业搬运、野外救援等场景充满不确定性，RL的自适应能力优于规则系统。硬件方面，摆线减速器方案相比谐波减速器具有更高的刚性和抗冲击能力，适合重载场景，但精度和成本控制难度更大。公司通过自研关节模组同时解决成本和技术适配问题。开源PhyCore的策略则是利用开发者生态加速数据飞轮的形成——更多部署意味着更多真实场景数据反馈，进而提升模型泛化能力。总体上，技术路线与目标场景之间没有明显错配。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>动易科技的股东结构经历了明显的"从VC主导到国资加码"的演变。早期峰瑞资本、Z基金带来的更多是品牌背书和AI生态资源（Z基金背后的智谱AI），中后期海珠城发、广州产投、锡创投等地方国资的入局，则直接绑定了产业落地资源——广州智造中心的开设即得益于海珠区的政策与空间支持。这种结构意味着公司在场景选择上会受到地方产业政策的引导（如广州的先进制造业导向），但创始团队超40%的持股比例又保障了较强的战略自主权。整体看，多元均衡的股东结构为动易科技提供了"产业资源+资本弹药+战略自主"的良性三角。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>从公开信息来看，动易科技成立仅一年半左右，尚未出现明显的场景切换或重大技术路线转向。但产品矩阵的演化暗示了其迭代逻辑：最早推出的C1（128cm原型机）定位模糊，后迅速收敛为清晰的M1（工业重载）、C2（服务轻量）、D1（特种轮足）三线并行。C2从C1演化而来，高度从128cm提升至135cm，负载和速度大幅提升，说明团队在原型验证后快速调整了产品定位。此外，PhyCore开源的时间点（2026年2月，与量产同步）表明公司在商业化早期就已将生态建设纳入战略，这是一种前瞻性的路径选择而非事后补救。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>动易科技的核心取舍体现为"全栈自研硬件+开源软件"的独特组合。与宇树科技（以四足和低价人形切入）、智元机器人（大模型+本体全栈但闭源）、银河通用（聚焦操作大模型）等竞品相比，动易科技选择了差异化的定位：硬件全栈自研确保性能壁垒和成本控制，软件开源降低生态门槛——类似"人形机器人领域的Android策略"。这种取舍的优势在于能吸引开发者和合作伙伴共建生态，劣势在于开源可能削弱软件层面的商业变现能力。此外，动易科技同时做整机和关节模组销售，身兼"整车厂"和"发动机供应商"双重角色，在产业链中占据了更灵活的位置。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-6">
+        <h4>2.6 其他重要观察</h4>
+        <p>值得关注的是动易科技"清华室友创业"的叙事——任晓雨和毛书翰的组合不仅具备"技术+商业"的互补性，还带有强烈的人格化特征，这对品牌传播和人才吸引有正面效应。此外，M1实现后空翻和C2实现羽毛球对打这两项"世界首次"的展示，在技术和营销层面都极具价值——它们不仅是技术能力的证明，也是人形机器人从"能走"到"能运动"的标志性节点。长期来看，动易科技面临的核心挑战在于：天使轮超2亿元的融资规模在同行中处于中上水平，但人形机器人的研发和量产是重投入赛道，A轮融资的估值能否支撑、以及能否在2026-2027年实现规模化的商业闭环，将是决定其能否从"明星创企"晋级为"行业头部"的关键。</p>
+      </div>
+
+      <h2 id="references">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://m.36kr.com/p/3671786265911943" target="_blank">从实验室走向产业界：动易科技智造中心于广州开业 — 36氪</a></li>
+          <li><a href="https://www.donews.com/news/detail/4/6453412.html" target="_blank">动易科技携PHYBOT系列人形机器人及PhyArc关节模组亮相WAIC 2025 — DoNews</a></li>
+          <li><a href="https://m.newseed.cn/news/1376874" target="_blank">动易科技完成亿元级天使++轮融资，加速推进Robot for AI — 新芽</a></li>
+          <li><a href="https://m.pedaily.cn/news/560091" target="_blank">动易科技完成亿元级天使++轮融资 — 投资界</a></li>
+          <li><a href="https://www.chinaventure.com.cn/news/114-20250417-385921.html" target="_blank">清华室友创业，人形机器人公司动易科技完成超亿元天使轮融资 — 投中网</a></li>
+          <li><a href="https://m.jiemian.com/article/12632651.html" target="_blank">动易科技完成超亿元天使轮融资，将发布首款全尺寸双足人形机器人 — 界面新闻</a></li>
+          <li><a href="https://www.donews.com/news/detail/8/6383735.html" target="_blank">动易科技完成亿元级天使++轮融资 — DoNews快讯</a></li>
+          <li><a href="https://www.leiphone.com/category/industrynews/t8dybcti4FtlvGlD.html" target="_blank">加速推进"Robot for AI"战略落地，动易科技完成亿元级天使++轮融资 — 雷锋网</a></li>
+          <li><a href="https://www.qbitai.com/2026/01/370277.html" target="_blank">动易科技完成亿元级天使++轮融资 — 量子位</a></li>
+          <li><a href="https://m.21jingji.com/article/20240913/herald/31378775dff3a56d56afafe67c93e1dd.html" target="_blank">获峰瑞、智谱生态基金投资：动易科技如何打造通用人形硬件+运控平台 — 21世纪经济报道</a></li>
+          <li><a href="https://www.stcn.com/article/detail/3607557.html" target="_blank">硬科技企业融资小步快跑 天使轮也挂"++" — 证券时报</a></li>
+          <li><a href="https://finance.sina.cn/stock/jdts/2026-02-09/detail-inhmesxt6541015.d.html" target="_blank">动易科技智造中心落地广州，PHYBOT C2量产+核心系统开源双发 — 新浪财经</a></li>
+          <li><a href="https://m.zhidx.com/p/533960.html" target="_blank">北京具身创企在广州开造机器人！年产400台，AI智能体永久免费开源 — 智东西</a></li>
+          <li><a href="https://www.leaderobot.com/news/7202" target="_blank">动易科技广州智造中心启用：一家机器人公司如何重新定义"量产"与"开源" — 机器人大讲堂</a></li>
+          <li><a href="https://agent.ren/2026/0207/6958.shtml" target="_blank">动易科技广州智造中心启用，重新定义机器人量产与开源模式 — 智能体</a></li>
+          <li><a href="https://robot.ofweek.com/2026-01/ART-898890-8120-30679552.html" target="_blank">吸金超2亿元！两名清华室友联手造机器人 — OFweek机器人网</a></li>
+          <li><a href="https://m.rccaijing.com/news-7318575331995743751.html" target="_blank">两名清华室友联手创业，动易科技完成超亿元天使+轮融资 — RC财经</a></li>
+          <li><a href="https://i.gasgoo.com/news/70443589.html" target="_blank">Seeds | 动易科技完成亿元级天使++轮融资 — 盖世汽车</a></li>
+          <li><a href="https://www.iyiou.com/briefing/202601191870106" target="_blank">动易科技完成亿元级天使++轮融资，累计超2亿元加速具身智能落地 — 亿欧</a></li>
+          <li><a href="https://www.haizhu.gov.cn/zwgk/zdlyxxgk/gqxx/qyjj/content/post_10273837.html" target="_blank">招商新动态：海珠城发推动动易科技落户，海珠区具身智能产业再添新军 — 广州市海珠区政府</a></li>
+          <li><a href="http://www.bkeconomy.com/detail-1768812481129028.html" target="_blank">动易科技完成亿元级天使++轮融资，天使轮累计融资额超2亿元 — 北京经济</a></li>
+          <li><a href="http://www.robotsci.com.cn/detail/1913058805437042688" target="_blank">动易科技完成超亿元天使轮融资，全栈人形本体+关节，猛冲商业化 — 机器人科学</a></li>
+          <li><a href="https://www.sensorexpert.com.cn/article/455469.html" target="_blank">北京人形机器人新锐动易科技完成超2亿元融资，多款全尺寸机器人亮相 — 传感器专家网</a></li>
+          <li><a href="https://m.lieyunpro.com/archives/500127" target="_blank">动易科技完成亿元级天使++轮融资，天使轮累计融资额超2亿元 — 猎云网</a></li>
+          <li><a href="https://www.163.com/dy/article/KJNUB0PF05118HJE.html" target="_blank">动易科技完成亿元级天使++轮融资 — 网易</a></li>
+          <li><a href="https://nuxt.cyzone.cn/article/822043.html" target="_blank">融资丨动易科技完成亿元级天使++轮融资 — 创业邦</a></li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">本页面最后更新于2026年5月4日。内容基于公开信息整理，仅供参考。</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

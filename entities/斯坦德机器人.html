@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>斯坦德机器人 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style></head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> <span class="breadcrumb-sep">›</span> <span>斯坦德机器人</span></div>
+  <div class="wiki-header">
+    <h1>斯坦德机器人</h1>
+    <div class="subtitle">斯坦德机器人（无锡）股份有限公司 · HKEX二次递表中（18C章） · 2016年成立 · 中国第4大工业智能移动机器人供应商</div>
+  </div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#founders">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#financing">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#technology">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#applications">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercialization">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financials">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#analysis1">2.1 团队背景与场景匹配度</a></li>
+        <li class="toc-lvl4"><a href="#analysis2">2.2 技术路线与场景适配性</a></li>
+        <li class="toc-lvl4"><a href="#analysis3">2.3 股东资本结构影响</a></li>
+        <li class="toc-lvl4"><a href="#analysis4">2.4 试错与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#analysis5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#analysis6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#references">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+
+      <aside class="infobox">
+        <div class="infobox-title">斯坦德机器人</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">斯坦德机器人（无锡）股份有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">英文</div><div class="ib-value">Standard Robots (Wuxi) Co., Ltd.</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2016年</div></div>
+        <div class="ib-row"><div class="ib-label">总部</div><div class="ib-value">江苏无锡（注册地）/ 深圳（运营中心）</div></div>
+        <div class="ib-row"><div class="ib-label">上市状态</div><div class="ib-value">港交所二次递表中（2026.1 第18C章）</div></div>
+        <div class="ib-section">财务数据（2025前9月）</div>
+        <div class="ib-row"><div class="ib-label">营收</div><div class="ib-value">1.88亿元（同比+19.7%）</div></div>
+        <div class="ib-row"><div class="ib-label">净亏损</div><div class="ib-value">-1.63亿（含1.2亿股权激励）</div></div>
+        <div class="ib-row"><div class="ib-label">毛利率</div><div class="ib-value">44.7%</div></div>
+        <div class="ib-row"><div class="ib-label">现金储备</div><div class="ib-value">7,776万元（截至2025.9）</div></div>
+        <div class="ib-section">估值与市场地位</div>
+        <div class="ib-row"><div class="ib-label">估值</div><div class="ib-value">约21亿元（D轮投后）</div></div>
+        <div class="ib-row"><div class="ib-label">行业排名</div><div class="ib-value">中国第4、全球第5大工业AMR</div></div>
+        <div class="ib-row"><div class="ib-label">市场份额</div><div class="ib-value">3.2%（全球）</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">赛道</div><div class="ib-value">工业智能移动机器人/具身智能</div></div>
+        <div class="ib-row"><div class="ib-label">定位</div><div class="ib-value">全栈自研工业AMR+具身智能</div></div>
+        <div class="ib-section">官网</div>
+        <div class="ib-row"><div class="ib-label">官网</div><div class="ib-value"><a href="https://www.standard-robots.com" target="_blank">standard-robots.com</a></div></div>
+      </aside>
+
+      <p class="article-intro"><strong>斯坦德机器人</strong>（全称：斯坦德机器人（无锡）股份有限公司，英文名Standard Robots）是一家专注于工业智能移动机器人（AMR）及具身智能解决方案的中国科技企业，成立于2016年，注册地江苏无锡、运营中心位于深圳。公司由三位哈工大90后校友——王永锟（CEO）、李洪祥（CTO）、王金鹏（COO）联合创立，Name音译自"Standard"，寓意成为行业标准。斯坦德是中国首批自研工业机器人操作系统（SROS）的企业，按2024年销量计为中国第4大、全球第5大工业智能移动机器人方案提供商。公司深度绑定小米生态（小米智造持股8.4%，且为小米汽车独家AMR供应商），于2026年1月二次递表港交所（第18C章），冲刺"工业具身智能第一股"。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper">
+        <table class="wikitable infotable">
+          <tr><th>项目</th><th>内容</th></tr>
+          <tr><td>公司全称</td><td>斯坦德机器人（无锡）股份有限公司</td></tr>
+          <tr><td>英文名称</td><td>Standard Robots (Wuxi) Co., Ltd.</td></tr>
+          <tr><td>成立时间</td><td>2016年（深圳起家，2025年注册地迁至无锡）</td></tr>
+          <tr><td>注册地/总部</td><td>江苏省无锡市（注册地）；深圳市（运营中心）</td></tr>
+          <tr><td>上市状态</td><td>港交所主板二次递表中（首次2025年6月失效，2026年1月4日二次递表），第18C章，联席保荐人：中信证券、国泰君安国际</td></tr>
+          <tr><td>创始人/CEO</td><td>王永锟（1991年生，哈工大硕士）</td></tr>
+          <tr><td>官网</td><td>standard-robots.com</td></tr>
+          <tr><td>主营业务</td><td>工业智能移动机器人（AMR）及具身智能解决方案：标准型/功能型/具身智能机器人 + RoboVerse智能协同系统</td></tr>
+        </table>
+      </div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>时间</th><th>事件</th></tr>
+          <tr><td>2016年</td><td>王永锟、李洪祥、王金鹏三位哈工大校友在深圳创立斯坦德机器人</td></tr>
+          <tr><td>2016年</td><td>获天使轮200万元（罗鸿个人投资）</td></tr>
+          <tr><td>2017年4月</td><td>Pre-A轮2,224万元（合创资本、松禾资本等）</td></tr>
+          <tr><td>2020年7月</td><td>完成B轮融资</td></tr>
+          <tr><td>2023年3月</td><td>C轮1.8亿元，小米智造领投1.5亿元，中信建投跟投；投后估值曾达21亿元</td></tr>
+          <tr><td>2024年5月</td><td>D轮3亿元，博华资本旗下梁溪投资领投</td></tr>
+          <tr><td>2024年</td><td>全年营收2.51亿元（+55%），机器人销量1,932台</td></tr>
+          <tr><td>2025年初</td><td>注册地迁至无锡（产业落地+政府资源）</td></tr>
+          <tr><td>2025年5月</td><td>发布首款轮式人形具身智能机器人DARWIN</td></tr>
+          <tr><td>2025年6月</td><td>首次向港交所递表（后失效）</td></tr>
+          <tr><td>2026年1月4日</td><td>更新招股书二次递表港交所，冲刺"工业具身智能第一股"</td></tr>
+        </table>
+      </div>
+
+      <h3 id="founders">1.2 创始人及核心团队</h3>
+      <p>斯坦德由三位哈工大90后校友联合创立，呈现典型的"名校工科生创业"模式。创始人王永锟的个人经历颇具传奇色彩：15岁时因家贫险些辍学，靠慈善教育项目完成学业；2009年考入哈工大控制科学与工程专业，大四加入哈工大竞技机器人队并获全国亚军。创业初期原CEO因抑郁症离职，王永锟26岁临危受命接任CEO，跑遍140多家投资机构才获融资。核心团队以哈工大机器人技术背景为主，兼具竞技机器人实战经验。</p>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+          <tr><td>创始人/CEO</td><td>王永锟</td><td>1991年生，黑龙江鹤岗人，哈工大控制科学与工程硕士。大四加入哈工大竞技机器人队获全国亚军。2016年联合创立斯坦德，26岁接任CEO。入选福布斯U30榜单。跑遍140+投资机构完成首轮融资，展现出极强的创业韧性。</td></tr>
+          <tr><td>联合创始人/CTO</td><td>李洪祥</td><td>哈工大校友，负责公司技术研发方向，主导SROS操作系统及核心控制器开发</td></tr>
+          <tr><td>联合创始人/COO</td><td>王金鹏</td><td>哈工大校友，负责公司运营管理</td></tr>
+        </table>
+      </div>
+      <p>王永锟通过直接持股+一致行动人+投票权代理控制公司约35.46%投票权。团队整体年轻化，以哈工大系工科人才为骨干，在机器人导航、控制、调度算法方向具有深厚积累。</p>
+
+      <h3 id="financing">1.3 融资与股东</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>轮次</th><th>时间</th><th>金额</th><th>投资方</th></tr>
+          <tr><td>天使轮</td><td>2016年</td><td>200万元</td><td>罗鸿（个人）</td></tr>
+          <tr><td>Pre-A轮</td><td>2017年4月</td><td>2,224万元</td><td>合创资本、松禾资本等</td></tr>
+          <tr><td>B轮</td><td>2020年7月</td><td>未披露</td><td>未完全披露</td></tr>
+          <tr><td>C轮</td><td>2023年3月</td><td>1.8亿元</td><td>小米智造领投1.5亿元，中信建投跟投</td></tr>
+          <tr><td>D轮</td><td>2024年5月</td><td>3亿元</td><td>博华资本旗下梁溪投资</td></tr>
+        </table>
+      </div>
+      <p><strong>IPO前股权结构</strong>：王永锟（直接+一致行动人+投票权代理）控制约35.46%投票权，梁溪投资（博华资本关联）14.29%（第一大外部股东），小米智造8.40%，源码资本4.94%，国科嘉和3.41%，陆奇（MPlus HK）少量持股。公司累计完成8轮融资。</p>
+      <p><strong>估值波动</strong>：Pre-C轮后达21亿元 → C轮前一度回调至13.5亿元 → C轮+D轮后重回21亿元。递表前创始人王永锟曾套现约800万元。</p>
+      <p><strong>IPO信息</strong>：2025年6月首次递表港交所后失效，2026年1月4日更新招股书二次递表（第18C章特专科技通道），联席保荐人为中信证券和国泰君安国际。同时于2025年12月28日向北交所报送A股上市申报材料（A+H双驱动计划）。募资用途：40%研发 + 销售网络扩展 + 产能提升 + 营运资金。</p>
+
+      <h3 id="technology">1.4 技术路线</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>维度</th><th>详情</th></tr>
+          <tr><td>总体架构</td><td>"1+N+S=∞"技术理念——1个技术平台（核心控制器+SROS操作系统+算法库）+ N类机器人 + RoboVerse智能协同系统 = 无限场景</td></tr>
+          <tr><td>操作系统</td><td>SROS（Standard Robot Operating System），中国首批自研工业智能移动机器人操作系统，支持异构处理器任务调度、原生AI架构、多种机器人形态</td></tr>
+          <tr><td>核心硬件</td><td>自研核心控制器（异构多处理器、工业级设计）、自研激光雷达（BOM成本较上代下降约40%）</td></tr>
+          <tr><td>导航技术</td><td>多传感器融合激光SLAM实时建图导航、信标定位、惯性导航，适应90%以上环境变化率</td></tr>
+          <tr><td>群体智能</td><td>中国首家实现工业机器人系统"世界模型与群体智能"的企业。Robo-World世界模型技术——数字重建工厂场景进行仿真训练</td></tr>
+          <tr><td>集群调度</td><td>Robo-Set无代码集群调度系统 + Robo-Team人机协作系统，单场景可调度超2,000台机器人</td></tr>
+          <tr><td>具身智能</td><td>多模态算法端到端模型（感知-决策-操控一体化）；DARWIN机器人实现仿人作业能力；VLA模型方向布局</td></tr>
+        </table>
+      </div>
+      <p>斯坦德的技术路线以"全栈自研"为核心理念，从底层定位算法、操作系统、控制器到VLA模型全部自主研发。SROS自研操作系统是其最核心的差异化壁垒——与基于ROS二次开发的主流方案不同，SROS从底层为工业场景优化，在实时性、安全性和AI原生支持方面具有优势。世界模型+群体智能方向在国内工业AMR企业中属于前瞻性布局。</p>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>产品类别</th><th>代表型号</th><th>单价区间</th><th>自由度</th><th>2025前9月销量</th><th>收入占比</th></tr>
+          <tr><td>标准型机器人</td><td>OASIS系列（背负式AMR）</td><td>6万-35万元</td><td>3轴</td><td>177台</td><td>~12.6%</td></tr>
+          <tr><td>功能型机器人</td><td>搬运/堆垛/牵引/叉取型</td><td>10万-60万元</td><td>4-8轴</td><td>1,148台</td><td>~75.9%</td></tr>
+          <tr><td>具身智能机器人</td><td>LINK系列（复合型）、DARWIN（轮式人形）</td><td>45万-125万元</td><td>9+(LINK)/23+(DARWIN)</td><td>46台</td><td>~8.2%</td></tr>
+        </table>
+      </div>
+      <p><strong>旗舰产品 DARWIN</strong>：2025年5月发布的双臂轮式人形具身智能机器人，23+个自由度（28个关节电机），最大速度1.5m/s，续航8小时，单臂负载10kg，具备蹲伏/站立双姿态切换、快换灵巧手系统、多模态感知网络和远程操控能力。</p>
+      <p><strong>LINK系列</strong>：工业级复合机器人（AMR底盘+协作机械臂+视觉模组），面向半导体精密物料处理，含LINK-300EL-SRA-12（12kg负载）、LINK-600EL-SRA-20-SRT（20kg负载）、LINK-OWD-SRA-C-FOUP-12（12寸晶圆FOUP搬运）等多个型号。</p>
+      <p><strong>RoboVerse智能协同系统</strong>：包含Robo-World（世界模型仿真）、Robo-Set（无代码集群调度）、Robo-Team（人机协作）三大模块。</p>
+
+      <h3 id="applications">1.6 应用场景</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>场景分类</th><th>典型应用</th><th>标杆客户</th></tr>
+          <tr><td>汽车制造</td><td>总装线物料配送（100%激光SLAM导航），门线/外装/仪表板多物料搬运</td><td>小米汽车（独家AMR供应商，200+台部署）、比亚迪、蔚来、丰田、大众</td></tr>
+          <tr><td>3C电子</td><td>精密零部件搬运、产线对接、在制品流转</td><td>华为（一级供应商）、富士康、OPPO</td></tr>
+          <tr><td>半导体</td><td>晶圆FOUP搬运、弹夹上下料、精密物料处理</td><td>长电科技等半导体企业</td></tr>
+          <tr><td>新能源</td><td>电池产线物料搬运、储能设备对接</td><td>中创新航、爱旭</td></tr>
+          <tr><td>具身智能探索</td><td>复杂工序操作（重型货物搬运、精密小件抓取、狭小空间作业）</td><td>DARWIN处于早期客户试用阶段</td></tr>
+        </table>
+      </div>
+      <p>公司在3C电子领域全球份额排名第2（2.9%），汽车领域全球第2（4.7%），半导体领域全球第5（1.0%）。2025年前9月海外收入占比27.8%，海外毛利率高达52.1%。</p>
+
+      <h3 id="commercialization">1.7 商业化进展</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>指标</th><th>2022年</th><th>2023年</th><th>2024年</th><th>2025前9月</th></tr>
+          <tr><td>机器人销量（台）</td><td>725</td><td>1,212</td><td>1,932</td><td>1,371</td></tr>
+          <tr><td>具身机器人累计销量</td><td colspan="4">约106台（2022年至2025年Q3累计）</td></tr>
+          <tr><td>整体方案收入占比</td><td colspan="4">86%-91%为"交钥匙"整线解决方案</td></tr>
+          <tr><td>客户总数</td><td colspan="4">400+全球客户</td></tr>
+        </table>
+      </div>
+      <p>小米汽车是斯坦德最具标杆性的客户案例——为小米SU7总装线交付200+台OASIS AMR及23台自动充电桩，打造了全国首条100%激光SLAM AMR电动汽车总装线，适应90%以上环境变化率。但2025年前9月汽车领域收入同比锐减60.81%，国内增长趋缓下公司将增长重心转向海外。</p>
+
+      <h3 id="financials">1.8 财务数据</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>指标</th><th>2022年</th><th>2023年</th><th>2024年</th><th>2025年前9月</th></tr>
+          <tr><td>营业收入</td><td>0.96亿元</td><td>1.62亿元</td><td>2.51亿元</td><td>1.88亿元</td></tr>
+          <tr><td>营收增速</td><td>—</td><td>+68.8%</td><td>+55.0%</td><td>+19.7%同比</td></tr>
+          <tr><td>毛利率</td><td>12.9%</td><td>31.6%</td><td>38.8%</td><td>44.7%</td></tr>
+          <tr><td>净亏损</td><td>-1.28亿元</td><td>-1.00亿元</td><td>-0.45亿元</td><td>-1.63亿元</td></tr>
+          <tr><td>经调整净亏损</td><td>-1.24亿元</td><td>-0.95亿元</td><td>-0.39亿元</td><td>-0.29亿元</td></tr>
+          <tr><td>累计亏损</td><td colspan="4">超2.73亿元（截至2025.9）</td></tr>
+          <tr><td>现金及等价物</td><td colspan="4">7,776万元（截至2025.9）</td></tr>
+          <tr><td>应收账款</td><td colspan="4">1.57亿元（截至2025.9）</td></tr>
+        </table>
+      </div>
+      <p>2022-2024年营收年复合增长率61.3%，毛利率从12.9%持续攀升至44.7%。2025年前9月净亏损骤增至1.63亿元主因1.2亿元股权激励开支，经调整净亏损仅2,930万元，亏损持续收窄。现金储备仅7,776万元，现金转换周期长达302天，短期流动性压力显著。三年累计融资约5亿元，累计亏损超2.73亿元。</p>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li><strong>小米深度绑定</strong>：小米智造既是第二大机构股东（8.4%），又是核心客户（独家AMR供应商），形成"股东+客户"双重关系</li>
+        <li><strong>A+H双驱动</strong>：2025年12月28日向北交所报送A股申报材料，与港股二次递表同步推进，体现对上市通道的急切诉求</li>
+        <li><strong>国产替代</strong>：自研激光雷达使BOM成本下降约40%，核心控制器和SROS操作系统全栈自研，减少海外供应链依赖</li>
+        <li><strong>价格战压力</strong>：国内标准化搬运机器人已下探至5万-10万元区间，斯坦德定位中高端面临定价压力</li>
+        <li><strong>供应链风险</strong>：核心零部件谐波减速器高度依赖日本哈默纳科、纳博特斯克等海外供应商</li>
+        <li><strong>竞品对标</strong>：与极智嘉（已上市）、海康机器人（创业板在审）、迦智科技（港股递表）形成"三足鼎立"格局</li>
+        <li><strong>具身智能占比极低</strong>：DARWIN/LINK系列2025年前9月仅售46台，占销量约3.4%，占收入8.2%</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="analysis1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>斯坦德三位哈工大90后创始人的背景与工业AMR赛道高度匹配。王永锟在哈工大竞技机器人队的实战经验塑造了团队"快速迭代、以赛代练"的工程文化——这在需要大量现场部署和调试的工业AMR场景中尤为重要。控制科学与工程专业背景直接对应当前核心的SLAM导航、运动控制等技术方向。但年轻团队也面临明显挑战：商业化经验不足导致早期销售费用率畸高，26岁临危受命的王永锟缺乏大公司管理经验，在公司快速扩张至400+客户时可能面临组织管理瓶颈。创始人递表前套现800万元被部分媒体解读为信心不足的信号。团队选择从深圳起家再迁至无锡，体现了"先贴近电子制造客户（深圳）→再获取制造集群+政府资源（无锡）"的阶段化地理策略。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>"1+N+S=∞"架构体现了斯坦德对工业场景的深刻理解——1个技术平台保证底层统一性和成本可控，N类机器人覆盖从基础搬运到精密操作的梯度需求，S系统解决多机器人协同的管理难题。SROS自研操作系统是其最具战略价值的技术选择——在工业场景对实时性、安全性要求极高的情况下，基于ROS二次开发的方案存在先天不足，SROS从底层优化的架构更适合工业部署。100%激光SLAM导航（无需磁条/二维码）在汽车总装线等环境变化率超90%的场景中体现了技术路线的正确性。但DARWIN的发布存在"技术过早产品化"的风险——双臂10kg负载无法满足重载工业场景，具身智能的商业化落地时间表与资本市场的耐心之间可能存在张力。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>小米智造的入股（8.4%+C轮领投1.5亿元）是斯坦德最重要的战略资本事件。小米既是股东又是客户的双重身份形成了"产业资本+应用场景"的深度绑定——小米汽车为斯坦德提供了200+台AMR的标杆订单，也为其他汽车客户提供了示范效应。但硬币的另一面是：前五大客户收入占比40.5%，对小米等少数大客户的依赖构成集中度风险。梁溪投资（14.29%）的入局与公司注册地迁至无锡直接相关，体现了政府产业基金"以投资换落地"的典型模式。陆奇（MPlus HK）的参与则增添了AI/科技领域的背书效应。A+H双线推进的上市策略反映了公司在现金储备紧张（仅7,776万元）情况下的急迫诉求，但两线并行的合规成本和精力分散值得关注。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>斯坦德经历了三次显著的路径调整。第一次：从深圳起家到注册地迁至无锡。2025年将注册地从深圳迁至无锡，背后是长三角制造业集群的产业资源+无锡政府（梁溪投资）的资金支持。第二次：从纯硬件销售转向"交钥匙"整线解决方案。86%-91%的收入来自整线方案而非单机销售，说明公司从"卖机器人"转向"卖生产力"——这一转型对毛利率的提升效果显著（从12.9%到44.7%）。第三次：从纯工业AMR向具身智能的跨越。DARWIN和LINK系列的推出表明公司正在试图打开更大的估值空间——"工业AMR"的天花板有限（2024年全球市场153亿元），但"工业具身智能"的故事可以将估值对标提升至更高倍数。然而具身智能产品仅售106台（累计），这一"换故事"策略能否获得资本市场认可仍有待验证。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>斯坦德的核心取舍是："做全栈不做集成，做AMR不做AGV"。与依赖磁条/二维码导航的传统AGV厂商不同，斯坦德坚持100%激光SLAM自主导航路线，舍弃了在标准化程度高但技术壁垒低的传统AGV市场的份额。在产业链定位上选择全栈自研（SROS+控制器+激光雷达+算法+VLA模型），而非在开源ROS基础上做应用集成。这是一条"重研发、长周期"的路线——短期投入大、亏损时间长，但长期构建了操作系统层面的竞争壁垒。与极智嘉和海康机器人的竞争中，斯坦德选择以汽车（尤其是新能源汽车）和3C电子为优势场景，而非极智嘉的仓储物流主战场。DARWIN的发布更是将竞争维度从"移动"升级到"操作"——但10kg负载的限制使其短期内难以在重工业场景形成真正威胁。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis6">
+        <h4>2.6 其他重要观察</h4>
+        <p>首先是现金流的紧迫性。现金仅7,776万元，现金转换周期302天，应收账款1.57亿元——这意味着公司在上市前处于高度脆弱的财务状态。如果IPO再次失效或延迟，公司可能需要寻求新一轮私募融资（down round风险）。其次是小众市场的天花板问题。工业AMR全球市场2024年仅144亿元，即便做到全球第一（当前第一的极智嘉也仅约2-3%份额），绝对收入规模也有限。DARWIN和具身智能的故事本质上是对这一天花板的突围尝试，但具身智能的商业化节奏远慢于移动机器人。第三是小众竞争格局下的"三足鼎立"。极智嘉（已上市）、海康机器人、斯坦德三家合计份额仍不到全球10%，市场高度碎片化意味着长期的竞争消耗战。最后是"工业具身智能第一股"的标签——微亿智造、迦智科技也在冲刺同一title，三家谁将率先挂牌值得关注。</p>
+      </div>
+
+      <h2 id="references">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://36kr.com/p/3639213176278404" target="_blank">36氪：又一家机器人公司冲刺IPO，年复合增长61%</a></li>
+          <li><a href="https://robot.ofweek.com/2026-01/ART-8321202-8420-30678345.html" target="_blank">OFweek：工业物流三足鼎立资本化，斯坦德更新招股书决战港股18C</a></li>
+          <li><a href="https://news.qq.com/rain/a/20260108A06CAT00" target="_blank">腾讯新闻：小米汽车超级工厂供应商，斯坦德机器人赴港IPO</a></li>
+          <li><a href="https://finance.sina.cn/2026-01-24/detail-inhiiuci4501923.d.html" target="_blank">新浪财经：当机器人风口遇上盈利拷问，斯坦德二次递表难解亏损烦恼</a></li>
+          <li><a href="http://dianzibao.cb.com.cn/html/2026-01/26/content_339303.htm" target="_blank">中国经营报：斯坦德机器人二次递表深度报道</a></li>
+          <li><a href="https://nuxt.cyzone.cn/article/820808.html" target="_blank">创业邦：小米汽车生态链公司冲刺工业具身智能第一股</a></li>
+          <li><a href="https://36kr.com/p/3647732182994820" target="_blank">36氪：年入2.51亿，雷军投的黑龙江90后要IPO</a></li>
+          <li><a href="https://www.163.com/dy/article/KJQIRJFS0519QIKK.html" target="_blank">网易：从竞技机器人队启蒙，哈工大90后学霸造机器人叩响港股IPO大门</a></li>
+          <li><a href="https://m.pedaily.cn/news/560189" target="_blank">投资界：年入2.51亿，黑龙江90后要IPO了</a></li>
+          <li><a href="https://www.caizhongshe.cn/article-1063258429587549664.html" target="_blank">财中社：斯坦德二度冲刺工业具身智能</a></li>
+          <li><a href="https://www.dutenews.com/n/article/8917378" target="_blank">读特新闻：小米汽车3分钟卖20万台背后，一家深圳机器人公司连夜打工</a></li>
+          <li><a href="https://www.cs.com.cn/ssgs/gsxw/202507/t20250704_6499891.html" target="_blank">中国证券报：小米YU7火爆后，斯坦德冲刺港交所</a></li>
+          <li><a href="https://www.chinaagv.com/news/detail/202506/33444.html" target="_blank">中国AGV网：斯坦德机器人为小米YU7按下交付加速键</a></li>
+          <li><a href="https://robot.ofweek.com/2026-01/ART-898890-8120-30679011.html" target="_blank">OFweek：估值21亿！90后哈工大学霸造机器人，9个月狂销1300+台</a></li>
+          <li><a href="https://www.yemacaijing.com/Index/view/id/90518" target="_blank">野马财经：小米、蔚来投资的斯坦德机器人赴港IPO，递表前创始人套现800万元</a></li>
+          <li><a href="https://www.x-techcon.com/article/1751.html" target="_blank">X-Tech：年销超1900台机器人，进入比亚迪小米车企生态链</a></li>
+          <li><a href="https://www.standard-robots.com/" target="_blank">斯坦德机器人官网</a></li>
+          <li><a href="https://www.standard-robots.com/core-tech" target="_blank">斯坦德机器人核心技术页面</a></li>
+          <li><a href="https://www.standard-robots.com/products/cid-1.html" target="_blank">斯坦德LINK系列产品页面</a></li>
+          <li><a href="https://en.standard-robots.com/products/cid-2/id-11.html" target="_blank">斯坦德DARWIN产品页面</a></li>
+        </ol>
+      </div>
+
+    </article>
+  </div>
+  <div class="page-footer">
+    <p>本页面由具身智能Wiki自动分发系统基于公开信息生成 · 数据截止日期：2026年5月 · 仅供参考，不构成投资建议</p>
+  </div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

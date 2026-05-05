@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>萝博派对 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> › <span>萝博派对</span></div>
+  <div class="wiki-header"><h1>萝博派对</h1><div class="subtitle">RoboParty · 2025年成立 · 天使轮 · 全栈开源双足人形机器人 · "机器人领域的安卓"</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#team">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#product">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#finance">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#analysis-1">2.1 团队背景与场景匹配度</a></li>
+        <li class="toc-lvl4"><a href="#analysis-2">2.2 技术路线与场景适配性</a></li>
+        <li class="toc-lvl4"><a href="#analysis-3">2.3 股东/资本结构对战略的影响</a></li>
+        <li class="toc-lvl4"><a href="#analysis-4">2.4 试错过程与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#analysis-5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#analysis-6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#references">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">萝博派对</div>
+        <div class="ib-section">基本信息</div>
+        <div class="ib-row"><div class="ib-label">公司全称</div><div class="ib-value">上海萝博派对科技有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">英文品牌</div><div class="ib-value">RoboParty</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2025年2月21日</div></div>
+        <div class="ib-row"><div class="ib-label">总部</div><div class="ib-value">上海张江机器人谷</div></div>
+        <div class="ib-row"><div class="ib-label">创始人/CEO</div><div class="ib-value">黄一（2004年生）</div></div>
+        <div class="ib-row"><div class="ib-label">核心产品</div><div class="ib-value">ROBOTO Origin 全栈开源双足机器人</div></div>
+        <div class="ib-section">融资数据</div>
+        <div class="ib-row"><div class="ib-label">累计融资</div><div class="ib-value">超3000万美元</div></div>
+        <div class="ib-row"><div class="ib-label">最新轮次</div><div class="ib-value">天使轮（2000万美元）</div></div>
+        <div class="ib-row"><div class="ib-label">主要投资方</div><div class="ib-value">商汤国香、经纬创投、小米战投</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">GitHub Star</div><div class="ib-value">1400+（全球Top 5）</div></div>
+        <div class="ib-row"><div class="ib-label">社区规模</div><div class="ib-value">2000+开发者</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">行业</div><div class="ib-value">具身智能 · 开源硬件</div></div>
+        <div class="ib-row"><div class="ib-label">赛道</div><div class="ib-value">全栈开源双足人形机器人</div></div>
+        <div class="ib-row"><div class="ib-label">阶段</div><div class="ib-value">天使轮 · 教育/科研场景</div></div>
+      </aside>
+
+      <p class="article-intro"><strong>萝博派对</strong>（RoboParty），全称上海萝博派对科技有限公司，成立于2025年2月，总部位于上海张江机器人谷。公司由2004年出生的哈尔滨工业大学毕业生<strong>黄一</strong>创立，定位为"机器人领域的安卓"，专注于<strong>全栈开源双足人形机器人</strong>的研发与生态建设。核心产品ROBOTO Origin（萝博头原型机）以1.2m身高、3m/s跑步速度及全栈开源（硬件图纸、BOM清单、AMP运控算法）引发全球开发者社区关注，GitHub Star突破1400+，位列全球具身智能开源项目Top 5。公司成立不到一年完成三轮融资，累计超3000万美元，投资方包括商汤国香资本、经纬创投、小米战投等。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper">
+        <table class="wikitable infotable">
+          <tr><th>项目</th><th>内容</th></tr>
+          <tr><td>公司全称</td><td>上海萝博派对科技有限公司</td></tr>
+          <tr><td>英文品牌</td><td>RoboParty</td></tr>
+          <tr><td>成立时间</td><td>2025年2月21日</td></tr>
+          <tr><td>总部</td><td>上海浦东新区张江机器人谷</td></tr>
+          <tr><td>创始人/CEO</td><td>黄一（2004年出生，哈工大智能机器人专业）</td></tr>
+          <tr><td>核心团队</td><td>约50人，主要来自哈工大智能机器人专业</td></tr>
+          <tr><td>上市状态</td><td>未上市</td></tr>
+          <tr><td>行业标签</td><td>具身智能 · 开源硬件 · 双足人形机器人 · 具身Infra</td></tr>
+        </table>
+      </div>
+      <h4>发展沿革</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>时间</th><th>事件</th></tr>
+          <tr><td>2025年2月21日</td><td>公司注册成立</td></tr>
+          <tr><td>2025年11月</td><td>完成种子轮融资（数千万美元），经纬创投、小米战投、银河通用等参投</td></tr>
+          <tr><td>2025年12月</td><td>完成种子+轮融资，商汤国香资本、百度风投等参投</td></tr>
+          <tr><td>2026年1月15日</td><td>ROBOTO Origin（萝博头原型机）在GitHub全栈开源</td></tr>
+          <tr><td>2026年1月</td><td>GitHub Star突破1400+，进入全球具身智能开源项目Top 5</td></tr>
+          <tr><td>2026年3月</td><td>AWE亮相，向上海市委书记陈吉宁、市长龚正汇报</td></tr>
+          <tr><td>2026年3月31日</td><td>完成2000万美元天使轮融资，商汤国香、经纬创投联合领投</td></tr>
+        </table>
+      </div>
+
+      <h3 id="team">1.2 创始人及核心团队</h3>
+      <p>萝博派对是中国具身智能赛道最年轻的创业团队之一。创始人黄一2004年出生，哈尔滨工业大学智能机器人专业大三提前毕业。大学期间以1.5万元成本在宿舍手搓全栈开源双足机器人AlexBot，展现了极强的动手能力和工程天赋。联合创始人王书一为黄一大学室友，担任技术负责人；陆俊杰（哈工大建筑学背景）负责产品设计。团队整体约50人，呈现"极客+工程师"的年轻化特征，以哈工大智能机器人专业为人才核心来源。</p>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+          <tr><td>创始人/CEO</td><td>黄一</td><td>2004年出生，哈工大智能机器人专业大三提前毕业；大一时以1.5万元成本在宿舍手搓AlexBot双足机器人；自称"海盗"底色，以极客精神和开源理念驱动创业</td></tr>
+          <tr><td>联合创始人/技术负责人</td><td>王书一</td><td>黄一大学室友，负责整体技术架构和核心算法</td></tr>
+          <tr><td>产品设计</td><td>陆俊杰</td><td>哈工大建筑学背景，负责产品工业设计与用户体验</td></tr>
+        </table>
+      </div>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>轮次</th><th>时间</th><th>金额</th><th>投资方</th></tr>
+          <tr><td>种子轮</td><td>2025年11月</td><td>约1000万美元</td><td>经纬创投（MPCi）、小米战投（瀚星创业）、银河通用、L2F光源创业者基金</td></tr>
+          <tr><td>种子+轮</td><td>2025年12月</td><td>未单独披露</td><td>商汤国香资本、BV百度风投等</td></tr>
+          <tr><td>天使轮</td><td>2026年3月31日</td><td>2000万美元（约1.38亿元）</td><td>商汤国香资本、经纬创投联合领投；浦东创投、上海未来产业基金、安创资本、赛纳资本、百川资本等跟投</td></tr>
+        </table>
+      </div>
+      <p>累计三轮融资超3000万美元（约2.08亿元人民币）。光源资本为孵化方和独家财务顾问。股东阵容兼具顶级VC（经纬）、产业资本（小米、商汤）、政府引导基金（浦东创投、上海未来产业基金）和高校系资本，体现了多方位支持。估值未公开披露。</p>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>技术维度</th><th>具体内容</th></tr>
+          <tr><td>总体AI技术路线</td><td>全栈开源路线；AMP运控算法（Adversarial Motion Priors，对抗性运动先验）+ BFM行为基础模型（Behavior Foundation Model）</td></tr>
+          <tr><td>运控算法</td><td>AMP拟人步态控制——基于数据驱动范式，学习人体动捕数据实现自然步态；支持3m/s跑步速度</td></tr>
+          <tr><td>行为模型</td><td>BFM第三代范式行为基础模型——已完成验证</td></tr>
+          <tr><td>硬件方案</td><td>自研关节模组，模块化设计，高扭矩密度与快速动态响应；类车规级高刚性金属本体结构</td></tr>
+          <tr><td>开源策略</td><td>全栈开源：硬件图纸、EBOM物料清单、供应商名单、整机控制代码、AMP运控算法、Sim2Real调试经验、Know-how知识库</td></tr>
+          <tr><td>算力优化</td><td>持续降低前沿模型对算力资源消耗门槛，推动行为智能向更可落地、可规模化方向演进</td></tr>
+        </table>
+      </div>
+
+      <h3 id="product">1.5 产品形态</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>产品</th><th>状态</th><th>关键参数</th></tr>
+          <tr><td>AlexBot</td><td>创业前完成</td><td>黄一大一期间以1.5万元成本在宿舍手搓的全栈开源双足机器人</td></tr>
+          <tr><td>ROBOTO Origin（萝博头原型机）</td><td>2026年1月15日全栈开源</td><td>身高1.2m，重30-34kg，跑步速度3m/s；AMP拟人步态算法；开源硬件图纸+BOM+控制代码</td></tr>
+          <tr><td>ATOM01 / ATOM02-M</td><td>样机完成</td><td>系列研发迭代产品</td></tr>
+          <tr><td>RPO / RP1 Prototype</td><td>阶段性验证完成</td><td>整机关键阶段验证</td></tr>
+          <tr><td>ATOM02</td><td>计划2026年Q2发布并开源</td><td>第二代产品，下一代目标身高1.5m</td></tr>
+        </table>
+      </div>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>场景分类</th><th>具体应用</th><th>目标用户</th></tr>
+          <tr><td>科研/教育</td><td>高校实验室研究平台、机器人教学教具</td><td>全球高校及科研机构</td></tr>
+          <tr><td>开发者原型</td><td>具身智能算法验证、应用开发原型机</td><td>独立开发者、创业团队</td></tr>
+          <tr><td>企业研发</td><td>企业研发部门快速搭建机器人测试平台</td><td>机器人本体及AI公司</td></tr>
+        </table>
+      </div>
+      <p>当前阶段聚焦教育科研场景的小规模商业化。核心合作伙伴为地瓜机器人（ROBOTO Origin采用地瓜RDK X5开发者套件作为首选主控），入选地瓜机器人「地心引力计划」。早期创业项目曾获傅利叶智能赞助。</p>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <p>公司计划分三阶段实现商业化：2026年全球开发者社区扩展至1000核心成员，教育科研场景小规模商业化；2027-2028年通过核心零部件和JDM服务实现盈利；2029年后目标成为全球领先的人形机器人通用本体平台。目前已无宣发自然流量获订单数百份，覆盖海外科研实验室、教学场景及早期产品原型团队。多位海外开发者已提交PR并参与主干迭代。</p>
+
+      <h3 id="finance">1.8 财务数据</h3>
+      <p>公司成立仅一年，无公开营收、利润或现金储备数据。累计融资超3000万美元为资金储备提供了充足支持。以"硬件做商店、生态做商品"的商业模式，当前收入以教育和科研场景的硬件套件销售为主。</p>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>入选EAI OpenSource 10具身智能十大开源项目，全球具身智能开源项目Top 5</li>
+        <li>公司定位"具身智能Infra底座"，目标让具身智能开发成本降低80%</li>
+        <li>2026年AWE亮相向上海书记市长汇报，获政府层面关注</li>
+        <li>小米战投（瀚星创业）持股，工商变更显示小米机器人版图进一步拓展</li>
+        <li>黄一创业前曾获傅利叶智能赞助AlexBot项目，体现了产业界对年轻极客的扶持</li>
+        <li>"开源之都"上海将萝博派对作为标杆案例，赋能全球开发者大会</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="analysis-1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>黄一的"极客宿舍创业"故事与开源路线高度匹配。一个00后大学生在宿舍用1.5万元手搓出全栈开源双足机器人，这一叙事本身就具有极强的社区感染力——完美契合开源社区"打破壁垒、人人可造"的精神内核。创始团队的年轻化特征也天然适配开源社区的文化：极客精神、快速迭代、社区驱动。但在商业化维度上，年轻团队在供应链管理、规模化生产和企业级销售方面缺乏经验，这可能是公司在第二阶段（核心零部件和JDM服务盈利）面临的主要挑战。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>全栈开源是极具争议但逻辑自洽的技术策略。在教育科研场景中，开源意味着零许可成本、完全可定制、快速验证——这正是高校实验室和早期开发者最需要的。3m/s的跑步速度和AMP拟人步态算法使ROBOTO Origin在性能上具备竞争力，而全栈开源则大幅降低了进入门槛。但"全栈开源"策略也带来两个核心风险：（1）开源意味着技术壁垒被主动拆除，如果无法通过社区网络效应和数据飞轮构建新的壁垒，可能被竞争对手快速复制并低价超越；（2）开源硬件（不同于开源软件）的维护和迭代成本更高，物料供应链的复杂性可能导致开源承诺与实际交付能力之间的落差。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>股东阵容清晰地反映了多层次战略布局。小米战投的进入意味着可能的供应链协同（小米生态链制造能力）和消费级渠道资源；商汤国香资本带来了AI大模型层面的技术支持；经纬创投提供了顶级VC的资本背书和投后管理；上海未来产业基金和浦东创投代表了地方政府对开源机器人赛道的政策扶持。"政府+产业+VC"的三角结构为萝博派对提供了稳健的资金和资源基础，但也意味着公司需要在开源社区的"自由极客精神"与产业资本的"商业化回报预期"之间找到平衡。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>公司成立不到一年即完成三轮融资，节奏极快且路径清晰。从AlexBot（宿舍手搓）到ROBOTO Origin（正式开源产品）再到规划中的ATOM02（1.5m目标），产品迭代方向明确——从"能做出来"到"做得好"再到"做得大"。商业模式从"硬件销售"向"核心零部件+JDM服务"的演变也是合理的——开源硬件的单次销售利润有限，生态服务和定制化开发才是长期盈利点。但目前尚处于第一阶段向第二阶段的过渡期，社区商业化的具体路径仍有待验证。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>萝博派对的核心取舍是：<strong>不做封闭生态，做开源平台；不做整机品牌，做具身Infra</strong>。这一定位使其避开了与智元、宇树等整机品牌的正面竞争，转而与Figure AI（技术先进性标杆）和Tesla（渠道规模化标杆）形成跨维度的参照。开源策略的本质是"用社区换时间"——通过激发全球开发者的创造力来加速技术迭代，弥补团队在规模和经验上的不足。但关键挑战在于，如果头部整机厂商（如智元）也开始部分开源其技术栈，萝博派对作为"纯开源"平台的差异化将被削弱。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-6">
+        <h4>2.6 其他重要观察</h4>
+        <p>（1）"00后创始人"标签本身是一把双刃剑：在融资和公关层面极具话题性和传播力，但也会引发对团队经验和管理能力的质疑。（2）上海市政府对萝博派对的高度关注（书记市长视察、世界开发者大会标杆案例）表明开源机器人已被纳入上海科技创新战略版图，这意味着公司可能在政策资源和政府订单方面具有先发优势。（3）海外社区占比高是一个值得关注的信号——如果开源社区的海外用户持续增长，公司可能从"中国开源机器人公司"进化为"全球化开源机器人平台"，这在当前地缘政治环境下的估值叙事中具有特殊意义。（4）"硬件做商店、生态做商品"的商业模式如果成功，将为具身智能行业提供一个新的样本——证明开源+硬件也可以走通商业化闭环。</p>
+      </div>
+
+      <h2 id="references">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://m.pedaily.cn/news/562269" target="_blank">持续推进核心技术与产品迭代，「RoboParty 萝博派对」完成 2000 万美元天使轮融资</a> — 投资界</li>
+          <li><a href="https://m.36kr.com/p/3746195144225541" target="_blank">「RoboParty 萝博派对」完成 2000 万美元天使轮融资，全球影响力初现，卡位开源具身第一梯队</a> — 36氪</li>
+          <li><a href="https://www.iyiou.com/news/202603311125672" target="_blank">半年三轮融资！RoboParty获超1亿元天使轮融资，商汤国香、经纬创投</a> — 亿欧</li>
+          <li><a href="https://www.itheat.com/index.php/view/57511.html" target="_blank">小米再拓机器人版图！上海萝博派对科技工商变更，聚焦人形机器人开源赛道</a> — IT热评</li>
+          <li><a href="https://open.zhidx.com/p/544734.html" target="_blank">04年哈工大CEO造人形机器人，刚融资超亿元，商汤国香投了</a> — 智东西</li>
+          <li><a href="https://www.qbitai.com/2026/01/370355.html" target="_blank">哈工大系闯出人形机器人黑马：成立不到一年，全栈开源3m/s原型机，小米商汤都投了</a> — 量子位</li>
+          <li><a href="https://www.donews.com/news/detail/4/6248288.html" target="_blank">小米战投联合领投萝博派对 千万美元种子轮融资</a> — DoNews</li>
+          <li><a href="https://m.lieyunpro.com/archives/500919" target="_blank">RoboParty 萝博派对完成 2000 万美元天使轮融资</a> — 猎云网</li>
+          <li><a href="https://www.chinaventure.com.cn/news/80-20260331-390734.html" target="_blank">「RoboParty 萝博派对」完成 2000 万美元天使轮融资</a> — 投中网</li>
+          <li><a href="https://news.qq.com/rain/a/20260317A03INU00" target="_blank">「萝博派对」黄一：用"全开源"重铸人形机器人底座 | 光源伙伴</a> — 腾讯新闻</li>
+          <li><a href="https://caijing.chinadaily.com.cn/a/202601/20/WS696f210fa310942cc499c079.html" target="_blank">卡位具身 Infra 赛道！萝博派对全栈开源人形机器人技术底座</a> — 中国日报财经</li>
+          <li><a href="https://www.cinn.cn/hz/2026/01-20/Qr2wl65D.html" target="_blank">小米、经纬、商汤押注的00后团队，要把机器人底座做成生态！</a> — 中国工业新闻网</li>
+          <li><a href="https://www.manilatimes.net/2026/02/12/tmt-newswire/globenewswire/xiaomi-backed-roboparty-launches-origin-worlds-first-tier-full-stack-open-source-bipedal-humanoid-robot-forging-embodied-infrastructure/2277350" target="_blank">Xiaomi-Backed RoboParty Launches ORIGIN</a> — Manila Times</li>
+          <li><a href="https://www.cnr.cn/shanghai/gstjshanghai/20260329/t20260329_527565824.shtml" target="_blank">"开源之都"让全球极客"非来不可"</a> — 央广网</li>
+          <li><a href="https://m.jfdaily.com/sgh/detail?id=1723369" target="_blank">两个月就能造出人形机器人？上海未来产业基金如何用"双轮驱动"捕获青年创新力</a> — 解放日报</li>
+          <li><a href="https://damodev.csdn.net/696f94eea16c6648a983cfed.html" target="_blank">萝博派对（RoboParty）Roboto_Origin项目全栈上线</a> — CSDN</li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">本页面由具身智能Wiki维护，最后更新于2026年5月 · 内容仅供信息参考，不构成投资建议</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

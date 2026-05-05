@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>灵宝CASBOT — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> › <span>灵宝CASBOT</span></div>
+  <div class="wiki-header"><h1>灵宝CASBOT</h1><div class="subtitle">CASBOT · 北京中科慧灵机器人技术有限公司 · 成立于2023年 · 累计融资约2亿元</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#team">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#finance">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#a21">2.1 团队背景与场景选择的匹配度</a></li>
+        <li class="toc-lvl4"><a href="#a22">2.2 技术路线与场景的适配性</a></li>
+        <li class="toc-lvl4"><a href="#a23">2.3 股东/资本结构对战略的影响</a></li>
+        <li class="toc-lvl4"><a href="#a24">2.4 试错过程与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#a25">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#a26">2.6 其他重要观察与分析</a></li>
+        <li class="toc-lvl2"><a href="#refs">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">灵宝CASBOT</div>
+        <div class="ib-section">基本信息</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">北京中科慧灵机器人技术有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">英文品牌</div><div class="ib-value">CASBOT</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2023年8月</div></div>
+        <div class="ib-row"><div class="ib-label">总部</div><div class="ib-value">北京市海淀区东升科技园</div></div>
+        <div class="ib-row"><div class="ib-label">创始人/CEO</div><div class="ib-value">张正涛（中科院自动化所研究员）</div></div>
+        <div class="ib-row"><div class="ib-label">COO</div><div class="ib-value">张淼</div></div>
+        <div class="ib-row"><div class="ib-label">CTO</div><div class="ib-value">马世奎</div></div>
+        <div class="ib-section">融资数据</div>
+        <div class="ib-row"><div class="ib-label">累计融资</div><div class="ib-value">约2亿元人民币</div></div>
+        <div class="ib-row"><div class="ib-label">最新轮次</div><div class="ib-value">天使+轮（2025.06）</div></div>
+        <div class="ib-row"><div class="ib-label">领投方</div><div class="ib-value">联想创投、蓝思科技</div></div>
+        <div class="ib-section">产品线</div>
+        <div class="ib-row"><div class="ib-label">人形机器人</div><div class="ib-value">CASBOT 01 / CASBOT 02</div></div>
+        <div class="ib-row"><div class="ib-label">轮式机器人</div><div class="ib-value">CASBOT W1 / W2</div></div>
+        <div class="ib-row"><div class="ib-label">灵巧手</div><div class="ib-value">五指仿生灵巧手</div></div>
+        <div class="ib-row"><div class="ib-label">教育开源</div><div class="ib-value">灵小宝（CASBOT Mini）</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">赛道</div><div class="ib-value"><span class="tag">具身智能</span><span class="tag">人形机器人</span></div></div>
+        <div class="ib-row"><div class="ib-label">场景定位</div><div class="ib-value"><span class="tag">工业制造</span><span class="tag">矿业能源</span></div></div>
+        <div class="ib-section">官网</div>
+        <div class="ib-row"><div class="ib-label">官网</div><div class="ib-value"><a href="https://www.casbot.com.cn" target="_blank">casbot.com.cn</a></div></div>
+      </aside>
+
+      <p class="article-intro"><strong>灵宝CASBOT</strong>（全称北京中科慧灵机器人技术有限公司）是一家专注于具身智能人形机器人研发与商业化的中国科技企业，成立于2023年8月，总部位于北京海淀。公司依托中国科学院自动化研究所的学术背景，由张正涛研究员创立，走"工厂派"务实路线，聚焦工业制造和矿业能源两大刚需场景。截至2025年6月，累计完成约2亿元融资，投资方包括联想创投、蓝思科技、国投创合等。旗下拥有全尺寸双足人形机器人、轮式具身机器人、五指仿生灵巧手等多条产品线，其中CASBOT 02售价32.88万元已上线京东自营。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper">
+        <table class="wikitable infotable">
+          <tr><th style="width:120px">项目</th><th>内容</th></tr>
+          <tr><td>公司全称</td><td>北京中科慧灵机器人技术有限公司</td></tr>
+          <tr><td>英文品牌</td><td>CASBOT</td></tr>
+          <tr><td>成立时间</td><td>2023年8月</td></tr>
+          <tr><td>注册地</td><td>北京市海淀区</td></tr>
+          <tr><td>总部地址</td><td>北京市海淀区东升科技园</td></tr>
+          <tr><td>上市状态</td><td>未上市</td></tr>
+          <tr><td>官网</td><td><a href="https://www.casbot.com.cn" target="_blank">https://www.casbot.com.cn</a></td></tr>
+          <tr><td>企业资质</td><td>中关村高新技术企业 · 北京市"专精特新"中小企业（2025年Q3）</td></tr>
+          <tr><td>研发模式</td><td>"南北协同"——深圳团队负责硬件/供应链，海淀团队负责算法/系统</td></tr>
+        </table>
+      </div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th style="width:100px">时间</th><th>事件</th></tr>
+          <tr><td>2023年8月</td><td>北京中科慧灵机器人技术有限公司成立</td></tr>
+          <tr><td>2024年11月</td><td>发布首款全尺寸双足人形机器人CASBOT 01（代号"星期三"）</td></tr>
+          <tr><td>2025年2月</td><td>完成超亿元天使轮融资，联想创投、国投创合、河南资产基金参投</td></tr>
+          <tr><td>2025年6月</td><td>完成近亿元天使+轮融资，蓝思科技领投；发布CASBOT 02（灵贰），售价32.88万元上线京东自营</td></tr>
+          <tr><td>2025年下半年</td><td>轮式机器人CASBOT W1上线京东；发布新一代五指仿生灵巧手</td></tr>
+          <tr><td>2026年1月</td><td>"工业具身智能北京市重点实验室"获批成立（中科院自动化所+灵宝CASBOT+国网北京电力共建）</td></tr>
+          <tr><td>2026年4月10日</td><td>"慧聚生态·灵启未来"2026生态伙伴大会，发布W2、机器人乐队、灵小宝、D1四大新品，签约多家战略合作伙伴</td></tr>
+        </table>
+      </div>
+
+      <h3 id="team">1.2 创始人及核心团队</h3>
+      <p>灵宝CASBOT团队兼具深厚学术底蕴与产业实战经验，创始核心来自中国科学院自动化研究所和头部机器人企业，整体呈现"学术派+产业派"混合型人才结构。深圳团队专门负责硬件设计与供应链协同，海淀团队聚焦算法研发与系统集成，形成"南北协同"组织架构。公司2025年团队规模约80-100人，研发人员占比约70%。</p>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+          <tr><td>创始人/董事长</td><td>张正涛</td><td>中国科学院自动化研究所研究员、博士生导师，中组部"万人计划"领军人才。长期从事具身智能与精密操作研究，在3D视觉、灵巧操作领域有深厚学术积累。2025年当选工信部人形机器人与具身智能标准化技术委员会（MIIT/TC8）首届委员。</td></tr>
+          <tr><td>联合创始人/COO</td><td>张淼</td><td>清华大学硕士，负责公司运营管理、商业化推进及生态伙伴体系建设。2025-2026年间主导完成两轮近亿元融资及2026年生态伙伴大会。</td></tr>
+          <tr><td>联合创始人/CTO</td><td>马世奎</td><td>曾任达闼机器人研发副总裁，拥有丰富的机器人整机研发和系统工程经验，主导CASBOT全系列产品线技术架构设计。</td></tr>
+          <tr><td>副总裁</td><td>杨莹</td><td>负责战略合作与对外关系，在2026年生态伙伴大会上代表公司与多方完成战略签约。</td></tr>
+        </table>
+      </div>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <h4>融资历史</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>轮次</th><th>时间</th><th>金额</th><th>领投方</th><th>跟投方/参投方</th></tr>
+          <tr><td>天使轮</td><td>2025年2月</td><td>超亿元</td><td>—</td><td>联想创投、国投创合、河南资产基金</td></tr>
+          <tr><td>天使+轮</td><td>2025年6月</td><td>近亿元</td><td>蓝思科技</td><td>天津佳益、国投创合（老股东）、河南资产基金（老股东）</td></tr>
+        </table>
+      </div>
+      <h4>股东结构</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>股东类别</th><th>代表机构</th><th>战略意义</th></tr>
+          <tr><td>产业资本</td><td>联想创投、蓝思科技</td><td>联想开放"火种计划"制造场景，蓝思提供零部件+整机组装+消费电子/汽车场景资源</td></tr>
+          <tr><td>国有资本</td><td>国投创合、河南资产基金</td><td>提供产业政策对接及资本长期稳定性</td></tr>
+        </table>
+      </div>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>技术维度</th><th>具体方案</th></tr>
+          <tr><td>AI架构</td><td>VLA（视觉-语言-动作）模型，分层端到端架构——"CASBOT Embodied Brain"：本地端侧具身模型+云端大模型分离，保证工厂断网时稳定作业</td></tr>
+          <tr><td>后训练方法</td><td>强化学习（RL）在线微调——解决VLA在精细化作业场景的性能瓶颈，使模型自适应调整环境和人工干扰（ICRA 2025论文录用）</td></tr>
+          <tr><td>数据方案</td><td>多域数据采集体系：真机运行数据+仿真模拟数据+真人行为示范数据（与中科院自动化所联合研发密集触觉手套+视觉眼镜系统）</td></tr>
+          <tr><td>运控方案</td><td>全身力矩模型预测控制+强化学习步态规划，行走速度≥7km/h，环境通过率>95%</td></tr>
+          <tr><td>灵巧操作</td><td>复合连杆传动+全掌触觉传感器，亚毫米级精度(±0.5mm)，80余种操作模式</td></tr>
+          <tr><td>自研程度</td><td>全栈自研——从硬件本体（灵巧手、整机结构）到核心算法（VLA、运控、力控）均为自主研发</td></tr>
+          <tr><td>差异化特色</td><td>聚焦"上半身手-眼-脑协同"，与宇树等以运控见长的厂商形成差异化</td></tr>
+        </table>
+      </div>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>产品线</th><th>型号</th><th>形态</th><th>关键参数</th><th>售价</th><th>发布时间</th><th>适用场景</th></tr>
+          <tr><td rowspan="2">双足人形机器人</td><td>CASBOT 01（星期三）</td><td>全尺寸双足</td><td>179cm / ~60kg / 52 DOF / 550 TOPS / 续航≥4h</td><td>未公开</td><td>2024.11</td><td>通用类脑智能、特种作业</td></tr>
+          <tr><td>CASBOT 02（灵贰）</td><td>轻量化双足</td><td>163cm / ~55kg / 275 TOPS</td><td>32.88万元</td><td>2025.06</td><td>交互娱乐、教育科研、文旅商服</td></tr>
+          <tr><td rowspan="2">轮式机器人</td><td>CASBOT W1</td><td>轮式具身智能</td><td>—</td><td>未公开</td><td>2025下半年</td><td>工业制造场景</td></tr>
+          <tr><td>CASBOT W2</td><td>双臂轮式</td><td>宽500mm / 四轮八驱全向底盘 / 可下千米矿井</td><td>未公开</td><td>2026.04</td><td>工业制造、矿业能源、数据采集</td></tr>
+          <tr><td>灵巧手</td><td>五指仿生灵巧手</td><td>仿生灵巧手</td><td>800g / 负载5kg / 精度±0.5mm / 80+操作模式</td><td>未公开</td><td>2025下半年(新品)</td><td>精密装配、科研验证</td></tr>
+          <tr><td>教育平台</td><td>灵小宝（CASBOT Mini）</td><td>半尺寸开源</td><td>21 DOF</td><td>4.99万元(限时2.99万)</td><td>2026.04</td><td>教育科研、开发者生态</td></tr>
+          <tr><td>桌面平台</td><td>CASBOT D1</td><td>桌面灵巧操作</td><td>开箱即用</td><td>未公开</td><td>2026.04</td><td>高校科研、VLA算法快速验证</td></tr>
+          <tr><td>文旅产品</td><td>CASBOT机器人乐队</td><td>演艺机器人集群</td><td>鼓手/键盘/吉他/贝斯四成员，毫秒级协同</td><td>—</td><td>2026.04</td><td>文旅演艺、品牌活动</td></tr>
+        </table>
+      </div>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>场景分类</th><th>具体场景</th><th>合作方/客户</th><th>进展</th></tr>
+          <tr><td rowspan="3">工业制造</td><td>3C电子柔性制造</td><td>联想集团（"火种计划"核心合作伙伴）</td><td>产线POC验证中</td></tr>
+          <tr><td>消费电子/汽车制造</td><td>蓝思科技</td><td>开放场景资源</td></tr>
+          <tr><td>质检装配/电力巡检</td><td>国网北京电力</td><td>共建重点实验室</td></tr>
+          <tr><td rowspan="3">矿业能源</td><td>矿山井下安全巡防</td><td>山东招金集团、山东中矿集团</td><td>三方合资公司，2025年下半年投入使用</td></tr>
+          <tr><td>千米矿井作业</td><td>—（CASBOT W2）</td><td>产品已发布</td></tr>
+          <tr><td>矿山装药</td><td>中信重工</td><td>共建重点实验室，全国产化特种机器人</td></tr>
+          <tr><td>教育科研</td><td>高校科研/开发者</td><td>多所高校</td><td>灵小宝、D1平台已供货</td></tr>
+          <tr><td>文旅商服</td><td>演艺/设备租赁</td><td>城市之间（北京）科技</td><td>乐队已在北京春晚、中关村论坛巡演</td></tr>
+        </table>
+      </div>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <p>灵宝CASBOT采用"B端优先"策略，通过POC验证→1台样机→10台首单→百台级订单的客户规律驱动量产节奏。2025年量产交付目标：双足人形机器人约100台套、轮式具身机器人约100台套、仿生灵巧手约200只。京东线上渠道方面，CASBOT 02上线次日即成交2单，灵小宝（Mini）2026年生态大会现场50台售罄。2026年生态大会期间与星核芯光签署千台框架采购协议，支撑产品批量落地。</p>
+
+      <h3 id="finance">1.8 财务数据</h3>
+      <p>公司成立于2023年，目前处于商业化早期阶段，<strong>公开资料未披露具体营收及利润数据</strong>。2025年核心目标为完成小批量量产和首轮交付。已知关键财务相关信息包括：已获得工业、矿业能源领域在手订单；京东上线后有直接成交记录；累计融资约2亿元，目前账面现金可支撑核心物料储备、产能建设和B端场景交付。</p>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>2025年，创始人张正涛当选工信部人形机器人与具身智能标准化技术委员会（MIIT/TC8）首届76名委员之一。</li>
+        <li>2026年1月，"工业具身智能北京市重点实验室"获批，依托中科院自动化所，灵宝CASBOT和国网北京电力共建。</li>
+        <li>国家矿山安全局要求2026年底前实现"危重岗位机器换人"，为灵宝矿山场景创造了政策刚需窗口。</li>
+        <li>灵宝CASBOT已正式加入北京市机器人产业协会。</li>
+        <li>2026年生态伙伴大会发布五大生态计划（"慧创、慧研、慧拓、慧服、慧享"），目标新增100家核心生态伙伴、共建10大联合创新实验室。</li>
+        <li>与永信至诚科技集团签署具身智能安全合作协议，共筑产业安全防线。</li>
+        <li>CASBOT机器人乐队已在北京春晚、中关村论坛等重要场合巡演，形成差异化品牌曝光。</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="a21">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>灵宝CASBOT的团队构成与其选择的工业+矿业场景高度匹配。创始人张正涛作为中科院自动化所研究员，长期深耕精密操作与3D视觉研究，这直接决定了公司以"具身操作"（而非运动能力）为核心技术壁垒的路线选择。CTO马世奎来自达闼，拥有消费级/工业级机器人整机研发经验，弥补了学术团队在产品工程化上的短板。COO张淼的运营和融资能力则为公司快速打通B端客户关系提供了商业驱动力。这种"学术底蕴+产业工程+商业运营"的三驾马车结构，较纯学术团队或纯产业团队更具完整性，尤其适合需要长周期研发+深度行业know-how的工业和矿业赛道。</p>
+      </div>
+
+      <div class="analysis-block" id="a22">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>灵宝选择的分层端到端VLA架构与其矿山井下、工厂车间等目标场景高度适配——这些场景常面临网络不稳定甚至断网的情况，本地"端侧具身模型"可保证离线持续作业，云端大模型则在联网时提供复杂推理支持。强化学习后训练方法进一步解决了工业场景中环境干扰多、任务精细度要求高的痛点。但值得关注的是，半结构化工业场景对VLA的泛化能力要求相对低于完全开放的家庭场景，这降低了灵宝的技术落地难度；然而矿山场景的极端环境（粉尘、湿度、振动）对硬件可靠性提出了远超一般工业场景的要求，灵宝在硬件工程化方面的积累能否支撑仍需时间验证。</p>
+      </div>
+
+      <div class="analysis-block" id="a23">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>灵宝的股东结构体现出清晰的"产业绑定"逻辑。联想创投（天使轮）为灵宝打开了联想全球制造体系的场景入口（"火种计划"），蓝思科技（天使+轮领投）则提供了三重价值——资本注入、供应链协同（关键零部件+整机组装）、以及消费电子/汽车/智能家居场景资源的开放。这种产业资本密集的股东结构意味着灵宝在工业制造领域的场景资源远超纯财务投资驱动的同行，但也可能使其在场景选择上受制于股东优先级的约束。国有资本（国投创合、河南资产基金）的参与则提供了政策对接便利和资本稳定性，尤其在矿山安全等政策驱动型赛道上具有战略意义。</p>
+      </div>
+
+      <div class="analysis-block" id="a24">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>灵宝CASBOT从成立至今展现出清晰的路径聚焦而非频繁试错的特征。公司从2024年11月首发CASBOT 01起即明确"工业+矿业"双赛道定位，未出现明显的场景切换或产品线大幅调整。2025年6月从CASBOT 01到CASBOT 02的迭代体现了向轻量化、可销售产品的务实调整（从179cm/60kg的全尺寸"技术旗舰"下沉到163cm/55kg/32.88万元的"可商业化版本"）。2026年产品线扩展（W2、灵小宝、D1、机器人乐队）显示灵宝在巩固工业矿业主赛道的同时，开始通过低成本的"生态型产品"培育开发者社区和品牌影响力，这种"主力产品深耕B端+生态产品覆盖长尾"的策略较为成熟。</p>
+      </div>
+
+      <div class="analysis-block" id="a25">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>灵宝CASBOT在行业中的核心取舍明确：走"iPod式专用务实路线"而非"iPhone式通用平台路线"。与宇树科技侧重运控/消费级、优必选侧重教育/服务、智元机器人侧重通用AI大脑不同，灵宝坚定选择工业和矿业两大垂直场景做深度渗透，并通过合资公司、战略签约等方式与产业巨头形成紧密绑定。在硬件vs大脑的选择上，灵宝采取了"全栈但不封闭"的策略——自研灵巧手和核心算法以构建壁垒，但通过生态大会开放VLA模型SDK和硬件接口以吸引开发者。这种"核心自研+生态开放"的组合在现阶段具身智能行业较为罕见，若执行得当可能形成独特的竞争护城河。</p>
+      </div>
+
+      <div class="analysis-block" id="a26">
+        <h4>2.6 其他重要观察与分析</h4>
+        <p>灵宝CASBOT的商业化策略呈现出几个值得关注的独特之处。第一，"客户规律驱动"的量产逻辑（POC→1台→10台→100台）显示公司对B端销售周期有清醒认知，避免了过度承诺导致交付风险。第二，将32.88万元的人形机器人上线京东看似面向C端，实则COO张淼明确表态"零售渠道是链接商机的窗口，主要面向B端客户展示"——这种"电商获客+线下成交"的混合模式可能成为B端机器人销售的新范式。第三，2026年发布的灵小宝（4.99万元）对标宇树G1等教育市场产品，但灵宝更强调"开源"和"开发者生态"而非硬件走量，显示其希望通过软件生态建立长期粘性。第四，国家矿山安全局2026年底"危重岗位机器换人"的deadline为灵宝矿山业务提供了明确的政策时间窗口，能否在此期间完成产品可靠性验证和大规模交付将是关键考验。</p>
+      </div>
+
+      <h2 id="refs">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://www.cls.cn/detail/2086110" target="_blank">灵宝CASBOT联创张淼：近亿元融资加持 人形机器人开始踏足矿场——连线创始人（财联社）</a></li>
+          <li><a href="https://w.geekpark.net/news/351261" target="_blank">灵宝机器人完成近亿元融资，工厂派投资人盯上「人形机器人」（极客公园）</a></li>
+          <li><a href="https://36kr.com/p/3352760004883078" target="_blank">北京人形机器人黑马再获近亿元融资，一台产品售价32万（36氪）</a></li>
+          <li><a href="https://36kr.com/p/3348658418310020" target="_blank">拿下工业、矿产能源头部客户订单，人形机器人公司「灵宝CASBOT」获近亿元融资（硬氪/36氪）</a></li>
+          <li><a href="https://finance.eastmoney.com/a/202506263441555171.html" target="_blank">共拓"人机协作"新模式 蓝思科技领投灵宝CASBOT（东方财富网）</a></li>
+          <li><a href="https://m.lieyunpro.com/archives/497792" target="_blank">人形机器人品牌灵宝CASBOT完成近亿元天使+轮融资，蓝思科技领投（猎云网）</a></li>
+          <li><a href="https://ex.chinadaily.com.cn/exchange/partners/82/rss/channel/cn/columns/sz8srm/stories/WS685d03aaa31009d21e5bec82.html" target="_blank">灵宝CASBOT完成近亿元天使+轮融资，技术务实加速商业化落地（中国日报）</a></li>
+          <li><a href="https://peking.bjd.com.cn/content/s688988cce4b0bd64e2e1a2ad.html" target="_blank">我在海淀造机器人①——"灵宝"破局（北京日报）</a></li>
+          <li><a href="https://www.stdaily.com/web/gdxw/2025-06/26/content_360833.html" target="_blank">人形机器人灵宝完成近亿元融资（科技日报）</a></li>
+          <li><a href="https://m.ebrun.com/583858.html" target="_blank">对话灵宝机器人：价格不是关键 先解决机器人"能干啥"（亿邦动力）</a></li>
+          <li><a href="https://cn.chinadaily.com.cn/a/202604/10/WS69d8cabca310942cc49a71f5.html" target="_blank">"慧聚生态·灵启未来"中科慧灵2026生态伙伴大会在京举行（中国日报）</a></li>
+          <li><a href="https://news.qq.com/rain/a/20260410A06TGT00" target="_blank">中科慧灵召开2026生态伙伴大会，以协同体系构建具身智能规模发展的现实支点（腾讯新闻）</a></li>
+          <li><a href="https://topics.gmw.cn/2026-04/10/content_38700817.htm" target="_blank">慧聚生态灵启未来 具身智能机器人走向真实应用新阶段（光明网）</a></li>
+          <li><a href="https://peking.bjd.com.cn/content/s69ddc915e4b0cd719ea08257.html" target="_blank">海淀企业新品矩阵勾勒具身智能新图景（北京日报）</a></li>
+          <li><a href="https://kw.beijing.gov.cn/xwdt/kcyx/xwdtshgg/202601/t20260107_4406763.html" target="_blank">工业具身智能北京市重点实验室落地（北京市科委）</a></li>
+          <li><a href="http://finance.ynet.com/2026/04/14/4001127t632.html" target="_blank">具身智能生态伙伴——永信至诚携手灵宝CASBOT，护航产业安全发展（北京青年报）</a></li>
+          <li><a href="https://www.itiger.com/hant/news/2546271380" target="_blank">對話靈寶機器人COO張淼：價格不是關鍵，先解決機器人「能幹啥」（老虎社区）</a></li>
+          <li><a href="https://www.163.com/dy/article/K30RRMOI0511CP87.html" target="_blank">对话灵宝机器人：价格不是关键，先解决机器人"能干啥"（网易）</a></li>
+          <li><a href="http://stock.10jqka.com.cn/20260414/c675970999.shtml" target="_blank">永信至诚携手灵宝CASBOT 共筑具身智能安全生态（同花顺）</a></li>
+          <li><a href="https://app-web.chnfund.com/jx/202506/t20250626_4499316.html" target="_blank">灵宝CASBOT完成近亿元天使+轮融资（中国基金报）</a></li>
+          <li><a href="https://www.kczg.org.cn/fruit/detail?id=729930" target="_blank">面向场景落地的具身智能机器人技术（科创中国）</a></li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">本页面内容基于公开信息整理，数据截至2026年5月。页面风格遵循具身智能Wiki统一模板。</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

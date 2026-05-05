@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>阿米嘎嘎 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> <span class="breadcrumb-sep">›</span> <span>阿米嘎嘎</span></div>
+  <div class="wiki-header"><h1>阿米嘎嘎</h1><div class="subtitle">Amigaga · 2020年成立 · 天使轮(奇绩创坛+明月湖) · 双臂协作/四足/教育机器人</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#founders">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financials">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#analysis-1">2.1 团队背景与场景选择</a></li>
+        <li class="toc-lvl4"><a href="#analysis-2">2.2 技术路线与场景适配</a></li>
+        <li class="toc-lvl4"><a href="#analysis-3">2.3 股东/资本结构影响</a></li>
+        <li class="toc-lvl4"><a href="#analysis-4">2.4 试错与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#analysis-5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#analysis-6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#references">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">阿米嘎嘎</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">深圳阿米嘎嘎科技有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">英文名</div><div class="ib-value">Amigaga</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2020年1月6日</div></div>
+        <div class="ib-row"><div class="ib-label">注册地</div><div class="ib-value">深圳市宝安区</div></div>
+        <div class="ib-row"><div class="ib-label">创始人/CEO</div><div class="ib-value">蒲灿（爱丁堡大学博士）</div></div>
+        <div class="ib-row"><div class="ib-label">联合CTO</div><div class="ib-value">杨传宇（爱丁堡大学机器人学博士）</div></div>
+        <div class="ib-section">融资数据</div>
+        <div class="ib-row"><div class="ib-label">最新轮次</div><div class="ib-value">天使轮（2024.12）</div></div>
+        <div class="ib-row"><div class="ib-label">投资方</div><div class="ib-value">奇绩创坛+明月湖国际智能产业科创基地</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">注册资本</div><div class="ib-value">约54万元</div></div>
+        <div class="ib-row"><div class="ib-label">政府专项</div><div class="ib-value">重庆具身智能人形机器人1亿元专项</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">赛道</div><div class="ib-value">具身智能·服务/教育机器人</div></div>
+        <div class="ib-row"><div class="ib-label">产品线</div><div class="ib-value">双臂协作、四足、双足教育、操作系统</div></div>
+        <div class="ib-section">官网</div>
+        <div class="ib-row"><div class="ib-label">官网</div><div class="ib-value">amigaga.com</div></div>
+      </aside>
+
+      <p class="article-intro"><strong>阿米嘎嘎</strong>（深圳阿米嘎嘎科技有限公司，Amigaga），是一家成立于2020年1月的具身智能机器人公司，总部位于深圳市宝安区。公司由爱丁堡大学博士蒲灿（CEO/CTO）与爱丁堡大学机器人学博士杨传宇（联合CTO）联合创立。公司产品线覆盖双臂协作机器人（Gagabot）、四足配送机器人、双足教育机器人及自研机器人操作系统，定位室内通用多场景应用。2024年12月完成天使轮融资，投资方为奇绩创坛与明月湖国际智能产业科创基地。创始人蒲灿兼任重庆大学国家卓越工程师学院特聘副教授，参与主持2025年重庆市具身智能人形机器人研发及应用重大专项（投资近1亿元）。公司产品已中标中山大学人工智能学院教学机器人项目。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper"><table class="wikitable infotable">
+        <tr><th>项目</th><th>内容</th></tr>
+        <tr><td>公司全称</td><td>深圳阿米嘎嘎科技有限公司</td></tr>
+        <tr><td>英文名称</td><td>Shenzhen Amigaga Technology Co., Ltd.</td></tr>
+        <tr><td>成立时间</td><td>2020年1月6日</td></tr>
+        <tr><td>注册地址</td><td>深圳市宝安区航城街道</td></tr>
+        <tr><td>注册资本</td><td>约54万人民币</td></tr>
+        <tr><td>法定代表人</td><td>张洋洋</td></tr>
+        <tr><td>上市状态</td><td>未上市</td></tr>
+        <tr><td>官方网站</td><td>amigaga.com</td></tr>
+        <tr><td>主营业务</td><td>双臂协作机器人、四足机器人、双足教育机器人及机器人操作系统研发/销售</td></tr>
+      </table></div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>时间</th><th>事件</th></tr>
+        <tr><td>2020年1月6日</td><td>深圳阿米嘎嘎科技有限公司正式注册成立</td></tr>
+        <tr><td>2020-2024年</td><td>产品研发期：开发Gagabot双臂协作机器人、四足机器人、双足教育机器人</td></tr>
+        <tr><td>2024年12月30日</td><td>完成天使轮融资，奇绩创坛、明月湖国际智能产业科创基地联合投资</td></tr>
+        <tr><td>2025年</td><td>蒲灿参与主持重庆市具身智能人形机器人研发及应用重大专项（投资近1亿元）</td></tr>
+        <tr><td>2025年</td><td>中标中山大学人工智能学院教学机器人项目（合同金额约95万元）</td></tr>
+        <tr><td>2025年</td><td>参与重庆市轮足机器人类脑研发专项（投资251万元）</td></tr>
+      </table></div>
+
+      <h3 id="founders">1.2 创始人及核心团队</h3>
+      <p>阿米嘎嘎的核心团队具有鲜明的海归学术背景。创始人蒲灿为爱丁堡大学博士，三维视觉与AI专家，现任重庆大学国家卓越工程师学院特聘副教授、具身智能实验室负责人。联合CTO杨传宇同为爱丁堡大学机器人学博士，深度强化学习专家，其研究论文曾登上《Science Robotics》封面。团队以海归博士为核心技术力量，结合高校科研平台（重庆大学）和产业孵化生态（奇绩创坛/明月湖），呈现"学术驱动+孵化加速"的人才结构特征。</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+        <tr><td>创始人/CEO/CTO</td><td>蒲灿</td><td>爱丁堡大学博士，三维视觉与AI专家；重庆大学国家卓越工程师学院特聘副教授、具身智能实验室负责人；参与主持重庆具身智能人形机器人1亿元重大专项</td></tr>
+        <tr><td>联合CTO</td><td>杨传宇</td><td>爱丁堡大学机器人学博士，深度强化学习专家，论文曾登《Science Robotics》封面</td></tr>
+      </table></div>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <h4>融资历史</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>时间</th><th>轮次</th><th>金额</th><th>投资方</th></tr>
+        <tr><td>2020年（创立初）</td><td>种子轮</td><td>未披露</td><td>未披露</td></tr>
+        <tr><td>2024年12月30日</td><td>天使轮</td><td>未披露</td><td>奇绩创坛（前YC中国）、明月湖国际智能产业科创基地</td></tr>
+      </table></div>
+
+      <h4>股东结构</h4>
+      <p>阿米嘎嘎的股东以早期孵化型资本为主。奇绩创坛（陆奇创办的前YC中国）是天使轮联合投资方之一，为典型的"加速器+早期投资"模式，通常在投后提供深度的产品和技术辅导。明月湖国际智能产业科创基地位于重庆两江新区明月湖，与重庆大学及当地政府深度合作——蒲灿本人任职于重庆大学，这构成了阿米嘎嘎与明月湖科创基地之间的桥梁。这一"深圳注册+重庆科研+奇绩孵化"的资源组合为公司在华南和西南两大区域同时获取资源提供了便利。</p>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>维度</th><th>详情</th></tr>
+        <tr><td>AI技术方向</td><td>具身智能大模型、机器人感知-规划-控制、深度强化学习运动控制</td></tr>
+        <tr><td>感知技术</td><td>三维视觉感知（蒲灿核心研究领域），环境感知传感器集成</td></tr>
+        <tr><td>运动控制</td><td>四足机器人运动控制（3m/s速度）、双足步态（教育版18自由度）、双臂协作控制</td></tr>
+        <tr><td>操作系统</td><td>自研面向小白用户的无代码机器人操作系统，降低开发门槛</td></tr>
+        <tr><td>政府专项</td><td>重庆具身智能人形机器人研发及应用重大专项（近1亿）、轮足机器人类脑研发专项（251万）</td></tr>
+      </table></div>
+      <p>阿米嘎嘎的技术路线呈现"多形态覆盖+教育开源+高校联动"的特色。在硬件形态上同时布局双臂协作、四足和双足三条线，体现了对多场景通用性的追求而非单一形态的专注。在软件层面自研无代码操作系统，目标是将机器人应用开发门槛降至"小白用户"级别，这与公司教育场景的核心定位高度一致。依托重庆大学的科研平台和重庆市政府的大额专项支持，公司在具身智能大模型和类脑研发方向具有持续的技术投入能力。</p>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>产品系列</th><th>类型</th><th>型号/参数</th><th>适用场景</th></tr>
+        <tr><td>Gagabot</td><td>双臂协作机器人</td><td>移动无人小车+双机械臂+环境感知传感器，支持无代码开发</td><td>医院、餐厅、酒吧、家庭、商场、仓库</td></tr>
+        <tr><td>四足机器人</td><td>仿生四足</td><td>12自由度，12kg，速度3m/s，续航1小时</td><td>物流最后一公里配送</td></tr>
+        <tr><td>双足机器人（教育版）</td><td>小型双足</td><td>高37.3cm，1.85kg，18自由度，算法开源</td><td>AI教育（踢球、巡线、人脸识别等）</td></tr>
+        <tr><td>机器人操作系统</td><td>软件平台</td><td>面向小白用户的自定义多功能无代码操作系统</td><td>全产品线配套</td></tr>
+      </table></div>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>场景分类</th><th>具体应用</th><th>说明</th></tr>
+        <tr><td>教育科研</td><td>高校AI实验室教学、中小学AI教育</td><td>已中标中山大学项目（约95万元），算法开源降低学术使用门槛</td></tr>
+        <tr><td>商业服务</td><td>餐厅/酒吧服务、商场导览</td><td>Gagabot双臂协作机器人目标场景</td></tr>
+        <tr><td>医疗健康</td><td>医院物资配送、辅助服务</td><td>Gagabot目标场景之一</td></tr>
+        <tr><td>物流配送</td><td>最后一公里配送</td><td>四足机器人核心场景</td></tr>
+        <tr><td>家庭服务</td><td>家庭助理、陪伴</td><td>Gagabot覆盖场景</td></tr>
+        <tr><td>仓储物流</td><td>仓库物料搬运</td><td>Gagabot通用移动平台</td></tr>
+      </table></div>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <p>阿米嘎嘎成立超过5年，商业化仍处于早期阶段。已确认的订单包括中山大学人工智能学院教学机器人项目（合同金额约95万元）。公司同时通过重庆大学平台参与政府专项项目获取研发资金（近1亿元人形机器人专项+251万元轮足机器人专项）。四足机器人和Gagabot双臂协作机器人产品的市场化销售规模尚未公开披露。公司官网（amigaga.com）提供产品展示，但未见明确的批量订单或营收数据公告。</p>
+
+      <h3 id="financials">1.8 财务数据</h3>
+      <p>公司为非上市私营企业，未公开披露财务报表。注册资本约54万元，天使轮融资金额未披露。公司主要资金来源包括天使轮融资（奇绩创坛+明月湖）、政府专项研发资金（重庆具身智能人形机器人专项近1亿元、轮足机器人专项251万元）以及教育市场项目收入（中山大学约95万元）。考虑到公司已运营超过5年但融资轮次较少，推测公司在2020-2024年间以自筹资金和种子轮资金维持运营，2024年底天使轮后才进入加速发展阶段。</p>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>需注意区分阿米嘎嘎（深圳）与奇瑞旗下Chery-Aimoga人形机器人品牌（售价约28.58万元），两者为完全不同的实体</li>
+        <li>蒲灿兼任重庆大学国家卓越工程师学院特聘副教授、具身智能实验室负责人</li>
+        <li>杨传宇论文曾登上《Science Robotics》封面，体现了团队在顶级学术层面的影响力</li>
+        <li>公司参与主持2025年重庆市具身智能人形机器人研发及应用重大专项（投资近1亿元），具有地方政府深度背书</li>
+        <li>公司创始人蒲灿曾在2025年中国海归创业大赛中展示项目</li>
+        <li>双足教育机器人算法开源，面向AI教育社区开放</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="analysis-1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>阿米嘎嘎的创始团队以海归博士为核心，蒲灿的三维视觉与AI背景和杨传宇的深度强化学习背景构成了"感知+决策"的完整学术能力组合。团队选择了教育场景作为首要商业化突破口（中山大学项目+开源教育机器人），这一选择与学术背景高度匹配——教育场景对机器人的绝对性能要求较低，但需要完整的学术故事和技术可复现性，这正是学术型团队的天然优势。然而，Gagabot同时瞄准了医院、餐厅、家庭等高度非结构化的商业和消费场景，这些场景对产品可靠性、成本控制和售后支持的要求远超教育场景，团队的学术基因和有限的工程化经验可能构成挑战。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>公司"多形态覆盖+无代码操作系统"的技术路线与教育场景高度适配。开源的双足教育机器人和无代码操作系统降低了学术用户的使用门槛，这一策略类似于ROS在机器人学术界的定位——通过降低入门成本建立用户生态。但多形态（双臂、四足、双足、轮足）并行的策略在初创阶段存在资源分散的风险——每种形态的控制算法、硬件设计和供应链都有独立的挑战。重庆1亿元专项的"人形机器人"方向和251万元的"轮足机器人"方向反映了政府层面也在推动多线并进，这既是资源注入也是方向牵引。需要观察公司是否会在未来2-3年内收敛到1-2个核心形态。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>奇绩创坛+明月湖的组合提供了"市场化加速+地方政府资源"的双重赋能。奇绩创坛（陆奇创办的前YC中国）以其深度的创业辅导和产品方法论著称，通常会推动被投企业聚焦核心指标和快速迭代。明月湖科创基地则提供了重庆地方政府和重庆大学的资源网络（实验室、人才、专项经费）。这种"深圳（创业生态）+重庆（政府和学术资源）"的双城布局具有一定优势，但也可能带来团队分散和管理成本增加的问题。天使轮融资规模未披露，2020年成立至2024年底才完成天使轮，融资节奏较慢可能反映了早期阶段的商业化挑战。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>阿米嘎嘎成立超过5年（2020-2025），但公开产品线和融资信息多集中于2024-2025年，暗示前4年可能经历了较长的技术积累和方向探索期。从当前产品线来看，公司选择了"多形态覆盖"而非"单一爆品"策略，这一方面可能是对早期试错的自然结果（不同场景需求不同形态），另一方面也可能反映了尚未找到明确的PMF（产品市场匹配）。2024年底天使轮完成和2025年政府专项获批可能标志着公司进入新的加速阶段，但路径收敛的信号尚不明朗。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>阿米嘎嘎在竞争定位上的核心特征是"小而全"——不做大规模人形机器人（与智元、宇树、Figure不同），不做专一的工业刚需场景（与智动力、鹿明不同），而是以较低成本覆盖教育、商业、家庭等多个轻量级场景。这种定位的价值在于：如果教育市场成功建立用户生态（类似Arduino在开源硬件领域的地位），可能形成网络效应和品牌护城河。风险在于：多场景、多形态的并行研发在小团队（注册资本54万）的背景下可能导致"什么都做、什么都不精"。竞争方面，教育机器人市场已有优必选（K12教育机器人）、大疆（RoboMaster）等强力玩家，阿米嘎嘎需要找到差异化的切入点。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-6">
+        <h4>2.6 其他重要观察、分析</h4>
+        <p>阿米嘎嘎最值得关注的优势是"地方政府深度背书"。蒲灿在重庆大学的学术职位和参与主持的近1亿元重庆人形机器人专项为公司在西南地区提供了独特的资源壁垒——这种"教授创业者+政府大专项"的模式在具身智能赛道中较为少见。同时需关注的是：（1）公司成立5年仅完成一轮公开天使轮，融资节奏偏慢，后续资金持续性需要验证；（2）中山大学95万元的中标金额反映教育市场的客单价较低，规模化需要大量客户积累；（3）"阿米嘎嘎"的命名风格偏向C端/消费级定位，但公司目前的实际商业化以B端（教育/政府）为主，品牌定位与实际业务存在张力；（4）与奇瑞旗下"Aimoga"的名称相似性可能带来品牌混淆风险。</p>
+      </div>
+
+      <h2 id="references">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://vc.pedaily.cn/company/713685.html">阿米嘎嘎｜投资界公司详情</a></li>
+          <li><a href="https://www.innohere.com/ir/162865/finance.html">阿米嘎嘎融资历史｜InnoHere</a></li>
+          <li><a href="https://www.innohere.com/ir/162865/dynamics.html">阿米嘎嘎公司动态｜InnoHere</a></li>
+          <li><a href="http://amigaga.com/">阿米嘎嘎官方网站</a></li>
+          <li><a href="https://faculty.cqu.edu.cn/pucan/zh_CN/index.htm">蒲灿——重庆大学教师主页</a></li>
+          <li><a href="https://oseccn.com/project/info/12947">阿米嘎嘎——中国海归创业大赛项目展示</a></li>
+          <li><a href="http://m.imrobotic.com/android/detail/10225.html">阿米嘎嘎 双足机器人｜机器人网</a></li>
+          <li><a href="https://bidding.sysu.edu.cn/node/15476">中山大学人工智能学院教学机器人等设备采购项目｜中山大学招标</a></li>
+          <li><a href="https://m.tianyancha.com/company/3403989229">深圳阿米嘎嘎科技有限公司｜天眼查</a></li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">本页面内容基于公开信息整理，数据截止至2026年5月。内容仅供参考，不构成投资建议。如有信息更新或勘误，请参考原始来源。</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

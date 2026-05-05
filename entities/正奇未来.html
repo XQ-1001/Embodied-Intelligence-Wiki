@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>正奇未来 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> <span class="breadcrumb-sep">›</span> <span>正奇未来</span></div>
+  <div class="wiki-header">
+    <h1>正奇未来</h1>
+    <div class="subtitle">北京正奇未来智能科技有限公司 · 一步Freego · 成立2023年 · 北京 · Pre-A轮 · 3KM生活圈具身智能机器人</div>
+  </div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 公司基本信息</a></li>
+        <li class="toc-lvl3"><a href="#team">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financial">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#analysis-1">2.1 团队背景与场景选择匹配度</a></li>
+        <li class="toc-lvl4"><a href="#analysis-2">2.2 技术路线与场景适配性</a></li>
+        <li class="toc-lvl4"><a href="#analysis-3">2.3 股东/资本结构对战略的影响</a></li>
+        <li class="toc-lvl4"><a href="#analysis-4">2.4 试错过程与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#analysis-5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#analysis-6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#references">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">正奇未来</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">北京正奇未来智能科技有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">品牌名</div><div class="ib-value">一步Freego (FREEGO)</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2023年10月17日</div></div>
+        <div class="ib-row"><div class="ib-label">注册地</div><div class="ib-value">北京市门头沟区石龙经济开发区</div></div>
+        <div class="ib-row"><div class="ib-label">创始人/CEO</div><div class="ib-value">吴书林</div></div>
+        <div class="ib-row"><div class="ib-label">团队规模</div><div class="ib-value">约11人</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">首款产品</div><div class="ib-value">FreeGo X5 AI出行机器人</div></div>
+        <div class="ib-row"><div class="ib-label">融资金额</div><div class="ib-value">约500万人民币（Pre-A）</div></div>
+        <div class="ib-row"><div class="ib-label">投资方</div><div class="ib-value">线性资本</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">赛道</div><div class="ib-value">AI出行机器人</div></div>
+        <div class="ib-row"><div class="ib-label">技术特色</div><div class="ib-value">跨模态感知大模型</div></div>
+        <div class="ib-row"><div class="ib-label">地区</div><div class="ib-value">北京/深圳/上海</div></div>
+        <div class="ib-section">官网</div>
+        <div class="ib-row"><div class="ib-label">官网</div><div class="ib-value">www.freegoai.com</div></div>
+      </aside>
+
+      <p class="article-intro"><strong>正奇未来</strong>（全称北京正奇未来智能科技有限公司，品牌名"一步Freego"），是一家专注于3公里生活圈具身智能机器人的初创企业。公司成立于2023年10月，由前百度IDG副总裁、前华为北京业务总经理吴书林创办。首款量产产品FreeGo X5于2025年4月在CMEF首发亮相，定位为AI出行代步机器人，融合多传感器环境感知与跨模态感知大模型技术。2026年2月获得线性资本约500万元Pre-A轮独家投资，目前在北京、深圳开展多点实测，团队约11人。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper">
+        <table class="wikitable infotable">
+          <tr><th>项目</th><th>内容</th></tr>
+          <tr><td>公司全称</td><td>北京正奇未来智能科技有限公司</td></tr>
+          <tr><td>品牌名</td><td>一步Freego（FREEGO）</td></tr>
+          <tr><td>成立时间</td><td>2023年10月17日</td></tr>
+          <tr><td>注册地</td><td>北京市门头沟区石龙经济开发区</td></tr>
+          <tr><td>法定代表人</td><td>吴书林（创始人兼CEO）</td></tr>
+          <tr><td>团队规模</td><td>约11人</td></tr>
+          <tr><td>官网</td><td>www.freegoai.com</td></tr>
+          <tr><td>上市状态</td><td>未上市</td></tr>
+        </table>
+      </div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>时间</th><th>事件</th></tr>
+          <tr><td>2023年10月</td><td>公司正式注册成立</td></tr>
+          <tr><td>2025年4月</td><td>首款量产产品FreeGo X5在CMEF（中国国际医疗器械博览会）首发亮相</td></tr>
+          <tr><td>2026年2月</td><td>完成约500万元Pre-A轮融资，线性资本独家投资</td></tr>
+          <tr><td>2026年</td><td>在北京、深圳开展多点实测；在上海/苏州招聘结构工程师</td></tr>
+        </table>
+      </div>
+
+      <h3 id="team">1.2 创始人及核心团队</h3>
+      <p>创始人吴书林拥有丰富的科技企业管理经验，曾在两家头部企业担任高管——前百度IDG（智能驾驶事业群）副总裁、前华为北京业务总经理。这一履历赋予他在智能出行、自动驾驶感知技术以及大型企业组织管理方面的双重经验。核心团队均来自头部智能制造与互联网AI企业，整体呈现"大厂高管创业"特征。目前团队约11人，处于早期精干阶段，在上海/苏州已启动技术岗位招聘。</p>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+          <tr><td>创始人/CEO</td><td>吴书林</td><td>前百度IDG（智能驾驶事业群）副总裁、前华为北京业务总经理。兼具智能驾驶技术理解与大型企业管理经验。</td></tr>
+        </table>
+      </div>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>轮次</th><th>时间</th><th>金额</th><th>投资方</th></tr>
+          <tr><td>Pre-A轮</td><td>2026年2月</td><td>约500万人民币</td><td>线性资本（独家）</td></tr>
+        </table>
+      </div>
+      <p>本轮融资用于加速核心算法迭代、硬件量产及重点城市场景落地。线性资本作为专注于前沿科技早期投资的机构，其入局为正奇未来提供了AI与机器人领域的生态资源。公司目前未上市。</p>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>技术维度</th><th>具体路线</th></tr>
+          <tr><td>总体AI架构</td><td>自研跨模态感知大模型——整合视觉、语音、触觉等多模态信息，实现环境感知与交互决策</td></tr>
+          <tr><td>环境感知</td><td>FreeGo Co-Pilot系统——多传感器融合+AI算法，实现厘米级环境感知，构建人机共驾安全体系</td></tr>
+          <tr><td>情感交互</td><td>FreeGo AI Space——声-光-影三位一体情感交互系统；支持亲友声音克隆，提供个性化陪伴体验</td></tr>
+          <tr><td>硬件平台</td><td>自研传感器产品；"硬件平台化+软件服务化"双轮驱动</td></tr>
+        </table>
+      </div>
+      <p>吴书林的百度IDG背景为公司注入了自动驾驶级别的感知技术基因。FreeGo Co-Pilot本质上将L4级自动驾驶的环境感知能力降维应用于3公里生活圈的低速场景（代步/配送），属于"高阶技术低维场景化"的策略。</p>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>产品</th><th>发布时间</th><th>定位</th><th>关键特性</th></tr>
+          <tr><td>FreeGo X5</td><td>2025年4月（CMEF首发）</td><td>AI出行代步机器人</td><td>一体化环抱式"超级扶手"设计；嵌入式流光LED灯带；FreeGo Co-Pilot厘米级环境感知；FreeGo AI Space情感交互系统；极简未来主义设计</td></tr>
+        </table>
+      </div>
+      <p>FreeGo X5的产品形态介于"智能代步车"与"陪伴机器人"之间，旨在覆盖出行代步、情感陪伴和末端配送三大功能。其亮相渠道选择CMEF（医疗展），暗示初期目标人群包括老年人、康复患者等特需群体。</p>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>场景分类</th><th>具体场景</th><th>当前状态</th></tr>
+          <tr><td>出行代步</td><td>城市短途通勤、园区摆渡、特需群体（老年人/康复患者）代步</td><td>北京、深圳多点实测中</td></tr>
+          <tr><td>情感陪伴</td><td>AI陪伴智能体——数字人形象定制+声音克隆，面向独居老人、儿童等</td><td>产品功能集成中</td></tr>
+          <tr><td>末端配送</td><td>3公里内最后一公里物流配送</td><td>规划中</td></tr>
+        </table>
+      </div>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <ul>
+        <li><strong>量产状态</strong>：FreeGo X5已为首款量产产品，2025年4月CMEF首发。</li>
+        <li><strong>实测推进</strong>：北京、深圳两地开展多点实测，验证产品在真实城市场景下的表现。</li>
+        <li><strong>团队扩张</strong>：在上海/苏州招聘结构工程师等核心技术岗位。</li>
+        <li><strong>融资节奏</strong>：2026年2月完成Pre-A轮约500万元，融资规模较小，反映公司仍处于极早期验证阶段。</li>
+      </ul>
+
+      <h3 id="financial">1.8 财务数据</h3>
+      <p>正奇未来未上市，处于极早期阶段，无公开财务数据。Pre-A轮融资约500万元，团队11人，反映公司目前处于精益验证阶段。预计实质性营收贡献需在产品完成城市实测并获得批量订单后实现。</p>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>品牌名"一步Freego"中的"一步"暗示产品致力于解决"最后一公里/最后一步"的出行需求。</li>
+        <li>公司选择CMEF（医疗展）作为首发舞台，而非CES或机器人专业展会，显示其初期核心场景偏向医疗康复和特需群体。</li>
+        <li>创始人吴书林的百度IDG背景暗示公司在感知技术上可能复用自动驾驶领域的成熟技术栈，降低研发风险。</li>
+        <li>线性资本作为早期投资方，在AI赛道有广泛布局，可提供产业生态连接。</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="analysis-1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>吴书林的百度IDG背景与"AI出行机器人"的定位具有很强的逻辑一致性。百度IDG的核心能力是L4级环境感知与路径规划——这正是出行代步机器人最需要的技术能力。将自动驾驶的感知技术"降维"应用于3公里低速场景，技术风险相对可控。但场景本身（老年代步/康复出行）对医疗合规、安全认证的要求较高，吴书林的华为/百度背景偏重消费科技与出行科技，在医疗器械合规方面的经验可能不足。CMEF选择暗示团队意识到了这一挑战并主动靠近医疗场景。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>正奇未来的"跨模态感知大模型+硬件平台化"路线，与其"三合一"场景定位（出行+陪伴+配送）存在适配张力。出行代步对安全性和环境感知要求最高，情感陪伴对NLP和交互设计要求最高，末端配送对路径规划和任务可靠性要求最高——三个方向的技术重点不完全重叠。对于一个11人团队而言，同时推进三条技术线存在资源分散风险。团队可能需要聚焦一个核心场景（最可能是出行代步），将另外两个功能作为差异化卖点而非独立产品线。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>线性资本约500万元的Pre-A轮投资规模较小，反映正奇未来目前估值不高、融资节奏保守。线性资本在AI和机器人领域的广泛布局（包括多家具身智能企业）既是资源也是潜在冲突——如果线性同时投资了正奇未来的竞品，需要注意利益冲突。目前单一投资方的股东结构给予团队较大的战略自由度，但后续融资需要证明产品市场匹配性才能获得更大额度的融资支持。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>正奇未来路径调整的证据尚不充分（公司成立仅2年半，产品刚发布1年），但从首发展会选择CMEF而非CES/机器人展可以看出团队在场景聚焦上的策略性选择——有意避开拥挤的全尺寸人形/工业机器人赛道，从医疗康复这一相对蓝海切入。如果后续数据显示医疗场景获客成本过高或市场教育难度大，团队可能转向城市通勤场景。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>正奇未来的核心取舍是：<strong>不做"全尺寸人形"，做"功能型出行机器人"</strong>——形态上更接近智能代步车而非人形机器人。这一定位避开了与人形机器人头部企业的正面竞争，但也牺牲了人形机器人带来的"科技感"溢价和媒体关注度。"出行+陪伴+配送"的三合一功能组合在产品定义上具有创新性（如九号平衡车、赛格威等传统代步工具缺乏AI感知和情感交互能力），但能否说服消费者为"比代步车贵但比汽车便宜"的AI出行机器人付费，是核心市场验证问题。定价策略将是关键变量。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-6">
+        <h4>2.6 其他重要观察</h4>
+        <p>正奇未来是一个有意思的创业案例：前百度L4自动驾驶高管，没有去做Robotaxi或自动驾驶卡车（拥挤赛道），也没有去做全尺寸人形机器人（资本密集赛道），而是选择了一个相对低调但需求真实的3公里出行场景。这一选择的优势在于：中国老龄化加速（2025年60岁以上人口超3亿）带来的代步/陪伴需求是确定的长期趋势；劣势在于团队规模和资金体量过小（11人、500万），在硬件量产和渠道铺设上面临显著挑战。如果正奇未来能在未来12-18个月内完成产品市场匹配验证并获得A轮以上融资，可能成为"以小博大"的创业样本；否则面临着被更有资源的大型硬件公司覆盖的风险。</p>
+      </div>
+
+      <h2 id="references">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://vc.pedaily.cn/company/882281.html">FREEGO — 投资界公司页</a></li>
+          <li><a href="https://www.donews.com/news/detail/8/6424940.html">正奇未来获Pre-A轮融资，加码3KM生活圈具身智能机器人 — DoNews（2026-02）</a></li>
+          <li><a href="https://m.ebrun.com/576880.html">一步FreeGo首款量产AI出行机器人震撼亮相2025CMEF — 亿邦动力（2025-04）</a></li>
+          <li><a href="https://data.iyiou.com/company/details/98beac3c14b6e9352cb517bd52cf10f4/profile">FREEGO — 亿欧数据</a></li>
+          <li><a href="https://www.liepin.com/job/1981956037.shtml">北京正奇未来智能科技有限公司上海招聘 — 猎聘</a></li>
+          <li><a href="https://top.qcc.com/tc/d6d5d250c2c2.html">Freego — 企查查</a></li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">本页面最后更新于2026年5月4日 · 信息来源截至各参考链接标注日期 · 具身智能Wiki</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body>
+</html>

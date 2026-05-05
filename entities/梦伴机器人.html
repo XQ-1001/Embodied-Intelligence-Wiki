@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>梦伴机器人 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> › <span>梦伴机器人</span></div>
+  <div class="wiki-header"><h1>梦伴机器人</h1><div class="subtitle">Somnia Lab · 2025年成立 · 天使轮 · 亲密交互人形机器人 · Embodied Interface</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#team">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#product">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#finance">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#analysis-1">2.1 团队背景与场景匹配度</a></li>
+        <li class="toc-lvl4"><a href="#analysis-2">2.2 技术路线与场景适配性</a></li>
+        <li class="toc-lvl4"><a href="#analysis-3">2.3 股东/资本结构对战略的影响</a></li>
+        <li class="toc-lvl4"><a href="#analysis-4">2.4 试错过程与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#analysis-5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#analysis-6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#references">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">梦伴机器人</div>
+        <div class="ib-section">基本信息</div>
+        <div class="ib-row"><div class="ib-label">公司全称</div><div class="ib-value">深圳市梦伴机器人科技有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">英文品牌</div><div class="ib-value">Somnia Lab</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2025年10月30日</div></div>
+        <div class="ib-row"><div class="ib-label">总部</div><div class="ib-value">深圳市南山区</div></div>
+        <div class="ib-row"><div class="ib-label">法定代表人</div><div class="ib-value">吴嘉豪</div></div>
+        <div class="ib-row"><div class="ib-label">注册资本</div><div class="ib-value">1000万元</div></div>
+        <div class="ib-section">融资数据</div>
+        <div class="ib-row"><div class="ib-label">最新轮次</div><div class="ib-value">天使轮</div></div>
+        <div class="ib-row"><div class="ib-label">融资金额</div><div class="ib-value">近千万美元</div></div>
+        <div class="ib-row"><div class="ib-label">融资时间</div><div class="ib-value">2026年4月</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">行业</div><div class="ib-value">具身智能 · 情感AI</div></div>
+        <div class="ib-row"><div class="ib-label">赛道</div><div class="ib-value">亲密交互人形机器人</div></div>
+        <div class="ib-row"><div class="ib-label">阶段</div><div class="ib-value">天使轮 · 量产推进中</div></div>
+      </aside>
+
+      <p class="article-intro"><strong>梦伴机器人</strong>（Somnia Lab），全称深圳市梦伴机器人科技有限公司，成立于2025年10月，总部位于深圳南山区。公司以"Embodied Interface（具身交互界面）"为终极愿景，专注<strong>亲密交互人形机器人</strong>赛道，核心产品为约20kg的轻量化全人形机器人，搭载生成式情感交互模型，目标从"建立关系"而非"替代劳动"切入消费级市场。2026年4月完成近千万美元天使轮融资，正加速推进量产与全球化布局。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper">
+        <table class="wikitable infotable">
+          <tr><th>项目</th><th>内容</th></tr>
+          <tr><td>公司全称</td><td>深圳市梦伴机器人科技有限公司</td></tr>
+          <tr><td>英文品牌</td><td>Somnia Lab</td></tr>
+          <tr><td>成立时间</td><td>2025年10月30日</td></tr>
+          <tr><td>总部</td><td>深圳市南山区粤海街道海珠社区海德三道16号漾日湾畔</td></tr>
+          <tr><td>法定代表人</td><td>吴嘉豪</td></tr>
+          <tr><td>注册资本</td><td>1000万元人民币</td></tr>
+          <tr><td>上市状态</td><td>未上市</td></tr>
+          <tr><td>行业标签</td><td>具身智能 · 情感AI · 消费机器人 · 人形机器人</td></tr>
+        </table>
+      </div>
+      <h4>发展沿革</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>时间</th><th>事件</th></tr>
+          <tr><td>2025年10月30日</td><td>公司注册成立</td></tr>
+          <tr><td>2026年4月16日</td><td>完成近千万美元天使轮融资，首次公开亮相</td></tr>
+        </table>
+      </div>
+
+      <h3 id="team">1.2 创始人及核心团队</h3>
+      <p>公司法定代表人为吴嘉豪，但目前公开报道尚未披露创始人详细履历及核心团队成员信息。公司表示正在持续扩张AI、机器人与产品团队。团队背景在公开信息中呈现高度低调特征，与多数具身智能初创公司高调宣传创始团队的做法形成反差。</p>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+          <tr><td>法定代表人</td><td>吴嘉豪</td><td>公开信息有限，具体履历待进一步披露</td></tr>
+        </table>
+      </div>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>轮次</th><th>时间</th><th>金额</th><th>投资方</th></tr>
+          <tr><td>天使轮</td><td>2026年4月16日</td><td>近千万美元</td><td>未公开披露（投资方名单待官方进一步公告）</td></tr>
+        </table>
+      </div>
+      <p>天使轮融资于2026年4月16日由雷锋网·鲸犀独家报道后，亿欧数据、腾讯新闻、DoNews等多家媒体转发。Pre-A轮计划近期启动。融资金额近千万美元在天使轮中属于较高水平，但投资方名单尚未公开。估值未披露。</p>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>技术维度</th><th>具体内容</th></tr>
+          <tr><td>总体AI技术路线</td><td>生成式情感交互模型（Generative Affective Interaction Model），基于用户状态与场景动态生成行为，从"执行指令"升级为"理解与回应"</td></tr>
+          <tr><td>交互范式</td><td>非脚本化、连续互动；本地语音+低延迟触觉反馈</td></tr>
+          <tr><td>记忆系统</td><td>Home Space Memory——持续学习用户行为与情绪周期，情绪记忆跨空间延续</td></tr>
+          <tr><td>硬件本体</td><td>约20kg轻量化全人形结构；仿生材料体系；新一代运动控制算法</td></tr>
+          <tr><td>自研程度</td><td>软硬件一体化自研，已完成关键工程验证</td></tr>
+        </table>
+      </div>
+      <p>Somnia Lab的技术路线与主流具身智能公司有本质区别：其核心目标是让机器人"理解和回应"人类情感，而非完成物理任务。技术体系以情感交互AI为核心，硬件本体为承载情感的载体。这一定位决定了其在运动控制精度、负载能力等传统机器人指标上的优先级低于情感识别准确度、交互自然度和长期陪伴效果。</p>
+
+      <h3 id="product">1.5 产品形态</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>产品特性</th><th>描述</th></tr>
+          <tr><td>形态</td><td>轻量化全人形机器人</td></tr>
+          <tr><td>重量</td><td>约20kg</td></tr>
+          <tr><td>材料</td><td>仿生材料体系，触感接近真实人类</td></tr>
+          <tr><td>运动控制</td><td>新一代运动控制算法，动作接近真实人类</td></tr>
+          <tr><td>AI能力</td><td>生成式情感交互模型，连续非脚本化互动；Home Space Memory持续学习</td></tr>
+          <tr><td>感知</td><td>本地语音+低延迟触觉反馈</td></tr>
+          <tr><td>量产状态</td><td>已完成关键工程验证，加速推进量产</td></tr>
+        </table>
+      </div>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <p>Somnia Lab提出了清晰的三阶段场景进化路径：<strong>第一阶段（卧室情绪锚点）</strong>——从人类最私密场景切入，提供晨间唤醒、睡前舒缓、深夜情绪安抚等服务，建立高频情绪交互与信任绑定；<strong>第二阶段（全屋情感管家）</strong>——能力从卧室扩展至客厅/书房，控制灯光、温度、音乐等，基于用户状态主动调节环境；<strong>第三阶段（家庭AGI中枢）</strong>——机器人成为家庭空间的具身智能入口，自然语言统一交互取代App/设备操作，演化为人机共生时代的基础设施。</p>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <p>公司提出"硬件销售→高频使用→情感沉淀→持续付费→AI订阅+内容+人格生态→网络效应+数据壁垒"的商业闭环路径。目前已完成关键工程验证，正在加速推进量产与全球化布局。具体出货量、产能规划等尚未披露。</p>
+
+      <h3 id="finance">1.8 财务数据</h3>
+      <p>公司成立于2025年10月，无公开营收、利润或现金储备数据。注册资本1000万元，天使轮融资近千万美元。财务信息极为有限。</p>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>公司英文名"Somnia"来源于拉丁语"梦境"，暗示产品定位与"梦伴"中文名一脉相承</li>
+        <li>全球AI情感陪伴市场2025年约183.5亿美元，预计2030年达700-1500亿美元（ARK Invest预测）</li>
+        <li>中国AI陪伴市场2024年约10亿元，预计2030年达38.6亿美元，年复合增长率超75%</li>
+        <li>竞品包括爱湫-AIQ（四川具身）、心忆康康（北京心忆科技）、芙崽Fuzozo（珞博智能+华为）、日本LOVOT等</li>
+        <li>"Embodied Interface"概念将人形机器人定义为"人类与智能世界之间的第一接口"，区别于手机屏幕的传统交互范式</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="analysis-1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>由于团队信息目前公开有限，难以进行深入的背景-场景匹配分析。但公司选择从"卧室情绪锚点"切入的策略暗示了团队可能具有消费电子或互联网产品背景，而非传统的工业机器人或学术科研背景——这一选择需要的是对消费级用户情感需求的深刻理解，而非顶尖的运动控制工程能力。公司的极度低调也与大多数具身智能创始团队热衷学术/产业背书形成反差，可能反映了不同的创始理念：先做产品，后用产品说话；或者创始团队背景并非传统AI/机器人明星圈层。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>情感交互人形机器人的技术挑战与传统工业/服务机器人完全不同。Somnia Lab面临的核心技术挑战并非运动控制的精度或负载能力，而是：（1）情感AI模型能否真正理解和回应用户的情绪状态，而非仅是预设脚本的变体；（2）长期陪伴中的记忆系统能否维持一致性人格，避免"人格漂移"；（3）仿生材料和触觉反馈能否在成本可控的前提下提供令人信服的接近真人体验。20kg的全人形结构在消费级产品中已属轻量化，但与毛绒玩具型竞品（如芙崽Fuzozo，出货超12万台）相比，全人形的高成本和高技术门槛既是壁垒也是风险。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>天使轮投资方尚未公开披露，这使得外部难以评估资本对战略方向的影响。近千万美元的天使轮规模在具身智能赛道中属于较高水平，表明投资方对公司愿景和团队有较强信心。但投资方的性质（消费VC还是硬科技VC、是否具有产业资源）将实质性地影响公司后续的发展路径——消费VC可能推动快速起量、追求DAU/留存等互联网指标；硬科技VC则可能更关注技术壁垒和工程能力。Pre-A轮及投资方披露将是观察公司战略走向的关键窗口。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>公司成立仅半年，尚无明显的路径调整记录。但三阶段进化路径（卧室→全屋→家庭AGI中枢）本身就是一个带有"假设验证"色彩的战略框架：第一阶段在卧室场景中的用户接受度和留存率将直接决定第二阶段是否值得推进。如果在卧室场景中出现用户"新鲜感消退"的问题（这是AI陪伴硬件的行业共性挑战），公司可能需要在情感AI能力和硬件产品形态之间做出调整——例如降低全人形的复杂度，向更轻量、更低成本的形态过渡。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>Somnia Lab的核心取舍是：<strong>不做工具，做伴侣；不做功能性机器人，做情感关系入口</strong>。这与智元、宇树等以工业/服务场景为核心的具身智能公司处于完全不同的赛道。其最直接的对标是日本的LOVOT（定价约3万元，已量产）和国内的AI陪伴机器人。这一选择的优势在于差异化极强，赛道壁垒不在于工程能力而在于情感AI能力和品牌心智；劣势在于市场天花板尚未被验证——人类是否愿意为"机器人伴侣"长期付费仍是一个开放性问题。全人形的高成本（相比毛绒玩具型竞品）也可能在早期限制出货量。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-6">
+        <h4>2.6 其他重要观察</h4>
+        <p>（1）AI陪伴赛道的窗口期可能较短：华为、京东、优必选等巨头已入局AI陪伴硬件，Somnia Lab需要在巨头全面发力之前建立起品牌心智和用户粘性。（2）"Embodied Interface"概念如果被市场接受，其想象空间远超单一机器人产品——它可能重新定义人机交互的范式，类似于iPhone重新定义了手机。（3）隐私和伦理问题是情感陪伴机器人不可回避的挑战：Home Space Memory意味着机器人持续学习和记忆用户的私密行为与情绪数据，这在全球隐私监管趋严的背景下可能引发争议。（4）公司的极度低调传播策略本身值得关注——在具身智能"军备竞赛"式的融资PR环境中，这可能是刻意为之的差异化策略，也可能反映创始团队对外部舆论的审慎态度。</p>
+      </div>
+
+      <h2 id="references">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://m.leiphone.com/category/robot/F2FYzkFCbLWRpDZw.html" target="_blank">独家丨Somnia Lab 完成千万美元天使轮融资，瞄准人机关系入口与万亿级具身情感生态</a> — 雷锋网·鲸犀</li>
+          <li><a href="https://www.iyiou.com/data/202604171127277" target="_blank">Somnia Lab获天使轮投资</a> — 亿欧数据</li>
+          <li><a href="https://news.qq.com/rain/a/20260417A08UZG00" target="_blank">Somnia Lab获天使轮投资</a> — 腾讯新闻</li>
+          <li><a href="https://www.donews.com/news/detail/8/6514603.html" target="_blank">Somnia Lab获近千万美元天使轮融资</a> — DoNews</li>
+          <li><a href="https://www.tianxiaqiye.com/jqrqy/208967.html" target="_blank">深圳市梦伴机器人科技有限公司</a> — 天下企业</li>
+          <li><a href="https://developer.aliyun.com/article/1728551" target="_blank">AI情感陪伴——当机器学会"懂你"</a> — 阿里云开发者社区</li>
+          <li><a href="https://m.jiemian.com/article/13870487.html" target="_blank">市场年增148%，但AI陪伴硬件仍未跨过"生死线"</a> — 界面新闻</li>
+          <li><a href="https://leaderobot.com/news/6198" target="_blank">央视释放信号，陪伴机器人或将抢先人形走进千家万户？</a> — 机器人大讲堂</li>
+          <li><a href="https://www.stcn.com/article/detail/3523163.html" target="_blank">华为、京东、优必选等先后入局，AI玩具成AI硬件新蓝海？</a> — 证券时报</li>
+          <li><a href="https://cn.technode.com/post/2026-01-08/ai-companion-robot-ces-2026/" target="_blank">陪伴机器人踏平了CES的门槛，但今年会是元年么？</a> — 动点科技</li>
+          <li><a href="http://ep.cntronics.com/market/15543" target="_blank">不止替代，更要温暖：爱湫重新定义人形机器人的价值边界</a> — 中国电子报</li>
+          <li><a href="https://m.sohu.com/a/1007118837_121134737/" target="_blank">家用服务机器人"双雄"竞速</a> — 搜狐</li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">本页面由具身智能Wiki维护，最后更新于2026年5月 · 内容仅供信息参考，不构成投资建议</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

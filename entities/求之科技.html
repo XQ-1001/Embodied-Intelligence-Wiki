@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>求之科技 — 具身智能Wiki</title><style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style></head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> › <span>求之科技</span></div>
+  <div class="wiki-header"><h1>求之科技</h1><div class="subtitle">求之科技（无锡）有限公司 · DISCOVER Robotics · 2023年成立 · 清华AIR孵化 · AIRBOT系列 · 科研市场</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#team">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financials">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#misc">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#a1">2.1 团队背景与场景选择</a></li>
+        <li class="toc-lvl4"><a href="#a2">2.2 技术路线与场景适配</a></li>
+        <li class="toc-lvl4"><a href="#a3">2.3 股东/资本结构影响</a></li>
+        <li class="toc-lvl4"><a href="#a4">2.4 试错与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#a5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#a6">2.6 其他观察与分析</a></li>
+        <li class="toc-lvl2"><a href="#references">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">求之科技</div>
+        <div class="ib-section">基本信息</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">求之科技（无锡）有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">英文品牌</div><div class="ib-value">DISCOVER Robotics</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2023年1月13日</div></div>
+        <div class="ib-row"><div class="ib-label">总部</div><div class="ib-value">无锡滨湖区五三零大厦</div></div>
+        <div class="ib-row"><div class="ib-label">创始人/首席科学家</div><div class="ib-value">周谷越</div></div>
+        <div class="ib-row"><div class="ib-label">法人代表</div><div class="ib-value">王政</div></div>
+        <div class="ib-row"><div class="ib-label">注册资本</div><div class="ib-value">约1091.67万元</div></div>
+        <div class="ib-row"><div class="ib-label">孵化方</div><div class="ib-value">清华大学智能产业研究院（AIR）</div></div>
+        <div class="ib-section">融资数据</div>
+        <div class="ib-row"><div class="ib-label">最新轮次</div><div class="ib-value">A轮（2025年7月）</div></div>
+        <div class="ib-row"><div class="ib-label">融资金额</div><div class="ib-value">未公开（约1500万）</div></div>
+        <div class="ib-row"><div class="ib-label">投资方</div><div class="ib-value">北京信息产业发展基金、联想创投</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">产品线</div><div class="ib-value">AIRBOT系列（Play/MMK2/PTK/TOK4）、DISCOVERSE</div></div>
+        <div class="ib-row"><div class="ib-label">目标市场</div><div class="ib-value">高校科研、教学实训</div></div>
+        <div class="ib-row"><div class="ib-label">愿景</div><div class="ib-value">"让机器人走进千家万户"</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">赛道</div><div class="ib-value">具身智能机器人（软硬一体）</div></div>
+        <div class="ib-row"><div class="ib-label">出身</div><div class="ib-value">清华AIR系 / 大疆系</div></div>
+        <div class="ib-row"><div class="ib-label">阶段</div><div class="ib-value">A轮/科研市场主导</div></div>
+      </aside>
+
+      <p class="article-intro">求之科技（求之科技（无锡）有限公司，DISCOVER Robotics）成立于2023年1月，由清华大学智能产业研究院（AIR）孵化，首席科学家周谷越为前大疆核心成员（近10年）、MIT TR35亚太区入选者。公司以AIRBOT系列机器人产品和DISCOVERSE仿真平台为核心，主打高校与科研机构市场，提供具身智能全方位解决方案。2025年7月完成A轮融资，由北京信息产业发展基金与联想创投联合投资。公司愿景为"让机器人走进千家万户"。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper"><table class="wikitable infotable">
+        <tr><th>项目</th><th>内容</th></tr>
+        <tr><td>公司全称</td><td>求之科技（无锡）有限公司</td></tr>
+        <tr><td>英文品牌</td><td>DISCOVER Robotics</td></tr>
+        <tr><td>成立时间</td><td>2023年1月13日</td></tr>
+        <tr><td>注册地</td><td>无锡市滨湖区五三零大厦1号楼11层（2023年7月从北京迁至无锡）</td></tr>
+        <tr><td>注册资本</td><td>约1091.67万元人民币</td></tr>
+        <tr><td>法定代表人</td><td>王政</td></tr>
+        <tr><td>公司类型</td><td>有限责任公司（港澳台投资、非独资）</td></tr>
+        <tr><td>孵化方</td><td>清华大学智能产业研究院（AIR）</td></tr>
+        <tr><td>愿景</td><td>"让机器人走进千家万户"</td></tr>
+      </table></div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>时间</th><th>事件</th></tr>
+        <tr><td>2023年1月</td><td>公司在北京注册成立，清华大学AIR孵化</td></tr>
+        <tr><td>2023年7月</td><td>公司迁址至无锡滨湖区，融入无锡机器人产业生态</td></tr>
+        <tr><td>2024年7月</td><td>AIRBOT移动升降双臂机器人正式开启预售，"供不应求"</td></tr>
+        <tr><td>2025年1月</td><td>联合清华AIR、地瓜机器人启动ICRA 2025 Sim2Real挑战赛</td></tr>
+        <tr><td>2025年4月</td><td>参加无锡首届具身智能机器人运动会</td></tr>
+        <tr><td>2025年7月</td><td>完成A轮融资，北京信息产业发展基金与联想创投参投</td></tr>
+        <tr><td>2025年7-8月</td><td>联合清华AIR与地瓜机器人举办"具身智能强化营"（浙大站、无锡站）</td></tr>
+      </table></div>
+
+      <h3 id="team">1.2 创始人及核心团队</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+        <tr><td>首席科学家/实际控制人</td><td>周谷越</td><td>香港科技大学博士，师从"中国机器人教父"李泽湘教授；前大疆创新核心成员（近10年），曾任大疆计算机视觉总监、首席产品经理、杰出科学家；现任清华大学智能产业研究院（AIR）副教授、DISCOVER Lab主任；2021年入选MIT TR35亚太区榜单</td></tr>
+        <tr><td>联合创始人/法人</td><td>王政</td><td>求之科技联合创始人，公司法定代表人和董事经理</td></tr>
+        <tr><td>科教产品线负责人</td><td>李楚璇</td><td>公司监事</td></tr>
+        <tr><td>市场销售负责人</td><td>付健</td><td>负责市场与销售业务</td></tr>
+      </table></div>
+      <p>核心团队来自清华大学、大疆、阿里等顶尖院校和科技企业。周谷越的"大疆+李泽湘"双重背景尤为突出——大疆10年产品化经验赋予其工程落地能力，李泽湘体系则提供了机器人学术与产业生态资源。团队整体呈现"<strong>学术产业双栖</strong>"特征。</p>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>轮次</th><th>时间</th><th>金额</th><th>投资方</th></tr>
+        <tr><td>A轮</td><td>2025年7月14日</td><td>未公开（部分来源提及约1500万元）</td><td>北京信息产业发展基金（政府引导基金）、联想创投（产业资本）</td></tr>
+      </table></div>
+      <p>融资总额及估值未公开披露。北京信息产业发展基金为北京市级产业投资基金（可能与京国瑞国企改革发展基金存在基金管理关联，工商登记中未明确显示京国瑞作为直接股东）。联想创投在具身智能/机器人赛道布局积极，求之科技是其在该领域的又一标的。</p>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>维度</th><th>描述</th></tr>
+        <tr><td>总体AI技术路线</td><td>软硬一体全栈自研——机器人本体、运动控制、智能系统全部自主研发；围绕模仿学习、预训练模型、遥操作数据采集持续突破</td></tr>
+        <tr><td>核心仿真平台</td><td>DISCOVERSE——端到端具身智能仿真器，高保真数字孪生，真实感渲染，支持Sim2Real迁移</td></tr>
+        <tr><td>数据方案</td><td>AIRBOT PTK桌面数采平台+TOK4遥操作方案，打通"仿真-真机"全流程数据闭环</td></tr>
+        <tr><td>技术特色</td><td>Sim2Real迁移为核心竞争力——通过DISCOVERSE仿真平台与真机无缝衔接；ICRA 2025 Sim2Real挑战赛首次使用其平台</td></tr>
+      </table></div>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>产品</th><th>类别</th><th>核心特性</th></tr>
+        <tr><td>AIRBOT Play</td><td>桌面级六轴轻量化机械臂</td><td>支持模仿学习、预训练模型部署、示教功能；科研教学首选</td></tr>
+        <tr><td>AIRBOT MMK2</td><td>移动升降双臂机器人</td><td>仿人双臂协同、深度视觉、自主导航、可升降作业空间</td></tr>
+        <tr><td>AIRBOT PTK</td><td>桌面数采平台</td><td>数据采集、训练集构建，打通仿真-真机流程</td></tr>
+        <tr><td>AIRBOT TOK4</td><td>双臂协同遥操作</td><td>远程操作、人机协同</td></tr>
+        <tr><td>DISCOVERSE</td><td>具身智能仿真器</td><td>高保真数字孪生、真实感渲染、Sim2Real迁移</td></tr>
+      </table></div>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>场景领域</th><th>具体应用</th><th>说明</th></tr>
+        <tr><td>高校科研</td><td>具身智能算法研究、Sim2Real验证</td><td>核心市场，AIRBOT系列主力场景</td></tr>
+        <tr><td>教学实训</td><td>具身智能强化营、高校实验室</td><td>与清华AIR、地瓜机器人等联合举办多期</td></tr>
+        <tr><td>工业检测</td><td>精密操作、质量检测</td><td>在推进中</td></tr>
+        <tr><td>服务业</td><td>商业服务场景</td><td>在推进中</td></tr>
+      </table></div>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <p>公司目前以高校科研市场为主。2024年7月AIRBOT开启预售即"供不应求，广受高校和科研院校好评"。业务模式为硬件销售+系统集成+技术维护。同时推进服务业、制造业等商业应用场景落地。2025年通过ICRA挑战赛、具身智能强化营等活动持续扩大品牌影响力和学术生态渗透率。具体出货量、营收数据未公开披露。</p>
+
+      <h3 id="financials">1.8 财务数据</h3>
+      <p>公司为早期企业，未上市，未公开披露营收、利润、毛利率等财务数据。已知A轮融资约1500万元（部分来源），由北京信息产业发展基金与联想创投投资。</p>
+
+      <h3 id="misc">1.9 其他信息</h3>
+      <ul>
+        <li>周谷越同时担任清华AIR副教授和DISCOVER Lab主任，这种"教授+创业者"双重身份在清华AIR孵化企业中较为典型</li>
+        <li>公司从北京迁至无锡，与无锡对具身智能/人形机器人的重点产业扶持政策密切相关</li>
+        <li>无锡滨湖区政协工商联界别组曾到访调研，评价公司为"人工智能技术研发的先锋和产业应用的标杆"</li>
+        <li>公司与艾欧智能（TeleXperience）达成遥操作技术合作，AIRBOT适配其平台</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="a1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>周谷越的大疆背景（10年产品化经验）+李泽湘体系（学术与产业生态资源）+清华AIR副教授身份，构成了"产学研"三位一体的独特组合。选择以高校科研为核心市场，与创始人的学术身份高度匹配——清华AIR的学术网络为AIRBOT提供了天然的种子用户和品牌背书，ICRA挑战赛等学术活动则持续强化这一市场壁垒。但"让机器人走进千家万户"的愿景暗示公司最终目标是消费级市场，而大疆背景（消费电子+计算机视觉）恰好为这一转向提供了经验储备。当前"先科研后消费"的路径选择是务实且逻辑自洽的。</p>
+      </div>
+
+      <div class="analysis-block" id="a2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>公司以Sim2Real为核心技术特色，DISCOVERSE仿真平台与AIRBOT真机形成闭环。这一路线在科研场景中具有极强的适配性——学术研究者需要在仿真中快速迭代算法、在真机上验证效果，Sim2Real迁移能力直接决定了研究效率。但若未来从科研转向消费/家庭场景，仿真环境能否覆盖真实家庭的高度非结构化环境，将是一个技术挑战。模仿学习+预训练模型的组合在当前学术前沿是主流路线，但工业场景中更强调可靠性和可解释性，与科研场景的容错空间不同。</p>
+      </div>
+
+      <div class="analysis-block" id="a3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>北京信息产业发展基金（政府引导基金）+联想创投（产业资本）的组合，既提供了政府政策背书的稳定性（尤其在信创/国产替代语境下），又通过联想创投链接了联想的全球供应链和制造资源。但A轮融资仅1500万左右的规模相对克制，可能反映了两方面：一是公司以科研市场为主，现金流压力相对较小（预收款模式）；二是估值逻辑尚未被资本市场大幅推高，为后续融资留下空间。政府引导基金的参与也意味着公司可能在区域产业落地（无锡）方面有一定的承诺或约束。</p>
+      </div>
+
+      <div class="analysis-block" id="a4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>公司从北京迁至无锡（2023年7月）是一个值得关注的战略性搬迁——北京是AI人才高地但运营成本高、制造业生态薄弱；无锡在制造成本、产业政策扶持和长三角机器人产业链方面有明显优势。AIRBOT从2024年预售即供不应求，说明产品-市场匹配度较高。2025年密集的学术活动（ICRA挑战赛、强化营×2）显示公司在积极构建学术生态护城河。目前尚未观察到明显的场景切换或技术路线转向，公司仍处于"深耕科研→拓展商业"的线性推进阶段。</p>
+      </div>
+
+      <div class="analysis-block" id="a5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>求之科技的核心取舍是"先做科研工具，再做消费产品"——类似于从"实验室的苹果机"走向"每个人口袋里的iPhone"的路径（但反向：先2B后2C）。公司选择了软硬一体全栈自研，这与纯软件平台（如具识智能的InsightOS）或纯本体公司形成差异化。但全栈自研意味着资源分散——既要投入仿真器（DISCOVERSE）、数采平台（PTK）、遥操作（TOK4），又要做机械臂本体（Play）和移动双臂（MMK2），产品线较多可能导致核心单品打磨不足。</p>
+      </div>
+
+      <div class="analysis-block" id="a6">
+        <h4>2.6 其他重要观察与分析</h4>
+        <p>几点值得关注：其一，周谷越的"李泽湘弟子+大疆系"标签在机器人投资圈具有高度辨识度——李泽湘体系已成功孵化大疆、云鲸、正浩等明星企业，求之科技自带"下一个大疆"的叙事。其二，公司选择Sim2Real作为核心技术壁垒是明智的，因为仿真器的数据积累和算法迭代具有网络效应——越多研究者使用DISCOVERSE，仿真器就越精准，吸引更多用户。其三，ICRA 2025 Sim2Real挑战赛是重要的学术社区运营动作，类似早年NVIDIA通过学术竞赛推广CUDA生态。其四，迁址无锡虽然降低了运营成本，但也远离了北京的AI人才池，长期人才招聘可能面临挑战（虽然无锡有江南大学等高校）。其五，公司港澳台投资背景（周谷越可能为香港身份）为未来海外业务拓展提供了组织架构上的便利。</p>
+      </div>
+
+      <h2 id="references">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://air.tsinghua.edu.cn/info/1147/2175.htm" target="_blank">求之科技 — 清华大学智能产业研究院</a></li>
+          <li><a href="https://air.tsinghua.edu.cn/yjhzdw/qzkj.htm" target="_blank">院级合作单位 — 求之科技 — 清华大学AIR</a></li>
+          <li><a href="https://vc.pedaily.cn/company/818414.html" target="_blank">求之科技（无锡）有限公司 — 投资界</a></li>
+          <li><a href="https://innohere.com/ir/159611/finance.html" target="_blank">求之科技 — 融资历史 — 公司图谱</a></li>
+          <li><a href="https://innohere.com/ir/159611/general.html" target="_blank">求之科技 — 公司简介 — 公司图谱</a></li>
+          <li><a href="https://data.iyiou.com/company/details/3299270b34c2a72af8e8639527531f16/profile" target="_blank">求之科技 — 亿欧数据</a></li>
+          <li><a href="https://www.163.com/dy/article/K4U5JG7905119596.html" target="_blank">苏州、无锡新增两家融资成功的公司，均与机器人相关 — 网易</a></li>
+          <li><a href="https://www.163.com/dy/article/K4MQSNSD05119LOG.html" target="_blank">无锡再出手！又从北京挖来一匹"黑马" — 网易</a></li>
+          <li><a href="https://jxxy.wxit.edu.cn/info/1181/16112.htm" target="_blank">"求之学院具身智能强化营第一期・无锡站"圆满落幕 — 无锡职院</a></li>
+          <li><a href="https://io-ai.tech/zh/showcases/discover/" target="_blank">求之科技 DISCOVER | 艾欧智能</a></li>
+          <li><a href="https://io-ai.tech/telexperience/en/showcases/airbot/" target="_blank">求之科技 DISCOVER | TeleXperience</a></li>
+          <li><a href="http://zx.wuxi.gov.cn/doc/2025/08/19/4633301.shtml" target="_blank">滨湖区政协工商联界别组开展"人工智能"专题调研活动 — 无锡政协</a></li>
+          <li><a href="https://www.zidonghua.com.cn/news/academism/75500.html" target="_blank">清华AIR-地瓜机器人具身智能强化营圆满结营 — 自动化网</a></li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">此页面基于公开信息整理，数据截至2026年5月。求之科技（无锡）有限公司 · 具身智能Wiki</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

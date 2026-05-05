@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>小雨智造 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> <span class="breadcrumb-sep">›</span> <span>小雨智造</span></div>
+  <div class="wiki-header"><h1>小雨智造</h1><div class="subtitle">Xiaoyu Intelligent Manufacturing · 成立于2023年 · 工业具身智能 · 焊接机器人 · B轮</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#founder">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#product">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenario">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financial">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#others">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl3"><a href="#a21">2.1 团队背景与场景选择匹配度</a></li>
+        <li class="toc-lvl3"><a href="#a22">2.2 技术路线与场景适配性</a></li>
+        <li class="toc-lvl3"><a href="#a23">2.3 股东/资本结构对战略的影响</a></li>
+        <li class="toc-lvl3"><a href="#a24">2.4 试错过程与路径调整</a></li>
+        <li class="toc-lvl3"><a href="#a25">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl3"><a href="#a26">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#refs">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">小雨智造</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">北京小雨智造科技有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">英文名</div><div class="ib-value">Xiaoyu Intelligent Manufacturing</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2023年1月5日</div></div>
+        <div class="ib-row"><div class="ib-label">注册地</div><div class="ib-value">北京市海淀区</div></div>
+        <div class="ib-row"><div class="ib-label">创始人/CEO</div><div class="ib-value">乔忠良</div></div>
+        <div class="ib-row"><div class="ib-label">联合创始人/CTO</div><div class="ib-value">王文林</div></div>
+        <div class="ib-section">融资信息</div>
+        <div class="ib-row"><div class="ib-label">最新轮次</div><div class="ib-value">B轮（2026.03）</div></div>
+        <div class="ib-row"><div class="ib-label">B轮金额</div><div class="ib-value">数亿元人民币</div></div>
+        <div class="ib-row"><div class="ib-label">B轮领投</div><div class="ib-value">华业天成</div></div>
+        <div class="ib-row"><div class="ib-label">累计融资</div><div class="ib-value">超5亿元（估算）</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">控制精度</div><div class="ib-value">&lt;1mm</div></div>
+        <div class="ib-row"><div class="ib-label">意向客户</div><div class="ib-value">上百家</div></div>
+        <div class="ib-row"><div class="ib-label">合作方</div><div class="ib-value">唐山松下 · 中国中车</div></div>
+        <div class="ib-section">官网</div>
+        <div class="ib-row"><div class="ib-label">网站</div><div class="ib-value">未公开</div></div>
+      </aside>
+
+      <p class="article-intro">小雨智造（北京小雨智造科技有限公司）是一家专注于工业具身智能的科技公司，成立于2023年1月，总部位于北京海淀。公司由前小米MIUI研发负责人乔忠良创立，定位为"一脑多形"的通用智能机器人平台，以焊接场景为切入点、端到端数据驱动为技术路线，聚焦航空航天、重型机械、船舶制造等非标焊接场景。2026年3月完成华业天成领投的数亿元B轮融资，投资方涵盖滴滴、科大讯飞、茅台基金、招银国际等产业及金融资本。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper"><table class="wikitable infotable">
+        <tr><th>项目</th><th>内容</th></tr>
+        <tr><td>公司全称</td><td>北京小雨智造科技有限公司</td></tr>
+        <tr><td>英文名称</td><td>Xiaoyu Intelligent Manufacturing</td></tr>
+        <tr><td>成立时间</td><td>2023年1月5日</td></tr>
+        <tr><td>注册地</td><td>北京市海淀区中关村东升科技园</td></tr>
+        <tr><td>法定代表人</td><td>乔忠良</td></tr>
+        <tr><td>注册资本</td><td>约1903.20万人民币</td></tr>
+        <tr><td>上市状态</td><td>未上市</td></tr>
+        <tr><td>核心定位</td><td>工业具身智能 · 通用焊接机器人 · "一脑多形"平台</td></tr>
+      </table></div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>时间</th><th>事件</th></tr>
+        <tr><td>2023年1月</td><td>公司正式成立，乔忠良离开小米后创立</td></tr>
+        <tr><td>2023年3月</td><td>完成种子轮融资，小米集团、王田苗教授（雅瑞天使）参投</td></tr>
+        <tr><td>2023年6月</td><td>完成天使轮融资（亿元级），北京智源研究院、黎万强等参投</td></tr>
+        <tr><td>2024年7月</td><td>与唐山松下签署战略合作协议，联合开发智能焊接机器人</td></tr>
+        <tr><td>2024年11月</td><td>完成A轮融资（亿元级），北京信息产业发展投资基金领投，科大讯飞参投</td></tr>
+        <tr><td>2025年1月</td><td>完成A+轮融资，讯飞创投独家投资</td></tr>
+        <tr><td>2025年7月</td><td>完成A++轮融资（亿元级），滴滴出行领投（滴滴首投具身智能），北京信产基金追加</td></tr>
+        <tr><td>2025年Q4</td><td>焊接机器人正式进入客户产线，实现首批量产交付</td></tr>
+        <tr><td>2026年3月</td><td>完成B轮融资（数亿元），华业天成领投，招银国际、茅台基金、贵州省科创天使基金跟投</td></tr>
+        <tr><td>2026年4月</td><td>与北京航空航天大学共建"工业具身智能联合实验室"，发起"工业具身智能产业联盟"倡议</td></tr>
+      </table></div>
+
+      <h3 id="founder">1.2 创始人及核心团队</h3>
+      <p>小雨智造的创始团队以"小米系"为核心班底，兼具操作系统、AI大脑和硬件经验。团队还汇聚了来自微软、华为、字节跳动等企业的技术人才，毕业背景涵盖清华、北大、南大、北航等高校。研发人员中约2/3从事模型算法相关工作。</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+        <tr><td>创始人 & CEO</td><td>乔忠良</td><td>北航计算机硕士（2010届），小米初创成员、首位应届生。在小米工作13年，担任MIUI研发负责人5年（负责MIUI 9至MIUI 12），主导"一次开发、多端部署"软件架构变革，创下小米从应届生到总经理的最快晋升纪录。2023年离开小米创立小雨智造。</td></tr>
+        <tr><td>联合创始人 & CTO</td><td>王文林</td><td>前小米软件系统平台部总经理，主导"小米大脑"和AIoT系统开发，曾就职微软、雅虎，在操作系统和AI系统架构方面有深厚积累。</td></tr>
+        <tr><td>关键投资人/顾问</td><td>黎万强</td><td>小米联合创始人之一，从种子轮一路追投至B轮，为小雨智造提供持续的战略指导和产业资源支持。</td></tr>
+      </table></div>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>轮次</th><th>时间</th><th>金额</th><th>领投方</th><th>跟投/参投方</th></tr>
+        <tr><td>种子轮</td><td>2023年3月</td><td>未披露</td><td>—</td><td>小米集团、王田苗教授（雅瑞天使）</td></tr>
+        <tr><td>天使轮</td><td>2023年6月</td><td>亿元级</td><td>—</td><td>北京智源研究院、黎万强（小米联合创始人）</td></tr>
+        <tr><td>A轮</td><td>2024年11月</td><td>亿元级</td><td>北京信息产业发展投资基金（100亿规模国资）</td><td>科大讯飞</td></tr>
+        <tr><td>A+轮</td><td>2025年1月</td><td>未披露</td><td>讯飞创投（科大讯飞旗下CVC）</td><td>—</td></tr>
+        <tr><td>A++轮</td><td>2025年7月</td><td>亿元级</td><td>滴滴出行（滴滴首投具身智能）</td><td>北京信产基金追加</td></tr>
+        <tr><td>B轮</td><td>2026年3月</td><td>数亿元</td><td>华业天成</td><td>招银国际、茅台基金、贵州省科创天使基金；老股东滴滴、黎万强追加</td></tr>
+      </table></div>
+
+      <h4>股东结构特征</h4>
+      <p>小雨智造的股东结构呈现显著的多元化特征：互联网产业资本（小米、滴滴）、AI产业资本（科大讯飞、北京智源研究院）、金融资本（华业天成、招银国际）、传统消费巨头（茅台基金）、地方政府基金（贵州省科创天使基金、北京信产基金）共同构成了其资本矩阵。黎万强个人从种子轮一路追投至B轮，提供了极强的信心背书。公司目前未上市，公开资料中未披露具体估值数字。作为参照，同期海淀区具身智能企业银河通用机器人估值约200亿元，市场普遍推测小雨智造估值在数十亿元级别。</p>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>维度</th><th>详情</th></tr>
+        <tr><td>AI技术架构</td><td>端到端、数据驱动；自研"Xiaoyu Brain"通用机器人大脑，原生多模态3D世界模型</td></tr>
+        <tr><td>数据方案</td><td>预训练：带真实尺度的仿真数据；后训练：工业场景高精度传感器SFT数据，使模型具备真实物理尺度理解能力</td></tr>
+        <tr><td>感知系统</td><td>自研通用视觉任务模型（动态分辨率），多模态任务决策模型；端侧导航5cm级，操作mm级分辨率</td></tr>
+        <tr><td>运控方案</td><td>基于仿真和深度强化学习的运控模型；末端闭环控制精度突破1mm（亚毫米级）</td></tr>
+        <tr><td>架构路线</td><td>"一脑多形"：统一大脑模型驱动不同形态本体（单臂、移动机械臂、轮式双臂、人形）；全栈自研，软件/大脑为研发重点</td></tr>
+        <tr><td>差异化特色</td><td>原生3D世界模型不仅理解"是什么"更理解"离我多远"；小米式"爆品逻辑"指导技术迭代方向</td></tr>
+        <tr><td>专利</td><td>2025年6月申请"应用于机器人焊接场景的交互方法、装置及电子设备"专利（CN120245015A）</td></tr>
+      </table></div>
+      <p>小雨智造的技术路线核心是构建具备真实物理世界尺度理解能力的通用具身大脑，用统一模型适配多种机器人形态。五大核心技术模块包括智能感知与决策引擎、高精度运控、动态实时闭环控制、模块化智能系统架构和自学习优化能力。预训练-后训练双阶段数据方案使其模型先在仿真中学习通用能力，再通过工业现场高精度数据微调至具体场景。</p>
+
+      <h3 id="product">1.5 产品形态</h3>
+      <p>小雨智造核心产品为"Xiaoyu Brain"通用机器人大脑，配合单臂+摄像头硬件形态交付软硬一体解决方案。首款落地产品为<strong>大模型智能焊接机器人</strong>。</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>产品线</th><th>形态</th><th>关键指标</th><th>适用场景</th></tr>
+        <tr><td>智能焊接机器人</td><td>单臂 + 摄像头 + Xiaoyu Brain</td><td>控制精度&lt;1mm、空间泛化80%、场景覆盖50%+、焊接质量达优秀焊工水平</td><td>航空航天、造船、重型机械、钢结构、汽车制造</td></tr>
+        <tr><td>扩展方向（规划中）</td><td>铆接/打磨/喷涂机器人</td><td>同一大脑驱动，扇形扩张</td><td>重工 → 汽车 → 消费电子</td></tr>
+      </table></div>
+      <p>公司尚未公布具体产品型号编号和完整规格参数表（臂展、负载、功率等），产品仍处于快速迭代和商业化早期阶段。核心卖点为自研通用具身大脑而非硬件本体，硬件部分与唐山松下等供应链伙伴合作开发。</p>
+
+      <h3 id="scenario">1.6 应用场景</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>场景领域</th><th>状态</th><th>典型客户/合作方</th><th>说明</th></tr>
+        <tr><td>航空航天</td><td><span class="tag tag-info">已常态化运营</span></td><td>未具名</td><td>高精尖非标焊接需求</td></tr>
+        <tr><td>造船/船舶制造</td><td><span class="tag tag-info">已常态化运营</span></td><td>未具名</td><td>大型结构件非标焊接</td></tr>
+        <tr><td>重型机械</td><td><span class="tag tag-info">已常态化运营</span></td><td>某重工龙头企业（百台订单）</td><td>百台战略采购协议已签</td></tr>
+        <tr><td>钢结构/建筑结构</td><td><span class="tag tag-info">已常态化运营</span></td><td>未具名</td><td>建筑钢结构非标焊接</td></tr>
+        <tr><td>轨道交通</td><td><span class="tag">推进中</span></td><td>中国中车集团</td><td>响应14条工业具身智能机器人场景需求</td></tr>
+        <tr><td>汽车制造</td><td><span class="tag">推进中</span></td><td>国家级车企（未具名）</td><td>合作推进中</td></tr>
+        <tr><td>消费电子</td><td><span class="tag tag-warn">规划中</span></td><td>依托小米产线场景</td><td>远期扩展方向</td></tr>
+      </table></div>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <p>小雨智造于2025年Q4实现焊接机器人首批量产交付，目前处于早期商业化阶段。已与某重工龙头企业签订<strong>百台战略采购协议</strong>，拥有<strong>上百家意向采购单位</strong>。2026年初深度合作10家"灯塔客户"，覆盖高精尖产业。公司采用"软硬一体"交付模式（研发重点以软件/大脑为主，工程师2/3做模型算法），未来计划打造开放生态平台，扶持方案商共享供应链、渠道和品牌，共建数据平台和基座模型。</p>
+      <p>商业化路径采用<strong>"扇形扩张"</strong>策略：以焊接为根据地，向铆接（上游）、打磨（下游）、喷涂（延伸）拓展；同时从重工场景向汽车制造和消费电子逐级渗透。乔忠良预计智能焊接机器人全球需求可达千万台量级，目标占据10%市场份额。</p>
+
+      <h3 id="financial">1.8 财务数据</h3>
+      <p>小雨智造目前未公开披露具体营收数据。公司成立于2023年，2025年Q4才实现首批量产交付，仍处于商业化早期阶段，目前以融资投入研发和场景拓展为主。规模化营收预计将在2026-2027年逐步体现。</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>指标</th><th>2023</th><th>2024</th><th>2025</th><th>2026（至Q1）</th></tr>
+        <tr><td>营收披露</td><td>未披露（研发期）</td><td>未披露（产品验证期）</td><td>未披露（Q4首交付）</td><td>未披露</td></tr>
+        <tr><td>年度融资</td><td>亿元级（种子+天使）</td><td>亿元级（A轮）</td><td>亿元级（A+ + A++）</td><td>数亿元（B轮）</td></tr>
+        <tr><td>累计融资</td><td>亿元级</td><td>数亿元</td><td>数亿元+</td><td>估算超5亿元</td></tr>
+      </table></div>
+
+      <h3 id="others">1.9 其他信息</h3>
+      <ul>
+        <li>公司命名"小雨"寓意"流水不争先，争的是滔滔不绝"和"润物细无声"的客户哲学。</li>
+        <li>乔忠良将小米时期的"爆品逻辑、群众路线、统一战线"三大方法论迁移到工业机器人领域。</li>
+        <li>2026年4月26日北航联合实验室揭牌仪式上，小雨智造发起"工业具身智能产业联盟"倡议，联合产业伙伴共建生态、共定标准。</li>
+        <li>乔忠良判断未来十年全球仅剩不到10家通用具身企业进入决赛圈，年出货10万台是门槛。</li>
+        <li>2026年被行业公认为具身智能"场景落地元年"，工信部等八部门印发《"人工智能+制造"专项行动实施意见》。</li>
+        <li>小米集团通过种子轮投资小雨智造，是其对外投资的第一家具身智能公司。</li>
+        <li>首个国家级标准体系《人形机器人与具身智能标准体系（2026版）》于2026年4月正式发布。</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="a21">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>乔忠良的MIUI研发背景使其擅长从"用户需求"出发做产品定义——这正是他将焊接场景作为切入点的逻辑起点：通过人社部数据发现焊工缺口超1000万，场景需求刚性极强。团队的技术底色集中在操作系统、AI系统和软硬协同领域（CTO王文林主导过"小米大脑"和AIoT），具备架构统一大脑平台的能力，但对工业焊接领域本身缺乏行业know-how。与唐山松下的战略合作（2024年7月）正是对这一短板的精准补位——唐山松下拥有近5万套焊接机器人的市场存量和30年焊接行业经验。团队选择用消费电子的产品方法论降维冲击传统工业自动化，这种跨界打法在场景清晰、需求标准化的焊接领域具有天然适配性，但也面临工业级安全性和可靠性门槛的挑战。</p>
+      </div>
+
+      <div class="analysis-block" id="a22">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>小雨智造选择端到端、数据驱动范式（类比特斯拉FSD路线），与焊接场景高度适配。焊接本质上是"末端轨迹规划+实时感知调整"的问题，端到端模型天然适合处理非标工件的自适应路径——这正是传统编程式焊接机器人无法覆盖的长尾市场（约占焊接总量的50%以上）。原生多模态3D世界模型具备真实物理尺度理解能力，解决了传统2D视觉在三维焊接空间中的深度感知痛点。但该路线对数据质量和数量高度依赖，"预训练仿真+SFT工业数据"的双阶段方案能否持续产出足够高质量的真实场景数据是核心风险。焊接场景对安全性要求极高，端到端黑盒模型的可解释性和可靠性在工业级部署中的验证仍是未完成的课题。</p>
+      </div>
+
+      <div class="analysis-block" id="a23">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>小雨智造的股东结构极具特色：滴滴的入股（2025年7月A++轮）表面看似与工业机器人无直接关系，但滴滴作为出行平台拥有庞大的车辆制造和维修生态，可能为小雨智造打开汽车后市场焊接场景。茅台基金的参与（2026年3月B轮）引发了市场对跨界联动的猜想——茅台在包装、仓储自动化等领域有广泛需求。北京信产基金的深度绑定（国资背景）使小雨智造获得"北京AI工业化排头兵"的政策定位优势，有利于获取政府项目和中字头客户（如中国中车）。多元化资本矩阵在给予丰富场景资源的同时，也可能导致战略方向的分散——不同产业资本的利益诉求差异可能影响公司对核心场景的聚焦与深耕。</p>
+      </div>
+
+      <div class="analysis-block" id="a24">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>从公开信息看，小雨智造的路径调整更多体现在场景聚焦策略的持续细化而非大的战略转向。公司从创立之初就确定了"一脑多形"的通用平台定位，但在落地层面经历了从"泛工业具身智能"到"聚焦焊接"再到"焊接场景内的扇形扩张（铆接→打磨→喷涂）"的持续收敛过程。2024年与唐山松下的合作标志着从纯技术验证走向产业联合开发，2025年Q4进入产线意味着从demo到量产的关键跨越。当前处于"焊接深耕"阶段，未来能否顺利从焊接向铆接、打磨等相邻场景迁移，将是对"Xiaoyu Brain"通用性假设的关键检验。</p>
+      </div>
+
+      <div class="analysis-block" id="a25">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>小雨智造的核心取舍是选择了"工业专用务实路线"而非"人形通用平台路线"。与同期估值更高的银河通用机器人（约200亿估值，走通用人形路线）和星动纪元（估值破百亿，走双足人形路线）相比，小雨智造明确以单臂工业形态起步、以焊接为第一个爆品场景。这是一种类似"iPod先行、iPhone后出"的战略——先在工业焊接这一垂直场景做到极致，再逐步扩展到更多场景和形态。公司的核心资产是"大脑"（Xiaoyu Brain）而非硬件本体，使其可以像"安卓"一样与多种硬件本体合作（如唐山松下），避开了硬件制造的重资产投入。但在硬件依赖合作伙伴的模式下，如何确保本体供应的质量、成本和交付节奏可控，是潜在的战略风险。</p>
+      </div>
+
+      <div class="analysis-block" id="a26">
+        <h4>2.6 其他重要观察</h4>
+        <p>小雨智造最独特的标签是"小米系方法论迁移"——乔忠良将小米的爆品逻辑（极致产品体验）、群众路线（深入场景找真实需求）和统一战线（生态链/方案商共建）完整移植到工业机器人领域。这种方法论在消费电子领域已被验证，在工业领域能否奏效仍需时间检验。2026年4月北航联合实验室和产业联盟倡议的发布标志着小雨智造从"产品公司"向"平台公司"的转型企图——通过标准制定和生态构建建立护城河。茅台基金的跨界投资暗示了具身智能正从科技圈向更广泛的产业资本渗透，可能加速行业的资本化和场景多元化。焊工单体工种缺口超1000万的数据说明，小雨智造所选赛道的需求确定性极强，相较于消费级人形机器人的路线，专注工业焊接的务实策略在短期商业化确定性上具有明显优势。</p>
+      </div>
+
+      <h2 id="refs">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://www.cls.cn/detail/2079450" target="_blank">滴滴首投具身智能！押宝聚焦工业落地的小雨智造 — 科创板日报</a></li>
+          <li><a href="https://m.36kr.com/p/3706592101691525" target="_blank">前小米高管创业机器人，用"爆品逻辑"做工业通用具身智能 — 36氪</a></li>
+          <li><a href="https://m.thepaper.cn/newsDetail_forward_31785705" target="_blank">小米系创业者，正成为资本押注"具身智能"的最佳标的 — 澎湃新闻</a></li>
+          <li><a href="https://leaderobot.com/news/5772" target="_blank">滴滴首次出手具身智能领域，领投小雨智造亿元级A+轮融资 — 机器人在线</a></li>
+          <li><a href="https://m.lieyunpro.com/archives/495834" target="_blank">不到一月，大模型机器人公司小雨智造再获讯飞创投独家A+轮投资 — 猎云网</a></li>
+          <li><a href="https://www.cinn.cn/sz/2025/07-08/Qr2wyNXD.html" target="_blank">小雨智造获滴滴、北京信产基金A+轮投资 — 中国工业报</a></li>
+          <li><a href="https://news.pedaily.cn/202507/552068.shtml" target="_blank">小雨智造获亿元级A+轮融资，滴滴领投 — 投资界</a></li>
+          <li><a href="http://tech.cnr.cn/techph/20260303/t20260303_527542058.shtml" target="_blank">小雨智造获数亿融资，加速具身智能工业落地 — 央广网</a></li>
+          <li><a href="https://www.cinn.cn/2026/03-03/ZkmPdOjD.html" target="_blank">小米系团队落地具身智能完成B轮融资 — 中国工业报</a></li>
+          <li><a href="https://www.ofweek.com/im/2026-03/ART-201920-8460-30682036.html" target="_blank">又融数亿！前小米高管创业，要造"机器人大脑"！ — 维科网</a></li>
+          <li><a href="https://www.lieyunpro.com/archives/500553" target="_blank">小雨智造获数亿融资，加速具身智能工业落地（2026） — 猎云网</a></li>
+          <li><a href="https://www.leiphone.com/category/industrynews/TJ561yBixdOnwjVW.html" target="_blank">华业天成领投小雨智造，最落地的具身智能公司获数亿元B轮融资 — 雷锋网</a></li>
+          <li><a href="https://www.donews.com/news/detail/1/6455010.html" target="_blank">通用具身智能公司小雨智造完成数亿元B轮融资 — DoNews</a></li>
+          <li><a href="https://finance.eastmoney.com/a/202604273720921151.html" target="_blank">小雨智造与北航共建实验室 — 东方财富</a></li>
+          <li><a href="https://www.guandian.cn/article/20260303/546062.html" target="_blank">"酿造"机器人 茅台再度跨界入股小雨智造 — 观点网</a></li>
+          <li><a href="https://www.guandian.cn/article/20260427/557823.html" target="_blank">小雨智造与北航共建工业具身智能联合实验室 — 观点网</a></li>
+          <li><a href="http://ydyl.china.com.cn/2024-07/24/content_117328443.shtml" target="_blank">唐山松下与小雨智造战略签约 聚焦智能焊接机器人品类 — 中国网</a></li>
+          <li><a href="http://finance.people.com.cn/BIG5/n1/2026/0304/c1004-40674614.html" target="_blank">小雨智造获数亿元融资 加速具身智能工业落地 — 人民网</a></li>
+          <li><a href="https://www.cls.cn/detail/1742167" target="_blank">小米集团智能制造布局再扩大 大模型智能焊接机器人要来了？ — 科创板日报</a></li>
+          <li><a href="https://www.iyiou.com/briefing/202603031883465" target="_blank">"小米系"小雨智造完成数亿元B轮融资 — 亿欧</a></li>
+          <li><a href="https://cbgc.scol.com.cn/news/7340248" target="_blank">"醉翁之意"不在酒？茅台基金首次涉足机器人赛道 — 川观新闻</a></li>
+          <li><a href="https://www.itsdw.cn/news/9346.html" target="_blank">通用具身智能科技公司小雨智造宣布完成数亿元B轮融资 — ITSDW</a></li>
+          <li><a href="https://vc.pedaily.cn/company/684364.html" target="_blank">北京小雨智造科技有限公司 — 投资界</a></li>
+          <li><a href="https://eu.36kr.com/zh/p/3706592101691525" target="_blank">前小米高管投身创业，以"爆品逻辑"打造工业通用具身智能机器人 — 36氪</a></li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">本页面由具身智能Wiki项目自动生成 | 数据截止至2026年5月4日 | 最后更新：2026-05-04</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

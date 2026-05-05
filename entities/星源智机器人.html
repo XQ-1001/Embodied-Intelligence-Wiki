@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>星源智机器人 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> › <span>星源智机器人</span></div>
+  <div class="wiki-header"><h1>星源智机器人</h1><div class="subtitle">Xingyuanzhi Robot · 2025年成立 · 通用具身大脑Tier 1供应商 · 成立4个月融资超3亿元</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#team">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#finance">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl3"><a href="#a-team">2.1 团队背景与场景选择</a></li>
+        <li class="toc-lvl3"><a href="#a-tech">2.2 技术路线与场景适配</a></li>
+        <li class="toc-lvl3"><a href="#a-capital">2.3 股东资本对战略的影响</a></li>
+        <li class="toc-lvl3"><a href="#a-pivot">2.4 试错过程与路径调整</a></li>
+        <li class="toc-lvl3"><a href="#a-position">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl3"><a href="#a-other">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#refs">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">星源智机器人</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">北京星源智机器人科技有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">英文</div><div class="ib-value">Xingyuanzhi Robot</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2025年8月1日</div></div>
+        <div class="ib-row"><div class="ib-label">注册地</div><div class="ib-value">北京亦庄（经济技术开发区）</div></div>
+        <div class="ib-row"><div class="ib-label">孵化方</div><div class="ib-value">北京智源人工智能研究院</div></div>
+        <div class="ib-row"><div class="ib-label">CEO</div><div class="ib-value">刘东</div></div>
+        <div class="ib-row"><div class="ib-label">联合创始人</div><div class="ib-value">穆亚东（北京大学研究员）</div></div>
+        <div class="ib-row"><div class="ib-label">定位</div><div class="ib-value">具身智能Tier 1 — 通用具身大脑供应商</div></div>
+        <div class="ib-section">融资信息</div>
+        <div class="ib-row"><div class="ib-label">最新轮次</div><div class="ib-value">天使+轮（2025年12月）</div></div>
+        <div class="ib-row"><div class="ib-label">累计融资</div><div class="ib-value">超3亿元人民币（成立4个月）</div></div>
+        <div class="ib-row"><div class="ib-label">估值</div><div class="ib-value">未公开披露</div></div>
+        <div class="ib-row"><div class="ib-label">主要投资方</div><div class="ib-value">高瓴、中科创星、元禾原点、赛富基金、凯联资本、智元机器人、乐聚智能、智微智能等</div></div>
+        <div class="ib-section">核心产品</div>
+        <div class="ib-row"><div class="ib-label">具身大脑</div><div class="ib-value">RoboBrain / RoboBrain Pro</div></div>
+        <div class="ib-row"><div class="ib-label">算力平台</div><div class="ib-value">T5域控制器（2070 TFLOPS）</div></div>
+        <div class="ib-row"><div class="ib-label">操作系统</div><div class="ib-value">RoboOS</div></div>
+        <div class="ib-row"><div class="ib-label">算力背包</div><div class="ib-value">BotPack B系列（B5/B4）</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">领域</div><div class="ib-value"><span class="tag">具身智能</span><span class="tag">具身大脑</span></div></div>
+        <div class="ib-row"><div class="ib-label">赛道</div><div class="ib-value"><span class="tag">通用大脑Tier 1</span><span class="tag">端侧算力平台</span><span class="tag">世界模型</span></div></div>
+        <div class="ib-section">官网</div>
+        <div class="ib-row"><div class="ib-label">网址</div><div class="ib-value">未公开（孵化期）</div></div>
+      </aside>
+
+      <p class="article-intro"><strong>星源智机器人</strong>（全称北京星源智机器人科技有限公司），成立于2025年8月，由北京智源人工智能研究院孵化。公司定位为具身智能领域的通用具身大脑Tier 1供应商，以"不造本体、只做大脑"的策略切入产业链，构建了涵盖RoboBrain具身大脑、T5域控制器和RoboOS操作系统的软硬一体化技术栈。创始团队来自京东智能驾驶和北京大学，兼具自动驾驶产业化经验与多模态大模型前沿研究能力。成立仅4个月即完成两轮累计超3亿元融资，投资方包括高瓴、中科创星、智元机器人等产业与财务资本，是2025年具身智能赛道融资速度最快的初创公司之一。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper">
+        <table class="wikitable infotable">
+          <tr><th>项目</th><th>内容</th></tr>
+          <tr><td>公司全称</td><td>北京星源智机器人科技有限公司</td></tr>
+          <tr><td>成立时间</td><td>2025年8月1日</td></tr>
+          <tr><td>注册地址</td><td>北京经济技术开发区（亦庄）</td></tr>
+          <tr><td>孵化方</td><td>北京智源人工智能研究院</td></tr>
+          <tr><td>上市状态</td><td>未上市</td></tr>
+          <tr><td>企业定位</td><td>具身智能Tier 1供应商——通用具身大脑/物理AI</td></tr>
+          <tr><td>主营业务</td><td>RoboBrain具身大脑、T5算力平台、BotPack算力背包、RoboOS操作系统</td></tr>
+        </table>
+      </div>
+      <h4>发展沿革</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>时间</th><th>事件</th></tr>
+          <tr><td>2025年8月1日</td><td>公司正式注册成立，由北京智源人工智能研究院孵化</td></tr>
+          <tr><td>2025年9月</td><td>完成2亿元天使轮融资；与北京亦庄机器人公司签署三年5亿元战略订单；亮相百度世界大会</td></tr>
+          <tr><td>2025年10月</td><td>T5域控制器搭载智元「精灵G2」工业机器人进入批量交付；龙旗南昌3C工厂实测成功率超99.5%</td></tr>
+          <tr><td>2025年11月</td><td>与中力股份（全球最大电动叉车公司）联合发布具身装卸技术及全场景装卸自动化方案</td></tr>
+          <tr><td>2025年12月</td><td>完成超亿元天使+轮融资（赛富基金、凯联资本领投），累计融资超3亿元</td></tr>
+          <tr><td>2026年1月</td><td>获智微智能战略投资；搭载宇树G1及更多本体实现适配</td></tr>
+          <tr><td>2026年4月</td><td>亮相首届智元创投A计划伙伴日；BotPack B系列算力背包发布；机器人服务官护航北京亦庄半马</td></tr>
+        </table>
+      </div>
+
+      <h3 id="team">1.2 创始人及核心团队</h3>
+      <p>星源智机器人的核心团队呈现"自动驾驶产业化+多模态AI学术前沿"的精英组合。CEO刘东的京东智驾全栈经验为产品化与商业化闭环提供了关键保障，联合创始人穆亚东的多模态具身大模型研究则为技术路线提供了学术深度。</p>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+          <tr><td>创始人/CEO</td><td>刘东</td><td>前京东智能驾驶总经理，主导京东智能驾驶产品全栈研发与商业化闭环，具备自动驾驶领域从0到1的产品化、规模化和商业落地完整经验</td></tr>
+          <tr><td>联合创始人</td><td>穆亚东</td><td>北京大学研究员、智源学者，在多模态大模型、具身智能与机器人领域处于世界学术前沿，为公司的技术路线提供了深厚的学术支撑</td></tr>
+        </table>
+      </div>
+      <p>团队整体呈现鲜明的<strong>混合型精英结构</strong>：刘东代表的产业派负责产品定义、客户拓展和商业化闭环，穆亚东代表的学术派确保技术架构的前沿性和差异化。公司汇聚了来自智源研究院、京东、北京大学、中科院等平台的研发人才。具体员工总数及研发人员占比暂未公开披露。</p>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <h4>融资历史</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>轮次</th><th>时间</th><th>金额</th><th>投资方</th><th>用途</th></tr>
+          <tr><td>天使轮</td><td>2025年9月</td><td>2亿元人民币</td><td>高瓴、元禾原点、中科创星、元生创投；产业方：智元机器人、芯联资本、国汽投资、中力实桥</td><td>团队建设、RoboBrain研发、T5平台量产</td></tr>
+          <tr><td>天使+轮</td><td>2025年12月</td><td>超亿元人民币</td><td>赛富基金、凯联资本领投；三七互娱、科实资本、乐聚智能跟投；老股东元生创投、元禾原点持续加注</td><td>RoboBrain Pro研发、BotPack B系列研发、场景拓展</td></tr>
+        </table>
+      </div>
+      <h4>股东结构分析</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>股东类别</th><th>代表机构</th><th>战略意义</th></tr>
+          <tr><td>顶级VC/PE</td><td>高瓴、赛富基金、凯联资本、元禾原点、中科创星</td><td>高瓴在具身智能领域已构建完整产业链布局（感知→计算→关节→本体→算法→终端），星源智是其"大脑"层关键棋子</td></tr>
+          <tr><td>产业资本（本体）</td><td>智元机器人、乐聚智能</td><td>直接绑定头部本体厂商作为首发客户和生态验证方</td></tr>
+          <tr><td>产业资本（下游）</td><td>国汽投资、中力实桥、智微智能、三七互娱</td><td>覆盖汽车、物流叉车、算力硬件、数字娱乐等多元应用场景</td></tr>
+          <tr><td>孵化方</td><td>北京智源人工智能研究院</td><td>提供前沿AI研究资源、学者网络和政策支持</td></tr>
+        </table>
+      </div>
+      <p>公司估值未公开披露。考虑到成立仅4个月即完成超3亿元融资且投资方阵容豪华（高瓴+智元+国家队），市场给予较高估值预期。公司未上市。</p>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>技术维度</th><th>说明</th></tr>
+          <tr><td>总体AI架构</td><td>"认知大脑+运动小脑"分层架构：上层负责多模态感知、场景理解、时空推理与长周期任务规划；下层实现毫秒级精确动作执行</td></tr>
+          <tr><td>世界模型路线</td><td>两条路线并进：①基于视频生成底座叠加动作模块；②以JEPA为代表的轻量化世界特征学习（联合创始人穆亚东为JEPA方向核心学者）</td></tr>
+          <tr><td>感知技术</td><td>多模态感知与数字化重建（视觉/LiDAR/IMU/GNSS），对物理世界进行3D空间理解</td></tr>
+          <tr><td>导航技术</td><td>NavBrain导航大脑：通用大小脑分层架构，语义理解+长程推理+动态避障，无需预先建图</td></tr>
+          <tr><td>反思-重规划</td><td>思维链闭环机制：任务执行中持续检查完成状态，执行错误时自动重新规划</td></tr>
+          <tr><td>端侧部署</td><td>T5域控制器端侧运行VLA/VLM模型（如PI 0.5），摆脱云端依赖；自研RoboOS操作系统</td></tr>
+          <tr><td>跨本体通用</td><td>大脑可适配不同机器人本体，调用不同VLA操作模型（行走、抓取、叠衣等），已适配智元、宇树、中力叉车等</td></tr>
+          <tr><td>软硬一体</td><td>从芯片（NVIDIA Jetson Thor）到域控制器（T5）到操作系统（RoboOS）到大脑算法（RoboBrain）垂直整合</td></tr>
+        </table>
+      </div>
+      <p>技术路线的核心特色在于"端侧全栈+跨本体通用"。CEO刘东将具身智能当前阶段对标2016-2017年的自动驾驶，认为行业需要统一的具身世界模型来实现全链路端到端闭环。星源智选择了软硬件协同优化+一体交付的策略，将模型部署在端侧，解决延迟与断网失效问题，同时以跨本体的标准化平台定位避免与本体厂商竞争。</p>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>产品分类</th><th>子类/型号</th><th>关键参数</th><th>适用场景</th></tr>
+          <tr><td rowspan="2">具身大脑（软件）</td><td>RoboBrain</td><td>跨本体高泛化性通用大脑，世界理解+任务宏观规划+多VLA模型调用</td><td>各类机器人的通用大脑层</td></tr>
+          <tr><td>RoboBrain Pro</td><td>专业版，多模态感知+场景理解+运动规划+动作控制深度融合（天使+轮重点研发）</td><td>工业级复杂作业场景</td></tr>
+          <tr><td rowspan="2">算力平台（硬件）</td><td>T5域控制器</td><td>NVIDIA Jetson Thor T5000，峰值2070 TFLOPS (FP16)，128GB LPDDR5x，2TB NVMe SSD，16路GMSL2摄像头，6路CANFD</td><td>机器人大小脑一体化端侧部署</td></tr>
+          <tr><td>BotPack B系列</td><td>B5: 2070 TFLOPS / B4: 1200 TFLOPS；尺寸326×196×105mm；重量<2.5kg；无损快拆；UWB+IMU+GNSS</td><td>机器人外挂式算力背包（适配宇树G1等）</td></tr>
+          <tr><td>操作系统</td><td>RoboOS</td><td>自研可商用机器人操作系统，封装硬件接口/传感器驱动/通信/OTA/A/B系统无缝回滚</td><td>所有搭载星源智大脑的机器人</td></tr>
+          <tr><td>导航大脑</td><td>NavBrain</td><td>语义理解+长程推理+动态避障，无需预先建图</td><td>仓储物流、服务机器人导航</td></tr>
+        </table>
+      </div>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>场景分类</th><th>具体应用</th><th>合作方/落地案例</th></tr>
+          <tr><td rowspan="3">工业制造</td><td>3C制造产线（上下料、检测、装配）</td><td>智元精灵G2 + 龙旗科技南昌工厂（8小时无间断作业，成功率>99.5%）</td></tr>
+          <tr><td>工业叉车无人装卸</td><td>中力股份联合发布（2cm精度全流程无人化装卸）</td></tr>
+          <tr><td>工业级交互式作业</td><td>搭载T5的智元精灵G2已批量交付</td></tr>
+          <tr><td rowspan="3">商业服务</td><td>闪电仓/前置仓拣选</td><td>亦庄三年5亿元订单覆盖，CEO认为这是"目前落地最快的场景"</td></tr>
+          <tr><td>药店无人值守</td><td>亦庄订单覆盖场景之一</td></tr>
+          <tr><td>餐饮/酒店/养老服务</td><td>亦庄订单覆盖场景</td></tr>
+          <tr><td rowspan="2">其他</td><td>园林/公共空间</td><td>亦庄订单覆盖场景</td></tr>
+          <tr><td>赛事服务</td><td>2026北京亦庄人形机器人半马"机器人服务官"</td></tr>
+        </table>
+      </div>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>维度</th><th>进展</th></tr>
+          <tr><td>战略订单</td><td>2025年9月与北京亦庄机器人公司签署三年不低于5亿元战略订单，覆盖餐饮、酒店、养老、园林等场景</td></tr>
+          <tr><td>硬件出货</td><td>T5域控制器2025年已实现数百套批量交付，量产体系成熟</td></tr>
+          <tr><td>首发客户</td><td>智元精灵G2工业机器人搭载T5域控，龙旗南昌3C工厂实测8小时无间断作业成功率>99.5%</td></tr>
+          <tr><td>产业合作</td><td>与中力股份（全球最大电动叉车公司）联合发布具身装卸技术并完成实地验证</td></tr>
+          <tr><td>平台适配</td><td>已适配智元、宇树G1、中力叉车等多种机器人本体</td></tr>
+          <tr><td>生态伙伴</td><td>亮相智元创投A计划伙伴日，拓展数十家行业伙伴</td></tr>
+        </table>
+      </div>
+
+      <h3 id="finance">1.8 财务数据</h3>
+      <p>星源智机器人成立于2025年8月，截至2026年5月成立约9个月，处于极早期商业化阶段，未公开披露系统性财务数据。以下为可获取的财务相关信息：</p>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>维度</th><th>信息</th></tr>
+          <tr><td>营收</td><td>未公开披露。已锁定亦庄三年不低于5亿元战略订单，T5域控已出货数百套</td></tr>
+          <tr><td>利润</td><td>未公开披露。预计处于大规模研发投入期</td></tr>
+          <tr><td>融资储备</td><td>累计融资超3亿元（天使轮2亿+天使+轮超1亿），资金储备充裕</td></tr>
+        </table>
+      </div>
+      <div class="callout"><div class="callout-title">说明</div>公司为非上市极早期初创企业，以上信息基于公开融资报道和战略合作公告整理。</div>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>CEO刘东将具身智能行业发展对标2016-2017年的自动驾驶，认为当前处于"从0到1"的技术验证期，即将进入规模化落地阶段</li>
+        <li>公司上市后（智微智能）通过战略投资方式入股，是公开资本市场与具身智能创业公司的少数直接股权链接之一</li>
+        <li>T5域控制器是目前业内公开发布参数最详细、量产最早的端侧具身大脑算力平台之一</li>
+        <li>BotPack B系列算力背包定位为"让每台机器人都能拥有最强端侧大脑"，复用本体电源、即插即用、无损快拆</li>
+        <li>公司战略定位明确对标汽车行业的华为Tier 1模式——不造本体、只做大脑，强调跨本体的平台通用性</li>
+        <li>参与2025年百度世界大会，与智元机器人联合展示搭载T5的精灵G2</li>
+        <li>乐聚智能既投资了星源智天使+轮，也是其行业合作伙伴，体现产业资本与业务协同的深度绑定</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="a-team">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>星源智的"自动驾驶CEO+多模态AI学者"组合与具身大脑Tier 1定位高度匹配。刘东在京东智能驾驶的经历提供了三个关键能力：①理解端侧实时系统的工程复杂性（类比自动驾驶域控）；②主导过从研发到商业化的完整闭环（而非仅学术demo）；③具备大客户BD和产业生态构建经验（京东智驾涉及大量合作伙伴管理）。穆亚东的JEPA世界模型研究则为星源智提供了区别于主流视频生成路线的差异化技术方向。团队的主要缺位在于：未发现机械/硬件工程或本体设计背景的核心成员，这与公司"不做本体"的定位一致，但T5/BotPack的硬件产品线需要强大的硬件工程团队支撑，该能力的构建情况有待观察。</p>
+      </div>
+
+      <div class="analysis-block" id="a-tech">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>星源智的"端侧全栈+跨本体通用"技术路线与其目标场景具有良好的适配性。亦庄的餐饮/酒店/养老/园林场景多为半结构化甚至非结构化环境，对云端依赖的高延迟方案天然不适用，端侧部署的T5方案恰好解决了这一痛点。中力叉车的工业装卸场景同样要求低延迟和高可靠性（2cm精度），端侧推理是刚需。但技术路线存在两个值得关注的风险点：第一，跨本体通用意味着需要在不同硬件平台、不同传感器配置上保持一致的性能，这在工程上极为复杂，实际表现能否达到宣称的泛化性需要更多第三方验证；第二，JEPA世界模型虽在学术界有较强理论基础，但距离工程化落地和规模化验证仍有距离，短期内可能仍需依赖更成熟的视频生成路线。</p>
+      </div>
+
+      <div class="analysis-block" id="a-capital">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>星源智的股东结构呈现出"顶级VC+产业本体+下游场景"的三层嵌套特征，这在具身智能赛道中较为罕见。高瓴作为核心投资人，已在具身智能产业链布局了感知（千觉）、计算（地瓜）、关节（环动、富兴）、本体（智元、星海图、思灵）、算法（灵初）、终端（维他动力）的全链条，星源智天然获得高瓴生态内大量潜在客户资源。智元作为股东兼客户的关系尤为关键——智元精灵G2搭载T5实现批量交付，证明了"投资+采购"模式的可行性。但也需注意：过度依赖智元单一客户可能导致收入集中风险，且其他本体厂商可能因竞品关系对使用星源智大脑产生顾虑。智微智能的战略投资则提供了资本市场背书和算力硬件供应链协同。</p>
+      </div>
+
+      <div class="analysis-block" id="a-pivot">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>星源智成立仅约9个月，可追踪的公开信息中未发现明显的战略转向或场景切换，但产品线的快速拓展值得关注。公司在天使轮阶段（2025年9月）以RoboBrain软件和T5域控为主打，到天使+轮（2025年12月）已推出RoboBrain Pro专业版，2026年4月又发布了BotPack B系列算力背包。这种从"嵌入式域控"到"外挂式背包"的产品形态拓展，反映了对不同客户需求的快速响应——域控制器适合深度集成的量产机型（如智元G2），算力背包则适合已有本体的快速智能化改装（如宇树G1）。这一策略的内在逻辑合理，但产品线过快扩张也可能分散有限的工程资源。</p>
+      </div>
+
+      <div class="analysis-block" id="a-position">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>星源智的竞争定位可以概括为"具身智能的华为Tier 1模式"——不做机器人整机，只做通用大脑平台。这种"不造车、只做智能驾驶方案"的类比已被CEO刘东公开使用。在具身智能产业链分工远未确定的当下，这一取舍具有鲜明的战略自觉性：放弃本体的万亿级整机市场，瞄准通用大脑的平台级机会。核心取舍在于"做横向平台vs做纵向整机"——星源智选择了前者，这意味着需要解决跨本体兼容性的巨大工程挑战，但一旦成功，将拥有比任何单家本体厂商更大的市场空间。与同行（如智元自研大脑+本体）相比，星源智的独立性理论上可以触达更广的客户群，但智元作为股东兼客户的双重身份使这一独立性存在边界。</p>
+      </div>
+
+      <div class="analysis-block" id="a-other">
+        <h4>2.6 其他重要观察</h4>
+        <p>第一，星源智的"4个月3亿融资"创下了具身智能赛道的融资速度纪录，但这同时也带来了高期望值压力——投资方和市场将密切关注2026年的实际营收和交付数据。第二，公司CEO刘东的公开言论中频繁使用"华为Tier 1"类比，这一叙事在资本市场具有吸引力，但华为Tier 1模式在汽车行业的大规模验证花费了十年以上，具身智能赛道能否复现这一路径尚存疑问。第三，T5域控制器的技术规格（2070 TFLOPS、128GB内存、16路摄像头）在当前具身智能领域属于顶级配置，但硬件的快速迭代意味着需要持续投入研发以保持领先。第四，亦庄三年5亿元战略订单虽然金额可观，但覆盖场景极为分散（餐饮/酒店/养老/园林），如何在这些差异性极大的场景中提供标准化产品而非项目制交付，是公司从"项目公司"走向"产品平台"的关键挑战。</p>
+      </div>
+
+      <h2 id="refs">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://www.chinastarmarket.cn/detail/2142699" target="_blank">科创板日报 — 高瓴押注！前京东智驾总经理入局具身智能 星源智天使轮融2亿</a></li>
+          <li><a href="https://www.iyiou.com/news/202509111108874" target="_blank">亿欧 — 具身大脑赛道迎"闪电融资"，星源智机器人完成2亿元天使轮融资</a></li>
+          <li><a href="https://www.robotsci.com.cn/detail/1999279261952905216" target="_blank">机器人大讲堂 — 成立4个月已融资超3亿元！星源智机器人再获超亿元融资</a></li>
+          <li><a href="https://www.zhidx.com/p/520752.html" target="_blank">智东西 — 给智元机器人造大脑，北京这家创企又融资超亿元｜融资首发</a></li>
+          <li><a href="https://www.zhidx.com/p/552235.html" target="_blank">智东西 — 给智元做完大脑，又给宇树装上最强外挂，星源智想做机器人的通用平台</a></li>
+          <li><a href="https://dxpress.gelonghui.com/p/3359408" target="_blank">格隆汇 — 星源智成立4个月已融资超3亿元，持续领跑具身大脑赛道</a></li>
+          <li><a href="https://kfqgw.beijing.gov.cn/ywdt/dwkfgd/cych/202512/t20251212_4344546.html" target="_blank">北京亦庄经开区 — 星源智完成超亿元天使+轮融资</a></li>
+          <li><a href="https://w.geekpark.net/news/356356" target="_blank">极客公园 — 星源智携「最强具身大脑」亮相百度世界大会，赋能智元机器人</a></li>
+          <li><a href="https://nuxt.cyzone.cn/article/810431.html" target="_blank">创业邦 — 前京东智驾一号位具身智能创业，成立一个月融资2亿元</a></li>
+          <li><a href="https://www.fortunechina.com/jingxuan/43363.htm" target="_blank">财富中文网 — 中国具身智能公司再获高额天使轮融资</a></li>
+          <li><a href="https://i.gasgoo.com/news/70438766.html" target="_blank">盖世汽车 — 为智元精灵G2提供具身大脑，星源智再获超亿元融资</a></li>
+          <li><a href="https://www.jwipc.cn/newsinfo185.html" target="_blank">智微智能官网 — 战略投资星源智——通向物理世界的通用具身大脑</a></li>
+          <li><a href="https://www.zidonghua.com.cn/news/exhibition/85238.html" target="_blank">自动化网 — 星源智亮相智元创投A计划伙伴日</a></li>
+          <li><a href="https://kfqgw.beijing.gov.cn/ywdt/kjcgzhgd/kjqy/202511/t20251114_4316702.html" target="_blank">北京亦庄经开区 — 强强联合为叉车安上机器人智脑</a></li>
+          <li><a href="https://www.chinaforkliftpart.com/detail/202512/05/80320.html" target="_blank">叉车配件网 — 具身大脑域控制器T5</a></li>
+          <li><a href="https://m.techweb.com.cn/article/2025-12-15/2969299.shtml" target="_blank">TechWeb — Physical AI赛道再落子！三七互娱投资具身大脑公司星源智</a></li>
+          <li><a href="https://m.lieyunpro.com/archives/498624" target="_blank">猎云网 — 高瓴、智元等机构押注，具身大脑公司星源智完成2亿元天使轮融资</a></li>
+          <li><a href="https://www.infoq.cn/article/4oqzuxcwjrofyyxupwi9" target="_blank">InfoQ — 刚成立1个月，这家具身大脑公司就吸金2亿</a></li>
+          <li><a href="http://www.capitallink.cn/doc_30611960.html" target="_blank">凯联资本 — 星源智完成天使+轮超亿元融资，凯联资本联合领投</a></li>
+          <li><a href="http://finance.ynet.com/2026/04/23/4003936t632.html" target="_blank">北京青年报 — 星源智"机器人服务官"护航2026北京亦庄人形机器人半马</a></li>
+          <li><a href="https://tech.ifeng.com/c/8oBzIIhtICL" target="_blank">凤凰科技 — 给无人叉车装具身大脑，货物装卸全流程无人化</a></li>
+          <li><a href="https://open.zhidx.com/p/538635.html" target="_blank">智东西 — 从春晚爆火到两会点名，机器人的战场变了</a></li>
+        </ol>
+      </div>
+
+      <div class="page-footer">本页面由具身智能Wiki项目自动生成，数据截至2026年5月。内容基于公开报道和公司官方信息整理，仅供参考。</div>
+    </article>
+  </div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

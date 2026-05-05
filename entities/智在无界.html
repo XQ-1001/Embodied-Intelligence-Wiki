@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>智在无界 — 具身智能Wiki</title><style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style></head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> › <span>智在无界</span></div>
+  <div class="wiki-header"><h1>智在无界</h1><div class="subtitle">BeingBeyond · 2025年成立 · 具身智能基础大模型 · 天使轮</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#team">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financial">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#misc">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl3"><a href="#a-team">2.1 团队背景与场景匹配</a></li>
+        <li class="toc-lvl3"><a href="#a-tech">2.2 技术路线与场景适配</a></li>
+        <li class="toc-lvl3"><a href="#a-capital">2.3 股东/资本结构影响</a></li>
+        <li class="toc-lvl3"><a href="#a-pivot">2.4 试错与路径调整</a></li>
+        <li class="toc-lvl3"><a href="#a-position">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl3"><a href="#a-other">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#refs">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">智在无界</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">北京智在无界科技有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">英文名</div><div class="ib-value">BeingBeyond</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2025年1月</div></div>
+        <div class="ib-row"><div class="ib-label">注册地</div><div class="ib-value">北京</div></div>
+        <div class="ib-row"><div class="ib-label">法定代表人</div><div class="ib-value">李明珠</div></div>
+        <div class="ib-row"><div class="ib-label">创始人</div><div class="ib-value">卢宗青</div></div>
+        <div class="ib-section">财务数据</div>
+        <div class="ib-row"><div class="ib-label">融资轮次</div><div class="ib-value">天使轮</div></div>
+        <div class="ib-row"><div class="ib-label">累计融资</div><div class="ib-value">数千万元×2轮</div></div>
+        <div class="ib-row"><div class="ib-label">估值</div><div class="ib-value">未公开</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">训练数据量</div><div class="ib-value">20万+小时（2026.4）</div></div>
+        <div class="ib-row"><div class="ib-label">跨本体适配</div><div class="ib-value">30+种构型</div></div>
+        <div class="ib-row"><div class="ib-label">员工规模</div><div class="ib-value">早期初创（约20-40人估计）</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">赛道</div><div class="ib-value">具身智能基础模型</div></div>
+        <div class="ib-row"><div class="ib-label">路线</div><div class="ib-value">纯软（机器人大脑）</div></div>
+        <div class="ib-section">官网</div>
+        <div class="ib-row"><div class="ib-label">官网</div><div class="ib-value">未公开</div></div>
+      </aside>
+      <p class="article-intro">智在无界（BeingBeyond）是一家专注于具身智能通用基础大模型的中国初创公司，2025年1月成立于北京，由北京大学计算机学院长聘副教授卢宗青创立。公司坚持"纯软"路线，只研发机器人的"大脑"——通用具身操作模型，不涉足硬件本体制造。其旗舰模型Being-H系列在跨本体泛化操作方面处于行业前沿，截至2026年4月已能控制超过30种不同构型的机器人。公司已完成两轮数千万元级天使融资，投资方包括联想之星、考拉基金、领航新界、灵心巧手、重庆国资等。</p>
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper"><table class="wikitable infotable">
+        <tr><th colspan="2">公司基本信息</th></tr>
+        <tr><td>公司全称</td><td>北京智在无界科技有限公司</td></tr>
+        <tr><td>英文名称</td><td>BeingBeyond</td></tr>
+        <tr><td>成立时间</td><td>2025年1月（2025年5月正式运营）</td></tr>
+        <tr><td>注册地</td><td>中国北京鼎好大厦</td></tr>
+        <tr><td>法定代表人</td><td>李明珠</td></tr>
+        <tr><td>创始人兼CEO</td><td>卢宗青</td></tr>
+        <tr><td>主营业务</td><td>具身智能通用基础大模型研发（机器人大脑/通用操作模型）</td></tr>
+        <tr><td>定位</td><td>纯软路线——只做大脑模型，不做硬件本体</td></tr>
+        <tr><td>官网</td><td>未公开</td></tr>
+      </table></div>
+      <h4>发展沿革</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>时间</th><th>事件</th></tr>
+        <tr><td>2025年1月</td><td>北京智在无界科技有限公司注册成立</td></tr>
+        <tr><td>2025年5月</td><td>公司正式运营，核心团队到位</td></tr>
+        <tr><td>2025年6月</td><td>完成天使轮前融资（数千万元），联想之星领投；发布首个通用智能体Being-0</td></tr>
+        <tr><td>2025年7-8月</td><td>发布Being-H0灵巧手操作模型，基于约1000小时人类视频预训练</td></tr>
+        <tr><td>2026年1月</td><td>完成天使轮融资（数千万元），考拉基金领投，灵心巧手、领航新界、重庆国资跟投；发布Being-H0.5，支持30种机器人构型</td></tr>
+        <tr><td>2026年4月14日</td><td>发布Being-H0.7世界模型，基于20万小时人类行为视频训练，6项国际评测综合第一</td></tr>
+      </table></div>
+
+      <h3 id="team">1.2 创始人及核心团队</h3>
+      <p>智在无界由北京大学计算机学院长聘副教授卢宗青创立。卢宗青此前曾任北京智源人工智能研究院多模态交互研究中心负责人，在AI多模态交互与机器人大脑领域有深厚学术积累。团队核心成员主要来自前智源研究院班底，整体呈现学术派导向的混合型人才结构——既有高校科研背景，也有产业工程化能力。公司处于早期初创阶段，员工规模估计约20-40人，R&amp;D人员占比极高（80%+），以算法研究和大规模视频数据处理工程师为主体。</p>
+      <div class="table-wrapper"><table class="wikitable infotable">
+        <tr><th colspan="2">核心人员</th></tr>
+        <tr><th>角色</th><th>姓名/背景</th></tr>
+        <tr><td>创始人/CEO</td><td>卢宗青，北京大学计算机学院长聘副教授，前智源研究院多模态交互研究中心负责人；研究方向：具身智能、多模态AI、机器人操作</td></tr>
+        <tr><td>法定代表人</td><td>李明珠</td></tr>
+      </table></div>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>轮次</th><th>时间</th><th>金额</th><th>领投方</th><th>跟投方</th></tr>
+        <tr><td>天使轮前</td><td>2025年6月</td><td>数千万元</td><td>联想之星</td><td>智谱Z基金、燕缘创投、彬复资本</td></tr>
+        <tr><td>天使轮</td><td>2026年1月</td><td>数千万元</td><td>考拉基金（拉卡拉旗下）</td><td>领航新界、灵心巧手（产业方）、重庆明月湖科技成果转化创业投资基金（国资）、重庆科技成果转化股权投资基金（国资）；老股东联想之星、星连资本持续加注</td></tr>
+      </table></div>
+      <p>截至2026年4月，公司累计完成两轮数千万元级融资。股东结构呈现"财务+产业+国资"多元特征：联想之星作为早期孵化方提供创业资源，考拉基金和领航新界为市场化VC，灵心巧手以"客户+股东"双重身份提供产业协同，重庆两家国有基金体现地方政府对具身智能产业链的战略布局。目前公司尚未公布估值数据。</p>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <div class="table-wrapper"><table class="wikitable infotable">
+        <tr><th>维度</th><th>说明</th></tr>
+        <tr><td>AI架构</td><td>"预训练-后训练"双层框架 + Retriever-Actor-Critic强化学习闭环</td></tr>
+        <tr><td>数据方案</td><td>人类视频预训练路线（行业首创）：通过头戴摄像头录制第一视角人手操作视频；自研U1灵巧手数据采集系统</td></tr>
+        <tr><td>世界模型</td><td>Being-H0.7集成潜空间推理世界模型，覆盖跨本体/跨场景/连续动态/流体/柔性物体/物理规律/上下文推理七个维度</td></tr>
+        <tr><td>全栈/专用</td><td>纯软路线，专注通用操作基础模型，不涉及硬件本体或具身感知硬件</td></tr>
+        <tr><td>自研程度</td><td>高：Video Tokenizer（自研视频解构技术）、Retriever-Actor-Critic框架、数据采集体系均为自主研发</td></tr>
+        <tr><td>部署</td><td>支持NVIDIA Orin-NX（约75TOPS）等端侧芯片实时运行，优化后可在小算力平台上运行</td></tr>
+        <tr><td>跨本体能力</td><td>Being-H0.5已适配30+种机器人构型，实现零样本跨本体迁移</td></tr>
+      </table></div>
+      <p>智在无界在技术路线上有两个显著差异化：第一，行业首个系统性采用"人类视频预训练"方法，通过低成本（约几十元/小时）的人类手部操作视频采集作为预训练数据，绕过了遥操作采集的高成本瓶颈；第二，"预训练-后训练"双层架构将通用能力（预训练）与特定任务适配（后训练，Being-Dex）解耦，使模型可在不同本体上快速迁移。公司创始人预计到2027年达到100万小时训练数据时将出现模型能力的"涌现"式质变。</p>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>产品系列</th><th>功能定位</th><th>最新版本/状态</th><th>关键参数</th><th>适用场景</th></tr>
+        <tr><td>Being-H</td><td>灵巧手操作模型（核心旗舰）</td><td>Being-H0.7（2026年4月）</td><td>基于20万小时人类行为视频训练；6项国际评测综合第一；潜空间世界模型；适配30+构型</td><td>物流分拣、精密装配、快递扫码、服务操作等精细手部任务</td></tr>
+        <tr><td>Being-M</td><td>全身移动操作模型</td><td>研发中</td><td>约1500万条"文本+动作"配对训练；控制双足机器人全身移动+操作</td><td>双足人形机器人复杂场景移动操作</td></tr>
+        <tr><td>Being-W</td><td>动作跟随模型</td><td>研发中</td><td>配合Being-M实现动作映射</td><td>搭配Being-M使用</td></tr>
+        <tr><td>Being-Dex</td><td>后训练增值服务</td><td>已商用</td><td>约30分钟学会新任务；按数据量收费</td><td>面向本体企业客户的快速任务定制</td></tr>
+        <tr><td>Being-0</td><td>通用智能体（概念原型）</td><td>2025年6月发布</td><td>模块化端到端架构，集成运动、导航、灵巧操作</td><td>长程自主任务演示</td></tr>
+        <tr><td>U1采集系统</td><td>数据采集硬件</td><td>已部署</td><td>头戴式第一视角手部视频采集设备</td><td>训练数据规模化生产</td></tr>
+      </table></div>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>场景类别</th><th>具体场景</th><th>典型任务</th><th>合作方/客户</th></tr>
+        <tr><td>工业制造</td><td>物流仓储</td><td>快递扫码分拣、包裹搬运、货架补货</td><td>宇树（G1采集平台）、PND（Adam-U部署平台）</td></tr>
+        <tr><td>工业制造</td><td>精密装配</td><td>零部件组装、柔性操作</td><td>多家国内头部本体公司</td></tr>
+        <tr><td>商业服务</td><td>零售/餐饮</td><td>物品递送、桌台清理</td><td>探索中</td></tr>
+        <tr><td>家庭消费</td><td>家务操作</td><td>物品归位、简单烹饪辅助</td><td>中长期目标场景</td></tr>
+        <tr><td>科研开发</td><td>本体适配</td><td>为新机器人本体提供"即插即用"操作大脑</td><td>多家本体公司作为潜在客户</td></tr>
+      </table></div>
+      <p>核心产业合作资源：灵心巧手（灵巧手硬件+客户+股东，深度绑定）、宇树Unitree（数据采集用G1平台）、PND鹏迪科技（联合发布Adam-U Ultra机器人）、NVIDIA（算力芯片合作）。</p>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <p>智在无界处于商业化早期阶段（种子客户验证期），主要进展包括：</p>
+      <ul>
+        <li><strong>收费模式已确立：</strong>一次性License费用（每台机器人数万至十万元）+ Being-Dex后训练服务（按数据量收费），未来计划推出SaaS年包模式</li>
+        <li><strong>首批合作客户：</strong>PND（联合发布Adam-U Ultra机器人，接入Being-H实现"开箱即用"）、灵心巧手（战略客户）</li>
+        <li><strong>跨本体迁移验证：</strong>用宇树G1采集的快递分拣数据训练出的模型，可首次上机零样本迁移至PND Adam-U执行同一任务，证明了模型的跨本体商业价值</li>
+        <li><strong>多家本体企业接洽：</strong>国内多家头部具身本体公司已建立合作关系或正在技术验证阶段</li>
+        <li><strong>出货量数据：</strong>尚未公布具体License部署数量，公司处于从技术验证向规模商业化过渡阶段</li>
+      </ul>
+
+      <h3 id="financial">1.8 财务数据</h3>
+      <p>智在无界为非上市公司，财务数据未公开。以下为基于公开信息的估算：</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>指标</th><th>2025年（估计）</th><th>2026年（估计/规划）</th></tr>
+        <tr><td>营收</td><td>少量（种子客户验证）</td><td>初步商业化（License+后训练）</td></tr>
+        <tr><td>研发支出</td><td>数千万元（年度）</td><td>数千万至亿元级</td></tr>
+        <tr><td>账面资金</td><td>两轮融资合计数千万元×2，可支持1-2年运营</td><td>待补充</td></tr>
+        <tr><td>员工</td><td>约20-40人（估计）</td><td>持续招聘中</td></tr>
+      </table></div>
+
+      <h3 id="misc">1.9 其他信息</h3>
+      <ul>
+        <li>创始人卢宗青公开判断2026年具身智能行业将走向"软硬分化"——模型公司和本体公司各司其职，一家公司很难同时把硬件和软件都做深</li>
+        <li>公司自研具身模型的年成本估算为数千万至亿元级；外采大脑的一次性License仅数万元，卢宗青认为经济账将驱动行业分工</li>
+        <li>卢宗青对"世界模型"在机器人直接控制上的应用持谨慎态度，认为可用来生成训练数据，但直接部署在机器人上"非常有难度"</li>
+        <li>公司是具身智能行业首个系统性提出"人类视频预训练"路线的企业，该路线被认为有可能突破当前遥操作采集的高成本瓶颈</li>
+        <li>Being-H0.7在6项国际权威评测中综合排名全球第一（4项登顶），被部分媒体称为"最强具身世界模型"</li>
+        <li>公司的长期愿景是成为具身智能领域的"OpenAI"——先做科研突破，再开展规模化商业</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="a-team">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>卢宗青的学术背景为北京大学计算机学院多模态交互方向，加上在智源研究院主导多模态交互研究中心的经历，使其团队在AI算法层面具有先发优势。这一背景选择"纯软+通用操作模型"路线，直接面向工业制造（物流分拣、精密装配）等标准化程度高、动作模式相对固定的场景，是高度合理的。逻辑在于：学术界出身团队更适合攻克跨本体泛化这一算法难题，而非涉足硬件制造的供应链和量产复杂度。但与"场景深耕"型团队（如焊接制造背景→工业场景）相比，智在无界缺乏对某个垂直场景的深度行业Know-how积累，这是其作为通用模型供应商需要通过与本体企业合作来弥补的短板。</p>
+      </div>
+
+      <div class="analysis-block" id="a-tech">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>人类视频预训练+跨本体泛化的技术路线，与公司定位的"通用操作大脑"目标高度适配。传统的遥操作采集成本高、无法规模化，而头戴式视频采集成本仅几十元/小时，可以通过众包方式快速积累百万小时级数据。跨本体的零样本迁移能力（宇树G1→PND Adam-U）也验证了这一路线的可行性。潜在风险：人类视频数据终究是2D视觉信息，映射到3D物理世界的操作涉及深度估计、力控反馈等挑战；当前路线在精密力控、动态环境交互等任务上的表现可能仍有上限。如果未来发现视频预训练的"天花板"，可能需要转向虚实融合数据方案。</p>
+      </div>
+
+      <div class="analysis-block" id="a-capital">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>智在无界的股东结构具有明确的多维度特征：联想之星提供早期孵化和产业资源对接；灵心巧手以"客户+股东"身份入股，形成了深度绑定的产业协同——不仅提供了灵巧手硬件的真实测试场景，也为模型提供了下游出口；重庆两家国有基金（明月湖基金、科技成果转化基金）的入股，可能意味着在重庆区域承接制造业智能化改造项目的机会，同时也可能带来对应用场景优先级的一定引导。财务投资者（考拉基金、领航新界等）的主导地位使其保持了较高的战略独立性，不会因单一产业资本的绑定而限制场景选择广度。</p>
+      </div>
+
+      <div class="analysis-block" id="a-pivot">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>智在无界成立仅一年余，路径调整幅度不大，但已可见几个关键迭代：从2025年6月的Being-0（集成运动+导航+操作的通用智能体概念）快速聚焦到2025年下半年的Being-H灵巧手操作模型，体现了从"什么都做"到"聚焦手部操作"的战略收缩——这一调整是合理的，因为手部灵巧操作才是通用模型中最难、也是最能形成壁垒的环节。2026年4月发布的Being-H0.7融入世界模型能力，是从操作模型向"理解物理规律的世界模型"的能力跃迁，标志着公司从工具型产品向平台型能力的升级。目前Being-M（全身移动操作）仍在研发中，如果移动操作的商业化节奏慢于手部操作，可能需要评估资源分配的优先级。</p>
+      </div>
+
+      <div class="analysis-block" id="a-position">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>智在无界的核心取舍非常明确：做具身智能领域的"芯片/IP供应商"（类比高通/ARM），而非"整机品牌"（类比苹果）。这一取舍决定了其资源全部投向算法和数据，放弃了硬件本体、供应链、整机品牌等高资产投入环节。与同行对比：银河通用、星尘智能等公司走软硬一体全栈路线，智元机器人走自研本体+模型路线；智在无界是行业中少数旗帜鲜明走"纯软"独立模型供应商路线的企业。这一维度的取舍在经济学上是清晰的——自研模型成本数千万至上亿元/年 vs 外采License数万元/台，当本体企业年出货量不大时，外采更经济。但如果未来头部本体企业（如特斯拉、Figure）持续自研模型并形成封闭生态，第三方模型供应商的市场空间可能受限。</p>
+      </div>
+
+      <div class="analysis-block" id="a-other">
+        <h4>2.6 其他重要观察、分析</h4>
+        <p>几点值得注意：其一，智在无界的"人类视频预训练"与特斯拉Optimus的采集路线有相似之处（均利用人类动作数据），但智在无界更进一步将此作为核心方法论系统化推进，而非辅助手段。其二，灵心巧手作为"客户+股东"的双重身份是一种值得关注的产业协同模式——本体零部件商通过入股下游模型公司，既锁定技术供应也分享增值收益，这类模式可能在供应链中复制。其三，重庆国资的入股时间点（2026年1月工商变更）与公司天使轮融资高度相关，体现了地方政府在具身智能领域从"观望"到"出手"的转变——从投本体硬件（重庆此前已有赛力斯凤凰技术等）升级到布局核心软件层。其四，Being-H0.7在2026年4月被冠以"世界模型"的标签，反映了行业从"操作模型"到"世界模型"的话语升级趋势，但在实际能力上是否真正达到了通用世界模型的水准仍需时间验证。</p>
+      </div>
+
+      <h2 id="refs">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://www.36kr.com/p/3653424523682183" target="_blank">36氪 - 死磕机器人大脑的北大副教授，和我们聊了聊具身领域最大的"偏见"（2026年）</a></li>
+          <li><a href="https://36kr.com/p/3324923112614405" target="_blank">36氪 - 前智源团队创业，联想领投了一家人形机器人大模型公司（2025年6月）</a></li>
+          <li><a href="https://36kr.com/p/3766161393369609" target="_blank">36氪 - BeingBeyond发布最强世界模型，具身行业开启"大脑纪元"（2026年4月）</a></li>
+          <li><a href="https://www.legendstar.com.cn/news/469987746384504418" target="_blank">联想之星 - 智在无界完成数千万元融资，联想之星领投</a></li>
+          <li><a href="https://www.legendstar.cn/news/469987746384504418?lang=en" target="_blank">Legend Star - 智在无界完成数千万元融资，联想之星领投</a></li>
+          <li><a href="https://finance.eastmoney.com/a/202601203624481998.html" target="_blank">东方财富网 - 灵心巧手、重庆国资入股人形机器人大模型公司智在无界（2026年1月）</a></li>
+          <li><a href="https://finance.ifeng.com/c/8q48g7rBdwM" target="_blank">凤凰网财经 - 灵心巧手、重庆国资入股人形机器人大模型公司智在无界</a></li>
+          <li><a href="https://m.x-techcon.com/article/98170.html" target="_blank">Seeds智库 - 重庆国资出手，入股一家做"机器人大脑"的公司</a></li>
+          <li><a href="https://www.zhidx.com/p/548518.html" target="_blank">智东西 - 北京具身智能黑马造的大模型，屠榜多项国际测评！（2026年）</a></li>
+          <li><a href="https://m.ithome.com/html/938781.htm" target="_blank">IT之家 - 预测动态轨迹、理解物理规律：BeingBeyond智在无界发布通用具身世界模型Being-H0.7（2026年4月）</a></li>
+          <li><a href="https://www.chinastarmarket.cn/detail/2058712" target="_blank">科创板日报 - 整机投资告一段落？具身智能大模型再吸金 Z基金、联想都投了</a></li>
+          <li><a href="https://www.chinastarmarket.cn/detail/2263289" target="_blank">科创板日报 - 灵心巧手、重庆国资入股人形机器人大模型公司智在无界</a></li>
+          <li><a href="https://www.aibangbots.com/a/1663" target="_blank">AI帮机器人 - 联想之星领投，人形机器人通用大模型企业智在无界完成数千万元融资</a></li>
+          <li><a href="https://www.163.com/dy/article/K26ADKUI05198R3E.html" target="_blank">网易 - 智在无界完成数千万元融资，联想之星领投</a></li>
+          <li><a href="https://auto.gasgoo.com/news/202601/21I70443762C601.shtml" target="_blank">盖世汽车 - 重庆国资出手，入股一家做"机器人大脑"的公司</a></li>
+          <li><a href="http://stock.stockstar.com/RB2026012300036241.shtml" target="_blank">证券之星 - 智在无界天使轮融资，投资方为领航新界、考拉基金等</a></li>
+          <li><a href="https://bank.stockstar.com/IG2026012000017767.shtml" target="_blank">证券之星 - 灵心巧手、重庆国资入股人形机器人大模型公司智在无界</a></li>
+          <li><a href="https://news.qq.com/rain/a/20260120A040KO00" target="_blank">腾讯新闻 - 灵心巧手、重庆国资入股人形机器人大模型公司智在无界</a></li>
+          <li><a href="https://www.yicaixin.cn/153653.html" target="_blank">易才信 - 灵心巧手、重庆国资入股人形机器人大模型公司智在无界</a></li>
+          <li><a href="https://caifuhao.eastmoney.com/news/20260130172017653847890" target="_blank">东方财富号 - 具身智能万亿市场爆发！灵心巧手入选独角兽榜单</a></li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">本页面由具身智能Wiki项目自动生成，内容基于公开资料整理，仅供研究参考。</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

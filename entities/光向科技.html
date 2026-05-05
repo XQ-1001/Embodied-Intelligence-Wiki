@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>光向科技 — 具身智能Wiki</title><style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style></head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> <span class="breadcrumb-sep">›</span> <span>光向科技</span></div>
+  <div class="wiki-header"><h1>光向科技</h1><div class="subtitle">Guangxiang Technology · 2025年4月成立 · 清华孵化 · 工业具身智能初创</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#team">1.2 核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financial">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl3"><a href="#a21">2.1 团队背景与场景匹配度</a></li>
+        <li class="toc-lvl3"><a href="#a22">2.2 技术路线与场景适配性</a></li>
+        <li class="toc-lvl3"><a href="#a23">2.3 股东/资本结构对战略的影响</a></li>
+        <li class="toc-lvl3"><a href="#a24">2.4 试错过程与路径调整</a></li>
+        <li class="toc-lvl3"><a href="#a25">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl3"><a href="#a26">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#refs">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">光向科技</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">光翔科技（Guangxiang Technology）</div></div>
+        <div class="ib-row"><div class="ib-label">英文名</div><div class="ib-value">Guangxiang Technology</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2025年4月</div></div>
+        <div class="ib-row"><div class="ib-label">总部地点</div><div class="ib-value">中国北京</div></div>
+        <div class="ib-row"><div class="ib-label">创始人</div><div class="ib-value">张涛（CEO）</div></div>
+        <div class="ib-row"><div class="ib-label">孵化背景</div><div class="ib-value">清华车辆与运载学院/人工智能学院</div></div>
+        <div class="ib-section">融资数据</div>
+        <div class="ib-row"><div class="ib-label">累计融资</div><div class="ib-value">超1亿元人民币</div></div>
+        <div class="ib-row"><div class="ib-label">主要投资方</div><div class="ib-value">IDG资本、东方富海、埃夫特等</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">业务类型</div><div class="ib-value"><span class="tag tag-info">工业具身智能</span><span class="tag">清华系</span></div></div>
+      </aside>
+
+      <p class="article-intro"><strong>光向科技</strong>（Guangxiang Technology，亦称光翔科技）是一家成立于2025年4月的工业具身智能初创公司，由清华大学车辆与运载学院和人工智能学院联合孵化，总部位于北京。公司聚焦于以<strong>轮式工业机器人</strong>为核心形态，以汽车制造总装环节为切入点，采用强化学习驱动的具身智能技术路线，致力于打通"仿真→真机部署"全链路。截至2026年初，公司已完成多轮融资累计超1亿元，投资方包括IDG资本、东方富海、埃夫特等。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper">
+      <table class="wikitable infotable">
+        <tr><th>项目</th><th>内容</th></tr>
+        <tr><td>公司全称</td><td>光翔科技（Guangxiang Technology）</td></tr>
+        <tr><td>成立时间</td><td>2025年4月</td></tr>
+        <tr><td>总部地点</td><td>中国北京</td></tr>
+        <tr><td>孵化机构</td><td>清华大学车辆与运载学院、清华大学人工智能学院</td></tr>
+        <tr><td>创始人/CEO</td><td>张涛</td></tr>
+        <tr><td>联合创始人/首席科学家</td><td>李升波（清华大学教授）</td></tr>
+        <tr><td>上市状态</td><td>未上市</td></tr>
+      </table>
+      </div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>时间</th><th>事件</th></tr>
+        <tr><td>2025年4月</td><td>公司正式成立</td></tr>
+        <tr><td>2025年7月</td><td>完成种子轮融资</td></tr>
+        <tr><td>2026年3月</td><td>完成天使轮及天使+轮融资，累计超1亿元</td></tr>
+        <tr><td>2026年3月</td><td>与多家国际知名车企达成战略合作，完成第一阶段POC验证</td></tr>
+      </table>
+      </div>
+
+      <h3 id="team">1.2 核心团队</h3>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+        <tr><td>创始人/CEO</td><td>张涛</td><td>前阿里巴巴高德地图技术总监，曾主导百万级车载终端的定位感知技术量产部署，兼具互联网大厂和汽车产业双重背景</td></tr>
+        <tr><td>联合创始人/首席科学家</td><td>李升波</td><td>清华大学教授，AI领域国际知名专家，发表论文200+篇，引用量超22600次，连续四年入选Elsevier中国高被引学者</td></tr>
+      </table>
+      </div>
+      <p>团队呈现<strong>"产业+学术"强强联合</strong>结构。CEO张涛具备高德地图技术管理和百万级车载终端量产经验，首席科学家李升波提供清华顶尖AI学术支撑。</p>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>轮次</th><th>时间</th><th>主要投资方</th></tr>
+        <tr><td>种子轮</td><td>2025年7月</td><td>未披露</td></tr>
+        <tr><td>天使轮</td><td>2026年3月</td><td>IDG资本（领投）、东方富海（领投）、零一创投、大泰资本、L2F企业家基金</td></tr>
+        <tr><td>天使+轮</td><td>2026年3月</td><td>埃夫特（EFORT，产业资本跟投）</td></tr>
+      </table>
+      </div>
+      <p>累计融资超1亿元人民币，IDG资本和东方富海联合领投。产业资本埃夫特（机器人上市公司）的参与显示了工业场景的战略协同意图。</p>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>维度</th><th>内容</th></tr>
+        <tr><td>AI架构</td><td>自研高平滑度神经网络架构，追求高精度+高可靠性+高平稳性动作输出</td></tr>
+        <tr><td>学习方式</td><td>强化学习（Reinforcement Learning）为核心，非模仿学习，目标接近100%任务成功率</td></tr>
+        <tr><td>数据方案</td><td>仿真数据驱动训练，打通"仿真→真机部署"全链路</td></tr>
+        <tr><td>硬件路线</td><td>轮式工业机器人为主力形态，认为在工厂标准化环境中定位更精准、能耗更低</td></tr>
+        <tr><td>平台工具</td><td>GOPS平台——具身智能模型全流程模块化（设计/开发/训练/调试），支撑规模化交付</td></tr>
+        <tr><td>差异化</td><td>强化学习（vs行业主流的模仿学习）；工业场景"深垂直"策略；仿真→真机的工程化部署能力</td></tr>
+      </table>
+      </div>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>产品/平台</th><th>形态</th><th>定位</th><th>状态</th></tr>
+        <tr><td>轮式工业机器人</td><td>轮式移动操作平台</td><td>汽车制造总装环节自动化</td><td>POC验证完成</td></tr>
+        <tr><td>GOPS平台</td><td>软件工具链</td><td>具身智能模型全流程开发部署平台</td><td>已发布</td></tr>
+      </table>
+      </div>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>场景类别</th><th>具体场景</th><th>现状</th></tr>
+        <tr><td>汽车制造</td><td>总装环节操作任务（当前切入点）</td><td>多家国际车企POC验证中</td></tr>
+        <tr><td>3C电子制造</td><td>精密装配、质量检测（计划拓展）</td><td>规划中</td></tr>
+        <tr><td>重工业</td><td>重型设备维护、物料处理（远期拓展）</td><td>规划中</td></tr>
+      </table>
+      </div>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <ul>
+        <li>已与多家国际知名车企达成深度战略合作</li>
+        <li>在真实生产工位完成第一阶段POC验证</li>
+        <li>从实验室到工程部署不到一年（同类公司通常需数年）</li>
+        <li>未来三年目标：进入至少10家车企，部署1000+台智能机器人</li>
+      </ul>
+
+      <h3 id="financial">1.8 财务数据</h3>
+      <p>公司处于早期创业阶段，无公开财务数据。累计融资超1亿元人民币，主要投向核心技术研发和商业化交付。</p>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>长期路径为"深度垂直→全工业覆盖→通用具身智能"渐进式发展</li>
+        <li>技术路线上强调强化学习而非模仿学习，与行业主流形成差异化</li>
+        <li>团队不到一年完成从实验室到工程部署的关键跨越</li>
+        <li>公司公开信息有限，部分资料来自钛媒体和36氪报道</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="a21">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>CEO张涛的高德背景带来了高精定位与空间感知能力，这在工业环境中用于机器人精确定位具有直接价值。清华车辆学院的学术支撑使得团队对汽车制造场景有天然理解优势。选择从汽车总装切入而非3C或物流，与团队背景高度匹配——汽车制造是高德车载业务的核心生态，也是清华汽车工程的传统强项。</p>
+      </div>
+
+      <div class="analysis-block" id="a22">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>选择强化学习而非模仿学习，在工业场景中有其合理之处：工厂任务定义清晰（明确的奖励函数可设计），对成功率有极高要求（接近100%），这正是强化学习的优势所在。但强化学习在连续动作空间和复杂操作中的收敛速度通常慢于模仿学习，仿真到真机的迁移（sim2real gap）是核心技术风险。GOPS平台化工具链的构建显示了从单一项目交付向规模化复制的意图。</p>
+      </div>
+
+      <div class="analysis-block" id="a23">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>IDG资本和东方富海的联合领投为团队提供了充足的早期资金，但更值得关注的是埃夫特的产业资本参与。埃夫特是中国工业机器人上市公司，其入股意味着光向科技在产业链整合和场景获取方面可能有战略协同。但初创公司在早期引入产业投资方也需平衡——避免过度绑定单一产业方而限制场景拓展空间。</p>
+      </div>
+
+      <div class="analysis-block" id="a24">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>光向科技成立不到一年即完成POC验证，发展速度极快，显示出清华团队的技术积累深度和张涛的产业化执行力。目前未观察到明显的路径调整或场景切换。但随着更多车企的部署验证，产品在实际工况中的表现将是对路线选择的关键检验。</p>
+      </div>
+
+      <div class="analysis-block" id="a25">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>光向科技做出了清晰取舍：不做人形、不做通用平台、不做消费级——专注工业轮式+汽车场景+强化学习。这种"深垂直"策略在早期有利于建立场景壁垒，但也面临场景天花板问题（汽车总装市场规模有限）。从汽车→3C→重工业的渐进扩展路径看似合理，但每一步的跨场景迁移都有技术门槛。</p>
+      </div>
+
+      <div class="analysis-block" id="a26">
+        <h4>2.6 其他重要观察</h4>
+        <p>光向科技在工业具身智能领域的核心差异化在于：它是少数明确以"强化学习"而非"模仿学习"为核心技术路线的团队。这一选择如果成功（实现接近100%的工业级成功率），将构成强大的技术壁垒；如果sim2real差距无法弥合，则可能面临商业化延迟风险。公司公开信息极为有限，产品具体技术参数、合作车企名单、团队规模等均未披露，需要持续跟踪。</p>
+      </div>
+
+      <h2 id="refs">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://www.tmtpost.com/7930203.html">Guangxiang Technology Raises Over 100 Million Yuan — 钛媒体</a></li>
+          <li><a href="https://eu.36kr.com/en/p/3737667859398665">IDG Capital Leads Angel Round Financing — 36氪</a></li>
+          <li><a href="https://eu.36kr.com/en/newsflashes/3737738833232132">Guangxiang Technology completes multiple financing rounds — 36氪</a></li>
+          <li><a href="https://pitchbook.com/profiles/company/897395-77">Guangxiang Technology 2026 Company Profile — PitchBook</a></li>
+          <li><a href="https://www.moomoocn.com/hant/news/post/67456675/guangxiang-technology-raises-over-100-million-yuan">Guangxiang Technology raises over 100 million yuan — 富途</a></li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">此页面最后编辑于2026年5月4日 · 内容遵循知识共享协议 · 数据来源截至编辑当日 · 注：该公司公开信息极为有限，部分内容来自"光翔科技"(Guangxiang Technology)相关报道</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

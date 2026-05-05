@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>源络科技 — 具身智能Wiki</title><style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style></head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> › <span>源络科技</span></div>
+  <div class="wiki-header"><h1>源络科技</h1><div class="subtitle">CoreNetic.AI · 2023年成立 · 轮式双臂灵巧手机器人 · A+轮 · 阿里巴巴领投 · 前Figure AI技术总监创办</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#team">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#finance">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#analysis1">2.1 团队背景与场景选择的匹配度</a></li>
+        <li class="toc-lvl4"><a href="#analysis2">2.2 技术路线与场景的适配性</a></li>
+        <li class="toc-lvl4"><a href="#analysis3">2.3 股东/资本结构对战略的影响</a></li>
+        <li class="toc-lvl4"><a href="#analysis4">2.4 试错过程与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#analysis5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#analysis6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#references">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">源络科技</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">北京源络科技有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">英文</div><div class="ib-value">CoreNetic.AI</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2023年7月</div></div>
+        <div class="ib-row"><div class="ib-label">创始人/CEO</div><div class="ib-value">连文昭</div></div>
+        <div class="ib-row"><div class="ib-label">联合创始人</div><div class="ib-value">谢铮</div></div>
+        <div class="ib-row"><div class="ib-label">总部</div><div class="ib-value">北京市海淀区</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">团队规模</div><div class="ib-value">未公开（初创阶段）</div></div>
+        <div class="ib-row"><div class="ib-label">产品线</div><div class="ib-value">Monte 01 / Monte 02（轮式双臂灵巧手）</div></div>
+        <div class="ib-row"><div class="ib-label">量产合作</div><div class="ib-value">领益智造北京具身智能超级工厂（首批合作伙伴）</div></div>
+        <div class="ib-section">融资</div>
+        <div class="ib-row"><div class="ib-label">累计融资</div><div class="ib-value">数亿元人民币（4轮）</div></div>
+        <div class="ib-row"><div class="ib-label">最近轮次</div><div class="ib-value">A+轮（2025年5月，北京市人工智能产业投资基金）</div></div>
+        <div class="ib-row"><div class="ib-label">核心投资方</div><div class="ib-value">阿里巴巴（领投A轮）、峰瑞资本、元禾原点、戈壁大湾区、坚果资本、水木创投、北京市人工智能产业投资基金</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">领域</div><div class="ib-value"><span class="tag tag-info">具身智能</span><span class="tag tag-info">人形机器人</span></div></div>
+        <div class="ib-row"><div class="ib-label">核心场景</div><div class="ib-value"><span class="tag">生命科学实验室自动化</span></div></div>
+      </aside>
+      <p class="article-intro"><strong>源络科技（CoreNetic.AI）</strong>是一家由前Figure AI首位AI技术总监连文昭和前优必选Walker系列负责人谢铮于2023年联合创办的具身智能机器人公司。公司以轮式双臂灵巧手为本体形态，聚焦生命科学实验室自动化场景，2025年完成由阿里巴巴领投的数亿元A轮融资，并于2026年初成为领益智造北京具身智能超级工厂的首批签约合作伙伴。创始人连文昭公开主张"用具身实现智能"的技术哲学，反对过度依赖大语言模型的语义驱动路径，这一差异化立场使公司在当前具身智能热潮中形成了独特的技术辨识度。</p>
+      <h2 id="facts">1 事实层</h2>
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper">
+        <table class="wikitable infotable">
+          <tr><th>项目</th><th>内容</th></tr>
+          <tr><td>公司全称</td><td>北京源络科技有限公司</td></tr>
+          <tr><td>英文名称</td><td>CoreNetic.AI</td></tr>
+          <tr><td>成立时间</td><td>2023年7月</td></tr>
+          <tr><td>注册地</td><td>北京市海淀区</td></tr>
+          <tr><td>法定代表人</td><td>魏晓丽</td></tr>
+          <tr><td>上市情况</td><td>非上市</td></tr>
+          <tr><td>注册资本</td><td>约314.4万元（2025年5月增至）</td></tr>
+        </table>
+      </div>
+      <h4>发展沿革</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>时间</th><th>事件</th></tr>
+          <tr><td>2023年7月</td><td>公司成立，创始人连文昭（前Figure AI技术总监）与谢铮（前优必选Walker负责人）联合创办</td></tr>
+          <tr><td>2023-2024年</td><td>完成天使轮融资（峰瑞资本、水木创投、顺禧基金），金额数千万元</td></tr>
+          <tr><td>2024年</td><td>完成第一代产品Monte 01（轮式双臂移动操纵平台）开发，仅用4个月</td></tr>
+          <tr><td>2024年8月</td><td>完成天使轮追加融资（杭州灏月/阿里巴巴旗下领投）</td></tr>
+          <tr><td>2025年2月</td><td>完成数亿元A轮融资，阿里巴巴领投，元禾原点、戈壁大湾区、坚果资本、峰瑞资本跟投</td></tr>
+          <tr><td>2025年5月</td><td>Monte 02在2025世界机器人大会全球首发；完成A+轮（北京市人工智能产业投资基金入股）</td></tr>
+          <tr><td>2026年2月</td><td>成为领益智造北京具身智能超级工厂首批签约合作伙伴，锁定整机组装测试订单</td></tr>
+        </table>
+      </div>
+
+      <h3 id="team">1.2 创始人及核心团队</h3>
+      <p>源络科技的核心团队堪称国内具身智能赛道中"履历天花板"级别的配置。两位创始人分别为硅谷顶级人形机器人公司（Figure AI）的首位AI负责人和中国头部人形机器人公司（优必选）的核心产品负责人，实现了"AI+硬件"的完美互补。</p>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+          <tr><td>创始人/CEO</td><td>连文昭</td><td>杜克大学电气与计算机工程博士（师从Lawrence Carin）。曾任Vicarious AI机器人团队负责人（类脑神经网络与机器人抓取），Google X/Intrinsic资深研究科学家（机器人统一算法操作系统），Figure AI首位AI负责人/技术总监（机器人大脑研发，2022年加入，早期核心员工）。回国后曾任中科院自动化研究所研究员、中国科学院大学教授，现任上海交通大学人工智能学院教授。研究方向覆盖模仿学习、仿真学习、机器人视觉、灵巧手操作。</td></tr>
+          <tr><td>联合创始人</td><td>谢铮</td><td>华中科技大学机械科学与工程本科，航天三院硕士（期间研究液压人形机器人）。曾任优必选Walker系列人形机器人产品线负责人，完整参与从原型机到Walker X全链条产品研发（十余年经验），2022年曾短暂加入达闼机器人。擅长复杂机器人系统产品定义、技术分解和工程实现。</td></tr>
+        </table>
+      </div>
+      <p>两人为高中同学，技术栈一个偏"软"（AI算法/大脑）一个偏"硬"（机械本体/系统工程），形成了高度互补的创始组合。团队人才结构为"海外顶级AI+国内顶级硬件"混合型，在国内具身智能创企中具有独特的国际化视野和工程落地能力的双重优势。</p>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <h4>融资历史</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>时间</th><th>轮次</th><th>金额</th><th>主要投资方</th></tr>
+          <tr><td>2023-2024年</td><td>天使轮</td><td>数千万元</td><td>峰瑞资本、水木创投、顺禧基金</td></tr>
+          <tr><td>2024年8月</td><td>天使轮追加</td><td>数千万元</td><td>杭州灏月（阿里巴巴/淘天集团旗下）领投</td></tr>
+          <tr><td>2025年2月</td><td>A轮</td><td>数亿元</td><td>阿里巴巴领投，元禾原点、戈壁大湾区、坚果资本、峰瑞资本跟投</td></tr>
+          <tr><td>2025年5月</td><td>A+轮</td><td>未披露</td><td>北京市人工智能产业投资基金入股</td></tr>
+        </table>
+      </div>
+      <p>累计融资数亿元人民币。阿里巴巴从天使轮追加阶段即开始布局，并在A轮领投，显示出对连文昭团队的高度看好。北京市人工智能产业投资基金的入局（A+轮）则为公司提供了北京本地的政策和产业资源对接。估值方面未公开披露，但以A轮数亿元融资推测，估值应在十亿至数十亿元人民币区间。</p>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>技术维度</th><th>方案</th><th>说明</th></tr>
+          <tr><td>AI架构</td><td>"多模态大语言模型+实时运动规划"分层架构</td><td>底层多模态模型做场景理解/物体识别/状态分析；高层基于结构化表征做任务推理；执行层负责实时运动规划与轨迹生成</td></tr>
+          <tr><td>数据策略</td><td>"少量数据示教+窄域模型"</td><td>通过单一样本示教（模仿学习、遥操作、视频学习）快速微调模型；融合仿真学习在仿真中自动生成正/负样本</td></tr>
+          <tr><td>技术哲学</td><td>"用具身实现智能"，非大语言模型驱动</td><td>创始人公开反对"具身智能"一词的泛化使用，主张机器人智能应来自与物理环境的主动交互（碰撞、摩擦等物理体验），而非仅靠大语言模型语义堆叠</td></tr>
+          <tr><td>可靠性策略</td><td>"让机器人能感知自己可能错了"为最高优先级</td><td>强调可靠性优于通用性，"通用机器人是陷阱，什么都能干但什么都干不好"</td></tr>
+          <tr><td>硬件架构</td><td>轮式底盘+双灵巧臂+高自由度灵巧手</td><td>不追求双足行走，以轮式解决移动问题，集中资源攻克上半身精细操作</td></tr>
+          <tr><td>前瞻方向</td><td>不排斥端到端VLA路线</td><td>与高校合作开展前瞻研究，保持技术路线的开放性</td></tr>
+        </table>
+      </div>
+      <p>源络科技的技术路线有一个鲜明的"反共识"特征：在整个人形机器人行业热议"具身智能"和"端到端VLA大模型"的当下，创始人连文昭公开表示不认同"具身智能"一词的流行用法，主张机器人智能应来自与物理环境的真实交互体验（碰撞、摩擦等），而非仅靠语义推理。这种"物理交互驱动"的技术哲学与Figure AI等公司"大模型驱动操作"的路线形成了理论层面的差异。但其分层架构设计中仍保留了多模态大模型作为感知层的角色，并非完全排斥大模型。</p>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>产品</th><th>形态</th><th>核心能力</th><th>推出时间</th></tr>
+          <tr><td>Monte 01</td><td>轮式双臂移动操纵平台</td><td>拉冰箱门、分拣物品、打开抽屉、样本搬运等任务；支持多端效应器、工业级连续自主操作</td><td>2024年（4个月完成开发）</td></tr>
+          <tr><td>Monte 02</td><td>轮式人形配置+高自由度灵巧手+力触觉感知</td><td>复杂精细操作（操作工具等）、实验室长序列精细任务（取样、转运、检测）</td><td>2025年5月（世界机器人大会首发）</td></tr>
+        </table>
+      </div>
+      <p>产品设计理念为"轮式双腿+灵巧上半身"——放弃双足行走的技术挑战，以轮式底盘解决移动问题，将全部工程资源集中在上半身的精细操作能力上。这种取舍有两个关键考量：一是双足行走在实验室、工厂等绝大多数室内场景中并非刚需（平坦地面轮式效率更高）；二是统一的载体形态有助于共享数据/模型/算法，实现规模效应下的降本。</p>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>场景分类</th><th>子场景</th><th>进展状态</th><th>合作方</th></tr>
+          <tr><td>生命科学实验室（核心锚定）</td><td>样本取样、转运、检测等长序列精细任务</td><td>已有深度合作</td><td>华大智造（目标打造下一代"精智"自动化实验室）</td></tr>
+          <tr><td>大健康/生物医药</td><td>实验室自动化、药物研发流程</td><td>场景延伸</td><td>—</td></tr>
+          <tr><td>3C电子装配</td><td>精密装配操作</td><td>场景延伸</td><td>—</td></tr>
+          <tr><td>农业</td><td>柔性物体操作（摘果、授粉等）</td><td>技术验证阶段</td><td>—</td></tr>
+        </table>
+      </div>
+      <p>场景选择逻辑清晰：生命科学实验室是一个"半限定环境"——仪器和流程高度规范，但操作精度要求毫米级，是"有边界的高难度场景"。在这个场景中验证成功后，再迁移至3C工厂装配、家庭烹饪等更开放的场景。与华大智造的合作是核心锚点——华大智造是国产测序设备和实验室自动化龙头（科创板上市），为其提供真实的场景需求和验证闭环。</p>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>维度</th><th>数据/说明</th></tr>
+          <tr><td>量产合作</td><td>2026年2月成为领益智造北京具身智能超级工厂首批签约合作伙伴，锁定整机组装测试订单</td></tr>
+          <tr><td>产能规划</td><td>超级工厂2026年产能1万台套，2027年2万台套，2030年目标50万台套</td></tr>
+          <tr><td>营收</td><td>未公开披露</td></tr>
+          <tr><td>客户获取</td><td>以B端实验室/工厂客户为主，华大智造为核心标杆客户</td></tr>
+          <tr><td>核心策略</td><td>"场景牵引硬件形态→数据回流→通用控制模型→向更通用任务扩展"</td></tr>
+        </table>
+      </div>
+
+      <h3 id="finance">1.8 财务数据</h3>
+      <p>源络科技为非上市初创企业，财务数据未公开披露。</p>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>指标</th><th>说明</th></tr>
+          <tr><td>营收</td><td>未公开披露；A轮阶段（数亿元融资），预计处于产品化初期</td></tr>
+          <tr><td>账面资金</td><td>累计融资数亿元，资金储备较为充裕</td></tr>
+          <tr><td>员工规模</td><td>未公开披露（初创阶段，推测数十人至百余人）</td></tr>
+          <tr><td>估值参考</td><td>未公开；以A轮融资数亿元推测，估值可能在10-30亿元区间</td></tr>
+        </table>
+      </div>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li><strong>阿里巴巴布局：</strong>阿里通过杭州灏月已连续布局逐际动力、有鹿机器人、星动纪元、源络科技四家具身智能公司，构成其在该赛道的"投资矩阵"。但阿里尚未公开其具身智能战略的整体框架</li>
+        <li><strong>创始人"反共识"立场：</strong>连文昭是当前国内具身智能领域少数公开质疑"具身智能"概念泛化、主张物理交互优先的创始人，在行业会议和媒体采访中多次表达这一观点</li>
+        <li><strong>北京产业生态：</strong>北京亦庄已聚集300余家机器人和智能制造企业，2025年发布"具身智能十条"政策，明确推动万台级量产能力，源络科技作为首批受益者之一</li>
+        <li><strong>学术兼职：</strong>连文昭现任上海交通大学人工智能学院教授，保持了"产+学"双线运作模式，有助于吸引学术人才和把握前沿技术方向</li>
+        <li><strong>开发效率：</strong>Monte 01从零到可以演示仅用4个月，体现了团队极强的工程化执行力</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="analysis1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>连文昭在Figure AI负责"机器人大脑"（AI系统）的经历，使其深刻理解通用人形机器人在从零搭建AI架构时的挑战和陷阱。选择"生命科学实验室"这个场景，与其在Google X/Intrinsic时期从事精密操作的经历一脉相承——实验室场景对操作精度和流程可靠性的要求极高，但对移动能力的需求相对有限（平坦地面+标准化布局），这与其选择轮式底盘的硬件决策高度匹配。谢铮在优必选Walker系列十余年的硬件产品经验，则确保了"灵巧手+力触觉感知"等精细操作硬件的工程可实现性。两人从不同方向同时在"精细操作"上形成交集，这解释了他们为何选择实验室而非工厂搬运或家庭服务作为首场景。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>"分层架构（多模态LLM+实时规划）"的技术选择在实验室场景中具有合理性：实验室任务的可分解性强（"取样→转运→检测"可以分解为清晰的步骤序列），分层架构中高层模型做任务分解、底层做精确执行，恰好匹配这一特性。但"少量示教+窄域模型"的策略存在一个隐含假设——每个实验室的任务类型足够相似，使得窄域模型可以在少量示教下泛化。从华大智造的合作来看，测序实验室的流程高度标准化，这一假设在首场景中可能成立。但若扩展到3C装配等更多样化的场景，"窄域"策略的泛化瓶颈可能会显现。创始人坚持"物理交互驱动智能"而非"大模型语义驱动"，在技术上市更稳健（减少大模型幻觉风险），但在资本叙事上可能不如"端到端VLA"路线性感——这可能影响后续融资的估值想象空间。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>阿里巴巴从天使轮追加到A轮领投的持续加注，是一个强信号——大厂在具身智能领域的投资往往不仅考虑财务回报，更看重与自身业务的战略协同。阿里的物流（菜鸟）、新零售（盒马）、云计算（阿里云）等业务线都可能与具身智能产生交集，但目前尚未看到阿里将源络科技与其业务线深度绑定的公开动作。北京市人工智能产业投资基金的入局，则为源络科技在亦庄的产业化落地（领益超级工厂合作）提供了直接的政策通道。股东结构中同时有互联网巨头（阿里）和地方国资（北京AI基金），这种"市场+政策"双轮驱动的资本结构有其灵活性优势，但也可能在战略方向上产生张力。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>源络科技成立仅不到3年（2023年7月-2026年5月），在如此短的时间内完成了两代产品迭代和数亿元融资，路径调整的空间有限。但可观察到的关键决策包括：（1）从成立之初即选择"轮式"而非"双足"——这是一个重要的硬件路线取舍，体现了团队对"移动能力vs操作能力"的优先级判断。（2）将首场景锚定在"生命科学实验室"而非更热门的"工厂制造"或"家庭服务"——这体现了对"有边界的高难度场景优先"的场景选择方法论。（3）坚持"不拿不该拿的钱"的低调资本策略——在具身智能泡沫化严重时克制融资节奏和估值。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>源络科技在竞争定位上的核心取舍可以概括为"iPod路线，非iPhone路线"——不做"什么都能干"的通用机器人（iPhone），而是做一个在特定场景（实验室）中做到极致的专用系统（iPod），再逐步泛化。这一策略的取舍是：放弃了"通用人形机器人"这个估值想象空间最大的叙事（Tesla Optimus、Figure 02所代表的路径），选择了更务实但可能天花板更低的垂直场景路径。在轮式vs双足的取舍上，也体现了类似的逻辑——双足行走的"酷炫"和营销价值远超轮式，但在实验室/工厂的ROI上轮式明显更优。这些取舍在短期商业逻辑上合理，但可能影响其在一级市场的估值天花板。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis6">
+        <h4>2.6 其他重要观察</h4>
+        <p>几点补充观察：（1）连文昭作为Figure AI早期核心员工（首位AI负责人）的回国创业，是中美科技人才流动的一个标志性事件。Figure AI估值约400亿美元，连文昭在Figure的经历为其回国创业提供了顶级的行业信用和技术视野。（2）源络科技与领益智造超级工厂的合作，将其置于北京亦庄"具身智能产业集群"的核心位置——这个集群包括了星海图、云迹科技、灵足时代等多家公司，未来的竞争和协作关系值得关注。（3）连文昭"反具身智能"的公开立场是把双刃剑——在中国创投圈习惯追热点的环境下，公开质疑行业热词需要勇气，但如果市场逻辑最终验证了他的判断（"大模型驱动的通用机器人短期无法落地"），他将获得巨大的思想领导力红利。（4）源络科技尚未在公开渠道展示过双足机器人或人形整机，这可能意味着其"轮式双臂"的硬件形态在短期内不会改变——考虑到双足是当前资本市场的热门概念，这是一个值得追踪的战略信号。</p>
+      </div>
+
+      <h2 id="references">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://www.iyiou.com/news/202502271091264" target="_blank">亿欧 — 源络科技完成数亿元A轮融资，阿里领投</a></li>
+          <li><a href="https://m.x-techcon.com/article/56402.html" target="_blank">科技连线 — 前Figure AI负责人创业做机器人，获阿里投资</a></li>
+          <li><a href="https://finance.sina.cn/2025-04-19/detail-inetshzz1624088.d.html" target="_blank">新浪财经 — 对话源络创始人连文昭：不喜欢"具身智能"这个词</a></li>
+          <li><a href="https://m.163.com/dy/article/JPJ5GFTA0511D0C3.html" target="_blank">网易 — 阿里巴巴领投！前Figure技术总监创业源络科技完成A轮融资</a></li>
+          <li><a href="https://finance.ifeng.com/c/8jfiMD1FllD" target="_blank">凤凰财经 — 北京市人工智能产投基金入股源络科技</a></li>
+          <li><a href="https://m.pedaily.cn/vc/company/702268.html" target="_blank">投资界 — 源络科技融资历程</a></li>
+          <li><a href="https://innohere.com/report/10032.html" target="_blank">英诺天使基金 — 源络科技评鉴详情</a></li>
+          <li><a href="http://www.zqrb.cn/gscy/gongsi/2026-02-09/A1770635028840.html" target="_blank">证券日报 — 领益智造北京具身智能超级工厂规划产能50万台套</a></li>
+          <li><a href="https://www.beijing.gov.cn/ywdt/gzdt/202602/t20260215_4518521.html" target="_blank">北京市政府网 — 亦庄给机器人盖了一个超级"产房"</a></li>
+          <li><a href="https://app.bjtitle.com/8816/newshow.php?newsid=6726949" target="_blank">北京头条 — 京津冀首个具身智能超级工厂在北京亦庄启动建设</a></li>
+          <li><a href="https://www.ncsti.gov.cn/kjdt/scyq/bjjjjskfq/jkdt/202602/t20260213_238343.html" target="_blank">国家科技信息中心 — 京津冀首个具身智能超级工厂启动建设</a></li>
+          <li><a href="http://www.gear001.com/html/news/34/2/5950.html" target="_blank">Gear001 — 阿里巴巴再次出手人形机器人</a></li>
+          <li><a href="https://flash.jin10.com/detail/20250526133813583800" target="_blank">金十数据 — 北京人工智能产业投资基金入股源络科技</a></li>
+          <li><a href="https://m.caijing.com.cn/s/202602/5141560" target="_blank">财经网 — 领益智造50万台套北京具身智能超级工厂落地</a></li>
+        </ol>
+      </div>
+      <div class="page-footer">
+        本页面最后更新于2026年5月4日 · 内容基于公开信息整理 · 不构成投资建议
+      </div>
+    </article>
+  </div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>中科第五纪 — 具身智能Wiki</title><style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style></head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a><span class="breadcrumb-sep"> › </span><span>中科第五纪</span></div>
+  <div class="wiki-header"><h1>中科第五纪</h1><div class="subtitle">Five Ages · 2024年9月成立 · 具身大脑供应商 · 宇树001号核心生态伙伴 · 红杉中国投资</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#founders">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#finance">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#an1">2.1 团队背景与场景选择的匹配度</a></li>
+        <li class="toc-lvl4"><a href="#an2">2.2 技术路线与场景的适配性</a></li>
+        <li class="toc-lvl4"><a href="#an3">2.3 股东/资本结构对战略的影响</a></li>
+        <li class="toc-lvl4"><a href="#an4">2.4 试错过程与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#an5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#an6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#refs">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">中科第五纪</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">中科第五纪智能技术有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">英文</div><div class="ib-value">Five Ages</div></div>
+        <div class="ib-row"><div class="ib-label">成立</div><div class="ib-value">2024年9月</div></div>
+        <div class="ib-row"><div class="ib-label">注册地</div><div class="ib-value">杭州</div></div>
+        <div class="ib-row"><div class="ib-label">创始人/CEO</div><div class="ib-value">刘年丰（中科院自动化所博士）</div></div>
+        <div class="ib-row"><div class="ib-label">首席科学家</div><div class="ib-value">孙富春（清华大学教授）</div></div>
+        <div class="ib-section">融资数据</div>
+        <div class="ib-row"><div class="ib-label">融资轮次</div><div class="ib-value">6轮（种子→Pre-A+），一年内完成</div></div>
+        <div class="ib-row"><div class="ib-label">最新轮次</div><div class="ib-value">Pre-A+轮 数亿元（2026年2月）</div></div>
+        <div class="ib-row"><div class="ib-label">领投方</div><div class="ib-value">红杉中国/芯能创投/优山资本</div></div>
+        <div class="ib-row"><div class="ib-label">估值变化</div><div class="ib-value">较成立初暴涨约20倍</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">核心产品</div><div class="ib-value">FAM超少样本具身操作大模型</div></div>
+        <div class="ib-row"><div class="ib-label">关键客户</div><div class="ib-value">宇树科技（001号大脑供应商）、美的、中石化</div></div>
+        <div class="ib-row"><div class="ib-label">技术路线</div><div class="ib-value">"大脑+本体"软硬一体</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">行业</div><div class="ib-value"><span class="tag tag-info">具身智能</span><span class="tag tag-info">具身大脑</span><span class="tag tag-info">大模型</span></div></div>
+        <div class="ib-row"><div class="ib-label">官网</div><div class="ib-value">未公开</div></div>
+      </aside>
+
+      <p class="article-intro"><strong>中科第五纪</strong>（Five Ages），全称中科第五纪智能技术有限公司，是一家由中国科学院自动化所与清华大学团队于2024年9月联合创立的具身智能公司，专注于为机器人提供"具身操作大脑"。公司以FAM（Few-shot Action Model）超少样本具身操作大模型和BridgeV2W具身世界模型为核心技术，走"大脑+本体"软硬一体路线，定位为"机器人界的苹果"。成立一年内即完成六轮融资，最新Pre-A+轮由红杉中国参与投资，估值较成立初期暴涨约20倍。公司已拿下宇树科技"001号具身大脑供应商"身份，并与美的、中石化等头部企业实现商业化落地。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper">
+        <table class="wikitable infotable">
+          <tr><th>项目</th><th>内容</th></tr>
+          <tr><td>公司全称</td><td>中科第五纪智能技术有限公司</td></tr>
+          <tr><td>英文名称</td><td>Five Ages</td></tr>
+          <tr><td>成立时间</td><td>2024年9月</td></tr>
+          <tr><td>注册地</td><td>浙江省杭州市</td></tr>
+          <tr><td>创始人/CEO</td><td>刘年丰（中国科学技术大学本科、中科院自动化所博士，师从谭铁牛院士）</td></tr>
+          <tr><td>联合创始人/首席科学家</td><td>孙富春（清华大学计算机系长聘教授、人工智能研究院智能机器人中心主任）</td></tr>
+          <tr><td>定位</td><td>具身智能"大脑"供应商，走"大脑+本体"软硬一体路线</td></tr>
+          <tr><td>核心产品</td><td>FAM超少样本具身操作大模型、BridgeV2W具身世界模型、轮式双臂机器人</td></tr>
+          <tr><td>关键客户</td><td>宇树科技（001号核心生态合作伙伴）、美的、零跑、中石化</td></tr>
+        </table>
+      </div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>时间</th><th>事件</th></tr>
+          <tr><td>2024年9月</td><td>中科第五纪在杭州成立，由中科院自动化所+清华大学团队联合创立</td></tr>
+          <tr><td>2024年底</td><td>完成种子轮、种子+轮融资（卓源亚洲/同创伟业）</td></tr>
+          <tr><td>2025年</td><td>连续完成4轮融资（天使轮等，华睿投资/鼎晖百孚/国海创新资本等），估值快速增长</td></tr>
+          <tr><td>2025年9月</td><td>中标宇树科技001号"具身操作大脑"供应商</td></tr>
+          <tr><td>2026年1月</td><td>获宇树科技"核心生态合作伙伴"称号</td></tr>
+          <tr><td>2026年2月</td><td>一个月内连续完成Pre-A及Pre-A+两轮融资，合计数亿元（红杉中国/芯能创投/优山资本等）</td></tr>
+          <tr><td>2026年3月</td><td>中国具身智能首次欧洲客户现场真机演示（德国斯图加特ERP峰会）</td></tr>
+          <tr><td>2026年4月</td><td>瑞典企业家代表团到访（GKN Aerospace/SKF/ICA/Yara等产业巨头）</td></tr>
+        </table>
+      </div>
+
+      <h3 id="founders">1.2 创始人及核心团队</h3>
+      <p>中科第五纪的创始团队呈现出"国家实验室+顶尖高校"的学术基因，核心成员全部具有中科院自动化所或清华大学的深度学术背景。团队定位为"学术派+产业派"混合型人才结构，兼具国家级科研积累与阿里达摩院/微软/华为等产业界产品落地经验。</p>
+
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+          <tr><td>创始人/CEO</td><td>刘年丰</td><td>90后博士，中国科学技术大学本科，中科院自动化所博士，师从谭铁牛院士（中科院院士、模式识别与计算机视觉领域权威）；长期从事AI及机器人产品研发与商业化落地</td></tr>
+          <tr><td>联合创始人/首席科学家</td><td>孙富春</td><td>清华大学计算机系长聘教授、人工智能研究院智能机器人中心主任；国家863计划专家组成员；多次获国际机器人操作竞赛冠军</td></tr>
+          <tr><td>联创/算法总监</td><td>刘京</td><td>谭铁牛院士博士生；曾就职于微软、华为</td></tr>
+          <tr><td>青年首席科学家</td><td>黄岩</td><td>谭铁牛院士博士生，深耕多模态智能方向</td></tr>
+          <tr><td>联合创始人</td><td>曹恩华</td><td>中科院自动化所硕士，曾任阿里达摩院算法专家</td></tr>
+        </table>
+      </div>
+      <p>团队特点：核心创始圈均由谭铁牛院士门下博士生构成，科研资源深厚；清华大学孙富春教授提供机器人操作领域的顶级学术支撑；产业界高管（阿里达摩院/微软/华为背景）带来工程化与产品化能力。</p>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <h4>融资历史</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>轮次</th><th>时间</th><th>主要投资方</th><th>金额</th></tr>
+          <tr><td>种子轮</td><td>2024年底</td><td>卓源亚洲</td><td>—</td></tr>
+          <tr><td>种子+轮</td><td>2024年底</td><td>同创伟业领投</td><td>—</td></tr>
+          <tr><td>天使轮等(4轮)</td><td>2025年</td><td>华睿投资、鼎晖百孚领投，同创伟业/卓源亚洲/国海创新资本等持续加注</td><td>近亿元</td></tr>
+          <tr><td>Pre-A轮</td><td>2026年2月</td><td>红杉中国领投，东方富海跟投</td><td>数亿元</td></tr>
+          <tr><td>Pre-A+轮</td><td>2026年2月</td><td>芯能创投、优山资本联合领投，清控金信跟投</td><td>(与Pre-A合计)</td></tr>
+        </table>
+      </div>
+      <p>公司成立仅一年余即完成六轮融资，Pre-A/Pre-A+两轮在一个月内连续完成，累计融资数亿元。估值较成立初期暴涨约20倍，新一轮融资已在洽谈中。</p>
+
+      <div class="callout">
+        <div class="callout-title">资本关注点</div>
+        <p>红杉中国为国内具身智能赛道最活跃的头部VC之一，其领投中科第五纪Pre-A轮标志着对"具身大脑"路线的重要押注。宇树科技"001号大脑供应商"的背书是吸引顶级资本的关键因素。</p>
+      </div>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <div class="table-wrapper">
+        <table class="wikitable infotable">
+          <tr><th>维度</th><th>详情</th></tr>
+          <tr><td>总体AI技术</td><td>FAM（Few-shot Action Model）超少样本具身操作大模型——区别于传统VLA（视觉-语言-动作）架构，加入独创"热力图对齐"技术，通过两次预训练实现高效学习</td></tr>
+          <tr><td>数据方案</td><td>"超少样本"路线——仅需3-5条真机示范数据即可完成新任务学习，数据需求降至传统方法的约1%；聚焦局部操作对象而非全局画面，解决光照/外观泛化难题</td></tr>
+          <tr><td>世界模型</td><td>BridgeV2W（Bridge Visual-to-World）具身世界模型——将机器人动作指令"翻译"为未来视觉画面，实现高精度可视化模拟与预判</td></tr>
+          <tr><td>触觉融合</td><td>VLTA融合触觉的多模态机器人大模型</td></tr>
+          <tr><td>全栈/专用路线</td><td>软硬一体——自研FAM大脑模型+自研轮式双臂机器人本体（身高187cm/28自由度/可热插拔7×24h运行）</td></tr>
+          <tr><td>技术指标</td><td>基础任务成功率97%（国际公开评测显著优于英伟达RVT-2）；电力巡检跨站室迁移成功率90%，末端定位精度±15mm</td></tr>
+        </table>
+      </div>
+      <p>中科第五纪的技术路线核心差异点在于"数据效率"——传统具身操作模型需要数千条示范数据，FAM通过"热力图对齐"技术让模型聚焦操作关键区域（如门把手、料箱把手），只需3-5条数据即可完成迁移学习。这一技术路线对工业场景极具价值，因为工厂产线频繁调整、新品类层出不穷，低数据门槛意味着快速适配。</p>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>产品分类</th><th>名称/型号</th><th>参数/特点</th><th>商业模式</th></tr>
+          <tr><td>具身大脑(软件)</td><td>FAM具身操作大模型</td><td>3-5条数据即可学习新操作任务；支持跨本体迁移</td><td>面向本体厂商按License收费</td></tr>
+          <tr><td>具身大脑(软件)</td><td>BridgeV2W世界模型</td><td>动作→视觉预判；自主避障决策</td><td>与FAM捆绑</td></tr>
+          <tr><td>整机(硬件)</td><td>轮式双臂具身机器人</td><td>身高187cm/28自由度/仿人形手臂7自由度/双电池热插拔/7×24h持续运行</td><td>面向终端客户按整机收费</td></tr>
+        </table>
+      </div>
+      <p>双商业模式并行：面向本体厂商（如宇树科技）提供FAM大脑License授权，面向终端客户（如美的、中石化）交付搭载FAM的整机机器人。这种"芯片式+整机式"双轨模式使公司可同时覆盖生态伙伴和直接客户。</p>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>场景分类</th><th>具体场景</th><th>代表客户/合作方</th><th>落地状态</th></tr>
+          <tr><td>工业制造</td><td>家电产线分拣搬运（微波炉产线）</td><td>美的（佛山工厂）</td><td>小批量订单，已签单</td></tr>
+          <tr><td>工业制造</td><td>汽车制造多场景</td><td>零跑汽车</td><td>合作推进中</td></tr>
+          <tr><td>电力能源</td><td>电力巡检+操作（开柜门/按开关/拔插头）</td><td>国家电网</td><td>场景落地中</td></tr>
+          <tr><td>能源</td><td>加油站自动加油/检测搬运</td><td>中石化</td><td>已交付定制机器人</td></tr>
+          <tr><td>商业零售</td><td>门店货品销售</td><td>头部央企</td><td>已交付</td></tr>
+          <tr><td>物流仓储</td><td>料箱搬运/传送带分拣</td><td>欧洲客户（德国展示）</td><td>POC演示阶段</td></tr>
+        </table>
+      </div>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <p>中科第五纪在成立仅一年余即实现了从实验室到产业落地的快速跨越。最关键的商业化里程碑包括：</p>
+      <ul>
+        <li><strong>宇树科技001号大脑供应商</strong>：2025年9月中标，2026年1月获"核心生态合作伙伴"认证，将FAM大脑集成至宇树G1人形机器人，共同拓展电力巡检和工业场景。</li>
+        <li><strong>美的产线落地</strong>：已通过POC验证阶段，签订小批量订单，机器人已进入佛山工厂微波炉产线执行分拣搬运任务。</li>
+        <li><strong>欧洲出海首秀</strong>：2026年3月德国斯图加特ERP峰会完成中国具身智能首次欧洲客户现场真机演示（料箱搬运+传送带分拣）。</li>
+        <li><strong>国际产业对话</strong>：2026年4月瑞典企业家代表团（GKN Aerospace/SKF/ICA/Yara等）到访，探讨精密制造、绿色工业、智慧农业合作。</li>
+      </ul>
+      <p>公司2026年目标：实现1-2亿订单规模，强调从POC验证转向真实复购。</p>
+
+      <h3 id="finance">1.8 财务数据</h3>
+      <p>公司成立时间较短（2024年9月），尚未进入公开披露财务阶段。已知数据：</p>
+      <ul>
+        <li>2025年完成4轮融资，累计融资额近亿元；2026年Pre-A/Pre-A+累计数亿元</li>
+        <li>尚未实现盈亏平衡，处于研发投入与商业化早期阶段</li>
+        <li>2026年目标订单规模：1-2亿元</li>
+      </ul>
+      <p class="tag tag-warn">注：公司为非上市企业，财务数据未公开披露，以上信息仅基于媒体报道和有限公开资料。</p>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>公司定位为"机器人界的苹果"——核心竞争力在智能系统与生态，而非制造本身。</li>
+        <li>强调"非标构型要收敛到标准硬件"，主张行业应走向标准化。</li>
+        <li>战略路径：3年内工业场景→商业服务业→2028年家庭场景落地。</li>
+        <li>中国具身智能首次在欧洲客户现场完成真机方案演示即为中科第五纪（2026年3月德国斯图加特）。</li>
+        <li>2026年被团队视为具身智能从POC走向真实复购的分水岭之年。</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="an1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>中科第五纪的创始团队以中科院自动化所谭铁牛院士门下博士生为核心，技术基因集中在模式识别、计算机视觉和多模态智能领域。这一学术背景与"具身大脑"定位高度匹配——视觉理解和跨模态学习是操作大模型的核心能力。但值得注意的是，团队缺乏工业制造或能源行业的产业背景，其早期场景选择（电力巡检、家电产线、加油站）更多由客户需求驱动而非自身产业经验驱动。清华大学孙富春教授的加盟（机器人操作领域权威）弥补了团队在机器人操作算法方面的权威性，但产业化落地执行的考验仍然在CEO刘年丰身上。总体来看，团队"视觉AI→操作大模型"的学术路径选对了方向，但在工业场景的深度理解和客户关系积累上属于从零构建。</p>
+      </div>
+
+      <div class="analysis-block" id="an2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>FAM的"超少样本"技术路线对工业场景极具适配价值——工厂产线频繁调整、SKU品类多、新产品层出不穷，如果每次变更都需要收集数千条示范数据，商业可行性几乎为零。仅需3-5条数据即可完成新任务学习，使得FAM在美的产线这类多品种小批量场景中具备显著优势。但"数据效率高"的另一面是"初始任务成功率97%"——在工业场景中，3%的失败率仍意味着每100次操作就有3次失误，这在半导体等极高可靠性场景中是不可接受的。电力巡检场景中的90%跨站室迁移成功率也有类似问题。公司需要证明FAM在关键任务上能达到99.5%以上的可靠性阈值，才能真正进入工业客户的规模化采购。</p>
+      </div>
+
+      <div class="analysis-block" id="an3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>中科第五纪的资本结构以顶级财务VC为主导——红杉中国、同创伟业、鼎晖百孚、东方富海等均为追求高回报的财务投资者。这种结构意味着公司有较强的战略自主权，不受产业资本绑定。但公司目前缺少产业资本（如制造企业、能源集团），意味着所有客户关系均需从零构建，无法像产业资本被投企业那样天然获得场景开放和订单绑定。宇树科技作为"001号核心生态伙伴"实际上承担了部分产业资本的角色——通过将FAM集成到宇树G1本体上，中科第五纪获得了宇树的渠道和客户资源，这是一种"以客户代产业资本"的策略，在初期是有效的替代方案。</p>
+      </div>
+
+      <div class="analysis-block" id="an4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>由于成立仅一年余，中科第五纪的试错周期尚短，路径调整不明显。但可观察到公司战略从最初可能的多场景探索快速收敛至"以宇树为支点、以工业落地为核心"的路径。公司最初的产品宣传涉及多种场景（电力、工业、零售、能源），但2026年已明确将"工业→商业服务→家庭"作为三步走战略，显示出对落地节奏的清醒认知。德国斯德哥尔摩ERP峰会的出海演示和瑞典代表团的到访表明，公司正在积极测试欧洲市场作为第二增长曲线。这是正确的节奏——先在国内通过宇树+美的验证产品，再以标杆案例开拓海外。</p>
+      </div>
+
+      <div class="analysis-block" id="an5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>中科第五纪在具身智能赛道中的定位极为清晰——不做硬件本体制造商（即便自研轮式机器人，也只是为了展示大脑能力），专注做"具身操作大脑"的供应商。这与英伟达的"卖铲子"策略相似。公司的核心取舍是：放弃本体制造的规模化营收，押注大脑模型的生态渗透率。宇树科技001号大脑供应商的身份是这一策略的重要验证——如果FAM能被集成到宇树G1/G2甚至更多型号上，中科第五纪就可以实现"每台宇树机器人都付License费"的商业模式。但这一策略的风险在于对宇树的依赖度过高，以及本体厂商自研大脑（如宇树自身也在研发AI能力）的潜在竞争威胁。</p>
+      </div>
+
+      <div class="analysis-block" id="an6">
+        <h4>2.6 其他重要观察</h4>
+        <p>中科第五纪的估值暴涨（一年20倍）在具身智能赛道并不罕见，但也暗示了估值泡沫风险。公司尚未披露任何年营收数据，2026年目标也仅为1-2亿订单规模，与数亿元融资额和暴涨估值之间存在张力。"超少样本"技术路线虽然学术上差异显著，但在实际商业化中能否持续形成壁垒需要观察——如果端到端VLA大模型在未来几年数据需求大幅下降，FAM的优势可能被侵蚀。此外，公司出海动作积极但尚处早期，欧洲市场的客户教育、合规认证和本地服务能力将考验团队的国际化执行力。</p>
+      </div>
+
+      <h2 id="refs">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://36kr.com/p/3700919151538052" target="_blank">36氪——给宇树做"大脑"的具身智能公司，融资数亿元，红杉中国投了</a></li>
+          <li><a href="https://m.lieyunpro.com/archives/500516" target="_blank">猎云网——刚刚，宇树"001号大脑供应商"，红杉中国投了</a></li>
+          <li><a href="https://m.caijing.com.cn/s/202602/5143482" target="_blank">财经网——宇树科技供应商中科第五纪已完成六轮融资</a></li>
+          <li><a href="https://m.zhidx.com/p/536591.html" target="_blank">智东西——给宇树造大脑，中科院系机器人创企融资数亿</a></li>
+          <li><a href="https://www.iyiou.com/briefing/202602271882092" target="_blank">亿欧——红杉中国等加码！中科第五纪一月完成Pre-A、Pre-A+轮融资</a></li>
+          <li><a href="http://www.cowincapital.com.cn/index.php?m=misc&c=index&a=article_detail&id=1453" target="_blank">同创伟业——中科第五纪月内连续完成两轮数亿元融资</a></li>
+          <li><a href="https://m.36kr.com/p/3700852632186497" target="_blank">36氪——红杉，投了宇树供应商</a></li>
+          <li><a href="https://www.zidonghua.com.cn/news/program/82763.html" target="_blank">自动化网——中国具身智能机器人欧洲首个真机方案演示</a></li>
+          <li><a href="https://www.zidonghua.com.cn/news/brand/84037.html" target="_blank">自动化网——瑞典企业家代表团到访中科第五纪</a></li>
+          <li><a href="https://auto.gasgoo.com/news/202602/27I70448176C601.shtml" target="_blank">盖世汽车——宇树"001号核心生态伙伴"，刚融了数亿元</a></li>
+          <li><a href="https://www.bjnews.com.cn/detail/1772178725129261.html" target="_blank">新京报——中科第五纪月内连获两轮数亿元融资</a></li>
+          <li><a href="https://tojoyun.com/m/news/zixun/69a22628cacc28391553223a" target="_blank">天九共享——为宇树提供"大脑"的具身智能企业获数亿元融资</a></li>
+          <li><a href="https://news.qq.com/rain/a/20260227A02AZG00" target="_blank">腾讯新闻——刚刚，宇树"001号大脑供应商"，红杉中国投了</a></li>
+          <li><a href="https://eu.36kr.com/zh/p/3700919151538052" target="_blank">36氪欧洲——获红杉中国投资！为宇树打造"大脑"的具身智能公司融资数亿元</a></li>
+          <li><a href="http://www.penghoo.cn/a/10486.html" target="_blank">鹏虎——宇树机器人核心供应商中科第五纪累计完成数亿元融资</a></li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">本页面最后更新于2026年5月4日 · 数据来源截至2026年4月公开报道 · 具身智能Wiki</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

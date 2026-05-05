@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>聆动通用 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> <span class="breadcrumb-sep">›</span> <span>聆动通用</span></div>
+  <div class="wiki-header"><h1>聆动通用</h1><div class="subtitle">Anhui Lingdong General Robot · 成立2024年12月 · 科大讯飞控股 · 合肥 · Pre-A轮数亿元</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#founders">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#financing">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercialization">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financials">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#analysis1">2.1 团队背景与场景选择匹配度</a></li>
+        <li class="toc-lvl4"><a href="#analysis2">2.2 技术路线与场景适配性</a></li>
+        <li class="toc-lvl4"><a href="#analysis3">2.3 股东/资本结构对战略的影响</a></li>
+        <li class="toc-lvl4"><a href="#analysis4">2.4 试错过程与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#analysis5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#analysis6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#references">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">聆动通用</div>
+        <div class="ib-section">基本信息</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">安徽聆动通用机器人科技有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2024年12月</div></div>
+        <div class="ib-row"><div class="ib-label">总部</div><div class="ib-value">安徽省合肥市</div></div>
+        <div class="ib-row"><div class="ib-label">创始人/CEO</div><div class="ib-value">季超（中科大博士）</div></div>
+        <div class="ib-row"><div class="ib-label">控股股东</div><div class="ib-value">科大讯飞（安徽讯飞云创科技）</div></div>
+        <div class="ib-section">财务数据</div>
+        <div class="ib-row"><div class="ib-label">2025年收入</div><div class="ib-value">半年达全年KPI</div></div>
+        <div class="ib-row"><div class="ib-label">2026年目标</div><div class="ib-value">收入翻番</div></div>
+        <div class="ib-section">估值/融资</div>
+        <div class="ib-row"><div class="ib-label">Pre-A轮</div><div class="ib-value">数亿元（2026年4月）</div></div>
+        <div class="ib-row"><div class="ib-label">累计融资</div><div class="ib-value">近10亿元级别</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">LDB01 MTBF</div><div class="ib-value">≥10,000小时</div></div>
+        <div class="ib-row"><div class="ib-label">数据团队</div><div class="ib-value">近1,000人</div></div>
+        <div class="ib-row"><div class="ib-label">区域覆盖</div><div class="ib-value">京津冀、长三角、珠三角</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">赛道</div><div class="ib-value"><span class="tag">具身智能</span><span class="tag">通用机器人</span><span class="tag">工业制造</span></div></div>
+      </aside>
+      <p class="article-intro">聆动通用（安徽聆动通用机器人科技有限公司），2024年12月成立于安徽合肥，是科大讯飞在具身智能领域的控股子公司。公司90后CEO季超（中科大博士）提出"一脑多形"战略，构建了iFlyBot-VLM（大脑）+ iFlyBot-VLA（小脑）+ LDB/LDT通用机器人（本体）的全栈自研体系，是安徽省首家实现"大脑-小脑-本体"全链路自主可控的具身智能企业。公司成立一年半内完成多轮累计近10亿元融资，2026年4月Pre-A轮刷新安徽省具身智能单笔融资纪录。</p>
+      <h2 id="facts">1 事实层</h2>
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper"><table class="wikitable infotable">
+        <tr><th>项目</th><th>内容</th></tr>
+        <tr><td>公司全称</td><td>安徽聆动通用机器人科技有限公司</td></tr>
+        <tr><td>成立时间</td><td>2024年12月</td></tr>
+        <tr><td>总部地点</td><td>安徽省合肥市</td></tr>
+        <tr><td>创始人/CEO</td><td>季超（90后，中国科学技术大学博士）</td></tr>
+        <tr><td>控股股东</td><td>安徽讯飞云创科技有限公司（科大讯飞全资子公司）</td></tr>
+        <tr><td>上市情况</td><td>未上市</td></tr>
+        <tr><td>公司定位</td><td>"讯飞系"具身智能通用机器人，安徽省首家"大脑-小脑-本体"全链路自主可控</td></tr>
+      </table></div>
+      <h4>发展沿革</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>时间</th><th>事件</th></tr>
+        <tr><td>2024年12月</td><td>公司正式成立</td></tr>
+        <tr><td>2025年上半年</td><td>完成两轮数千万元天使轮融资（科大讯飞、合肥高投、讯飞创投等）</td></tr>
+        <tr><td>2025年6月</td><td>WAIC首次公开展示LDT采训推一体机及智能语音背包</td></tr>
+        <tr><td>2025年7月</td><td>CEO季超接受专访，预测2026年为行业应用元年</td></tr>
+        <tr><td>2025年8月</td><td>完成数亿元天使轮融资，元禾璞华领投</td></tr>
+        <tr><td>2025年底</td><td>首发iFlyBot-VLM具身基础大模型</td></tr>
+        <tr><td>2026年3月12日</td><td>与中科云谷（中联重科子公司）签署战略合作协议</td></tr>
+        <tr><td>2026年3月26日</td><td>联合创始人周甲甲在第四届具身智能机器人产业发展论坛发表演讲</td></tr>
+        <tr><td>2026年4月16日</td><td>LDB01工规级具身智能通用机器人全球首发</td></tr>
+        <tr><td>2026年4月30日</td><td>完成数亿元Pre-A轮融资，刷新安徽省具身智能单笔纪录</td></tr>
+      </table></div>
+      <h3 id="founders">1.2 创始人及核心团队</h3>
+      <p>聆动通用由季超创立并担任CEO。季超为90后，中国科学技术大学机器人方向博士、高级工程师，曾任科大讯飞AI智能硬件/机器人负责人，在职期间累计实现数亿元营收，具备最早一批医院/银行/商超大型服务机器人批量应用商业闭环经验。联合创始人周甲甲在2026年第四届具身智能机器人产业发展论坛发表主题演讲。核心成员来自中科大、哈工大、港中文、中科院、马普所（MPI）、卡尔斯鲁厄理工学院（KIT）等顶尖机构，能力横跨大模型、感知、规控、运控、仿生机构等全栈领域，拥有车规级产品研发背景。</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+        <tr><td>创始人/CEO</td><td>季超</td><td>中科大机器人方向博士、高级工程师；前科大讯飞AI机器人负责人（实现数亿元营收）；医院/银行/商超服务机器人首批批量落地经验</td></tr>
+        <tr><td>联合创始人</td><td>周甲甲</td><td>代表公司出席第四届具身智能机器人产业发展论坛并发表演讲</td></tr>
+        <tr><td>核心团队</td><td>多方来源</td><td>中科大、哈工大、港中文、中科院、马普所、KIT等；全栈能力覆盖；车规级产品背景；讯飞生态近千人数据团队支撑</td></tr>
+      </table></div>
+      <p>团队整体呈现"学术顶级+产业老兵"的混合特征，兼具顶尖科研能力和大规模商业落地经验。</p>
+      <h3 id="financing">1.3 融资与股东</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>轮次</th><th>时间</th><th>金额</th><th>主要投资方</th></tr>
+        <tr><td>天使轮（两轮）</td><td>2024-2025年初</td><td>数千万元</td><td>科大讯飞、合肥高投、讯飞创投等</td></tr>
+        <tr><td>天使轮（新一轮）</td><td>2025年8月</td><td>数亿元</td><td>元禾璞华（领投）、讯飞创投、优势资本、盈科资本、天智投资、合肥高投等</td></tr>
+        <tr><td>Pre-A轮</td><td>2026年4月</td><td>数亿元</td><td>华义创投（领投）、讯飞创投（战略加码）、泰达科投、博众精工产投等</td></tr>
+      </table></div>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>股东类型</th><th>代表股东</th><th>持股/角色</th></tr>
+        <tr><td>控股股东</td><td>安徽讯飞云创科技（科大讯飞全资子公司）</td><td>控股地位，提供星火大模型底层支撑</td></tr>
+        <tr><td>战略产投</td><td>博众精工产投</td><td>Pre-A轮进入，制造业场景协同</td></tr>
+        <tr><td>头部财务投资者</td><td>华义创投、元禾璞华、泰达科投等</td><td>Pre-A/天使轮领投及跟投</td></tr>
+      </table></div>
+      <p>累计融资近10亿元级别，Pre-A轮刷新安徽省具身智能领域单笔融资最高纪录。融资资金用于多模态数据采集管线、具身世界模型研发、量产交付体系及全球化生态布局。</p>
+      <h3 id="tech">1.4 技术路线</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>维度</th><th>详情</th></tr>
+        <tr><td>AI基座</td><td>基于科大讯飞星火多模态通用大模型构建</td></tr>
+        <tr><td>iFlyBot-VLM（大脑）</td><td>2025年底首发，视觉-语言具身基础模型，打通高维环境感知→运动控制跨模态语义鸿沟，将视觉/空间信息抽象为可迁移操作语言；国内主流开源具身基础模型评测SOTA</td></tr>
+        <tr><td>iFlyBot-VLA（小脑）</td><td>显隐双路径动作规划框架（隐式动作逻辑学习+显式结构化离散动作token），端到端任务操作；抓取/折叠/分拣等任务SOTA；计划2026 Q4重大升级</td></tr>
+        <tr><td>WAM框架</td><td>World-Action Model，快速新任务技能学习与现场部署</td></tr>
+        <tr><td>数据方案</td><td>讯飞生态近千人数据团队；覆盖互联网数据+仿真合成数据+Embodied UMI真机数据+高精度同构遥操作数据；数据飞轮闭环</td></tr>
+        <tr><td>感知系统</td><td>车规级多模态感知系统+高性能算力平台</td></tr>
+        <tr><td>国产化</td><td>国产化率高，供应链安全可控</td></tr>
+        <tr><td>产学研</td><td>中科大、哈工大、清华、北大、北工大等；参与多项国家/省级科技专项；首批参与信通院具身智能基准评测并获优异成绩；参与多项国标/行标制定</td></tr>
+      </table></div>
+      <p>聆动通用走"一脑多形"路线，一个智能大脑适配多形态机器人本体。技术架构遵循"大脑（VLM）→ 小脑（VLA）→ 本体（LDB/LDT）"三层全栈自研，强调从数据采集到模型训练到硬件部署的完整链路。</p>
+      <h3 id="products">1.5 产品形态</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>产品分类</th><th>型号</th><th>关键参数/特征</th><th>适用场景</th></tr>
+        <tr><td>工规级通用机器人</td><td>LDB01</td><td>MTBF≥1万小时；双臂协同+躯体升降+整体移动；车规级感知+高性能算力；国产化率高</td><td>物流、汽车、3C、装备制造</td></tr>
+        <tr><td>采训推一体机</td><td>LDT系列</td><td>数据采集+模型训练+推理部署一体化</td><td>公共/企业训练场、高校科研</td></tr>
+        <tr><td>标准化硬件</td><td>智能语音背包</td><td>语音/多模态交互封装为标准化模组</td><td>赋能第三方机器人厂商</td></tr>
+      </table></div>
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>场景分类</th><th>具体应用</th><th>代表合作方</th></tr>
+        <tr><td>装备制造</td><td>工程机械物流、装配</td><td>中科云谷（中联重科子公司）</td></tr>
+        <tr><td>汽车制造</td><td>产线物料搬运、装配</td><td>博众精工产投协同</td></tr>
+        <tr><td>3C电子制造</td><td>精密操作、柔性拣选</td><td>未具体披露</td></tr>
+        <tr><td>仓储物流</td><td>分拣、搬运、码垛</td><td>未具体披露</td></tr>
+        <tr><td>科研教育</td><td>具身智能训练平台</td><td>中科大、哈工大、清华等</td></tr>
+      </table></div>
+      <h3 id="commercialization">1.7 商业化进展</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>指标</th><th>数据</th></tr>
+        <tr><td>2025年收入</td><td>成立半年即收获可观订单，半年度基本达到全年KPI（年初KPI偏保守）</td></tr>
+        <tr><td>2026年目标</td><td>收入翻番；CEO预测2026年为行业应用元年，头部公司订单将达10亿元级</td></tr>
+        <tr><td>区域覆盖</td><td>率先在京津冀、长三角、珠三角开展"具身智能+"应用落地</td></tr>
+        <tr><td>战略合作</td><td>与中科云谷等多家行业头部产业方建立深度战略合作</td></tr>
+        <tr><td>LDT/LDB部署</td><td>已在多试点场景稳定应用，获合作方高度认可</td></tr>
+        <tr><td>商业路线</td><td>"一脑多形"（一个智能大脑适配多形态机器人本体）</td></tr>
+      </table></div>
+      <h3 id="financials">1.8 财务数据</h3>
+      <p>聆动通用为成立一年多的初创企业，未公开完整年报。以下为公开信息汇总：</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>指标</th><th>2025年</th><th>2026年（目标）</th></tr>
+        <tr><td>收入</td><td>半年达全年KPI（KPI偏保守）</td><td>收入翻番</td></tr>
+        <tr><td>融资</td><td>累计数亿元（天使+天使新一轮）</td><td>新增数亿元（Pre-A）</td></tr>
+        <tr><td>团队规模</td><td>核心团队+讯飞近千人数据团队支撑</td><td>持续扩张</td></tr>
+      </table></div>
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>控股股东科大讯飞通过星火大模型为聆动通用提供底层AI能力支撑</li>
+        <li>公司为安徽省首家"大脑-小脑-本体"全链路自主可控的具身智能硬科技初创企业</li>
+        <li>首批参与中国信通院具身智能基准评测并获优异成绩</li>
+        <li>参与多项国家标准/行业标准制定</li>
+        <li>合肥百亿级智能机器人产业基金明确将其列为重点扶持方向</li>
+        <li>Pre-A轮融资明确用于"全球化产业生态布局"，暗示出海战略已启动规划</li>
+        <li>iFlyBot-VLA计划2026年Q4重大升级，届时端到端操作能力有望大幅提升</li>
+      </ul>
+      <h2 id="analysis">2 分析层</h2>
+      <div class="analysis-block" id="analysis1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>季超的中科大机器人博士背景+科大讯飞AI机器人负责人履历，使其在AI+机器人交叉领域具备深厚的学术和产业双重积累。他此前在医院/银行/商超服务机器人领域的批量落地经验，意味着团队对"机器人从实验室到真实场景"的工程化挑战有第一手认知。团队选择了泛制造业（汽车、3C、物流、装备制造）作为切入场景，这与成员的工业机器人背景和车规级产品经验高度匹配。团队横跨大模型、感知、规控、运控、仿生机构的全栈能力，也为"一脑多形"战略提供了人才基础。</p>
+      </div>
+      <div class="analysis-block" id="analysis2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>聆动通用的"大脑VLM+小脑VLA+本体LDB"三层架构，在技术路线上追求通用性与专用性的平衡。VLM负责高层感知认知的可迁移性，VLA负责柔性泛化操作，本体提供工规级可靠性——这种分层设计理论上可以让同一套"大脑"适配不同行业场景。但制造业场景对可靠性要求极高（LDB01的MTBF≥1万小时即是明证），而VLA模型在上千种SKU的泛化操作能力尚未经过大规模验证。技术路线方向正确，但"泛化能力vs可靠性"之间的张力需要在规模化落地中持续调校。</p>
+      </div>
+      <div class="analysis-block" id="analysis3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>科大讯飞的控股地位是聆动通用最核心的战略变量。正面影响包括：星火大模型的独家底层支撑、讯飞在政府/企业客户渠道的加持、近千人数据团队的协同。但控股结构也意味着聆动通用的战略自由度受限于讯飞体系。博众精工产投等制造业股东的进入，预示着公司在汽车/3C等制造场景的绑定加深。华义创投等头部财务投资者的加持则为公司提供了独立融资和市场化运作的空间。整体而言，股东结构呈现"AI巨头控股+制造业产投协同+头部财务投资"的三角格局。</p>
+      </div>
+      <div class="analysis-block" id="analysis4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>聆动通用成立仅一年半，试错样本尚不充分。目前可观察到的路径包括：从2025年WAIC展示的LDT采训推一体机（偏工具/平台型产品）到2026年LDB01工规级通用机器人（偏终端应用产品）的扩展，反映了公司从"卖工具给开发者"到"直接卖机器人给工厂"的商业路径延伸。"一脑多形"战略本身也是一种试错友好的架构设计——通过统一大脑适配不同本体，降低了单场景失败的整体风险。随着中科云谷等战略合作落地，公司在装备制造场景的验证正在加速。</p>
+      </div>
+      <div class="analysis-block" id="analysis5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>聆动通用选择了一条"高举高打+全栈自研"的差异化路线。相比于走专用机器人路线的公司（如单一品类的无人叉车），聆动选择做"通用大脑+多形态本体"；相比于纯软件/模型公司，聆动自研硬件本体。这种全栈策略的优势是壁垒高、想象空间大，但代价是资源投入重、商业化周期长。"一脑多形"本质上是在"iPhone式平台野心"和"iPod式单品务实"之间取中间路线——不做纯平台也不做纯单品，而以"讯飞大脑+聆动本体"的捆绑模式切入。这一路线的关键验证点在于LDB01能否在2026年实现规模化出货。</p>
+      </div>
+      <div class="analysis-block" id="analysis6">
+        <h4>2.6 其他重要观察</h4>
+        <p>聆动通用是典型的"大厂内部孵化+独立运作"模式，类似于Figure AI从OpenAI生态中孵化。这种模式的优势是起步即有顶级AI能力和数据资源，劣势是可能受制于母公司战略优先级。值得警惕的信号是：如果2026年行业应用确实如季超预测般爆发，10亿元级订单的分配将检验聆动的量产交付能力——目前LDB01刚首发，从发布到规模化量产之间存在巨大鸿沟。另一个值得关注的动态是其"全球化产业生态布局"的表述，暗示海外市场已在规划中，但具体路径和时间表尚未披露。</p>
+      </div>
+      <h2 id="references">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://36kr.com/p/3787913951059207" target="_blank">资本+产业双驱动 | 聆动通用完成新一轮数亿元Pre-A融资 — 36氪（2026.04.30）</a></li>
+          <li><a href="https://m.36kr.com/p/3417090204945801" target="_blank">聆动通用完成数亿元天使轮融资 — 36氪首发（2025年）</a></li>
+          <li><a href="https://www.zhidx.com/p/554950" target="_blank">90后中科大博士造工业机器人，刚融资数亿元，讯飞投了 — 智东西</a></li>
+          <li><a href="https://finance.sina.cn/2026-03-13/detail-inhqvtik1093374.d.html" target="_blank">聆动通用与中科云谷签署战略合作协议 — 新浪财经（2026.03.13）</a></li>
+          <li><a href="https://news.qq.com/rain/a/20250728A06FPG00" target="_blank">WAIC对话｜聆动通用CEO季超：2026年具身智能头部企业订单金额将达10亿元级 — 腾讯新闻（2025.07）</a></li>
+          <li><a href="https://bbtnews.com.cn/2025/0729/564491.shtml" target="_blank">2026年具身智能头部企业订单将达10亿元级 — 北京商报</a></li>
+          <li><a href="https://kcr.ahnews.com.cn/kcr/content/4661_1742075.html" target="_blank">刷新安徽记录！"讯飞系"企业再获亿元融资 — 科创融</a></li>
+          <li><a href="https://www.hfgxt.com.cn/index.php?c=content&a=show&id=3130" target="_blank">合肥高新区企业硬核突破 工业具身智能落地取得实质性进展 — 合肥高新发布</a></li>
+          <li><a href="https://auto.gasgoo.com/news/202603/26I70451439C1206.shtml" target="_blank">安徽聆动 周甲甲：多模态具身通用机器人在传统制造业领域的创新探索 — 盖世汽车（2026.03.26）</a></li>
+          <li><a href="https://lieyunpro.com/archives/498292" target="_blank">元禾璞华，领投了"讯飞系"具身智能玩家聆动通用 — 猎云网</a></li>
+          <li><a href="https://www.donews.com/news/detail/8/6537544.html" target="_blank">聆动通用完成数亿元Pre-A轮融资 — DoNews</a></li>
+          <li><a href="https://news.pedaily.cn/202604/563373.shtml" target="_blank">聆动通用完成新一轮数亿元Pre-A融资 — 投资界</a></li>
+          <li><a href="https://auto.gasgoo.com/news/202604/30I70456055C601.shtml" target="_blank">Seeds | 聆动通用完成新一轮数亿元Pre-A融资 — 盖世汽车</a></li>
+          <li><a href="https://finance.eastmoney.com/a/202604303726284941.html" target="_blank">聆动通用完成新一轮数亿元Pre-A融资 — 东方财富</a></li>
+          <li><a href="http://news.10jqka.com.cn/20250728/c669945596.shtml" target="_blank">聆动通用CEO季超：2026年具身智能头部企业订单金额将达10亿元级 — 同花顺</a></li>
+          <li><a href="https://szaicx.com/page192?article_id=17981" target="_blank">聆动通用|头部市场化资本+AI产业巨头加持 — 深圳AI创新协会</a></li>
+          <li><a href="http://api.app.anhuinews.com/content/8674513.html" target="_blank">合肥企业组团亮相2025世界人工智能大会 — 安徽新闻网</a></li>
+          <li><a href="https://ahsbszb.ahnews.com.cn/pc/con/202503/31/c1079802.html" target="_blank">合肥百亿基金"瞄准"智能机器人 — 安徽日报</a></li>
+          <li><a href="http://field.10jqka.com.cn/20260313/c675282648.shtml" target="_blank">聆动通用与中科云谷签署战略合作协议 — 同花顺（2026.03.13）</a></li>
+          <li><a href="https://www.x-techcon.com/article/135730.html" target="_blank">聆动通用完成新一轮数亿元Pre-A融资 — 新科技</a></li>
+          <li><a href="https://www.163.com/dy/article/KROR5V4F05198R3E.html" target="_blank">聆动通用完成新一轮数亿元Pre-A融资 — 网易</a></li>
+          <li><a href="https://xinwen.bjd.com.cn/content/s68887ccee4b0aabe0a044975.html" target="_blank">对话聆动通用CEO季超 — 北京日报</a></li>
+        </ol>
+      </div>
+      <div class="page-footer">本页面内容基于公开资料整理，最后更新于2026年5月4日 · <a href="../index.html">具身智能Wiki</a></div>
+    </article>
+  </div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

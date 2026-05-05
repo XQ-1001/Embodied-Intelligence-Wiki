@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>零次方机器人 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> › <span>零次方机器人</span></div>
+  <div class="wiki-header"><h1>零次方机器人</h1><div class="subtitle">Zerith · 2025年成立 · 具身智能场景落地领跑者 · A轮超亿元 · 单月量产百台</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#founders">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financials">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#a21">2.1 团队背景与场景匹配度</a></li>
+        <li class="toc-lvl4"><a href="#a22">2.2 技术路线与场景适配性</a></li>
+        <li class="toc-lvl4"><a href="#a23">2.3 股东/资本结构影响</a></li>
+        <li class="toc-lvl4"><a href="#a24">2.4 试错与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#a25">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#a26">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#references">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">零次方机器人</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">合肥零次方机器人有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">英文名称</div><div class="ib-value">Zerith</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2025年1月</div></div>
+        <div class="ib-row"><div class="ib-label">总部</div><div class="ib-value">安徽省合肥市</div></div>
+        <div class="ib-row"><div class="ib-label">创始人</div><div class="ib-value">闵宇恒、程颐（清华00后）</div></div>
+        <div class="ib-row"><div class="ib-label">团队规模</div><div class="ib-value">超100人</div></div>
+        <div class="ib-section">融资数据</div>
+        <div class="ib-row"><div class="ib-label">最新轮次</div><div class="ib-value">A轮（2026.04）</div></div>
+        <div class="ib-row"><div class="ib-label">最新金额</div><div class="ib-value">超亿元</div></div>
+        <div class="ib-row"><div class="ib-label">领投方</div><div class="ib-value">润泽集团（AIDC龙头）</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">产品系列</div><div class="ib-value">E系列/C系列/H系列</div></div>
+        <div class="ib-row"><div class="ib-label">核心场景</div><div class="ib-value">空间整理+空间清洁</div></div>
+        <div class="ib-row"><div class="ib-label">月产能</div><div class="ib-value">百台（2025年12月起）</div></div>
+        <div class="ib-row"><div class="ib-label">落地场景</div><div class="ib-value">全国20+地标场所</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">行业</div><div class="ib-value">具身智能 · 服务机器人</div></div>
+        <div class="ib-row"><div class="ib-label">赛道</div><div class="ib-value">商业场景服务机器人</div></div>
+        <div class="ib-row"><div class="ib-label">阶段</div><div class="ib-value">A轮 · 商业化放量</div></div>
+        <div class="ib-section">官网</div>
+        <div class="ib-row"><div class="ib-label">官网</div><div class="ib-value">zerith.cn（推测）</div></div>
+      </aside>
+
+      <p class="article-intro"><strong>零次方机器人</strong>（合肥零次方机器人有限公司，Zerith），成立于2025年1月，是一家由<strong>清华00后极客</strong>创办的具身智能商业场景落地领跑企业。公司创始团队闵宇恒、程颐等来自清华大学AI&Robot实验室，团队超百人，采用"前沿研发+行业专家"的双螺旋人才结构。公司以<strong>"空间整理"与"空间清洁"</strong>为核心应用场景，产品覆盖E系列、C系列、H系列多个机型。截至2026年4月，公司成立仅15个月即完成4轮融资，最新A轮获AIDC算力龙头润泽集团超亿元领投，2025年12月已实现单月稳定量产百台，2026年开年获近亿元订单，营收数千万，已落地全国20余个地标场景，与华润万家、商汤集团等建立战略合作。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper">
+      <table class="wikitable infotable">
+        <tr><th>项目</th><th>内容</th></tr>
+        <tr><td>公司全称</td><td>合肥零次方机器人有限公司</td></tr>
+        <tr><td>英文名称</td><td>Zerith</td></tr>
+        <tr><td>成立时间</td><td>2025年1月</td></tr>
+        <tr><td>注册地</td><td>安徽省合肥市</td></tr>
+        <tr><td>创始人</td><td>闵宇恒、程颐（清华大学AI&Robot实验室）</td></tr>
+        <tr><td>上市状态</td><td>未上市</td></tr>
+        <tr><td>官网</td><td>zerith.cn（推测）</td></tr>
+        <tr><td>行业定位</td><td>具身智能 · 商业场景服务机器人</td></tr>
+        <tr><td>团队规模</td><td>超100人，双螺旋结构（前沿研发+行业专家）</td></tr>
+      </table>
+      </div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>时间</th><th>事件</th></tr>
+        <tr><td>2025年1月</td><td>公司成立，闵宇恒、程颐等清华AI&Robot实验室核心成员创办</td></tr>
+        <tr><td>2025年2月</td><td>完成天使轮数千万元融资，合肥市种子基金、包河区领航创投等投资</td></tr>
+        <tr><td>2025年5月</td><td>完成天使+轮数千万元融资，力合创投、清创华石等投资</td></tr>
+        <tr><td>2025年上半年</td><td>推出具身操作基础模型ZERITH-V0，实现场景超长序列多任务突破</td></tr>
+        <tr><td>2025年7月</td><td>完成天使++轮数亿元融资，水木基金、瑞穗力合基金等投资</td></tr>
+        <tr><td>2025年12月</td><td>实现单月稳定量产百台，部署E系列、C系列等高性价比机器人</td></tr>
+        <tr><td>2026年初</td><td>斩获近亿元订单，营收数千万；全国20余个地标场景落地验证</td></tr>
+        <tr><td>2026年4月</td><td>完成A轮超亿元融资，润泽集团（AIDC龙头）领投，宁波东力等跟投</td></tr>
+      </table>
+      </div>
+
+      <h3 id="founders">1.2 创始人及核心团队</h3>
+      <p>零次方机器人由清华00后极客创办，创始团队具有鲜明的<strong>学术前沿派</strong>特征。闵宇恒、程颐等来自清华大学AI&Robot实验室，在具身智能算法、机器人控制等领域有扎实的学术积累。团队已超百人，采用独特的<strong>"双螺旋结构"</strong>——前沿研发团队（以清华等高校硕博士为主）与行业专家量产团队并行推进，吸引了来自百度、字节跳动等顶尖企业的工程人才。</p>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+        <tr><td>联合创始人</td><td>闵宇恒</td><td>清华大学AI&Robot实验室核心成员，00后极客创业者，在具身智能算法和机器人系统架构方面有深厚积累</td></tr>
+        <tr><td>联合创始人</td><td>程颐</td><td>清华大学AI&Robot实验室核心成员，与闵宇恒共同创立零次方，主导技术路线和产品研发方向</td></tr>
+      </table>
+      </div>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <h4>融资历史</h4>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>时间</th><th>轮次</th><th>金额</th><th>重点投资方</th></tr>
+        <tr><td>2025年2月</td><td>天使轮</td><td>数千万元</td><td>合肥市种子基金、包河区领航创投</td></tr>
+        <tr><td>2025年5月</td><td>天使+轮</td><td>数千万元</td><td>力合创投、清创华石、同创中小科转基金</td></tr>
+        <tr><td>2025年7月</td><td>天使++轮</td><td>数亿元</td><td>水木基金、瑞穗力合基金</td></tr>
+        <tr><td>2026年4月</td><td>A轮</td><td>超亿元</td><td>润泽集团（领投）、宁波东力、接力天使、平湖泽新</td></tr>
+      </table>
+      </div>
+      <h4>股东结构</h4>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>类型</th><th>代表机构</th></tr>
+        <tr><td>算力/产业资本</td><td>润泽集团（AIDC上市第一股，字节跳动核心算力供应商）</td></tr>
+        <tr><td>产业链资本</td><td>宁波东力（国内减速机龙头，正向机器人精密减速器延伸）</td></tr>
+        <tr><td>清华系基金</td><td>水木基金、力合创投、清创华石</td></tr>
+        <tr><td>地方国资/政府基金</td><td>合肥市种子基金、包河区领航创投、平湖泽新</td></tr>
+        <tr><td>市场化基金</td><td>瑞穗力合基金、接力天使、同创中小科转基金</td></tr>
+      </table>
+      </div>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>技术维度</th><th>详情</th></tr>
+        <tr><td>基础模型</td><td>ZERITH-V0具身操作基础模型（2025年上半年推出），实现场景超长序列多任务突破</td></tr>
+        <tr><td>核心架构</td><td>ZERITH-V2类脑双流异步执行架构——</td></tr>
+        <tr><td>认知-行为双流</td><td>认知网络负责全局任务规划，行为网络负责实时力控执行，异构网络异步协同</td></tr>
+        <tr><td>神经动力学引擎</td><td>保障底层控制的实时性与高动态任务稳定性，异步稀疏调制机制降低计算开销</td></tr>
+        <tr><td>4D时空记忆</td><td>4D时空记忆模块+预测编码网络，构建"三重记忆空间"，解决长程任务"记忆丢失"难题</td></tr>
+        <tr><td>数据增广</td><td>ZERITH4D-SDA模型：将互联网多模态数据（高环境熵）与底层物理交互数据（高物理熵）异构融合</td></tr>
+        <tr><td>发展阶段论</td><td>提出具身智能三阶段：伪通用→去通用→真通用，当前锚定"去通用"阶段</td></tr>
+      </table>
+      </div>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>产品系列</th><th>定位</th><th>说明</th></tr>
+        <tr><td>E系列</td><td>高性价比·垂直场景</td><td>面向空间整理、空间清洁等刚性需求场景</td></tr>
+        <tr><td>C系列</td><td>特定任务场景</td><td>面向特定商业任务的专用机器人</td></tr>
+        <tr><td>H系列（图示系列）</td><td>通用机器人</td><td>高性价比版本的通用型机器人</td></tr>
+      </table>
+      </div>
+      <p>所有产品均聚焦"空间整理"和"空间清洁"两类刚性需求，以高鲁棒性在可复制商业环境中解决真实问题。</p>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>场景分类</th><th>具体领域</th><th>代表落地场所</th></tr>
+        <tr><td>零售/商超</td><td>货架整理、商品归位、地面清洁</td><td>深圳万象城OLE超市、合肥万象城OLE超市</td></tr>
+        <tr><td>交通枢纽</td><td>公共空间清洁整理</td><td>合肥新桥机场</td></tr>
+        <tr><td>战略合作</td><td>商业场景部署</td><td>华润万家（全国超市零售网络）、商汤集团</td></tr>
+        <tr><td>全国布局</td><td>20余个地标场所</td><td>覆盖合肥、北京、深圳等城市</td></tr>
+      </table>
+      </div>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>维度</th><th>数据/进展</th></tr>
+        <tr><td>2026年订单</td><td>近亿元（开年以来）</td></tr>
+        <tr><td>2026年营收</td><td>数千万（2026年初公开口径）</td></tr>
+        <tr><td>量产能力</td><td>2025年12月起单月稳定量产百台</td></tr>
+        <tr><td>落地场景</td><td>全国20余个地标场所</td></tr>
+        <tr><td>战略合作</td><td>润泽集团（算力+场景）、华润万家（零售场景）、商汤集团（AI合作）</td></tr>
+        <tr><td>资金用途</td><td>深化具身智能专项场景模型算法、优化机器人本体性能拉升量产规模、加速全国及全球高价值场景复制</td></tr>
+      </table>
+      </div>
+
+      <h3 id="financials">1.8 财务数据</h3>
+      <p>公司未上市，公开财务数据有限。已知2026年开年获近亿元订单，营收数千万。2025年12月实现单月稳定量产百台。A轮超亿元融资（2026年4月）后，资金将用于软件模型深化、硬件本体优化及场景规模复制。成立15个月完成4轮融资，融资节奏在具身智能赛道属于极快水平。</p>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>创始人团队为清华00后，是目前中国具身智能赛道最年轻的创业团队之一</li>
+        <li>提出具身智能"三段论"：伪通用→去通用→真通用，当前锚定"去通用"阶段——主动收敛场景，在可复制商业环境中以高鲁棒性解决真实问题</li>
+        <li>润泽集团董事长周超男表示投资零次方是"对算力价值落地这一核心命题的深度实践"</li>
+        <li>宁波东力作为国内减速机龙头跟投，意味着核心零部件供应链的早期绑定</li>
+        <li>合肥市种子基金从天使轮起持续支持，体现了合肥市对具身智能赛道的前瞻性布局</li>
+        <li>团队采用"双螺旋结构"——清华系前沿研发+百度/字节等产业专家量产团队，兼顾技术高度与工程落地</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="a21">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>零次方选择"空间整理+空间清洁"作为核心场景，与其清华AI&Robot实验室的学术背景高度匹配。整理和清洁是具身智能领域的"Hello World"级任务——看似简单但涵盖了感知（识别物体位置和状态）、规划（决定整理策略）、操作（抓取和放置）的全栈能力要求。清华AI&Robot实验室在长序列任务规划和操作泛化方面的学术积累，恰好对应了商超货架整理这类"多物体、多步骤、半结构化"场景的技术难点。创始团队的00后身份和"年轻化"特质，也使他们更容易理解并快速响应商超、机场等新生代服务场景的数字化转型需求。团队引入来自百度、字节跳动的工程化人才形成"双螺旋结构"，弥补了学术团队在规模化量产和供应链管理方面的经验短板。</p>
+      </div>
+      <div class="analysis-block" id="a22">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>ZERITH-V2的"认知-行为双流异构网络"架构，在技术哲学上精准解决了服务机器人"想得对但做得慢"或"做得快但做不对"的经典困境。认知网络负责全局任务规划（"哪些货架需要整理、按什么顺序"），行为网络负责实时力控执行（"这个玻璃瓶需要用多大的力、以什么角度拿起"），两者异步协同而非串行依赖。这种架构在商超、机场等半结构化场景中特别有价值——环境有一定规律（货架结构固定）但内容高度变化（商品位置随机），认知网络可以依赖先验知识进行粗粒度规划，行为网络则通过实时感知做精细调整。ZERITH4D-SDA将互联网数据与物理交互数据融合的思路，是行业前沿方向——互联网数据提供"常识理解"（知道什么是洗发水、什么是饮料），物理交互数据提供"操作能力"（知道怎么拿起不滑落），二者缺一不可。</p>
+      </div>
+      <div class="analysis-block" id="a23">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>零次方的股东结构最值得关注的是润泽集团的领投——这是"算力底座"与"实体场景"的深度战略锚定。润泽集团是国内AIDC上市第一股、字节跳动核心算力供应商，其投资零次方不只是财务投资，而是寻找算力落地场景的战略布局。这意味着零次方在算力资源和AI基础设施方面拥有了其他机器人公司难以比拟的后盾。宁波东力作为国内减速机龙头的跟投，则为机器人核心零部件的供应链稳定性提供了保障——减速机是人形/服务机器人的关键成本项。清华系基金（水木、力合、清创华石）的持续参与，体现了清华校友资源的网络效应和学术背书。"合肥政府+平湖政府"的双地方政府支持，为公司提供了制造基地和产业政策的双保险。</p>
+      </div>
+      <div class="analysis-block" id="a24">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>零次方成立仅15个月，其"试错史"尚短，但从公开信息中可以看出清晰的战略收敛路径。公司最初以"通用具身智能"为愿景，但很快收敛到"空间整理+空间清洁"这两个最刚需、最可复制、最高频的商业场景——这就是其"去通用"战略的核心内涵：不追求全能，而是主动选择收敛场景，在可复制环境中把1-2件事做到极致。从产品矩阵看，E/C/H三个系列的划分也体现了"从专用到通用"的渐进逻辑：先以E/C系列在特定场景打磨产品力和数据飞轮，再以H系列向更广泛的应用拓展。2025年7月完成数亿元天使++轮后加速商业化推进，到12月即实现单月量产百台，这一节奏说明公司从"实验室驱动"向"市场驱动"的转型非常果断。</p>
+      </div>
+      <div class="analysis-block" id="a25">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>零次方在中国具身智能赛道中做出了一个非常务实的取舍：不走"人形机器人"的炫目路线，而是以功能驱动而非形态驱动的理念选择最经济实用的机器人构型。在其选定的"空间整理/清洁"场景中，轮式底盘+机械臂的方案在成本、可靠性、维护性上都优于双足人形方案。这一取舍使其避开了人形赛道最激烈的竞争（宇树、智元、傅利叶、PNDbotics等），但同时也面临来自传统清洁机器人（科沃斯、高仙等）和AMR企业的竞争压力。零次方的核心差异在于"AI大脑"——ZERITH-V2的双流架构和4D时空记忆能力，使其机器人不仅能清洁，还能"理解"和"整理"空间，这是传统路径规划+避障方案难以实现的。公司选择的"去通用→真通用"进化路径，本质上是以商业闭环积累数据反哺AI能力——这一思路与特斯拉FSD的数据飞轮策略有异曲同工之处。</p>
+      </div>
+      <div class="analysis-block" id="a26">
+        <h4>2.6 其他重要观察</h4>
+        <p>第一，零次方从成立到月产百台用时11个月，在具身智能赛道属于极快的商业化节奏，但其"数千万营收"和"近亿订单"的差距说明交付能力仍在爬坡中。第二，润泽集团的战略投资是"算力换场景"的经典案例——如果零次方成为润泽算力在具身智能领域的"标杆客户"，其示范效应可能为润泽带来更多机器人公司的算力订单，形成双赢。第三，华润万家的战略合作具有重大商业价值——华润万家在全国有数千家门店，如果零次方能在其超市网络中完成标准化复制，将形成极强的网络效应和数据飞轮。但超市场景的高动态性（顾客随机行为）对机器人的安全性、鲁棒性和人机协作能力提出了严峻挑战。第四，公司成立仅15个月已吸引百度、字节等大厂人才，说明其技术方向和创始团队对AI人才的吸引力较强。第五，从天使轮合肥市种子基金到A轮润泽集团，资本演变体现了从"政府扶持"到"产业资本认可"的升级轨迹。</p>
+      </div>
+
+      <h2 id="references">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://m.pedaily.cn/news/562562" target="_blank">投资界：清华00后团队创办，零次方机器人完成超亿元新一轮融资</a></li>
+          <li><a href="https://36kr.com/p/3759104937820930" target="_blank">36氪：算力龙头润泽集团领投，清华00后团队零次方机器人新一轮融资超亿元</a></li>
+          <li><a href="https://www.hf365.com/hfzx/system/2026/04/12/030048667.shtml" target="_blank">合肥在线：合肥企业零次方机器人新一轮融资超亿元</a></li>
+          <li><a href="https://m.jiemian.com/article/14234464.html" target="_blank">界面新闻：算力龙头领投 零次方机器人获超亿元融资</a></li>
+          <li><a href="https://nuxt.cyzone.cn/article/829981.html" target="_blank">创业邦：算力巨头入局具身智能，润泽集团领投清华00后新一轮超亿元融资</a></li>
+          <li><a href="https://www.zidonghua.com.cn/news/Finance/83688.html" target="_blank">自动化网：算力龙头入局！润泽集团领投零次方新一轮超亿元融资</a></li>
+          <li><a href="https://d1ev.com/news/shichang/294545" target="_blank">第一电动：清华00后极客创业，刚融了超亿元，已量产百台具身机器人</a></li>
+          <li><a href="https://www.seccw.com/document/detail/id/43351.html" target="_blank">SECCW：零次方机器人完成新一轮超亿元融资</a></li>
+          <li><a href="https://caijing.chinadaily.com.cn/a/202604/10/WS69d8c32aa310942cc49a71d9.html" target="_blank">中国日报财经：算力龙头润泽集团领投！清华00后团队零次方机器人获超亿元融资</a></li>
+          <li><a href="https://www.donews.com/news/detail/4/6505720.html" target="_blank">DoNews：清华00后创立、算力巨头入局，零次方机器人完成新一轮超亿元融资</a></li>
+          <li><a href="http://www.bowangcaijing.cn/news/1386931.html" target="_blank">博望财经：润泽集团领投，零次方机器人完成超亿元新一轮融资</a></li>
+          <li><a href="https://finance.sina.cn/2026-04-10/detail-inhtzamx5180476.d.html" target="_blank">新浪财经：算力龙头领投 零次方机器人获超亿元A轮融资</a></li>
+          <li><a href="https://m.36kr.com/newsflashes/3758962984141317" target="_blank">36氪快讯：具身智能企业"零次方机器人"完成超亿元融资，由清华00后团队创办</a></li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">此页面由具身智能Wiki项目自动生成 · 数据截止2026年5月 · 内容仅供参考，不构成投资建议</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

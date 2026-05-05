@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>颗粒进化 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> <span class="breadcrumb-sep">›</span> <span>颗粒进化</span></div>
+  <div class="wiki-header"><h1>颗粒进化</h1><div class="subtitle">xLean · 成立2022年 · 孵化自港中文天石机器人研究所 · A轮数千万美元 · 00后创始人</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#founders">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#financing">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercialization">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financials">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#analysis1">2.1 团队背景与场景选择匹配度</a></li>
+        <li class="toc-lvl4"><a href="#analysis2">2.2 技术路线与场景适配性</a></li>
+        <li class="toc-lvl4"><a href="#analysis3">2.3 股东/资本结构对战略的影响</a></li>
+        <li class="toc-lvl4"><a href="#analysis4">2.4 试错过程与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#analysis5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#analysis6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#references">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">颗粒进化</div>
+        <div class="ib-section">基本信息</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">颗粒进化（上海）机器人有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">品牌名</div><div class="ib-value">xLean</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2022年6月</div></div>
+        <div class="ib-row"><div class="ib-label">创始人</div><div class="ib-value">薛轲翰（2001年，00后）</div></div>
+        <div class="ib-row"><div class="ib-label">孵化来源</div><div class="ib-value">香港中文大学天石机器人研究所</div></div>
+        <div class="ib-section">融资</div>
+        <div class="ib-row"><div class="ib-label">A轮</div><div class="ib-value">数千万美元（2026年4月）</div></div>
+        <div class="ib-row"><div class="ib-label">累计融资</div><div class="ib-value">近亿元（四轮）</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">主打产品</div><div class="ib-value">xLean TR1 双形态洗地机器人</div></div>
+        <div class="ib-row"><div class="ib-label">国内定价</div><div class="ib-value">¥4,000-6,000</div></div>
+        <div class="ib-row"><div class="ib-label">海外定价</div><div class="ib-value">约$1,000+</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">赛道</div><div class="ib-value"><span class="tag">家庭机器人</span><span class="tag">清洁机器人</span><span class="tag">消费硬件</span></div></div>
+      </aside>
+      <p class="article-intro">颗粒进化（xLean），全称颗粒进化（上海）机器人有限公司，前身清云智能（深圳）有限公司，2022年6月成立，孵化自香港中文大学天石机器人研究所。公司由00后创始人薛轲翰创立，专注于家庭服务机器人，以智能地面清洁为切入点，打造Family Agent OS核心硬件载体。首款产品xLean TR1是全球首款双形态变形洗地机器人，打破行业30年圆形传统。2026年4月完成数千万美元A轮融资，产品在Kickstarter首日众筹破50万美元。</p>
+      <h2 id="facts">1 事实层</h2>
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper"><table class="wikitable infotable">
+        <tr><th>项目</th><th>内容</th></tr>
+        <tr><td>公司全称</td><td>颗粒进化（上海）机器人有限公司（前身：清云智能（深圳）有限公司）</td></tr>
+        <tr><td>品牌名</td><td>xLean</td></tr>
+        <tr><td>成立时间</td><td>2022年6月</td></tr>
+        <tr><td>创始人/CEO</td><td>薛轲翰（2001年生，00后连续创业者）</td></tr>
+        <tr><td>孵化来源</td><td>香港中文大学天石机器人研究所</td></tr>
+        <tr><td>定位</td><td>专注家庭机器人，以智能清洁为切入点的消费级机器人公司</td></tr>
+        <tr><td>上市情况</td><td>未上市</td></tr>
+      </table></div>
+      <h4>发展沿革</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>时间</th><th>事件</th></tr>
+        <tr><td>2022年6月</td><td>公司前身清云智能（深圳）有限公司成立</td></tr>
+        <tr><td>2022-2024年</td><td>完成前两轮融资；创始人薛轲翰从港中文退学全职创业</td></tr>
+        <tr><td>2025年9月</td><td>亮相德国IFA展会，获Best of IFA Next Winner、Best of Design Honoree</td></tr>
+        <tr><td>2026年1月</td><td>参加美国CES展会</td></tr>
+        <tr><td>2026年4月</td><td>完成数千万美元A轮融资，国际国方、华业天成、五源资本等联合领投</td></tr>
+        <tr><td>2026年（预计）</td><td>xLean TR1国内外同步开售</td></tr>
+      </table></div>
+      <h3 id="founders">1.2 创始人及核心团队</h3>
+      <p>创始人薛轲翰，2001年出生，00后连续创业者。本科毕业于西北工业大学，曾在香港中文大学机器人研究所攻读博士，后主动退学创业。大三期间以CTO身份参与创办医院场景机器人公司莱陆科技，积累了从0到1的机器人产品经验。团队核心成员来自香港中文大学、上海交通大学、西北工业大学、东北大学等高校，整体呈现"年轻化+学术精英"特征，研发方向覆盖机械结构、SLAM导航、水汽分离等关键技术领域。</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+        <tr><td>创始人/CEO</td><td>薛轲翰</td><td>2001年生；西北工业大学本科；港中文机器人研究所博士退学创业；前莱陆科技CTO（医院机器人场景）；连续创业者</td></tr>
+        <tr><td>核心团队</td><td>学术精英型</td><td>港中文、上海交大、西工大、东北大学等；覆盖机械结构、导航算法、清洁技术等方向</td></tr>
+      </table></div>
+      <h3 id="financing">1.3 融资与股东</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>轮次</th><th>时间</th><th>金额</th><th>主要投资方</th></tr>
+        <tr><td>前两轮</td><td>2022-2024年</td><td>未详细披露</td><td>麟阁创投、奇绩创坛等</td></tr>
+        <tr><td>A轮</td><td>2026年4月</td><td>数千万美元</td><td>国际国方、华业天成、五源资本、万世资本等联合领投，原股东全部超额跟投</td></tr>
+      </table></div>
+      <p>累计完成四轮融资，融资总额接近亿元。A轮资金用于核心技术迭代研发、产品规模化量产及海外市场开拓。奇绩创坛（陆奇创立）的早期投资为公司在技术和创业者社区中提供了品牌背书。</p>
+      <h3 id="tech">1.4 技术路线</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>维度</th><th>详情</th></tr>
+        <tr><td>核心创新</td><td>水汽分离系统：迭代30多个版本，实现在低矮空间同时直吸液体和固体脏污（可乐、猫砂、食物残渣等）</td></tr>
+        <tr><td>形态设计</td><td>方形机身+可拆卸手柄，1秒切换为手持洗地机；打破行业30年圆形传统</td></tr>
+        <tr><td>导航算法</td><td>自研方形导航算法，解决方形机器人在复杂家居环境中的导航和脱困问题</td></tr>
+        <tr><td>安全系统</td><td>相机+雷达生物识别安全系统，识别宠物尾巴和小朋友手指；物理隐私遮挡开关</td></tr>
+        <tr><td>技术壁垒</td><td>软硬一体+数据飞轮：卖得越多→数据越多→体验越好；纯硬件约一年窗口期</td></tr>
+        <tr><td>场景取舍</td><td>战略性放弃地毯清洁场景，专注硬质地面极致清洁</td></tr>
+      </table></div>
+      <h3 id="products">1.5 产品形态</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>产品</th><th>型号</th><th>关键参数/特征</th><th>适用场景</th></tr>
+        <tr><td>双形态洗地机器人</td><td>xLean TR1</td><td>全球首款双形态变形洗地机器人；方形机身+可拆卸手柄；水汽分离；全能基站（固液分离+自动烘干）；国内¥4,000-6,000/海外约$1,000+</td><td>家庭硬质地面清洁（瓷砖、木地板等）</td></tr>
+      </table></div>
+      <p>产品规划：每年至少一个大版本更新，上半年一次、下半年一次；未来两年优先丰富地面清洁产品线。</p>
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>场景分类</th><th>具体应用</th><th>目标客户</th></tr>
+        <tr><td>家庭清洁</td><td>硬质地面（瓷砖/木地板）固体+液体混合垃圾清洁</td><td>有宠家庭、有幼童家庭、对地面清洁有高要求的消费群体</td></tr>
+        <tr><td>海外家庭</td><td>同场景，海外定价约$1,000+</td><td>欧美家庭用户（Kickstarter首日50万美元验证需求）</td></tr>
+      </table></div>
+      <h3 id="commercialization">1.7 商业化进展</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>指标</th><th>数据</th></tr>
+        <tr><td>Kickstarter表现</td><td>首日众筹金额突破50万美元</td></tr>
+        <tr><td>海外展会</td><td>IFA 2025（Best of IFA Next Winner、Best of Design Honoree）、CES 2026</td></tr>
+        <tr><td>销售渠道</td><td>国内京东、海外Kickstarter</td></tr>
+        <tr><td>上市计划</td><td>预计2026年国内外同步开售</td></tr>
+        <tr><td>售后服务</td><td>第一阶段自建国内主要城市售后网点</td></tr>
+      </table></div>
+      <h3 id="financials">1.8 财务数据</h3>
+      <p>颗粒进化为未上市初创企业，xLean TR1尚未正式开售，暂无公开营收数据。以下为融资相关财务指标：</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>指标</th><th>数据</th></tr>
+        <tr><td>累计融资</td><td>近亿元（四轮，A轮数千万美元为最大单笔）</td></tr>
+        <tr><td>众筹验证</td><td>Kickstarter首日50万美元</td></tr>
+        <tr><td>定价区间</td><td>国内¥4,000-6,000，海外约$1,000+</td></tr>
+      </table></div>
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>创始人薛轲翰是00后创业者（2001年生），大三即参与创办医院机器人公司</li>
+        <li>公司前身为清云智能（深圳），后品牌统一为xLean/颗粒进化</li>
+        <li>TR1方形设计打破扫地机器人行业30年圆形传统，类比iPhone打破键盘手机的形态创新</li>
+        <li>"能扫屎"为核心卖点——可同时处理固体和液体混合脏污，瞄准养宠和育儿家庭</li>
+        <li>创始人认为纯硬件约一年窗口期，真正的壁垒在于"软硬一体+数据飞轮"</li>
+        <li>孵化自香港中文大学天石机器人研究所，学术背景深厚</li>
+        <li>奇绩创坛（陆奇创立）为早期投资方，五源资本在A轮进入</li>
+      </ul>
+      <h2 id="analysis">2 分析层</h2>
+      <div class="analysis-block" id="analysis1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>薛轲翰的港中文机器人研究所背景和莱陆科技的医院机器人创业经历，使团队在机器人工程化和产品化方面具备实战经验。选择"家庭地面清洁"作为切入点——世界上最刚需、最高频的家务场景之一——利用了团队在结构设计（水汽分离）、导航算法（方形SLAM）和消费电子（便携式手柄设计）方面的复合能力。00后的创始人年龄也使其对年轻家庭用户（养宠、育儿）的需求有天然共情，产品定位和团队基因匹配度较高。</p>
+      </div>
+      <div class="analysis-block" id="analysis2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>xLean选择"水汽分离+方形机身+专注硬质地面"的技术路线，在清洁机器人赛道中做了高度聚焦的取舍。水汽分离解决了扫地机器人行业30年来的核心痛点——只能扫干不能洗湿；方形机身解决了贴边清洁死角问题；放弃地毯则避免了在技术资源有限的情况下与iRobot、科沃斯等巨头在地毯清洁上正面对抗。这种"窄而深"的技术路线在当前阶段是高度适配的，但长期看，产品线的横向扩展能力（从单一品类到多品类）尚未被验证。</p>
+      </div>
+      <div class="analysis-block" id="analysis3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>奇绩创坛和五源资本的进入为xLean带来了顶级VC的品牌背书和创业者社区资源。五源资本以投资小米、DJI等硬件独角兽著称，其在消费硬件出海方面的经验对xLean的海外Kickstarter+IFA/CES展会策略有直接助力。国际国方、华业天成等A轮联合领投方则提供了国际化视野和规模化生产的资源。股东结构偏"顶级VC+创业孵化"，没有产业资本的场景绑定，这给了xLean更大的独立性和场景选择自由度。</p>
+      </div>
+      <div class="analysis-block" id="analysis4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>xLean经历了从"医院机器人（莱陆科技）"到"家庭清洁机器人"的显著场景切换。薛轲翰大三时以CTO身份参与医院机器人创业，积累了B端场景经验后，发现C端家庭场景的市场天花板更大、用户付费意愿更直接，于是果断转向。这一路径调整是典型的技术型创始人在B端和C端之间做取舍的过程。从圆形扫地机的行业惯例到方形机身的形态突破，也经历了30多个水汽分离版本的迭代试错。</p>
+      </div>
+      <div class="analysis-block" id="analysis5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>xLean在清洁机器人赛道中选择了"单品极致+品牌溢价"路线，类似于Dyson在吸尘器领域的高端定位。与科沃斯、石头、追觅等国产清洁机器人品牌的多SKU策略不同，xLean先以一款TR1打穿"湿清洁"细分场景，再渐进扩展产品线。在"硬件vs软件"的选择上，创始人明确认为硬件是入口、数据飞轮是壁垒，选择了软硬一体的道路。在"国内vs海外"上则采取同步推进策略，Kickstarter和CES的早期投入显示其对全球市场的野心。</p>
+      </div>
+      <div class="analysis-block" id="analysis6">
+        <h4>2.6 其他重要观察</h4>
+        <p>xLean是少数由00后创始人领导并已获得数千万美元融资的机器人公司，这在中国具身智能/消费机器人领域十分罕见。薛轲翰在港中文退学创业的选择，类比硅谷的"dropout founder"叙事，对品牌传播有正向效应。但一个潜在风险是：清洁机器人赛道的竞争极其激烈，科沃斯、石头科技均为上市公司，追觅、云鲸等也在快速迭代，xLean的"一年窗口期"判断本身就说明硬件形态创新的护城河有限，后续能否构建数据飞轮和品牌壁垒是决定性因素。</p>
+      </div>
+      <h2 id="references">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://www.donews.com/news/detail/8/6509079.html" target="_blank">颗粒进化xLean完成数千万美元A轮融资 — DoNews（2026.04）</a></li>
+          <li><a href="https://www.jiemian.com/article/14380419.html" target="_blank">TOPBRAND | 颗粒进化完成融资 — 界面新闻</a></li>
+          <li><a href="https://www.163.com/dy/article/KQDCK0IS0556CAYF.html" target="_blank">00后创立的家庭机器人完成数千万美元A轮融资 — 网易</a></li>
+          <li><a href="https://m.jiemian.com/article/13866250.html" target="_blank">电厂 | 把洗地机"塞"进扫拖机器人，xLean怎么做到的 — 界面新闻</a></li>
+          <li><a href="https://www.brandark.com/t/IkLjSOdJ" target="_blank">智能清洁机器人公司「颗粒进化」完成数千万美元A轮融资 — 品牌方舟</a></li>
+          <li><a href="https://4g.stockstar.com/detail/RB2026041300027962" target="_blank">xLean颗粒进化A轮融资，融资额数千万美元 — 证券之星</a></li>
+          <li><a href="https://m.sohu.com/a/976110812_122576127" target="_blank">00后团队造"能扫屎"的机器人，方形设计如何颠覆扫地机行业 — 搜狐</a></li>
+          <li><a href="https://chejiahao.autohome.com.cn/info/24703745" target="_blank">把洗地机"塞"进扫拖机器人，xLean怎么做到的 — 汽车之家（转载）</a></li>
+          <li>IFA 2025参展：xLean TR1获Best of IFA Next Winner、Best of Design Honoree</li>
+          <li>CES 2026参展：xLean TR1北美首次亮相</li>
+          <li>Kickstarter：xLean TR1首日众筹金额突破50万美元</li>
+          <li>奇绩创坛为颗粒进化早期投资方</li>
+          <li>五源资本为颗粒进化A轮联合领投方</li>
+          <li>颗粒进化孵化自香港中文大学天石机器人研究所</li>
+          <li>创始人薛轲翰前创业项目：莱陆科技（医院场景机器人）</li>
+        </ol>
+      </div>
+      <div class="page-footer">本页面内容基于公开资料整理，最后更新于2026年5月4日 · <a href="../index.html">具身智能Wiki</a></div>
+    </article>
+  </div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

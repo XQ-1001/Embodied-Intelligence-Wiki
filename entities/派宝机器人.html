@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>派宝机器人 — 具身智能Wiki</title><style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style></head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> <span class="breadcrumb-sep">›</span> <span>派宝机器人</span></div>
+  <div class="wiki-header"><h1>派宝机器人</h1><div class="subtitle">PadBot · 非上市 · 2013年成立 · 国家级专精特新"小巨人" · 商用楼宇机器人方案商</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#founder">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financial">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#analysis-match">2.1 团队背景与场景匹配度</a></li>
+        <li class="toc-lvl4"><a href="#analysis-tech-fit">2.2 技术路线与场景适配性</a></li>
+        <li class="toc-lvl4"><a href="#analysis-capital">2.3 股东资本结构对战略的影响</a></li>
+        <li class="toc-lvl4"><a href="#analysis-pivot">2.4 试错过程与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#analysis-position">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#analysis-other">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#refs">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">派宝机器人</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">广东派宝机器人有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">曾用名</div><div class="ib-value">广州映博智能科技有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">英文名</div><div class="ib-value">PadBot</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2013年9月29日</div></div>
+        <div class="ib-row"><div class="ib-label">总部</div><div class="ib-value">广州黄埔区中新知识城</div></div>
+        <div class="ib-row"><div class="ib-label">创始人</div><div class="ib-value">覃争鸣、范耀军</div></div>
+        <div class="ib-section">财务数据</div>
+        <div class="ib-row"><div class="ib-label">累计融资</div><div class="ib-value">约1.8亿元（公开）</div></div>
+        <div class="ib-row"><div class="ib-label">海外营收占比</div><div class="ib-value">约40%</div></div>
+        <div class="ib-row"><div class="ib-label">营收</div><div class="ib-value">未公开</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">专利/软著</div><div class="ib-value">240+项</div></div>
+        <div class="ib-row"><div class="ib-label">产品系列</div><div class="ib-value">6大系列</div></div>
+        <div class="ib-row"><div class="ib-label">覆盖场景</div><div class="ib-value">迎宾/配送/巡逻/清洁/消毒</div></div>
+        <div class="ib-row"><div class="ib-label">导航面积</div><div class="ib-value">≤4万m²（单图）</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">技术路线</div><div class="ib-value">商用服务机器人（轮式+足式）</div></div>
+        <div class="ib-row"><div class="ib-label">核心场景</div><div class="ib-value">商业楼宇、智慧园区</div></div>
+        <div class="ib-row"><div class="ib-label">企业资质</div><div class="ib-value">国家级专精特新"小巨人"</div></div>
+        <div class="ib-section">官网</div>
+        <div class="ib-row"><div class="ib-label">官网</div><div class="ib-value"><a href="https://www.padbot.cn">padbot.cn</a></div></div>
+      </aside>
+
+      <p class="article-intro">派宝机器人（PadBot）成立于2013年，是国内最早一批聚焦商用楼宇场景的服务机器人企业。以华南理工大学机器人实验室为技术源头，由校友覃争鸣和范耀军共同创立，定位为商用楼宇机器人整体方案提供商。公司坚持"单品单用+产品矩阵"策略，构建了覆盖迎宾导览、物流配送、安保巡逻、商用清洁、消毒消杀五大场景的完整产品线，2025年推出四足机器狗G1向足式机器人延伸。经过十余年深耕，派宝已发展为国家级专精特新"小巨人"企业，海外营收占比攀升至约40%，2025年获湛江产投B+轮融资后在湛江建成面向海外市场的具身智能智造基地。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper">
+        <table class="wikitable infotable">
+          <tr><th>项目</th><th>内容</th></tr>
+          <tr><td>公司全称</td><td>广东派宝机器人有限公司</td></tr>
+          <tr><td>曾用名</td><td>广州映博智能科技有限公司</td></tr>
+          <tr><td>英文品牌</td><td>PadBot</td></tr>
+          <tr><td>成立时间</td><td>2013年9月29日</td></tr>
+          <tr><td>注册地</td><td>广州市黄埔区中新知识城</td></tr>
+          <tr><td>上市状态</td><td>非上市</td></tr>
+          <tr><td>官网</td><td><a href="https://www.padbot.cn">www.padbot.cn</a></td></tr>
+          <tr><td>创始人/法人</td><td>覃争鸣</td></tr>
+          <tr><td>品牌定位</td><td>商用楼宇机器人整体方案提供商</td></tr>
+          <tr><td>企业资质</td><td>国家级专精特新"小巨人"企业、高新技术企业、广东省专精特新中小企业</td></tr>
+          <tr><td>分支机构</td><td>国内十余家分公司/办事处，湛江子公司（海外智造基地）</td></tr>
+        </table>
+      </div>
+      <h4>发展沿革</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>时间</th><th>事件</th></tr>
+          <tr><td>2013年9月</td><td>广州映博智能科技有限公司成立，创立派宝机器人品牌</td></tr>
+          <tr><td>2015年1月</td><td>完成天使轮融资（联创永宣，500万元）</td></tr>
+          <tr><td>2016年</td><td>完成Pre-A轮（凯迪威）及战略融资（1000万元）</td></tr>
+          <tr><td>2018年</td><td>完成A轮融资（英诺资本），产品线扩展至配送、巡逻</td></tr>
+          <tr><td>2020年</td><td>完成A+轮融资（亚禾资本、初心资本）</td></tr>
+          <tr><td>2023年4月</td><td>完成B轮数千万元融资（知识城创投、青橙资本），确立商业楼宇专注赛道</td></tr>
+          <tr><td>2023年</td><td>S2巡逻机器人获安博会创新产品奖；正式成立海外事业部</td></tr>
+          <tr><td>2024年</td><td>S2再获安博会优秀创新产品奖；海外营收占比突破30%；广交会设立服务机器人专区首次参展</td></tr>
+          <tr><td>2025年8月</td><td>完成B+轮数千万元融资（湛江产投）；湛江子公司开业，"具身智能"智造基地投产；推出G1四足机器狗</td></tr>
+          <tr><td>2026年</td><td>入选黄埔区"新春第一会"好货推荐名单；新加坡代表团到访；香港国际创科展亮相；公司更名"广东派宝机器人有限公司"</td></tr>
+        </table>
+      </div>
+
+      <h3 id="founder">1.2 创始人及核心团队</h3>
+      <p>派宝机器人的核心创始团队源自华南理工大学计算机学院机器人实验室，两位创始人覃争鸣和范耀军系大学同窗，均毕业于智能机器人专业，在校期间曾代表学校多次获得国际机器人足球比赛冠亚军。覃争鸣毕业后加入IBM中国任高级咨询顾问和系统架构师，主导过顺丰速运、圆通快递等核心系统架构设计；范耀军则在北电（Nortel）和中兴（ZTE）从事通讯系统研发和海外市场销售，积累了东南亚和中东等市场经验。团队整体呈现华南理工校友系+ICT产业实战背景的混合特征，本科及以上学历占比90%以上。</p>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+          <tr><td>创始人/CEO/董事长</td><td>覃争鸣</td><td>华南理工大学计算机学院智能机器人专业硕士（2007届）；华南理工机器人实验室核心成员，多次获国际机器人足球比赛冠亚军；IBM中国高级咨询顾问/系统架构师（2007-2010），主导顺丰速运核心系统、圆通"金刚"核心系统架构设计；广州文讯信息科技技术合伙人（2010-2013）；广东省机器人协会副会长；暨南大学产业经济研究院行业导师；2023年首届高新技术企业科技创新大会"十大科技创新风云人物"</td></tr>
+          <tr><td>联合创始人/海外市场负责人</td><td>范耀军</td><td>华南理工大学计算机学院智能机器人专业硕士，与覃争鸣同为机器人实验室核心成员；北电（Nortel）通讯系统研发及产品推广；中兴（ZTE）大客户销售，熟悉东南亚和东欧通讯市场；2013年联合创办派宝机器人，负责海外市场拓展</td></tr>
+        </table>
+      </div>
+      <p>公司长期与华南理工大学计算机学院、软件学院保持紧密产学研合作，共建创新实验室和教学实习基地，并共建"广东省本科高校智能计算机联合实验室（具身智能方向）"。公司累计拥有近200项知识产权专利和软著、72项商标。</p>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <h4>融资历史</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>时间</th><th>轮次</th><th>金额</th><th>主要投资方</th></tr>
+          <tr><td>2015年1月</td><td>天使轮</td><td>500万元</td><td>联创永宣</td></tr>
+          <tr><td>2016年</td><td>Pre-A轮</td><td>未披露</td><td>凯迪威文化</td></tr>
+          <tr><td>2016年3月</td><td>战略融资</td><td>1000万元</td><td>未披露</td></tr>
+          <tr><td>2018年</td><td>A轮</td><td>未披露</td><td>英诺天使基金</td></tr>
+          <tr><td>2020年</td><td>A+轮</td><td>未披露</td><td>亚禾资本、初心资本、英诺天使基金</td></tr>
+          <tr><td>2023年4月</td><td>B轮</td><td>数千万元</td><td>知识城创投（领投）、青橙资本</td></tr>
+          <tr><td>2025年8月</td><td>B+轮</td><td>数千万元</td><td>湛江产投（湛江城发集团）</td></tr>
+        </table>
+      </div>
+      <h4>股东结构</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>股东类型</th><th>代表机构</th><th>性质</th></tr>
+          <tr><td>创始团队</td><td>覃争鸣、范耀军等</td><td>创始人持股平台</td></tr>
+          <tr><td>早期VC</td><td>联创永宣、英诺天使基金</td><td>天使/早期VC</td></tr>
+          <tr><td>中期VC</td><td>亚禾资本、初心资本、青橙资本</td><td>人民币VC</td></tr>
+          <tr><td>地方国资/产业</td><td>知识城创投、湛江产投（湛江城发集团）</td><td>广州市黄埔区国资、湛江市国资产业投资平台</td></tr>
+        </table>
+      </div>
+      <p>公司历经7轮融资，累计公开融资金额约1.8亿元人民币。2025年B+轮引入湛江产投后，在湛江城发智造产业园建成面向海外市场的具身智能智造基地，当年投产、当年上规。公司目前非上市，暂无IPO公开计划披露。</p>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>技术维度</th><th>详细说明</th></tr>
+          <tr><td>总体技术架构</td><td>以自研通用底盘为核心，融合LDS SLAM激光导航、多传感器融合定位、跨楼层自主乘梯技术，构建"底盘+模块化上装+核心算法库+派宝云平台"的四层技术栈</td></tr>
+          <tr><td>导航与定位</td><td>LDS SLAM激光导航，导航精度5mm/m，单图最大支持4万m²大面积扫图；支持跨楼层呼梯乘梯、通过闸机和电动门</td></tr>
+          <tr><td>底盘技术</td><td>自研轮式底盘，负载50-100kg，基于融合算法的自主运动控制</td></tr>
+          <tr><td>AI感知</td><td>自研AI视觉算法，支持15+种高频场景识别（门窗/占道经营/高温/积水/异动/杂物/睡岗/噪声/摔倒/消防/车牌/烟雾/火焰/人员识别等），接入DeepSeek大模型增强交互能力</td></tr>
+          <tr><td>全栈/专用</td><td>整机全链条自主设计路线，不依赖外部OEM/ODM；坚持"单品单用"理念，通过成熟通用底盘+模块化零部件+核心算法库灵活组合</td></tr>
+          <tr><td>数据方案</td><td>通过大量机器人实际运行反馈数据深度学习，持续优化运动算法与视觉算法；建设数据大模型实现机器人智能升级迭代</td></tr>
+          <tr><td>研发效率</td><td>模块化设计使新品研发周期从行业平均6-12个月缩短至2-3个月</td></tr>
+          <tr><td>差异化特色</td><td>国内少数从2013年起持续深耕商业楼宇场景的机器人企业；轮式+足式双形态布局（2025年推出G1四足机器狗）；参与起草《人-系统交互工效学》国家标准</td></tr>
+        </table>
+      </div>
+      <p>派宝的技术路线本质上是"模块化硬件平台+自研AI算法+场景闭环"的务实路径。不同于高举高打的"通用人形机器人"路线，派宝以成熟的轮式机器人底盘为基础，结合模块化上装和持续迭代的AI视觉算法，以短周期、低成本的方式覆盖商业楼宇的迎宾、配送、巡逻、清洁、消毒五大高频场景。2025年推出G1四足机器狗和人形机器人研发立项，标志着从轮式向足式的渐进式技术延伸。</p>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>产品系列</th><th>型号</th><th>核心参数</th><th>主要适用场景</th></tr>
+          <tr><td rowspan="3"><strong>迎宾接待</strong>（X/P系列）</td><td>X1展厅机器人</td><td>一键构图、自主避障导航、人脸识别</td><td>展厅导览</td></tr>
+          <tr><td>X2行业机器人</td><td>双屏设计、支持二次开发</td><td>政务大厅、银行、医院</td></tr>
+          <tr><td>X3政务导览机器人</td><td>49×140×48cm，23kg，头部10.1寸+胸前19寸屏，续航10h，导航精度5mm/m，接入DeepSeek大模型，支持多语种、身份证识别</td><td>政务大厅、文旅景区、展馆</td></tr>
+          <tr><td><strong>物流配送</strong>（W系列）</td><td>W2配送机器人</td><td>无轨自主导航、跨楼层乘梯、自主充电、可对接自动货柜</td><td>写字楼酒店公寓跨楼层配送</td></tr>
+          <tr><td rowspan="2"><strong>安保巡逻</strong>（S系列）</td><td>S2室内巡逻机器人</td><td>65×70×67cm，23-24kg，12800mAh电池，续航10h，4K/1080P+热成像，AI人体/人脸/烟雾/火焰/高温/噪音识别，跨楼层，参考价¥108,000</td><td>写字楼/商场/园区/地铁室内安防</td></tr>
+          <tr><td>S5室外巡逻机器人</td><td>2025年推出，室外道路安防巡逻</td><td>园区/厂区室外安防</td></tr>
+          <tr><td><strong>商用清洁</strong>（C系列）</td><td>C2清洁机器人</td><td>室内自主导航、跨楼层、自动规划清洁路线</td><td>写字楼/商场地面清洁</td></tr>
+          <tr><td><strong>消毒消杀</strong>（D系列）</td><td>D2消毒机器人</td><td>超声雾化消毒、跨楼层乘梯、定时消毒</td><td>医院/学校/公共场所消毒</td></tr>
+          <tr><td><strong>足式机器人</strong>（G系列）</td><td>G1四足机器狗</td><td>2025年新推出，楼梯间等垂直空间巡逻</td><td>楼梯间/复杂地形安防</td></tr>
+          <tr><td><strong>人形机器人</strong></td><td>（研发中）</td><td>B+轮资金用途之一</td><td>待定</td></tr>
+        </table>
+      </div>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>场景分类</th><th>具体场景</th><th>对应产品</th><th>典型客户/合作方</th></tr>
+          <tr><td>商业地产</td><td>写字楼大堂迎宾、跨楼层配送、室内巡逻、地面清洁</td><td>X3/W2/S2/C2</td><td>高端写字楼物业管理公司</td></tr>
+          <tr><td>政务服务</td><td>政务大厅导览、业务引导、身份证识别</td><td>X3</td><td>各地政务服务中心</td></tr>
+          <tr><td>文旅景区</td><td>景区导览、多语种讲解、路线引导</td><td>X3/X1</td><td>广东省旅博会参展合作方</td></tr>
+          <tr><td>酒店服务</td><td>酒店迎宾、客房配送、公共区域巡逻</td><td>X3/W2/S2</td><td>智慧酒店客户</td></tr>
+          <tr><td>医疗健康</td><td>医院导诊、药品配送、公共区域消毒</td><td>X2/W2/D2</td><td>医院客户</td></tr>
+          <tr><td>交通枢纽</td><td>地铁站室内安防巡逻</td><td>S2</td><td>地铁运营方</td></tr>
+          <tr><td>工业园区</td><td>室外道路巡逻、厂区安防</td><td>S5/G1</td><td>园区管理方</td></tr>
+          <tr><td>海外商业</td><td>大型商超/仓储巡逻、清洁</td><td>S系列/C系列</td><td>东南亚、中东客户</td></tr>
+        </table>
+      </div>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>指标</th><th>数据</th><th>时间节点</th></tr>
+          <tr><td>海外营收占比</td><td>攀升至总体营收约40%</td><td>截至2025年</td></tr>
+          <tr><td>海外增速</td><td>2023年以来海外销售额每年翻番</td><td>2023-2025</td></tr>
+          <tr><td>国内分支机构</td><td>十余家分公司/办事处</td><td>持续</td></tr>
+          <tr><td>湛江基地</td><td>当年投产、当年上规</td><td>2025年8月投产</td></tr>
+          <tr><td>广交会参展</td><td>连续第7届参展，展馆高级合作伙伴</td><td>截至2026年（第139届）</td></tr>
+          <tr><td>国际展会</td><td>2026香港国际创科展广东展团30家代表企业之一</td><td>2026年3月</td></tr>
+          <tr><td>新加坡合作</td><td>39家新加坡企业代表团到访考察</td><td>2026年3月</td></tr>
+          <tr><td>S2巡逻机器人</td><td>获2023年安博会创新产品奖、2024年安博会优秀创新产品奖</td><td>2023-2024</td></tr>
+          <tr><td>AI大模型接入</td><td>X3导览机器人接入DeepSeek大模型</td><td>2025年</td></tr>
+        </table>
+      </div>
+
+      <h3 id="financial">1.8 财务数据</h3>
+      <p>派宝机器人为非上市私营企业，<strong>未公开披露具体营收、净利润、出货量及员工总数等核心财务数据</strong>。以下为基于公开信息的汇总：</p>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>指标</th><th>数据</th><th>说明</th></tr>
+          <tr><td>累计融资总额</td><td>约1.8亿元人民币（公开披露部分）</td><td>截至2025年8月B+轮</td></tr>
+          <tr><td>海外营收占比</td><td>约40%</td><td>截至2025年</td></tr>
+          <tr><td>海外营收增速</td><td>每年翻番</td><td>2023-2025年</td></tr>
+          <tr><td>年度营收</td><td>未公开</td><td>非上市公司</td></tr>
+          <tr><td>净利润/毛利率</td><td>未公开</td><td>非上市公司</td></tr>
+          <tr><td>员工总数</td><td>未公开</td><td>团队本科以上占比90%+</td></tr>
+          <tr><td>S2参考售价</td><td>¥108,000/台</td><td>公开渠道价格</td></tr>
+        </table>
+      </div>
+      <p>公司联合创始人范耀军在2025年7月公开表示"今年很有信心营收再翻一倍"，表明公司正处于快速增长通道。湛江基地当年投产当年上规的业绩也印证了商业化加速的趋势。</p>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>参与起草《人-系统交互工效学》国家标准</li>
+        <li>获2023年安博会创新产品奖、2024年安博会优秀创新产品奖（S2巡逻机器人）</li>
+        <li>联合创始人覃争鸣获2023年首届高新技术企业科技创新大会"十大科技创新风云人物"</li>
+        <li>覃争鸣兼任广东省机器人协会副会长、暨南大学产业经济研究院行业导师</li>
+        <li>与华南理工大学共建"广东省本科高校智能计算机联合实验室（具身智能方向）"</li>
+        <li>2025年广交会首次设立服务机器人专区，派宝作为广州代表企业受邀参展</li>
+        <li>湛江基地所在的广湛园构建了"5亿元产业投资母基金+1亿元医健基金"的资本赋能体系</li>
+        <li>公司更名历程：广州映博智能科技(2013) → 广东派宝机器人有限公司(2026)</li>
+        <li>品牌"派宝机器人/PadBot"主攻国内市场，海外以PadBot Robotics品牌运营</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="analysis-match">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>覃争鸣和范耀军的华南理工机器人实验室背景，天然决定了派宝在机器人运动控制和自主导航方面的技术基因。但更有趣的是两人ICT产业经历的影响：覃争鸣在IBM主导顺丰、圆通等快递核心系统架构设计，深刻理解"系统集成+场景流程"的商业化逻辑，这解释了派宝为何选择"不追求单一全能机器人，而是以产品矩阵覆盖物业全场景"的策略。范耀军在中兴、北电的海外市场经验则直接支撑了2023年起海外营收每年翻番的出海成绩，其对东南亚和中东市场的熟悉程度是其他机器人创业团队少有的资源。团队整体呈现出"学术机器人基因+ICT系统工程思维+海外销售网络"的三位一体结构，与商业楼宇服务的场景需求高度契合。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-tech-fit">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>派宝的"轮式底盘+模块化上装"技术路线与商业楼宇场景高度适配。商业楼宇的特点是：室内结构化环境、有电梯/闸机等标准基础设施、对机器人形态没有"人形"执念、关注成本效益。轮式机器人在这种环境中导航精度高（5mm/m）、成本可控（S2约10.8万元）、维护简单，是务实的最优解。一个值得注意的技术细节是跨楼层能力——派宝自研了呼梯乘梯和闸机通行模块，这套"与楼宇基础设施交互"的能力是看似简单但壁垒极高的工程积累。2025年推出G1四足机器狗针对的正是轮式机器人在楼梯间的盲区，是场景自然延伸而非技术路线切换。整体来看，派宝的技术路线温和而务实，没有为了"性感"而强行上人形，场景适配度高于行业平均。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-capital">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>派宝的融资节奏较为克制：成立十年仅7轮融资，累计约1.8亿元，与同期成立的机器人公司相比融资规模偏小。这有两面性：一方面说明公司对资本依赖度较低，可能已实现正向现金流或接近盈亏平衡；另一方面也意味着在需要大规模投入的人形机器人等前沿方向的资源有限。2023年知识城创投（黄埔区国资）的B轮融资和2025年湛江产投的B+轮融资，体现了广东省内"广州研发+湛江制造"的区域产业协同逻辑——广州黄埔提供AI产业集群和创新生态，湛江提供面向东盟的制造成本优势和政策支持。这一双城结构是地方国资引导产业布局的典型案例，但也意味着派宝的战略自由度受限于广东省产业规划框架。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-pivot">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>派宝经历了明显的战略聚焦过程。早期（2013-2018）产品线较分散，涵盖消费级陪伴机器人（如售价499元的小型机器人）、教育机器人等C端产品。2018-2020年间逐步收窄至B端商用服务。2023年B轮融资后明确"聚焦商业楼宇"赛道，砍掉边缘产品线，集中资源打磨X/W/S/C/D五大系列。2023年是关键转折点，公司正式成立海外事业部，从纯国内市场转向"国内+海外"双轮驱动。2025年推出G1四足机器狗则是从"纯轮式"向"轮+足"的组合模式升级。整个调整路径的逻辑清晰：从泛机器人→商用服务机器人→商业楼宇专业化→出海+足式延伸，每一步都是对上一阶段的收敛和升华，而非颠覆性转向。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-position">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>派宝的核心取舍是：不追求"通用具身智能"，而是做商业楼宇场景的"专用产品矩阵之王"。这一定位使其避开了与优必选、宇树等企业在人形机器人和通用平台上的正面交锋，而是在垂直场景中积累深度壁垒。其竞争策略可概括为：以轮式底盘为基座（低成本、高可靠），以模块化上装实现多场景覆盖（研发周期2-3个月），以派宝云平台实现多机协作，以海外市场为第二增长曲线。与竞争对手相比，派宝的差异化在于：不做"一个机器人做所有事"，而是"不同机器人各司其职+云端统一调度"，这在商业楼宇这一成本敏感型场景中更具经济性。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-other">
+        <h4>2.6 其他重要观察</h4>
+        <p>其一，派宝可能是中国商用服务机器人赛道中"活得最久"的企业之一——从2013年成立至今超过12年，穿越了2016年机器人泡沫和2020年后的行业洗牌期，这种时间沉淀本身就是壁垒。其二，公司的华南理工大学背景建立了一条从高校实验室到产品落地的稳定人才管道，这种"校-企"绑定的长期效应在机器人领域尤为珍贵。其三，湛江产投的B+轮和湛江智造基地的投产，揭示了广东省正将机器人产业向粤西延伸的战略意图——利用湛江面向东盟的地理优势构建出海跳板。其四，值得注意的是派宝涉足人形机器人研发（B+轮资金用途之一），虽然目前仍处于研发阶段，但如未来大规模投入，可能打破其"专注楼宇轮式"的战略定力，需要观察其在资源有限的情况下如何平衡。其五，公司具体的营收和利润数据不透明，外界难以评估其RaaS/产品销售的经济模型健康度。</p>
+      </div>
+
+      <h2 id="refs">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://www.padbot.cn">派宝机器人官方网站</a></li>
+          <li><a href="https://baike.baidu.com/item/广东派宝机器人有限公司/67172605">百度百科：广东派宝机器人有限公司</a></li>
+          <li><a href="https://www.36kr.com/p/3409391272136066">36氪：布局出海，大力发展AI+巡逻，派宝机器人完成数千万元B+轮融资</a></li>
+          <li><a href="https://iie.jnu.edu.cn/2025/1117/c29103a846230/page.htm">暨南大学产业经济研究院：覃争鸣行业导师页面</a></li>
+          <li><a href="https://news.pedaily.cn/202304/512806.shtml">投资界：华南理工团队创业，派宝机器人完成数千万元B轮融资</a></li>
+          <li><a href="https://www.zhineng518.com/page108?article_id=12134">智能518：派宝机器人湛江子公司盛大开业，具身智能智造基地落成投产</a></li>
+          <li><a href="https://www.donews.com/news/detail/8/5836242.html">DoNews：派宝机器人获数千万元融资，加速海外生产基地与机器人研发</a></li>
+          <li><a href="https://finance.eastmoney.com/a/202508123481786036.html">东方财富：派宝机器人完成数千万元B+轮融资</a></li>
+          <li><a href="https://m.jiemian.com/article/13162092.html">界面新闻：派宝机器人完成数千万元B+轮融资</a></li>
+          <li><a href="https://www.163.com/dy/article/KNVJ0GL405568W0A.html">网易：新加坡中小企业代表团到访派宝机器人</a></li>
+          <li><a href="https://www.padbot.cn/sys-nd/223.html">派宝官网：亮相黄埔区"新春第一会"，抢抓AI战略红利</a></li>
+          <li><a href="https://www.padbot.cn/sys-nd/226.html">派宝官网：助力广东制造业与服务业协同发展大会</a></li>
+          <li><a href="https://www.gdzjdaily.com.cn/p/2951082.html">湛江日报：开年即冲刺，投产再提速——广湛园2026年招商项目落地跑出加速度</a></li>
+          <li><a href="http://www.fenyong.gov.cn/zsyz/zcyzr/yhzc/content/post_2150628.html">奋勇高新区官网：广湛园2026年招商项目</a></li>
+          <li><a href="https://padbotrobot.com/robots/reception-robot-series/padbot-robot-x3/">PadBot国际站：X3导览机器人产品页</a></li>
+          <li><a href="https://padbotrobot.com/robots/padbot-security-robot-series/padbot-robot-s2/">PadBot国际站：S2巡逻机器人产品页</a></li>
+          <li><a href="https://guba.eastmoney.com/news,cjpl,1572616977.html">东方财富股吧：广州机器人企业表现亮眼，海外业务增速猛，今年有望再翻番</a></li>
+          <li><a href="https://www.zidonghua.com.cn/m/news/Finance/75606.html">自动化网：派宝机器人完成数千万元B+轮融资</a></li>
+          <li><a href="https://www.sohu.com/a/670571436_114778">搜狐：华南理工团队创业，派宝机器人瞄准商业楼宇构建物业管理产品闭环</a></li>
+          <li><a href="https://startup.aliyun.com/info/1060135.html">阿里云创新中心：华南理工团队瞄准商业楼宇无人化，派宝机器人完成数千万元B轮融资</a></li>
+          <li><a href="https://www.163.com/dy/article/I3902J31051480G7.html">网易：派宝机器人获数千万元B轮融资，拟开拓海外市场</a></li>
+          <li><a href="https://leaderobot.com/news/6085">机器人大讲堂：派宝机器人完成数千万元B+轮融资</a></li>
+          <li><a href="https://m.padbot.cn/sys-nd/187.html">派宝官网：闪耀2025广东旅博会，开启智慧文旅新征程</a></li>
+          <li><a href="http://www.gdsjqr.com/a/198?categoryId=9">广东省机器人协会：副会长企业风采——映博智能，聚焦商业楼宇无人化</a></li>
+          <li><a href="https://www.padbot.cn/sys-nd/234.html">派宝官网：受邀出席长江商学院公开课</a></li>
+        </ol>
+      </div>
+
+      <div class="page-footer">本页面由具身智能Wiki自动生成 · 数据截至2026年5月 · 来源于公开信息，仅供参考</div>
+    </article>
+  </div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

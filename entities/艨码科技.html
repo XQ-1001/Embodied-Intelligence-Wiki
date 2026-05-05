@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>艨码科技 — 具身智能Wiki</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> › <span>艨码科技</span></div>
+  <div class="wiki-header"><h1>艨码科技</h1><div class="subtitle">艨码科技（苏州）有限公司 · MOUME Tech · 成立于2023年 · 工业级双轮足机器人</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#founders">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#finance">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#ana1">2.1 团队背景与场景匹配度</a></li>
+        <li class="toc-lvl4"><a href="#ana2">2.2 技术路线与场景适配性</a></li>
+        <li class="toc-lvl4"><a href="#ana3">2.3 股东/资本结构对战略的影响</a></li>
+        <li class="toc-lvl4"><a href="#ana4">2.4 试错过程与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#ana5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#ana6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#references">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">艨码科技</div>
+        <div class="ib-section">基本信息</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">艨码科技（苏州）有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">英文名</div><div class="ib-value">MOUME Tech</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2023年10月</div></div>
+        <div class="ib-row"><div class="ib-label">注册资本</div><div class="ib-value">340.14万元</div></div>
+        <div class="ib-row"><div class="ib-label">法定代表人</div><div class="ib-value">蒋毅</div></div>
+        <div class="ib-row"><div class="ib-label">总部</div><div class="ib-value">苏州高新区太湖科学城</div></div>
+        <div class="ib-section">融资</div>
+        <div class="ib-row"><div class="ib-label">种子轮</div><div class="ib-value">南慧创投等（2025.6）</div></div>
+        <div class="ib-row"><div class="ib-label">种子+轮</div><div class="ib-value">拓新界资本（2025.9）</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">赛道</div><div class="ib-value">通用机器人/轮足机器人</div></div>
+        <div class="ib-row"><div class="ib-label">阶段</div><div class="ib-value">种子轮/产品发布</div></div>
+      </aside>
+
+      <p class="article-intro">艨码科技（MOUME Tech）是一家由海归博士创立的具身智能机器人公司，成立于2023年10月，总部位于苏州高新区。公司聚焦通用机器人本体设计与前沿控制技术，核心产品为工业级双轮足机器人「行影」，于2024年进博会全球首发。团队拥有日本早稻田大学和不二越（NACHI）等顶尖机构的机器人研发背景，已完成种子轮和种子+轮两轮融资。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper"><table class="wikitable infotable">
+        <tr><th>项目</th><th>内容</th></tr>
+        <tr><td>公司全称</td><td>艨码科技（苏州）有限公司</td></tr>
+        <tr><td>英文名</td><td>MOUME Tech</td></tr>
+        <tr><td>成立时间</td><td>2023年10月</td></tr>
+        <tr><td>注册资本</td><td>340.14万元人民币</td></tr>
+        <tr><td>法定代表人</td><td>蒋毅</td></tr>
+        <tr><td>注册地址</td><td>苏州高新区青山路1号2幢316室</td></tr>
+        <tr><td>子公司</td><td>广东瓦力科技有限公司（成立于2021年）</td></tr>
+      </table></div>
+      <h4>发展沿革</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>时间</th><th>事件</th></tr>
+        <tr><td>2021年</td><td>子公司广东瓦力科技成立</td></tr>
+        <tr><td>2023年10月</td><td>艨码科技（苏州）有限公司注册成立</td></tr>
+        <tr><td>2024年11月</td><td>「行影」双轮足机器人在第七届进博会全球首发</td></tr>
+        <tr><td>2025年初</td><td>通过瓦力科技与信测标准合资设立"信测标准（苏州）机器人技术有限公司"</td></tr>
+        <tr><td>2025年6月</td><td>完成种子轮融资</td></tr>
+        <tr><td>2025年9月</td><td>完成种子+轮融资，拓新界资本独家投资</td></tr>
+        <tr><td>2026年1月</td><td>总部项目正式签约落户太湖科学城功能片区并投产</td></tr>
+      </table></div>
+
+      <h3 id="founders">1.2 创始人及核心团队</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+        <tr><td>联合创始人兼CEO</td><td>孙猛</td><td>日本熊本大学信息电气电子工程硕士、神经科学博士；熊本大学兼任研究员；日本青年创业联合会理事；12年以上软硬件产品设计及项目管理经验</td></tr>
+        <tr><td>联合创始人兼CTO</td><td>蒋毅</td><td>日本早稻田大学机器人专业毕业；曾任职日本株式会社不二越（NACHI）机器人研发部；主持落地近百个机器人项目；12年以上机器人研发和商业项目管理经验</td></tr>
+      </table></div>
+      <p>核心团队均来自国际知名高校及国内外头部机器人企业，兼具日本先进制造基因和国内产业化落地能力。CEO孙猛的神经科学背景为机器人的运动控制与自主决策提供了独特的跨学科视角。</p>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>时间</th><th>轮次</th><th>投资方</th><th>财务顾问</th><th>金额</th></tr>
+        <tr><td>2025年6月</td><td>种子轮</td><td>南慧创投、苏高新科创天使基金、产业资本</td><td>探针资本</td><td>未披露</td></tr>
+        <tr><td>2025年9月</td><td>种子+轮</td><td>拓新界资本（独家）</td><td>—</td><td>未披露</td></tr>
+      </table></div>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>技术维度</th><th>详情</th></tr>
+        <tr><td>AI技术路线</td><td>融合先进感知、控制与决策算法，全链条正向设计</td></tr>
+        <tr><td>硬件路线</td><td>轮足融合技术——兼具轮式速度与低功耗 + 足式越障能力；依托日本先进硬件结构与工艺</td></tr>
+        <tr><td>数据方案</td><td>未公开披露</td></tr>
+        <tr><td>自研程度</td><td>覆盖结构设计、组装工艺、控制算法、AI感知、自适应决策的全链条正</td></tr>
+        <tr><td>技术特色</td><td>高可靠性设计（核心零部件3-5年无故障）；"下蹲"蓄力跳跃能力</td></tr>
+      </table></div>
+      <p>产品路线：通用移动机器人（当前）→ 通用作业机器人（推进中）→ 通用复合机器人（未来）。</p>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>产品</th><th>类别</th><th>关键特性</th><th>适用场景</th></tr>
+        <tr><td>行影</td><td>工业级双轮足机器人</td><td>轮足融合；耐冲击；低功耗低噪音；8-10h工作强度；3-5年核心件无故障；可跳跃</td><td>户外安全巡检、短途配送、勘测探索</td></tr>
+        <tr><td>轮式双臂作业机器人</td><td>轮式双臂</td><td>融合感知、控制与决策算法；精细化操作能力</td><td>物料配送、工业作业</td></tr>
+      </table></div>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>场景类别</th><th>具体场景</th><th>落地状态</th></tr>
+        <tr><td>安全巡检</td><td>户外/电力/石油/园区非结构化路面巡检</td><td>已验证</td></tr>
+        <tr><td>末端配送</td><td>快递"最后100米"末端配送</td><td>验证中</td></tr>
+        <tr><td>检测+机器人</td><td>与信测标准合资，检测流程无人化</td><td>已合资</td></tr>
+        <tr><td>科研实验室</td><td>科研场景应用验证</td><td>推进中</td></tr>
+        <tr><td>消费级（远期）</td><td>2-3年内推向家庭消费级市场</td><td>规划中</td></tr>
+      </table></div>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <ul>
+        <li>2025年初通过子公司瓦力科技与A股上市公司信测标准合资设立机器人公司，拓展检测机器人赛道</li>
+        <li>2026年1月总部项目签约落户太湖科学城并投产</li>
+        <li>产品已在进博会等国际展会展示，获取行业关注</li>
+        <li>深化海外产业资源对接，加速国际化合作</li>
+        <li>出货量及订单数据尚未披露</li>
+      </ul>
+
+      <h3 id="finance">1.8 财务数据</h3>
+      <p>公司未公开披露财务数据。已完成种子轮和种子+轮融资，金额未披露，用于核心技术攻坚、研发测试体系完善和场景落地验证。</p>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>公司理念："通用、可靠"的机器人发展理念</li>
+        <li>太湖科学城功能片区拥有具身智能产业链企业100余家（含上市6家、专精特新28家、高企75家），产业生态完善</li>
+        <li>团队为业内少有的具备日本先进制造基因+全栈研发+国内外产业化落地能力的初创企业</li>
+        <li>探针资本在种子轮中担任财务顾问（FA）角色</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="ana1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>CEO孙猛有神经科学博士背景，CTO蒋毅有早稻田大学机器人专业和不二越工业机器人研发经验。团队选择轮足机器人切入安全巡检和末端配送场景，与蒋毅在工业机器人可靠性工程方面的专长高度匹配。巡检场景对机器人的环境适应性和长期可靠性要求较高，这正是日本工业机器人基因的优势所在。但末端配送场景的挑战更多在商业模式和运营效率，与技术团队的传统优势领域存在一定错配。</p>
+      </div>
+
+      <div class="analysis-block" id="ana2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>轮足融合技术在巡检和配送场景中匹配度较高——这些场景需要同时兼顾平地移动效率和台阶/坡道等越障需求。但轮足形态在纯工业场景（如工厂内部AGV已成熟的平面搬运）中可能面临替代成本过高的挑战。公司选择从移动平台起步、逐步叠加作业能力的路线（移动→作业→复合），在逻辑上合理，但需要每一步都有足够的客户价值支撑才能跨过商业化门槛。</p>
+      </div>
+
+      <div class="analysis-block" id="ana3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>南慧创投和苏高新科创天使基金的参与意味着苏州高新区政府对公司的政策与资源背书，这是2026年总部项目快速落地的关键推动力。与信测标准的合资是产业资本合作的范例，为检测机器人场景提供了确定的早期客户。拓新界资本的种子+轮独家投资则显示了市场化资本对团队和方向的认可。整体资本结构偏向"政府+产业+市场化"的均衡组合。</p>
+      </div>
+
+      <div class="analysis-block" id="ana4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>公司成立约2年半，尚未观察到明显的路线级试错。但产品路线的渐进式布局（移动→作业→复合）和场景的横向拓展（巡检→配送→检测→消费级）暗示团队在主动管理商业化节奏。与信测标准的合资可视为一次"场景绑定"的尝试——通过合资锁定检测机器人的早期应用场景，降低市场开拓的不确定性。</p>
+      </div>
+
+      <div class="analysis-block" id="ana5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>艨码科技的轮足机器人路线本身就是一种取舍——不做双足人形机器人（技术难度极高但场景尚不明确），也不做纯轮式AGV（竞争红海），而是选择轮足融合的中间路线。这一路线在巡检和特殊地形作业中具有差异化优势，但市场空间可能小于纯轮式或纯双足路线。公司需要在"高可靠性"和"通用性"之间持续寻找平衡点。</p>
+      </div>
+
+      <div class="analysis-block" id="ana6">
+        <h4>2.6 其他重要观察</h4>
+        <p>艨码科技是少有的"日本技术基因+中国产业化落地"组合，这在当前中日科技合作环境下具有特殊价值。团队在日本学术界和产业界的网络可能为其带来独特的海外合作伙伴和技术资源。公司2-3年的消费级市场目标显示了长期野心，但轮足机器人在家庭场景的性价比和接受度仍存在较大不确定性，需要关注其从B端到C端的跨越路径是否务实。</p>
+      </div>
+
+      <div class="references" id="references">
+        <h3>3 参考资料</h3>
+        <ol>
+          <li><a href="http://www.snd.gov.cn/hqqrmzf/zdxm/202601/c9fc419aa29f4cdc80d75762e9661777.shtml" target="_blank">艨码科技总部项目签约落户太湖科学城 — 苏州高新区政府</a></li>
+          <li><a href="https://js.news.163.com/26/0109/16/KIRIDOV504249CU3.html" target="_blank">又一总部落地！艨码科技签约落户 — 网易江苏</a></li>
+          <li><a href="https://www.x-techcon.com/article/49301.html" target="_blank">苏州机器人创企艨码科技完成种子+轮融资 — 科创版日报</a></li>
+          <li><a href="https://www.iyiou.com/news/202506171100894" target="_blank">艨码科技完成种子轮融资 — 亿欧</a></li>
+          <li><a href="https://robot.ofweek.com/2025-09/ART-8321204-8120-30670711.html" target="_blank">海归博士造通用机器人，数月融了两次！ — OFweek机器人网</a></li>
+          <li><a href="https://tech.ifeng.com/c/8mfOGdrzYdl" target="_blank">苏州机器人创企，4个月内连拿两轮融资 — 凤凰科技</a></li>
+          <li><a href="https://vc.pedaily.cn/company/817078.html" target="_blank">艨码科技（苏州）有限公司 — 投资界</a></li>
+          <li><a href="https://www.thecover.cn/news/fjbn7XoyF8OH90qSdq8Jkw==" target="_blank">进博会"生力军"：创新应用 深耕中国 — 封面新闻</a></li>
+          <li><a href="http://www.chinahightech.com/chanye/2024-11/05/content_253299.html" target="_blank">记者探馆：进博会上的新质生产力 — 中国高新网</a></li>
+          <li><a href="https://epaper.cs.com.cn/zgzqb/html/2024-11/07/nw.D110000zgzqb_20241107_5-A01.htm" target="_blank">进博会"生力军" — 中国证券报</a></li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">此页面由具身智能Wiki项目自动生成，数据截至2026年5月。内容仅供参考，不构成投资建议。</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

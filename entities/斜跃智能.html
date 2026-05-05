@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>斜跃智能 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style></head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> › <span>斜跃智能</span></div>
+  <div class="wiki-header"><h1>斜跃智能</h1><div class="subtitle">杭州斜跃智能科技有限公司 · 2026年成立 · "理想系"家庭具身智能创业 · 首款产品预计2027年发布</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#founders">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financials">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#a1">2.1 团队背景与场景选择</a></li>
+        <li class="toc-lvl4"><a href="#a2">2.2 技术路线与场景适配性</a></li>
+        <li class="toc-lvl4"><a href="#a3">2.3 股东结构对战略影响</a></li>
+        <li class="toc-lvl4"><a href="#a4">2.4 试错与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#a5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#a6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#sources">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">斜跃智能</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">杭州斜跃智能科技有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2026年1月</div></div>
+        <div class="ib-row"><div class="ib-label">注册地</div><div class="ib-value">杭州/北京/深圳</div></div>
+        <div class="ib-row"><div class="ib-label">创始人</div><div class="ib-value">陈伟(CTO)、张骁(CEO)</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">团队规模</div><div class="ib-value">约20人（2026年3月）</div></div>
+        <div class="ib-row"><div class="ib-label">融资轮次</div><div class="ib-value">天使轮（2026年4月）</div></div>
+        <div class="ib-row"><div class="ib-label">首款产品</div><div class="ib-value">预计2027年上半年</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">赛道</div><div class="ib-value">家庭C端消费级机器人</div></div>
+        <div class="ib-row"><div class="ib-label">背景</div><div class="ib-value">"理想系"创业</div></div>
+        <div class="ib-section">官网</div>
+        <div class="ib-row"><div class="ib-label">官网</div><div class="ib-value">未公开</div></div>
+      </aside>
+      <p class="article-intro"><strong>斜跃智能</strong>，全称杭州斜跃智能科技有限公司，成立于2026年1月，是一家由前理想汽车两位核心高管联合创办的家庭具身智能机器人公司。创始人陈伟（前理想AI首席科学家）和张骁（前理想第二产品线总裁）分别主导技术与产品方向，形成"软硬一体"互补组合。公司聚焦家庭场景C端消费级机器人这一具身智能"圣杯"赛道，首款产品预计2027年上半年发布。2026年4月完成天使轮融资，投资方为元璟资本和理想汽车。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper"><table class="wikitable infotable">
+        <tr><th>项目</th><th>内容</th></tr>
+        <tr><td>公司全称</td><td>杭州斜跃智能科技有限公司</td></tr>
+        <tr><td>成立时间</td><td>2026年1月29日（部分信源称2月）</td></tr>
+        <tr><td>注册地</td><td>杭州、北京、深圳三地均注册，法定代表人均为张骁</td></tr>
+        <tr><td>注册资本</td><td>各100万元（融资后杭州公司增至约118.6万元）</td></tr>
+        <tr><td>上市情况</td><td>未上市</td></tr>
+        <tr><td>官网</td><td>未公开</td></tr>
+        <tr><td>定位</td><td>家庭场景C端消费级具身智能机器人</td></tr>
+      </table></div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>时间</th><th>事件</th></tr>
+        <tr><td>2026年1月/2月</td><td>公司成立，三地注册（杭州、北京、深圳）</td></tr>
+        <tr><td>2026年3月</td><td>团队已组建近20人，分三地办公（北京AI算法、杭州AI算法、深圳硬件量产）</td></tr>
+        <tr><td>2026年4月7日</td><td>完成工商变更，天使轮融资落地，元璟资本与理想汽车联合投资</td></tr>
+      </table></div>
+
+      <h3 id="founders">1.2 创始人及核心团队</h3>
+      <p>斜跃智能由理想汽车两位核心高管联合创立，两人同为内蒙古人、北邮校友，形成技术与产品的高度互补。团队整体呈现"大厂高管创业"特点，在大模型研发和消费级产品定义方面具备产业级经验。</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+        <tr><td>董事长&CTO（持股43.5%）</td><td>陈伟</td><td>北邮博士；前理想汽车AI首席科学家、基座模型负责人；主导MindGPT大模型、MindVLA车端VLA模型研发；此前任搜狗AI交互事业部首席科学家；在大模型、VLA、多模态交互领域有深厚积累</td></tr>
+        <tr><td>CEO（持股28.5%）</td><td>张骁</td><td>北邮校友；前理想汽车第二产品线总裁；理想ONE/L9核心产品定义者，"冰箱彩电大沙发"策略核心推手；此前在宝马MINI负责产品策划；在消费级产品需求理解和复杂硬件落地方面经验丰富</td></tr>
+      </table></div>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>轮次</th><th>时间</th><th>金额</th><th>投资方</th></tr>
+        <tr><td>天使轮</td><td>2026年4月</td><td>未公开披露</td><td>元璟资本（财务投资）、理想汽车（战略投资，通过旗下重庆车之辕创业投资有限公司）</td></tr>
+      </table></div>
+      <p>据知情人士透露，李想本希望加大投资力度，但斜跃作为初创公司希望保持更多独立性，因此理想投入资金并不多。这是理想汽车近两年来唯一投资的校友创业公司，也是元璟资本一年内孵化的第二个"理想系"创业团队。</p>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <p>斜跃智能的技术核心建立在陈伟在理想汽车期间积累的多项成果之上，涵盖基座模型、VLA、软硬协同设计等多个维度。</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>技术维度</th><th>说明</th></tr>
+        <tr><td>基座模型</td><td>自研多模态大模型，为斜跃的核心竞争壁垒</td></tr>
+        <tr><td>VLA模型</td><td>视觉-语言-动作统一模型（MindVLA约4B参数），实现感知-决策-行动统一的具身智能</td></tr>
+        <tr><td>空间视觉编码器</td><td>3D ViT架构，以视觉为核心，借助激光雷达引导模型理解真实空间结构，端到端3D表征学习</td></tr>
+        <tr><td>软硬协同设计</td><td>发表论文"Hardware Co-Design Scaling Laws via Roofline Modelling for On-Device LLMs"，在马赫100芯片上实践</td></tr>
+        <tr><td>仿真与RL</td><td>构建低成本高效仿真世界模型MindSim，在仿真环境中完成策略快速迭代</td></tr>
+        <tr><td>多模态交互</td><td>搜狗+理想时期积累的语音、NLP、实时双工交互能力</td></tr>
+      </table></div>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>产品</th><th>类型</th><th>关键参数</th><th>时间线</th></tr>
+        <tr><td>首款产品（未命名）</td><td>家庭场景消费级具身智能机器人</td><td>具体形态和参数未公布；定位"可持续学习、可信赖、真正融入家庭生活"的下一代智能终端</td><td>预计2027年上半年发布</td></tr>
+      </table></div>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <p>斜跃智能是目前极少数直接瞄准家庭C端场景的具身智能创业公司。绝大多数同行选择B端工业场景起步（如至简动力做工业操作），而家庭场景因环境复杂、用户期望高、安全要求严苛，被视为具身智能的"圣杯"级挑战。</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>场景分类</th><th>具体目标</th><th>说明</th></tr>
+        <tr><td>家庭服务</td><td>日常家务、家庭陪伴</td><td>核心目标场景，需解决复杂环境中的泛化操作能力</td></tr>
+        <tr><td>情感交互</td><td>家庭长期伙伴</td><td>强调"可持续学习、可信赖"，区别于工具型机器人</td></tr>
+      </table></div>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <p>公司处于极早期阶段（成立不到4个月），尚未有产品发布或商业化收入。首款产品预计2027年上半年发布，目前处于研发和团队组建阶段。</p>
+
+      <h3 id="financials">1.8 财务数据</h3>
+      <p>公司成立不足半年，无公开财务数据。天使轮融资金额未公开披露。</p>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>三地办公布局：北京（AI算法/模型/智能体）、杭州（AI算法）、深圳（硬件与量产）</li>
+        <li>理想汽车2026年将研发体系重组为基座模型、软件本体和硬件本体三大团队，其中硬件本体含汽车与机器人</li>
+        <li>斜跃智能是"理想系"创业浪潮的一部分，同期还有至简动力（半年5轮融资20亿、估值超10亿美元独角兽）、昆仑行（注册10天三轮融资）、维他动力、无界动力等多家公司</li>
+        <li>2025年具身智能融资事件超300起，金额超400亿元；2026年Q1具身智能百亿估值独角兽达14家</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="a1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>斜跃智能选择家庭C端场景是一个大胆且与其团队背景深度匹配的决定。陈伟的理想MindVLA车端模型经验——在复杂、动态、安全关键的物理环境中实现感知-决策-行动闭环——与家庭机器人所需的能力高度同构。张骁的"冰箱彩电大沙发"产品定义经历，本质是将技术转化为消费者可感知的价值，这种"消费电子化"的产品思维正是家庭机器人从实验室走向客厅的关键能力。两人联合创业的组合，在理论上构成了家庭机器人赛道最有说服力的团队拼图之一。</p>
+      </div>
+
+      <div class="analysis-block" id="a2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>家庭场景对机器人提出了比工业场景更高的综合要求：非结构化环境理解、安全交互、长期学习、情感陪伴。陈伟的VLA（视觉-语言-动作）统一模型路线试图用一个模型解决感知到控制的完整闭环，这与家庭场景需要端到端泛化能力的本质要求一致。但4B参数的VLA模型在车端可行（算力充裕），迁移到家庭机器人端侧时可能面临功耗和实时性挑战。软硬协同设计的论文积累表明团队对此已有意识。仿真世界模型MindSim的引入也是适配家庭场景长尾问题的合理选择。</p>
+      </div>
+
+      <div class="analysis-block" id="a3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>理想汽车的参投具有双重意义：一方面，理想可能是未来家庭机器人（特别是智能座舱场景外溢）的潜在合作伙伴或客户；另一方面，理想的汽车供应链资源可能为斜跃的硬件量产提供支持。但团队刻意保持独立性、限制理想投资金额，表明斜跃不希望被单一产业资本绑定，保留了向更广阔家庭场景发展的自由度。元璟资本一年内连续押注两个"理想系"团队（至简动力和斜跃），体现了对理想人才外溢效应的系统性布局。</p>
+      </div>
+
+      <div class="analysis-block" id="a4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>公司成立仅数月，尚未观察到明显的试错或调整。但从行业规律来看，直接挑战家庭C端场景意味着更高的试错成本——产品发布前的大量时间将消耗在技术验证和场景定义上。首款产品预计2027年上半年发布，约18个月的研发周期在机器人行业属于偏紧的时间表，产品形态可能在过程中经历显著迭代。</p>
+      </div>
+
+      <div class="analysis-block" id="a5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>斜跃智能最核心的取舍是"直接做C端家庭"而非"先B端后C端"的主流路径。这一选择意味着：更高的技术门槛、更长的商业化周期、更大的不确定性，但一旦突破将获得最大的市场空间。与同是"理想系"的至简动力（选择工业B端，半年估值超10亿美元）相比，斜跃选择了一条更难但天花板更高的路。这一定位也意味着斜跃在短期融资估值上可能不如B端同行亮眼，需要更耐心的资本支持。</p>
+      </div>
+
+      <div class="analysis-block" id="a6">
+        <h4>2.6 其他重要观察、分析</h4>
+        <p>斜跃智能的成立时间是2026年初，正处在具身智能融资狂潮的高点。2026年Q1已有14家具身智能独角兽（百亿估值以上），赛道拥挤度空前。创始团队虽然履历耀眼，但公司成立仅3个多月、团队仅20人、尚无产品原型，距离2027年的产品发布目标仍有大量不确定性。理想汽车自身的机器人战略（将L9定义为"具身智能开山之作"）与斜跃的家庭机器人定位是否存在竞合关系，也是值得关注的变量。</p>
+      </div>
+
+      <h2 id="sources">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://www.36kr.com/p/3757946054394375" target="_blank">理想破例投资具身创业公司，L9功臣创办 — 36氪</a></li>
+          <li><a href="https://www.jiemian.com/article/14220562.html" target="_blank">又一家"理想系"具身智能公司创办，理想汽车参投 — 界面新闻</a></li>
+          <li><a href="http://www.iheima.com/article-396026.html" target="_blank">理想汽车再投具身智能，前AI首席科学家创业获"老东家"力挺 — i黑马</a></li>
+          <li><a href="https://finance.eastmoney.com/a/202604083697965692.html" target="_blank">前理想高管创业具身智能，李想参投 — 东方财富</a></li>
+          <li><a href="https://news.qq.com/rain/a/20260407A078DW00" target="_blank">前理想高管联合创业做机器人，理想汽车、元璟资本投资 — 腾讯新闻</a></li>
+          <li><a href="https://www.chinaventure.com.cn/news/108-20260408-390852.html" target="_blank">斜跃智能获元璟资本与理想汽车联合投资 — 投中网</a></li>
+          <li><a href="https://www.donews.com/news/detail/1/6502236.html" target="_blank">前理想高管联合创办具身智能公司 — DoNews</a></li>
+          <li><a href="https://www.21jingji.com/article/20260407/herald/ee6e4d04ab1f678e224859c2427bdce1.html" target="_blank">21独家｜前理想高管联合创业做机器人 — 21世纪经济报道</a></li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">本页面由具身智能Wiki维护，最后更新于2026年5月。内容基于公开资料整理，仅供参考。</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

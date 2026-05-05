@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>万勋科技 — 具身智能Wiki</title><style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style></head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> <span class="breadcrumb-sep">›</span> <span>万勋科技</span></div>
+  <div class="wiki-header"><h1>万勋科技</h1><div class="subtitle">Wisson Robotics · 非上市 · 2019年成立 · 通用软体机器人全球领航者</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#founder">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financial">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#analysis-match">2.1 团队背景与场景匹配度</a></li>
+        <li class="toc-lvl4"><a href="#analysis-tech-fit">2.2 技术路线与场景适配性</a></li>
+        <li class="toc-lvl4"><a href="#analysis-capital">2.3 股东资本结构对战略的影响</a></li>
+        <li class="toc-lvl4"><a href="#analysis-pivot">2.4 试错过程与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#analysis-position">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#analysis-other">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#refs">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">万勋科技</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">万勋科技（深圳）有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">英文名</div><div class="ib-value">Wisson Robotics</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2019年9月17日</div></div>
+        <div class="ib-row"><div class="ib-label">总部</div><div class="ib-value">深圳福田新一代产业园</div></div>
+        <div class="ib-row"><div class="ib-label">创始人</div><div class="ib-value">王峥博士</div></div>
+        <div class="ib-row"><div class="ib-label">注册资本</div><div class="ib-value">457.99万元</div></div>
+        <div class="ib-section">财务数据</div>
+        <div class="ib-row"><div class="ib-label">累计融资</div><div class="ib-value">超2亿元（公开）</div></div>
+        <div class="ib-row"><div class="ib-label">营收</div><div class="ib-value">未公开</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">覆盖国家</div><div class="ib-value">100+个</div></div>
+        <div class="ib-row"><div class="ib-label">安全作业</div><div class="ib-value">13,000+架次</div></div>
+        <div class="ib-row"><div class="ib-label">授权专利</div><div class="ib-value">300+项</div></div>
+        <div class="ib-row"><div class="ib-label">服务500强</div><div class="ib-value">40+家</div></div>
+        <div class="ib-row"><div class="ib-label">R&D占比</div><div class="ib-value">>65%</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">技术路线</div><div class="ib-value">柔韧机器人（软体）</div></div>
+        <div class="ib-row"><div class="ib-label">核心场景</div><div class="ib-value">高空作业、自动充电</div></div>
+        <div class="ib-row"><div class="ib-label">企业资质</div><div class="ib-value">专精特新、高新企业</div></div>
+        <div class="ib-section">官网</div>
+        <div class="ib-row"><div class="ib-label">官网</div><div class="ib-value"><a href="https://www.wissonrobotics.com">wissonrobotics.com</a></div></div>
+      </aside>
+
+      <p class="article-intro">万勋科技（Wisson Robotics）成立于2019年，是全球通用软体机器人赛道领跑者。公司以自主研发的Pliabot<sup>&reg;</sup>柔韧技术为核心，首创"柔韧肌肉+神经元智能"双螺旋驱动架构，用气压驱动的仿生肌肉替代传统刚性电机-关节结构，实现负重比高达2000:1的轻量、安全、低成本的机器人系统。公司产品远销全球100多个国家和地区，2025年空中清洗机器人全球销量行业第一，同时布局自动充电、排爆、带电作业等20+行业场景，服务华润、万科、农夫山泉、道达尔能源等40+家头部企业。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper">
+        <table class="wikitable infotable">
+          <tr><th>项目</th><th>内容</th></tr>
+          <tr><td>公司全称</td><td>万勋科技（深圳）有限公司</td></tr>
+          <tr><td>英文名称</td><td>Wisson Robotics (Shenzhen) Co., Ltd.</td></tr>
+          <tr><td>成立时间</td><td>2019年9月17日</td></tr>
+          <tr><td>注册地</td><td>深圳市福田区梅林街道深圳新一代产业园</td></tr>
+          <tr><td>上市状态</td><td>非上市</td></tr>
+          <tr><td>官网</td><td><a href="https://www.wissonrobotics.com">www.wissonrobotics.com</a></td></tr>
+          <tr><td>创始人/法人</td><td>王峥</td></tr>
+          <tr><td>注册资本</td><td>457.9888万元</td></tr>
+          <tr><td>企业类型</td><td>有限责任公司（外商投资、非独资）</td></tr>
+          <tr><td>企业资质</td><td>国家高新技术企业、专精特新中小企业、科技型中小企业、深圳"种子独角兽"</td></tr>
+          <tr><td>技术定位</td><td>通用软体机器人技术全球领航者</td></tr>
+        </table>
+      </div>
+      <h4>发展沿革</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>时间</th><th>事件</th></tr>
+          <tr><td>2019年9月</td><td>公司成立于深圳</td></tr>
+          <tr><td>2020年5月</td><td>完成天使轮融资，英诺天使投资</td></tr>
+          <tr><td>2021年3月</td><td>完成Pre-A轮融资</td></tr>
+          <tr><td>2022年6月</td><td>完成Pre-A+轮近千万美元融资，顺为资本、蓝驰创投入场</td></tr>
+          <tr><td>2023年</td><td>获中国专利优秀奖（国家知识产权局+WIPO联合评选）；完成A轮融资</td></tr>
+          <tr><td>2024年12月</td><td>连续完成A轮/A+轮/A2轮系列融资，合计近2亿元；产品销往全球100+国家和地区</td></tr>
+          <tr><td>2025年1月</td><td>首次亮相CES 2025（拉斯维加斯），通用软体机器人全球首展</td></tr>
+          <tr><td>2025年5月</td><td>发布汎汐<sup>&reg;</sup>机器人服务品牌，推出RaaS模式；入选"2025中国未来独角兽TOP100"</td></tr>
+          <tr><td>2025年9月</td><td>完成B轮融资</td></tr>
+          <tr><td>2025年11月</td><td>高交会期间与招商局集团、雅高酒店集团等签署战略合作协议</td></tr>
+          <tr><td>2026年1月</td><td>完成B+轮融资，聚源海河基金、中芯聚源等入场</td></tr>
+          <tr><td>2026年3月</td><td>CCE清洁展上与近20家生态伙伴签署战略合作；汎汐<sup>&reg;</sup>生态覆盖全国近30省</td></tr>
+          <tr><td>2026年4月</td><td>正式启动香港地区空中清洗机器人服务；空中清洗机器人单一国家市场出货突破百台</td></tr>
+        </table>
+      </div>
+
+      <h3 id="founder">1.2 创始人及核心团队</h3>
+      <p>万勋科技创始人兼CEO王峥博士是仿生软体机器人领域国际知名学者。清华大学自动化系毕业，海外求学与工作多年，深圳市"孔雀计划"引进人才，任职南方科技大学机器人研究院教授。累计发表学术论文百余篇，申请专利数十项，多次获得国际国内学术奖项。直接持有公司约20.02%股权。公司核心团队中海外归国人才占比约30%，硕士及以上学历占比50%，研发人员占比超过65%（其中硕博比例超四成）。核心成员来自哈佛大学、慕尼黑工业大学、清华大学、哈尔滨工业大学、南方科技大学等顶尖高校，构建了从材料、结构到算法的全栈技术研发体系。</p>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+          <tr><td>创始人/CEO/首席科学顾问</td><td>王峥</td><td>清华自动化系毕业，海外多年研究经历；南方科技大学机器人研究院教授；仿生软体机器人领域国际知名学者，深圳孔雀计划人才；发表论文百余篇</td></tr>
+          <tr><td>董事</td><td>陈刚</td><td>公司核心管理层，参与公司战略与运营决策</td></tr>
+          <tr><td>董事</td><td>王忠杰</td><td>公司核心管理层</td></tr>
+          <tr><td>董事（投资方代表）</td><td>曹巍</td><td>蓝驰创投合伙人</td></tr>
+          <tr><td>董事（投资方代表）</td><td>汤涛</td><td>昊辰资本创始合伙人</td></tr>
+          <tr><td>监事</td><td>高玉琴</td><td>公司监事</td></tr>
+        </table>
+      </div>
+      <p>团队整体呈现学术背景深厚、国际化程度高的特点。联合创始人中包括广东省珠江青年人才、深圳孔雀计划海外高层次人才，形成以学术派为根基、结合产业落地能力的混合型团队结构。</p>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <h4>融资历史</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>时间</th><th>轮次</th><th>金额</th><th>主要投资方</th></tr>
+          <tr><td>2020年5月</td><td>天使轮</td><td>未披露</td><td>英诺天使投资</td></tr>
+          <tr><td>2021年3月</td><td>Pre-A轮</td><td>未披露</td><td>万物资本、祥峰天使投资、Zoo Capital</td></tr>
+          <tr><td>2022年6月</td><td>Pre-A+轮</td><td>近千万美元</td><td>顺为资本（领投）、蓝驰创投（领投）、万物资本（跟投）</td></tr>
+          <tr><td>2023年7月</td><td>A轮</td><td>未单独披露</td><td>昊辰资本（领投）、蓝驰创投、顺为资本全额追投</td></tr>
+          <tr><td>2024年4月</td><td>A+轮</td><td>（含A系列近2亿）</td><td>北京机器人产业发展投资基金（领投）、蓝驰创投全额追投</td></tr>
+          <tr><td>2024年12月</td><td>A2轮</td><td>（含A系列近2亿）</td><td>元钛基金（领投）、德虎资本（跟投）</td></tr>
+          <tr><td><strong>2024年合计</strong></td><td><strong>A轮系列</strong></td><td><strong>近2亿元人民币</strong></td><td>财务顾问：庚辛资本、万世资本</td></tr>
+          <tr><td>2025年9月</td><td>B轮</td><td>未披露</td><td>未公开披露</td></tr>
+          <tr><td>2026年1月</td><td>B+轮</td><td>未披露</td><td>聚源海河基金、中芯聚源、湖南钧犀高创二期基金等</td></tr>
+        </table>
+      </div>
+      <h4>股东结构</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>股东类型</th><th>代表机构</th><th>性质</th></tr>
+          <tr><td>创始团队</td><td>王峥（约20.02%）及联合创始人</td><td>创始人持股平台</td></tr>
+          <tr><td>早期VC</td><td>蓝驰创投（蓝驰）、顺为资本</td><td>双币财务投资机构，多次追投</td></tr>
+          <tr><td>中期VC</td><td>昊辰资本、元钛基金、德虎资本</td><td>人民币基金</td></tr>
+          <tr><td>产业/国资</td><td>北京机器人产业发展投资基金</td><td>北京国资背景产业基金</td></tr>
+          <tr><td>战略/产业</td><td>中芯聚源、聚源海河基金</td><td>半导体/硬科技产业资本</td></tr>
+          <tr><td>其他机构</td><td>万物资本、英诺天使、祥峰天使等</td><td>早期天使/VC</td></tr>
+        </table>
+      </div>
+      <p>公司累计已完成8轮融资，投资方阵容以顶级双币VC（蓝驰、顺为）为长期基石，叠加北京国资产业基金和半导体领域产业资本（中芯聚源），形成"VC领投+产业/国资加持"的复合股东结构。公司目前非上市，暂无IPO公开计划披露。</p>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>技术维度</th><th>详细说明</th></tr>
+          <tr><td>总体AI架构</td><td>"柔韧肌肉+神经元智能"双螺旋驱动：底层仿生肌肉实现物理柔韧，上层神经元智能贯通小脑-大脑AI与云端智能</td></tr>
+          <tr><td>驱动技术</td><td>SlimCell柔韧智能肌肉单元（高分子聚合物复合材料）+ SlimDrive高精度微气流驱控，纯气压驱动，无电机、无精密传感器</td></tr>
+          <tr><td>控制算法</td><td>SlimEngine柔韧核心控制算法：冗余柔性构型与刚柔混合构型的平稳高精度控制</td></tr>
+          <tr><td>感知方案</td><td>AwareFlex柔韧感知交互：本体自感知能力，无需复杂力传感器和外部视觉系统即可实现精准空间定位与力控</td></tr>
+          <tr><td>环境适应</td><td>ArmorFlex环境适应调节：密封加压腔体+耐久材料，防水防尘抗腐蚀，耐极端天气与电磁辐射</td></tr>
+          <tr><td>全栈/专用</td><td>全栈自研路线：覆盖底层材料、仿生肌肉结构、微气流驱控、核心控制算法到上层具身智能的多层技术栈</td></tr>
+          <tr><td>数据方案</td><td>低数据需求策略：通过本体自感知和物理智能实现高成功率作业，对大规模训练数据依赖低</td></tr>
+          <tr><td>硬件成本</td><td>高分子软性材料+3D打印生产，无需金属精密加工和昂贵传感器，供应链短、成本低</td></tr>
+          <tr><td>差异化特色</td><td>全球首创气压驱动仿生肌肉路线，负重比达2000:1（20克肌肉输出20公斤力），原生碰撞安全，区别于传统刚性电机机器人</td></tr>
+        </table>
+      </div>
+      <p>万勋科技走的是全球差异化的"柔韧机器人"技术路线，以气压驱动的仿生肌肉——而非传统电机-减速器结构——作为核心执行单元，解决了刚性机器人在适应性、安全和成本三个维度的核心瓶颈。该路线源自王峥博士在南方科技大学多年仿生软体机器人研究的学术积累，实现了从实验室到产业化的跨越。公司已累计申请数百项知识产权，300余项获授权，并领衔制定10余项国家级行业团体标准。</p>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>产品系列</th><th>子类/型号</th><th>核心参数</th><th>主要适用场景</th></tr>
+          <tr><td rowspan="4"><strong>猎户座Orion</strong> 空中柔韧机器人</td><td>AP3-P3 柔韧系留清洗系统</td><td>零距离高压清洗，适配大疆M350/M400系列</td><td>高空幕墙清洗</td></tr>
+          <tr><td>AP30-N1 空中柔韧作业平台</td><td>接触式精准检测与操作</td><td>风机防雷检测、航标灯更换</td></tr>
+          <tr><td>AP30-P4H 柔韧高压喷涂系统</td><td>高压喷涂作业</td><td>光伏板清洗、建筑喷涂</td></tr>
+          <tr><td>N1系列 安全应急作业平台</td><td>应急响应模块</td><td>应急救援</td></tr>
+          <tr><td rowspan="2"><strong>麒麟座Qilin</strong> 自动充电机器人</td><td>CF1 柔韧全自动充电机器人</td><td>仿生柔韧肌肉+视触觉AI，单次成功率>99.9%，适配100+品牌车型</td><td>新能源车自动充电、智慧场站</td></tr>
+          <tr><td>快充体验站方案</td><td>与首程控股联合打造</td><td>商业综合体停车场</td></tr>
+          <tr><td><strong>特种系列</strong></td><td>KT200双臂排爆机器人</td><td>国内首款量产双臂排爆机器人</td><td>反恐安防、排爆拆解</td></tr>
+          <tr><td><strong>特种系列</strong></td><td>KRV高压带电作业机器人</td><td>国内首家通过1000kV特高压带电作业测试</td><td>特高压输电线路带电检修</td></tr>
+          <tr><td><strong>基础系列</strong></td><td>K系列/S系列柔韧臂与夹爪</td><td>轻量化/超轻量化设计，可搭载于各类移动平台</td><td>机器狗、人形机器人、无人机等搭载</td></tr>
+          <tr><td><strong>汎汐<sup>&reg;</sup>服务品牌</strong></td><td>RaaS空中清洗服务生态</td><td>全国近30省覆盖，认证飞手200+人，储备面积近3000万m²</td><td>高空幕墙清洗与风机运维服务外包</td></tr>
+        </table>
+      </div>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>场景分类</th><th>具体场景</th><th>对应产品</th><th>合作方/客户</th></tr>
+          <tr><td>工业运维</td><td>风机叶片清洗/检测/喷涂、光伏板清洗、特高压带电检修</td><td>猎户座AP30系列、KRV</td><td>国电电力、国家能源</td></tr>
+          <tr><td>商业地产</td><td>写字楼/酒店/厂房/园区幕墙清洗</td><td>猎户座AP3-P3、汎汐<sup>&reg;</sup></td><td>华润、万科、招商蛇口、合生创展、雅高酒店集团</td></tr>
+          <tr><td>市政公共</td><td>轨交基建运维、航标灯更换</td><td>猎户座AP30-N1</td><td>天津轨交、成都轨交、航道管理部门</td></tr>
+          <tr><td>交通出行</td><td>新能源车自动充电</td><td>麒麟座CF1</td><td>首程控股、中国充电联盟</td></tr>
+          <tr><td>商业服务</td><td>加油站智能化升级</td><td>麒麟座/Qilin系列</td><td>道达尔能源（中国）</td></tr>
+          <tr><td>安全应急</td><td>反恐排爆、应急救援</td><td>KT200、N1系列</td><td>公安/应急部门</td></tr>
+          <tr><td>食品饮料</td><td>厂房/生产基地幕墙清洗</td><td>猎户座系列</td><td>农夫山泉</td></tr>
+          <tr><td>航空</td><td>飞机外表清洗作业</td><td>猎户座AP3-P3</td><td>飞机维修基地</td></tr>
+          <tr><td>智慧城市</td><td>城市副中心智能运维</td><td>汎汐<sup>&reg;</sup>生态</td><td>北京城市副中心投资建设集团</td></tr>
+          <tr><td>通信</td><td>通信基础设施清洗运维</td><td>猎户座系列</td><td>中国联通深圳分公司</td></tr>
+        </table>
+      </div>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>指标</th><th>数据</th><th>时间节点</th></tr>
+          <tr><td>全球市场覆盖</td><td>远销100+国家和地区</td><td>截至2025年</td></tr>
+          <tr><td>全球销量排名</td><td>空中清洗机器人品类全球第一</td><td>2025年（第三方机构认证）</td></tr>
+          <tr><td>欧洲/中东复购</td><td>高端市场头部客户持续复购</td><td>2025-2026</td></tr>
+          <tr><td>单一国家出货</td><td>单一国家市场出货突破百台</td><td>2026年</td></tr>
+          <tr><td>安全作业量</td><td>累计13,000+架次</td><td>截至2026年</td></tr>
+          <tr><td>服务面积储备</td><td>汎汐<sup>&reg;</sup>框架储备面积近3000万平方米</td><td>2026年3月</td></tr>
+          <tr><td>头部客户</td><td>40+家500强及行业头部企业</td><td>截至2026年</td></tr>
+          <tr><td>TOP20物业覆盖率</td><td>超过85%</td><td>2026年3月</td></tr>
+          <tr><td>认证飞手</td><td>200+人</td><td>2026年3月</td></tr>
+          <tr><td>充电成功率</td><td>单次>99.9%</td><td>稳定运行</td></tr>
+          <tr><td>幕墙清洗效率</td><td>传统人工作业4-6倍，成本降低30%-50%</td><td>持续验证</td></tr>
+          <tr><td>香港市场</td><td>2026年正式启动香港摩天大楼空中清洗服务</td><td>2026年4月</td></tr>
+        </table>
+      </div>
+
+      <h3 id="financial">1.8 财务数据</h3>
+      <p>万勋科技为未上市私营企业，<strong>尚未公开披露具体营收、利润及员工总数等核心财务数据</strong>。以下为基于公开信息的汇总：</p>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>指标</th><th>数据</th><th>说明</th></tr>
+          <tr><td>累计融资总额</td><td>超2亿元人民币（公开披露部分）</td><td>截至2026年1月B+轮</td></tr>
+          <tr><td>账面资金储备</td><td>未公开</td><td>B+轮融资后预计充裕</td></tr>
+          <tr><td>年度营收</td><td>未公开</td><td>非上市公司</td></tr>
+          <tr><td>净利润/毛利率</td><td>未公开</td><td>非上市公司</td></tr>
+          <tr><td>员工总数</td><td>未公开（研发占比>65%）</td><td>非上市公司</td></tr>
+          <tr><td>注册资本</td><td>457.99万元</td><td>工商登记</td></tr>
+        </table>
+      </div>
+      <p>作为参考，公司在2025年入选"中国未来独角兽TOP100"榜单，2026年初完成B+轮融资引入中芯聚源等战略投资方，资本市场对其商业化前景认可度较高。空中清洗机器人全球销量第一的第三方认证和RaaS订阅模式的推进，为营收增长提供了可预期的基本盘。</p>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>领衔制定10余项国家级行业团体标准，包括《无人机清洗与喷涂技术操作规程》等</li>
+        <li>获中国专利优秀奖（国家知识产权局+WIPO联合评选，专利领域最高荣誉）</li>
+        <li>获世界机器人大会"十大投创之星"、世界无人机大会"中国低空经济产业10强"等荣誉</li>
+        <li>2025年CES全球首展，引起国际媒体广泛关注</li>
+        <li>作为大疆官方生态合作伙伴，推动DJI M400固件新增高空清洗"高级作业模式"</li>
+        <li>携手中国充电联盟发布《中国新能源汽车自动充电服务用户行为洞察报告》</li>
+        <li>与道达尔能源（中国）签署战略合作，共同推进加油站智能化升级</li>
+        <li>汎汐<sup>&reg;</sup>品牌以"客户无需购买设备、直接购买服务"的RaaS模式运营，降低客户使用门槛</li>
+        <li>2025年11月于北京中关村通州园设立万勋科技（北京）有限公司</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="analysis-match">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>王峥博士的学术研究核心方向是仿生软体机器人——即以柔性材料和气压驱动模拟生物肌肉运动。这与万勋科技选择"高空精准作业"和"自动充电"两大场景高度匹配。高空幕墙清洗需要机械臂在风扰、不规则表面等非结构化环境下柔韧接触，传统刚性机械臂极易损坏幕墙或自身；自动充电需要机械臂安全、柔性地与车辆充电口对接，原生碰撞安全是核心刚需。王峥博士从南科大实验室将Pliabot技术带入产业化，学术积累的直接转化路径清晰。团队中30%海归、65%研发人员占比的结构，支撑了从材料科学到控制算法再到商业落地的全栈能力。但需注意的是，团队以学术和技术人才为主，在规模化销售和全球化渠道建设方面可能需要补强。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-tech-fit">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>Pliabot柔韧技术与其选定的高空作业和自动充电两大场景存在天然的"技术-场景"正反馈。在高空幕墙清洗场景中，气压驱动的柔韧臂相较于刚性臂有三重优势：轻量化（适配无人机载荷限制）、碰撞安全（不损伤玻璃幕墙）、环境抗性（密封腔体防水防尘）。在自动充电场景中，柔韧关节的被动形变能力使其无需高精度视觉定位即可成功对接充电口——单次成功率>99.9%的数据印证了路线选择的正确性。技术路线的潜在风险在于：气压驱动在极端高精度（如微米级装配）场景的精度上限可能低于电机驱动方案；高分子材料的长期疲劳寿命数据尚未充分积累。但总体来看，万勋的技术-场景匹配度在行业中处于领先水平，其"低数据需求+低算力需求+低硬件成本"的特征尤其适合规模化推广。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-capital">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>万勋科技的股东结构呈现"双币VC长期陪跑+国资产业基金加持+产业链资本布局"的三层梯度特征。蓝驰创投和顺为资本从Pre-A+轮起多轮追投，体现了对软体机器人赛道的长期信心，这类纯财务投资方通常支持公司保持较高的战略独立性。北京机器人产业发展投资基金的进入（2024年A+轮）为万勋打开了北京市场和北方市政场景资源，这在汎汐品牌的城市副中心等项目中已有体现。2026年初中芯聚源和聚源海河基金的入局，则可能指向公司在芯片/半导体清洁或精密制造场景的潜在拓展。整体来看，股东结构兼具战略灵活性和场景资源绑定能力，未出现单一产业资本过度主导的情况，公司保持了较好的独立决策空间。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-pivot">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>从公开信息看，万勋科技的核心技术路线（气压驱动柔韧机器人）自成立以来保持高度连续性，未出现重大技术路线转向。但在商业模式和场景优先级上有明显迭代：早期以卖设备为主（猎户座系列硬件销售），2025年5月推出汎汐<sup>&reg;</sup>品牌后明确升级为"RaaS服务订阅+设备销售"双轮驱动。这一转变的逻辑合理：高空幕墙清洗的终端客户（物业公司）更在意清洗效果和成本，而非设备所有权，RaaS模式降低了客户采购门槛同时为公司创造了经常性收入。另一个路径调整是自动充电场景的独立品牌化——从早期作为柔韧技术的"示范场景"之一，到2026年与首程控股、中国充电联盟建立深度合作，标志着自动充电正被培育为第二增长曲线。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-position">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>万勋科技的核心取舍是：不走主流的"刚性电机+精密传感器"人形/复合机器人路线，而是以柔韧肌肉为差异化技术锚点，集中火力打穿"高空精准作业"这一专用场景。这类似于iPod策略——在资源有限的情况下，用一个极致差异化的产品定义一个品类。公司明确走"硬件+平台+服务"的全栈模式而非做产业链一环（如仅供应柔韧夹爪），但全栈范围控制在柔韧技术相关的垂直领域内，不盲目扩展到与其技术底座无关的机器人品类。值得关注的是，万勋在2025-2026年开始将柔韧臂作为"基础模块"搭载于其他移动平台（机器狗、人形机器人等），这一开放策略可能使其从"专用设备商"向"柔韧平台商"演进，在行业格局中的定位弹性变大。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-other">
+        <h4>2.6 其他重要观察</h4>
+        <p>其一，万勋科技是目前具身智能领域中极少数以"软体/柔韧"为唯一技术路线的企业，全球软体机器人赛道的竞争者（如Soft Robotics Inc.）多聚焦于食品抓取等轻量场景，万勋在高空作业和自动充电这两个"重落地"场景的验证为其建立了先发壁垒。其二，"低空经济"政策的持续升温——无人机+柔韧臂的"空中作业"概念天然契合政策风口——为万勋提供了政策红利窗口。其三，全球化速度值得关注：从2023年的少量海外试水到2025年覆盖100+国家和全球销量第一，仅用约两年，这种速度在硬件领域罕见，需要关注其海外售后和本地化服务体系的跟进能力。其四，公司尚未公开营收数据，对于评估其RaaS模式的经济模型（客户生命周期价值vs获客成本）构成信息缺口。</p>
+      </div>
+
+      <h2 id="refs">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://www.wissonrobotics.com">万勋科技官方网站</a></li>
+          <li><a href="https://baike.baidu.com/item/万勋科技（深圳）有限公司/54015339">百度百科：万勋科技（深圳）有限公司</a></li>
+          <li><a href="https://news.pedaily.cn/202412/544382.shtml">投资界：「万勋科技」连获近2亿元A轮系列融资</a></li>
+          <li><a href="https://www.21jingji.com/article/20241220/herald/09000bc5e99057c0dde166cca96b2db9_zaker.html">21世纪经济报道：技术突破遇上资本热潮，软体机器人会成为下个风口吗？</a></li>
+          <li><a href="https://m.thepaper.cn/newsDetail_forward_32163254">澎湃新闻：从高空作业到自动充电，深企解锁"柔韧机器人"的无限可能</a></li>
+          <li><a href="https://lieyunpro.com/archives/495590">猎云网：连融三轮！又一机器人厂商获近2亿元融资</a></li>
+          <li><a href="https://www.163.com/dy/article/JJI1ATP605198R3E.html">网易：「万勋科技」连获近2亿元A轮系列融资</a></li>
+          <li><a href="https://m.cnfin.com/gs-lb//zixun/20260401/4394146_1.html">中国金融新闻网：万勋科技空中清洗机器人已销往100多个国家和地区</a></li>
+          <li><a href="https://m.dutenews.com/n/article/10238187">读特新闻：全球空中精准作业龙头！万勋科技Pliabot柔韧具身智能机器人亮相高交会</a></li>
+          <li><a href="https://m.dutenews.com/n/article/10245960">读特新闻：打造旗舰级空中清洗服务，深企万勋科技携头部企业共建生态体系</a></li>
+          <li><a href="https://tech.chinadaily.com.cn/a/202602/03/WS69818c32a310942cc499e013.html">中国日报：万勋科技空中清洗机器人领跑全球，中国智造再创辉煌</a></li>
+          <li><a href="http://ex.chinadaily.com.cn/exchange/partners/82/rss/channel/cn/columns/snl9a7/stories/WS69cca60ea310942cc49a5f28.html">中国日报：闪耀CCE清洁展，万勋科技以全球旗舰级空中清洗机器人与头部新生态赋能行业变革</a></li>
+          <li><a href="https://www.wissonrobotics.com/h-nd-96.html">万勋科技官网：通用软体机器人首登CES</a></li>
+          <li><a href="https://chejiahao.autohome.com.cn/info/24224475">汽车之家：柔韧黑科技破解自动充电痛点，万勋科技亮相深圳充换电展</a></li>
+          <li><a href="https://m.pedaily.cn/vc/people/49070.html">投资界：王峥人物页面</a></li>
+          <li><a href="https://www.newseed.cn/ht/1370110-9839">新芽NewSeed：万勋科技完成千万美元PreA+系列融资</a></li>
+          <li><a href="https://www.llinkslaw.com/index.php?a=show&catid=50&id=4016">通力律所：通力持续助力万勋科技完成2亿元A轮系列融资</a></li>
+          <li><a href="https://api3.cls.cn/share/article/1894695">财联社：万勋科技完成近2亿元A2轮融资</a></li>
+          <li><a href="https://www.zidonghua.com.cn/m/news/exhibition/67344.html">自动化网：CES归来记——绽放全球科技舞台的万勋通用软体机器人技术</a></li>
+          <li><a href="https://kw.beijing.gov.cn/xwdt/kcyx/xwdtyqqy/202411/t20241127_3951219.html">北京市科委：万勋科技（北京）有限公司落地中关村通州园</a></li>
+          <li><a href="https://www.dutenews.com/n/article/8860064">读特新闻：具身智能柔韧机器人"蜘蛛人"，高空幕墙清洗、风机运维更便捷</a></li>
+          <li><a href="http://www.szrobotics.cn/nd.jsp?id=1482&groupId=5">深圳市机器人协会：热烈欢迎万勋科技加入协会</a></li>
+          <li><a href="http://companynews.cps.com.cn/article/202303/941635.html">勋报：柔韧机器人技术（Pliabot）喜获国家专利优秀奖</a></li>
+          <li><a href="https://www.chinastarmarket.cn/detail/2331046">科创板日报："拥挤"的清洁机器人赛道，无人化与出海进程加速</a></li>
+          <li><a href="https://www.wissonrobotics.com/h-col-173.html">万勋科技官网：核心技术页面</a></li>
+        </ol>
+      </div>
+
+      <div class="page-footer">本页面由具身智能Wiki自动生成 · 数据截至2026年5月 · 来源于公开信息，仅供参考</div>
+    </article>
+  </div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

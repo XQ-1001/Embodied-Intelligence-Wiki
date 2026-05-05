@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>格蓝若机器人 — 具身智能Wiki</title><style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style></head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> › <span>格蓝若机器人</span></div>
+  <div class="wiki-header"><h1>格蓝若机器人</h1><div class="subtitle">武汉格蓝若 · 2025年独立运营 · 重载人形机器人 · A+轮 · 湖北省人形机器人链主企业</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#team">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#finance">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#analysis1">2.1 团队背景与场景选择的匹配度</a></li>
+        <li class="toc-lvl4"><a href="#analysis2">2.2 技术路线与场景的适配性</a></li>
+        <li class="toc-lvl4"><a href="#analysis3">2.3 股东/资本结构对战略的影响</a></li>
+        <li class="toc-lvl4"><a href="#analysis4">2.4 试错过程与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#analysis5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#analysis6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#references">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">格蓝若机器人</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">武汉格蓝若智能机器人有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">母公司</div><div class="ib-value">武汉格蓝若智能技术股份有限公司（2018年成立，国家专精特新小巨人）</div></div>
+        <div class="ib-row"><div class="ib-label">独立运营</div><div class="ib-value">2025年2月21日（存续分立）</div></div>
+        <div class="ib-row"><div class="ib-label">董事长</div><div class="ib-value">窦峭奇</div></div>
+        <div class="ib-row"><div class="ib-label">首席科学家</div><div class="ib-value">陈学东（中国工程院院士）</div></div>
+        <div class="ib-row"><div class="ib-label">总经理</div><div class="ib-value">郭继舜（斯坦福大学博士）</div></div>
+        <div class="ib-row"><div class="ib-label">总部</div><div class="ib-value">武汉光谷</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">母/子公司员工</div><div class="ib-value">母公司400+人（研发45%），机器人公司团队扩张中</div></div>
+        <div class="ib-row"><div class="ib-label">知识产权</div><div class="ib-value">200+项（集团）</div></div>
+        <div class="ib-row"><div class="ib-label">供应链本地化</div><div class="ib-value">核心零部件90%湖北本地</div></div>
+        <div class="ib-section">融资</div>
+        <div class="ib-row"><div class="ib-label">累计融资</div><div class="ib-value">超3.3亿元人民币（含信贷5000万）</div></div>
+        <div class="ib-row"><div class="ib-label">最近轮次</div><div class="ib-value">格蓝若精密战略融资2亿元（2026年3月）</div></div>
+        <div class="ib-row"><div class="ib-label">核心投资方</div><div class="ib-value">深创投、浙江金控、长江资本、精锻科技、光谷产投、武创华工激光基金</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">领域</div><div class="ib-value"><span class="tag tag-info">人形机器人</span><span class="tag tag-info">重载工业</span></div></div>
+        <div class="ib-row"><div class="ib-label">定位</div><div class="ib-value"><span class="tag">湖北省人形机器人链主</span><span class="tag">院士团队孵化</span></div></div>
+      </aside>
+      <p class="article-intro"><strong>格蓝若机器人（武汉格蓝若智能机器人有限公司）</strong>是湖北省人形机器人整机"链主"企业，由格蓝若集团与中国工程院陈学东院士团队（华中科技大学）联合孵化，2025年2月从母公司武汉格蓝若精密技术有限公司存续分立后独立运营。公司聚焦重载人形机器人赛道，核心产品"劳动者"系列（乳名"大壮"）是全球首款实现直膝行走的重载人形机器人，身高1.8米、可负重40-50公斤、关节扭矩380N·m。公司累计融资超3.3亿元，2024年11月习近平总书记调研湖北期间对"劳动者1号"予以充分肯定，是兼具技术领先性和政策背书的国内人形机器人代表性企业之一。</p>
+      <h2 id="facts">1 事实层</h2>
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper">
+        <table class="wikitable infotable">
+          <tr><th>项目</th><th>内容</th></tr>
+          <tr><td>公司全称</td><td>武汉格蓝若智能机器人有限公司</td></tr>
+          <tr><td>母公司</td><td>武汉格蓝若智能技术股份有限公司（2018年3月成立，国家级专精特新"小巨人"）</td></tr>
+          <tr><td>独立运营日</td><td>2025年2月21日（存续分立，承继原机器人业务）</td></tr>
+          <tr><td>注册地</td><td>武汉光谷</td></tr>
+          <tr><td>上市情况</td><td>非上市</td></tr>
+          <tr><td>资方关联上市</td><td>精锻科技（300258.SZ，A轮投资方，持股10%）</td></tr>
+          <tr><td>资质</td><td>母公司为国家级高新技术企业、国家级重点"小巨人"企业</td></tr>
+          <tr><td>官方网址</td><td><a href="http://www.glroad.com" target="_blank">www.glroad.com</a></td></tr>
+        </table>
+      </div>
+      <h4>发展沿革</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>时间</th><th>事件</th></tr>
+          <tr><td>2018年3月</td><td>武汉格蓝若智能技术股份有限公司成立（母公司）</td></tr>
+          <tr><td>2024年7月</td><td>母公司出资8000万元完成陈学东院士团队技术成果转化（超精密主动减振技术+智能人形机器人技术）</td></tr>
+          <tr><td>2024年11月</td><td>习近平总书记调研湖北，接见董事长窦峭奇及陈学东院士，"劳动者1号"获充分肯定</td></tr>
+          <tr><td>2025年2月</td><td>格蓝若机器人正式存续分立，独立运营；湖北"新春第一会"上"劳动者"三兄弟及"楚才"系列10款机器人集中亮相</td></tr>
+          <tr><td>2025年6月</td><td>完成A轮5000万元（精锻科技，持股10%）</td></tr>
+          <tr><td>2025年底</td><td>"大壮"投向量产，在变电站试点应用；订单突破千万元</td></tr>
+          <tr><td>2025年12月</td><td>完成A+轮数千万元（长江资本领投，光谷产投跟投）</td></tr>
+          <tr><td>2026年2月</td><td>第二代"M2"机器人发布，新增"嗅觉"能力，VLA大模型升级</td></tr>
+          <tr><td>2026年3月</td><td>格蓝若精密完成2亿元战略融资（深创投+浙江金控领投）</td></tr>
+          <tr><td>2026年4月</td><td>"大壮"在变电站、工厂、管廊等复杂场景正式"上岗"；全国首家人形机器人7S店在武汉光谷开业</td></tr>
+        </table>
+      </div>
+
+      <h3 id="team">1.2 创始人及核心团队</h3>
+      <p>格蓝若机器人的核心团队呈现"企业家+院士+海归博士"的黄金三角结构。董事长窦峭奇负责战略与资源整合，陈学东院士团队提供底层技术，郭继舜博士主导工程化落地与商业化。</p>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+          <tr><td>董事长/创始人</td><td>窦峭奇</td><td>格蓝若智能技术股份公司董事长，2024年11月习近平总书记调研湖北时作为企业代表亲自接见并汇报</td></tr>
+          <tr><td>首席科学家</td><td>陈学东</td><td>中国工程院院士，华中科技大学教授，20余年机器人技术积淀，获2项国家技术发明奖二等奖、1项国家科技进步奖二等奖。团队在超精密主动减振和智能人形机器人领域有深厚积累</td></tr>
+          <tr><td>总经理</td><td>郭继舜</td><td>斯坦福大学博士，湖北省领军人才，"支点建设青年先锋"，负责机器人公司的整体运营和产品商业化</td></tr>
+          <tr><td>核心技术骨干</td><td>罗欣</td><td>华中科技大学机械科学与工程学院教授，负责运动控制算法</td></tr>
+          <tr><td>副总经理（精密公司）</td><td>熊少华</td><td>格蓝若精密技术有限公司副总经理</td></tr>
+        </table>
+      </div>
+      <p>团队人才结构为"院士学术派+企业家产业派"混合型，母公司约400余人、研发人员占比45%。陈学东院士团队的加入使公司在运动控制和精密减振两个核心技术维度上具有国内顶级的学术信用，而郭继舜的斯坦福背景则为公司引入了国际视野和AI/具身智能领域的前沿方法论。</p>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <h4>融资历史</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>时间</th><th>轮次/类型</th><th>金额</th><th>主要投资方</th><th>用途</th></tr>
+          <tr><td>2024年7月</td><td>技术成果转化</td><td>8000万元</td><td>格蓝若智能（自有资金）</td><td>购买陈学东院士团队超精密主动减振、智能人形机器人知识产权</td></tr>
+          <tr><td>2025年6月</td><td>A轮</td><td>5000万元</td><td>江苏太平洋精锻科技（300258.SZ），持股10%</td><td>机器人业务研发</td></tr>
+          <tr><td>2025年12月</td><td>A+轮</td><td>数千万元</td><td>长江资本（湖北省人形机器人母基金管理人）领投，光谷产投跟投</td><td>本体研发迭代、产业化落地、生产基地建设</td></tr>
+          <tr><td>2026年3月</td><td>战略融资（精密公司）</td><td>2亿元</td><td>深创投、浙江金控联合领投；厦门俱成秋实、长江资本、武创华工激光基金、七晟合盈跟投</td><td>超精密主动减振、高端运动控制系统研发迭代及产能提升</td></tr>
+          <tr><td>2026年</td><td>信用贷款</td><td>5000万元</td><td>农业银行湖北分行（以专利等"技术软实力"获无抵押贷款）</td><td>关键零部件采购</td></tr>
+        </table>
+      </div>
+      <p>累计获取资金超3.3亿元（含贷款）。精锻科技作为A股上市公司入股并持股10%，为格蓝若机器人提供了产业背书和精密制造供应链协同的可能。长江资本的进入标志着湖北省对人形机器人产业的战略性押注。</p>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>技术维度</th><th>方案</th><th>说明</th></tr>
+          <tr><td>关节驱动</td><td>380N·m高扭矩一体化关节</td><td>"驱传控感"一体化集成，低速大扭矩、抗冲击稳定输出，业界领先水平</td></tr>
+          <tr><td>步态控制</td><td>三阶动态补偿算法</td><td>将步态误差从15cm精确控制至2mm，实现业界唯一的50kg级重载+直膝稳定行走</td></tr>
+          <tr><td>热管理</td><td>全链路热平衡管理</td><td>产-储-传-散全环节覆盖，解决重载机器人持续作业散热瓶颈</td></tr>
+          <tr><td>感知系统</td><td>多模态感知（视觉+听觉+嗅觉）</td><td>鱼眼摄像头+双目相机+阵列麦克风+电子鼻，可识别几十种气味</td></tr>
+          <tr><td>AI架构</td><td>VLA（视觉-语言-动作）大模型</td><td>多模态实时认知，轻量化端侧推理部署</td></tr>
+          <tr><td>底层技术</td><td>超精密主动减振</td><td>50余款高性能主动减振器，性能比肩国际标杆，应用于半导体/精密医疗/航天航空</td></tr>
+          <tr><td>供应链</td><td>90%湖北本地化</td><td>电子皮肤、电池、双目相机等核心零部件均来自湖北本地供应链</td></tr>
+        </table>
+      </div>
+      <p>格蓝若的技术路线有一个鲜明的差异化特征：以"重载+直膝"作为核心技术标签。全球大多数人形机器人公司（如Tesla Optimus、Figure、1X）追求轻量化通用操作，格蓝若反其道而行之——瞄准40-50公斤的工业级负重，这在关节扭矩、结构强度、散热和步态控制上都提出了远超轻量型机器人的技术挑战。陈学东院士团队在超精密运动控制方面的20年技术积累（含2项国家技术发明奖），是其能够突破重载直膝行走这一技术门槛的底层支撑。</p>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>产品</th><th>身高/体重</th><th>核心特征</th><th>目标场景</th></tr>
+          <tr><td>"大壮"（劳动者1号）</td><td>1.8m / 95-100kg</td><td>全球首款重载直膝人形机器人，负载40-50kg，380N·m关节扭矩</td><td>变电站巡检、工厂搬运、管廊巡检</td></tr>
+          <tr><td>重载机器人</td><td>1.9m</td><td>专门重物搬运型号</td><td>工业重载搬运</td></tr>
+          <tr><td>中型机器人（M2）</td><td>1.75m / 65kg</td><td>多模态感知（视觉+听觉+嗅觉），VLA大模型驱动，续航4小时</td><td>导航讲解、服务接待、轻载操作</td></tr>
+          <tr><td>小型机器人</td><td>1.3m</td><td>轻量灵活</td><td>科研教育</td></tr>
+          <tr><td>四足机器人</td><td>—</td><td>燃气巡检专用配置</td><td>燃气管道巡检</td></tr>
+          <tr><td>轮式类人形机器人</td><td>—</td><td>类人形+轮式底盘</td><td>多场景灵活适配</td></tr>
+        </table>
+      </div>
+      <p>"劳动者"家族已形成从1.9m重载到1.3m小型、从双足人形到四足/轮式的全尺寸产品矩阵。"大壮"作为旗舰产品，其独特卖点是"干脏活、累活、危险活"——与市面上大多数以服务/交互为导向的人形机器人形成了明确的场景区隔。</p>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>场景分类</th><th>子场景</th><th>进展状态</th><th>合作方</th></tr>
+          <tr><td>电力巡检</td><td>变电站24小时不间断巡检、带电检测、隐患排查</td><td>已签约框架协议，正式"上岗"</td><td>湖北省电力公司</td></tr>
+          <tr><td>工业搬运</td><td>重型零部件精准搬运</td><td>达成合作意向</td><td>"猛士"汽车</td></tr>
+          <tr><td>管廊巡检</td><td>地下管廊复杂环境巡检</td><td>已部署应用</td><td>—</td></tr>
+          <tr><td>燃气巡检</td><td>燃气管道四足机器人巡检</td><td>合作中</td><td>燃气公司</td></tr>
+          <tr><td>公共服务</td><td>火车站人流疏导</td><td>已落地</td><td>汉口火车站</td></tr>
+          <tr><td>环保检测</td><td>环境监测</td><td>合作中</td><td>武汉市环保局</td></tr>
+          <tr><td>文旅导览</td><td>景区/场馆导览讲解</td><td>合作中</td><td>湖北文旅集团</td></tr>
+          <tr><td>科研教育</td><td>高校科研实验</td><td>已落地</td><td>华中科技大学、武汉工程大学</td></tr>
+        </table>
+      </div>
+      <p>场景覆盖呈现"以电力/工业为锚点，向公共服务和文旅横向扩展"的格局。变电站巡检是最核心的落地场景——电力行业高危属性强、巡检频次高、人工成本大，且具备较为标准化的作业流程，是人形机器人商业化的理想"第一站"。</p>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>维度</th><th>数据/说明</th></tr>
+          <tr><td>2025年底订单</td><td>突破千万元</td></tr>
+          <tr><td>2026年订单预期</td><td>约5000万元</td></tr>
+          <tr><td>2027年目标</td><td>1.5亿元</td></tr>
+          <tr><td>销售渠道</td><td>全国首家人形机器人7S店（2026年武汉光谷开业），"大壮"现场展示抓取物料</td></tr>
+          <tr><td>产能规划</td><td>推进"机器人生产机器人"产线建设；计划在江西、云南设立子公司</td></tr>
+          <tr><td>客户获取</td><td>政府/国企客户为主（电力、环保、文旅、火车站），体现ToG导向</td></tr>
+        </table>
+      </div>
+
+      <h3 id="finance">1.8 财务数据</h3>
+      <p>格蓝若机器人为非上市初创企业，财务数据未公开披露。以下为可获取信息：</p>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>指标</th><th>说明</th></tr>
+          <tr><td>营收</td><td>2025年底订单破千万元；2026年预期5000万元；2027年目标1.5亿元</td></tr>
+          <tr><td>净利润/毛利率</td><td>未公开披露</td></tr>
+          <tr><td>账面资金</td><td>2024-2026年累计获取超3.3亿元（含贷款），资金储备较为充裕</td></tr>
+          <tr><td>员工规模</td><td>母公司400+人（研发45%），机器人公司团队扩张中</td></tr>
+          <tr><td>精锻科技持股估值参考</td><td>以5000万元获10%股权（2025年6月），对应投后估值约5亿元</td></tr>
+        </table>
+      </div>
+      <div class="callout"><div class="callout-title">估值参考</div>精锻科技以5000万元参与A轮获10%股权，推算格蓝若机器人A轮投后估值约5亿元人民币。此后A+轮和战略融资均未披露估值变化。</div>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li><strong>政策背书：</strong>2024年11月习近平总书记考察湖北时接见团队并对"劳动者1号"予以充分肯定；湖北省人形机器人整机"链主"企业；湖北省人形机器人产业投资基金重点支持对象</li>
+        <li><strong>技术成果转化模式：</strong>以8000万元从院士团队购买知识产权的方式完成技术转化，是高校成果转化的典型案例，值得关注其知识产权归属和后续收益分配安排</li>
+        <li><strong>列装展示：</strong>"楚才"系列10款人形机器人于2025年和2026年连续两年亮相湖北省"新春第一会"，具有鲜明的省级科技名片属性</li>
+        <li><strong>产业链带动：</strong>核心零部件90%来自湖北本地供应链（电子皮肤、电池、双目相机等），对湖北机器人产业链有较强的拉动效应</li>
+        <li><strong>银行信贷创新：</strong>以专利等"技术软实力"获得农业银行5000万元无抵押信用贷款，体现了科技金融对硬科技企业的支持模式创新</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="analysis1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>陈学东院士团队的核心技术积累集中在超精密运动控制和主动减振领域——这两个技术方向天然指向"大负载、高精度、强鲁棒"的工业级应用场景，而非轻量级的消费或服务场景。因此格蓝若选择"重载人形机器人"这个赛道，与其团队的技术禀赋高度匹配。但值得思考的是：院士团队的优势在于解决底层运动控制等"硬核"问题，但在AI大模型、多模态感知、端侧推理等"软核"领域并非其传统强项。郭继舜（斯坦福博士）的加入恰好弥补了这一短板——他的到任标志着格蓝若从"以机电控制为核心"向"机电+AI双轮驱动"的转型意图。团队结构的"院士+海归"组合是当前国内人形机器人创业公司中较为稀缺的人才配置。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>格蓝若的"重载+直膝"技术路线在业内具有独特性。"直膝行走"看起来是一个步态问题，实际上是整套运动控制架构的选择——大多数机器人采用"屈膝行走"是因为这降低了控制复杂度（类比人类半蹲走路的稳定性优于直立），但屈膝带来的是能耗激增和有效负载下降。格蓝若选择攻克直膝技术，本质上是为"重载"服务的：只有膝盖伸直，腿部骨骼（结构件）才能有效传导负载至地面。这个技术选择与公司选择的电力巡检+工业搬运场景高度适配——变电站场景中机器人可能需要搬运几十公斤的检修工具，屈膝机器人难以胜任。但直膝技术对复杂地形的适应性可能弱于屈膝方案，这在管廊等不规则地面场景中可能成为挑战。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>格蓝若的股东结构具有鲜明的"省域战略资本"特征：长江资本（湖北省人形机器人母基金管理人）、光谷产投（武汉地方国资）、武创华工激光基金（武汉产业资本），叠加深创投和浙江金控的跨省国资参与，形成了一套以国有资本为主导的投资组合。精锻科技（300258.SZ）作为唯一的产业资本方（持股10%），带来了制造业供应链的协同可能。这种资本结构的优势在于政策支持和政府订单的获取能力（电力、环保、文旅等国企客户），但也意味着公司战略可能受到较强的行政引导——例如"90%湖北本地供应链"是否是最优的纯商业决策，还是政策导向的结果？另外，国资主导的股东结构可能在后续融资中影响外资和纯市场化资本的进入意愿。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>格蓝若从母公司格蓝若智能技术股份有限公司分立（2025年2月）是值得关注的组织调整。母公司原是一家精密测量和智能电网设备企业（国家级小巨人），机器人业务在2024年7月以8000万元购买院士团队知识产权后才正式启动。不到一年即分拆独立运营，说明机器人业务的体量和战略重要性迅速超越了母公司原有框架。从产品路径来看，格蓝若在"大壮"发布后不到一年即形成了从1.9m重载到四足的完整产品矩阵，这种快速扩展的速度在硬件驱动的机器人行业较为罕见——可能意味着公司在同步推进技术验证和产品线扩张，尚未完成从"技术驱动"到"市场驱动"的转型。目前的场景覆盖（电力、管廊、燃气、火车站、文旅、环保）较为分散，未来可能需要聚焦1-2个"高ROI场景"做深做透。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>格蓝若的竞争定位可概括为"重载工业人形机器人的先行者"——对标国际来看，与Figure/Boston Dynamics/1X等公司的"通用操作"路线形成差异化。核心取舍在于：放弃了轻量级通用市场（服务、交互、家庭）的巨大想象空间，选择了重载工业这个更"窄"但壁垒更高的赛道。这个取舍的逻辑在于：轻量级人形机器人的商业化路径尚不明朗（谁愿意花数十万买一个搬不动重物的家用机器人？），而重载工业场景的付费意愿已经明确——电力公司愿意为替代高危巡检岗位付费，工厂愿意为替代重体力劳动付费。但风险在于：重载人形机器人的市场规模天花板（中国变电站总量约数万个级别）可能暂时不足以支撑大规模的商业化回报。格蓝若能否在重载定位之上，找到一个"千亿级场景"来证明其市场想象空间，是关键观察点。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis6">
+        <h4>2.6 其他重要观察</h4>
+        <p>几点补充观察：（1）格蓝若的"院士技术成果转化"模式值得关注——8000万元购买知识产权的方式，与常见的"院士兼职首席科学家+技术入股"模式不同。这种买断式安排的好处是知识产权清晰，便于后续融资和资本运作，但潜在的挑战是院士团队的持续参与度和技术迭代动力。（2）精锻科技以5000万换10%的A轮估值（5亿）在2025年的人形机器人赛道中属于中等偏下水平，彼时优必选（港股上市）市值约200亿港币、宇树估值据报道过百亿，格蓝若的估值折价可能反映了资本市场对"重载工业"这个细分赛道规模的保守估计。（3）全国首家人形机器人7S店是一个有趣的渠道实验——但人形机器人距离"进店即买"的消费级产品还有相当大的距离，7S店更可能是品牌展示+政企客户接待的旗舰窗口。（4）"总书记点赞"带来的政治信用是一把双刃剑：一方面为获取政府订单和产业政策支持提供了无与伦比的背书；另一方面也可能导致外界将公司归类为"政策驱动型"而非"市场驱动型"企业，影响其在纯市场竞争中的形象。</p>
+      </div>
+
+      <h2 id="references">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://www.lejucaijing.com/news-7406594869894509888.html" target="_blank">乐居财经 — 格蓝若机器人完成数千万元A+轮融资，加速产业化应用落地</a></li>
+          <li><a href="http://3g.cjn.cn/Detail/?id=5281427&typeid=0" target="_blank">长江日报 — 格蓝若精密获2亿元战略融资</a></li>
+          <li><a href="https://www.cnr.cn/hubei/yw/20260331/t20260331_527568199.shtml" target="_blank">央广网 — 武汉半导体核心部件企业获两亿元融资</a></li>
+          <li><a href="https://t.10jqka.com.cn/pid_566051730.shtml" target="_blank">同花顺 — 格蓝若机器人完成数千万元A+轮融资，长江资本领投</a></li>
+          <li><a href="https://hb.cri.cn/2024-12-11/d4dcbb73-7551-d53c-a216-7f8f21d56222.html" target="_blank">国际在线 — 汉产机器人年底集中亮相</a></li>
+          <li><a href="https://www.sohu.com/a/1005807303_121372103" target="_blank">搜狐 — 武汉团队打造出全球首个重载直膝人形机器人"大壮"</a></li>
+          <li><a href="http://www.hubei.gov.cn/hbfb/rdgz/202604/t20260406_5908078.shtml" target="_blank">湖北省政府网 — "大壮"站得直走得稳还能扛百斤物品</a></li>
+          <li><a href="https://ctdsb.net/c1747_202602/2669362.html" target="_blank">楚天都市报 — "大壮"长出"鼻子"，能识别几十种气味</a></li>
+          <li><a href="https://baike.baidu.com/item/楚才系列人形机器人/65373500" target="_blank">百度百科 — 楚才系列人形机器人</a></li>
+          <li><a href="http://stock.10jqka.com.cn/20260317/c675355424.shtml" target="_blank">同花顺 — 金融活水精准滴灌，人形机器人"大壮"实现40公斤重物搬运</a></li>
+          <li><a href="http://news.cnhubei.com/content/2025-11/04/content_19628602.html" target="_blank">湖北日报网 — "大壮"到车站学校上班，机器人公司订单破千万元</a></li>
+          <li><a href="https://www.stcn.com/article/detail/1855943.html" target="_blank">证券时报 — 精锻科技拟5000万元参与格蓝若智能机器人A轮融资</a></li>
+          <li><a href="https://www.cnstock.com/commonDetail/449050" target="_blank">中国证券报 — 精锻科技拟以5000万元参与A轮融资</a></li>
+          <li><a href="https://ctdsbepaper.hubeidaily.net/pc/content/202604/03/content_344553.html" target="_blank">楚天都市报 — 郭继舜：脏活累活让机器人来干</a></li>
+          <li><a href="https://news.hubeidaily.net/pc/c_5340880.html" target="_blank">湖北日报 — 格蓝若构建完整"劳动者"机器人家族</a></li>
+          <li><a href="https://m.lieyunpro.com/archives/499746" target="_blank">猎云网 — 长江资本领投，格蓝若机器人完成数千万元A+轮融资</a></li>
+          <li><a href="https://m.pedaily.cn/news/561554" target="_blank">投资界 — 格蓝若精密完成2亿元战略融资</a></li>
+          <li><a href="http://www.bowangcaijing.cn/news/1386167.html" target="_blank">博望财经 — 格蓝若机器人完成数千万元A+轮融资</a></li>
+          <li><a href="https://www.glroad.com/CompanyNews/info.aspx?itemid=281" target="_blank">格蓝若官网 — 创新成果获习总书记现场点赞</a></li>
+          <li><a href="https://news.hubeidaily.net/mobile/c_4089156.html" target="_blank">湖北日报 — 人形机器人"大壮"又有新进展</a></li>
+          <li><a href="http://zwxww.net/show-42-225709-1.html" target="_blank">中文新闻网 — 10个湖北"人"，惊艳亮相</a></li>
+          <li><a href="https://www.zidonghua.com.cn/news/tech/66093.html" target="_blank">中国自动化网 — 多院士领衔攻关，汉产机器人年底集中亮相</a></li>
+        </ol>
+      </div>
+      <div class="page-footer">
+        本页面最后更新于2026年5月4日 · 内容基于公开信息整理 · 不构成投资建议
+      </div>
+    </article>
+  </div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

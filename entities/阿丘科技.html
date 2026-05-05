@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>阿丘科技 — 具身智能Wiki</title><style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style></head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> › <span>阿丘科技</span></div>
+  <div class="wiki-header"><h1>阿丘科技</h1><div class="subtitle">Aqrose · 2017年成立 · 工业AI视觉平台 · B+轮 · 非上市</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#team">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#finance">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#analysis1">2.1 团队背景与场景选择的匹配度</a></li>
+        <li class="toc-lvl4"><a href="#analysis2">2.2 技术路线与场景的适配性</a></li>
+        <li class="toc-lvl4"><a href="#analysis3">2.3 股东/资本结构对战略的影响</a></li>
+        <li class="toc-lvl4"><a href="#analysis4">2.4 试错过程与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#analysis5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#analysis6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#references">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">阿丘科技</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">北京阿丘科技有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">英文名</div><div class="ib-value">Aqrose（阿丘机器人科技）</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2017年1月</div></div>
+        <div class="ib-row"><div class="ib-label">创始人/CEO</div><div class="ib-value">黄耀</div></div>
+        <div class="ib-row"><div class="ib-label">总部</div><div class="ib-value">北京（苏州、深圳、台湾、柏林、新加坡、东京、首尔设分部）</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">服务工厂</div><div class="ib-value">1200+家</div></div>
+        <div class="ib-row"><div class="ib-label">部署系统</div><div class="ib-value">20000+套</div></div>
+        <div class="ib-row"><div class="ib-label">覆盖行业</div><div class="ib-value">50+细分行业</div></div>
+        <div class="ib-row"><div class="ib-label">知识产权</div><div class="ib-value">200+项</div></div>
+        <div class="ib-section">融资</div>
+        <div class="ib-row"><div class="ib-label">累计融资</div><div class="ib-value">约2.85亿元人民币（6轮）</div></div>
+        <div class="ib-row"><div class="ib-label">最近轮次</div><div class="ib-value">B+轮（2021年4月）</div></div>
+        <div class="ib-row"><div class="ib-label">核心投资方</div><div class="ib-value">襄禾资本、DCM中国、君联资本、百度风投、嘉御资本、英诺天使</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">领域</div><div class="ib-value"><span class="tag tag-info">工业AI视觉</span><span class="tag tag-info">智能制造</span></div></div>
+        <div class="ib-row"><div class="ib-label">资质</div><div class="ib-value"><span class="tag">专精特新小巨人</span><span class="tag">国家高新技术企业</span></div></div>
+        <div class="ib-row"><div class="ib-label">官网</div><div class="ib-value"><a href="https://www.aqrose.com" target="_blank">aqrose.com</a></div></div>
+      </aside>
+      <p class="article-intro"><strong>阿丘科技（Aqrose）</strong>是一家专注于工业AI视觉平台的科技公司，由清华大学人工智能实验室核心成员于2017年创立。公司致力于将计算机视觉与深度学习技术应用于智能制造领域的质检与分拣环节，核心产品AIDI工业AI视觉算法平台已在国内部署量位居行业第一。截至2026年初，阿丘科技累计服务超过1200家工厂，部署AI系统逾20000套，覆盖消费电子、动力电池、半导体、光伏、汽车等50余个细分行业。公司先后获得英伟达"荣耀企业"认证，并与西门子、华工激光等工业巨头建立深度战略合作，是全球工业AI视觉领域的重要参与者。</p>
+      <h2 id="facts">1 事实层</h2>
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper">
+        <table class="wikitable infotable">
+          <tr><th>项目</th><th>内容</th></tr>
+          <tr><td>公司全称</td><td>北京阿丘科技有限公司（主体）；阿丘机器人科技（苏州）有限公司（运营实体）</td></tr>
+          <tr><td>英文名称</td><td>Aqrose</td></tr>
+          <tr><td>成立时间</td><td>2017年1月</td></tr>
+          <tr><td>注册地</td><td>北京海淀</td></tr>
+          <tr><td>上市情况</td><td>非上市（未公开IPO计划）</td></tr>
+          <tr><td>官方网址</td><td><a href="https://www.aqrose.com" target="_blank">www.aqrose.com</a></td></tr>
+          <tr><td>资质</td><td>国家级专精特新"小巨人"企业、国家高新技术企业</td></tr>
+        </table>
+      </div>
+      <h4>发展沿革</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>时间</th><th>事件</th></tr>
+          <tr><td>2017年1月</td><td>公司成立于北京，创始团队来自清华大学计算机系人工智能实验室</td></tr>
+          <tr><td>2017年5月</td><td>完成天使轮融资（英诺天使基金、臻云创投），金额数千万元</td></tr>
+          <tr><td>2018年1月</td><td>完成800万美元A轮（DCM中国、百度风投领投），正式推出AIDI平台</td></tr>
+          <tr><td>2019年2月</td><td>完成约1000万美元A+轮（君联资本领投），聚焦3C行业</td></tr>
+          <tr><td>2020年11月</td><td>完成2000万美元B轮（襄禾资本领投），成为工业AI视觉标杆</td></tr>
+          <tr><td>2021年4月</td><td>完成B+轮（嘉御资本、襄禾资本），扩展行业覆盖</td></tr>
+          <tr><td>2023年</td><td>入选"2023胡润全球猎豹企业榜"；IDC中国AI工业质检市场份额TOP3</td></tr>
+          <tr><td>2024年</td><td>发布AIDI 3.3（算法画布）及AIDG 2.2（缺陷生成），获英伟达"Inception Showcase年度优秀创业公司"</td></tr>
+          <tr><td>2025年</td><td>日本IMAGE SENSING SHOW亮相；获NVIDIA"荣耀企业"认证</td></tr>
+          <tr><td>2026年</td><td>亮相NVIDIA GTC 2026（Factory AI Pioneer）；西门子首届科技大会战略合作发布VisionAgent；与华工激光达成"激光+AI"战略合作</td></tr>
+        </table>
+      </div>
+
+      <h3 id="team">1.2 创始人及核心团队</h3>
+      <p>阿丘科技的创始团队源于清华大学计算机系人工智能实验室，具有典型的"学术精英创业"特征。CEO黄耀为清华本硕、计算机系人工智能方向出身，联合创始人郑慧伟、张辉等均为清华校友。团队在计算机视觉、深度学习领域拥有深厚积累，兼具学术研究与工程化落地能力。</p>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+          <tr><td>创始人/CEO</td><td>黄耀</td><td>清华大学计算机系本硕（人工智能实验室），90后创业者，主导公司战略与技术方向，获英伟达黄仁勋亲自颁发"Inception Showcase年度优秀创业公司"证书</td></tr>
+          <tr><td>联合创始人</td><td>郑慧伟</td><td>清华大学校友，多次代表公司在公开大会（如苏州"AI+制造"大会）发表主题演讲</td></tr>
+          <tr><td>联合创始人</td><td>张辉</td><td>清华背景，参与重大战略签约（如与华工激光合作现场出席）</td></tr>
+          <tr><td>副总裁</td><td>戴维</td><td>2026年西门子首届科技大会上代表公司做专题演讲，负责技术与产品商业化推广</td></tr>
+          <tr><td>首席AI科学家</td><td>吴雨培</td><td>NVIDIA GTC 2026线上演讲人，主导VisionAgent与工业大模型研发</td></tr>
+        </table>
+      </div>
+      <p>团队人才结构以学术派（清华系AI）为主导，整体偏向"学术+工程"混合型。公司团队规模未公开精确数字，但以年研发投入近亿元推测，研发人员占比应较高。CEO黄耀的清华AI背景直接决定了公司从成立之初即扎根AI工业视觉的技术路线选择。</p>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <h4>融资历史</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>轮次</th><th>时间</th><th>金额</th><th>估值</th><th>主要投资方</th></tr>
+          <tr><td>天使轮</td><td>2017年5月</td><td>数千万元人民币</td><td>—</td><td>英诺天使基金、臻云创投</td></tr>
+          <tr><td>战略融资</td><td>2017年9月</td><td>未披露</td><td>—</td><td>水木清华校友基金</td></tr>
+          <tr><td>A轮</td><td>2018年1月</td><td>800万美元</td><td>—</td><td>DCM中国领投，BV百度风投领投，长石资本、英诺天使、臻云创投跟投</td></tr>
+          <tr><td>A+轮</td><td>2019年2月</td><td>约1000万美元</td><td>—</td><td>君联资本领投，DCM中国、BV百度风投跟投</td></tr>
+          <tr><td>B轮</td><td>2020年11月</td><td>2000万美元</td><td>未公开（推测1-2亿美元区间）</td><td>襄禾资本领投，DCM中国、君联资本跟投</td></tr>
+          <tr><td>B+轮</td><td>2021年4月</td><td>未披露</td><td>—</td><td>嘉御资本、襄禾资本</td></tr>
+        </table>
+      </div>
+      <h4>股东结构</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>类型</th><th>股东</th><th>备注</th></tr>
+          <tr><td>财务投资者</td><td>襄禾资本、DCM中国、君联资本</td><td>多轮跟投，核心财务投资者</td></tr>
+          <tr><td>产业关联投资者</td><td>BV百度风投</td><td>百度旗下，具AI生态协同可能</td></tr>
+          <tr><td>早期天使</td><td>英诺天使基金、臻云创投、水木清华校友基金</td><td>种子及天使期进入</td></tr>
+          <tr><td>后期跟投</td><td>嘉御资本、长石资本</td><td>B/B+轮扩展</td></tr>
+        </table>
+      </div>
+      <p>公司未上市，累计融资约2.85亿元人民币（6轮）。自2021年B+轮以来无新公开融资披露。公司曾入选"2023胡润全球猎豹企业榜"（指估值5年内有望达独角兽级别的初创公司），暗示当时估值在数亿美元级别。</p>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>技术维度</th><th>方案</th><th>说明</th></tr>
+          <tr><td>AI架构</td><td>工业视觉大模型（AQ-VLM） + 专用小模型</td><td>从"一个场景一个模型"走向十亿级参数大模型底座，打破碎片化</td></tr>
+          <tr><td>数据方案</td><td>良品学习 + AIDG生成式AI + AQ-Data工业本体数据集</td><td>非监督学习仅需良品数据；AIGC生成逼真缺陷样本解决数据不足；自建工业本体数据集</td></tr>
+          <tr><td>自研程度</td><td>全栈自研（算法+平台+硬件）</td><td>核心算法、软件平台、近成像光路、软硬一体系统均为自研</td></tr>
+          <tr><td>推理部署</td><td>CPU推理加速</td><td>无需GPU即可实现工业级实时推理（500万像素图像~50ms），大幅降低客户部署成本</td></tr>
+          <tr><td>模型适配</td><td>AQ-LoRA敏捷微调框架</td><td>支持大模型快速适配新行业/新场景</td></tr>
+          <tr><td>生态整合</td><td>兼容DeepSeek大模型底座；NVIDIA平台深度集成</td><td>与西门子联合方案、NVIDIA Factory AI生态</td></tr>
+          <tr><td>差异化特色</td><td>CPU优先 + 零缺陷样本落地 + 行业大模型</td><td>显卡非必须；20+场景0缺陷样本即可投产；PCB行业垂直大模型交付周期从120天缩至14天</td></tr>
+        </table>
+      </div>
+      <p>阿丘科技的技术路线经历了从"专用小模型平台"到"通用大模型+平台化"的跃迁。早期以AIDI算法平台为核心，每个场景单独训练小模型；2025-2026年转向以AQ-VLM（十亿级参数工业视觉大模型）为底层基座、VisionAgent为统一应用框架的AI Native全栈体系。其核心技术壁垒在于：CPU推理加速（让客户无需购买GPU即可使用AI视觉）、良品学习（仅需良品数据即可检测异常）以及工业级AIGC缺陷生成。这些技术共同降低了AI视觉在制造业的落地门槛。</p>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>产品分类</th><th>产品名称</th><th>形态</th><th>核心功能</th><th>发布时间</th></tr>
+          <tr><td>AI算法平台</td><td>AIDI</td><td>软件平台</td><td>工业AI视觉算法平台，内置8大AI功能（缺陷检测、定位、分类、OCR等），最新3.3版支持算法画布零代码流程编排</td><td>2018年首发，持续迭代</td></tr>
+          <tr><td>应用开发平台</td><td>AQVision</td><td>软件平台</td><td>AI视觉应用开发平台，集成AIDI，支持流程/硬件/通信/UI配置</td><td>2023年</td></tr>
+          <tr><td>数据生成</td><td>AIDG</td><td>软件</td><td>基于生成式AI的智能缺陷样本生成软件，版本至2.2</td><td>2023年首发</td></tr>
+          <tr><td>行业大模型</td><td>AQ-VLM</td><td>大模型</td><td>十亿级参数工业视觉语言大模型，单模型覆盖100+产品型号</td><td>2025-2026年</td></tr>
+          <tr><td>统一应用平台</td><td>VisionAgent</td><td>软件平台</td><td>新一代开放式视觉应用平台，定位"企业级AI操作系统"，统一纳管全量视觉AI应用</td><td>2026年3月</td></tr>
+          <tr><td>软硬一体系统</td><td>SV2000</td><td>软硬一体</td><td>智能视觉系统</td><td>—</td></tr>
+          <tr><td>复盘系统</td><td>ARS</td><td>软件系统</td><td>智能复判系统，人工复核+AI结合</td><td>—</td></tr>
+          <tr><td>视频分析</td><td>VAS</td><td>软件系统</td><td>视频分析系统</td><td>—</td></tr>
+          <tr><td>云平台</td><td>AQCloud / NexSight</td><td>云平台</td><td>集中训练云平台；轻量化AI算法云平台</td><td>—</td></tr>
+        </table>
+      </div>
+      <p>产品矩阵覆盖从底层算法（AIDI）、行业大模型（AQ-VLM）、数据工具（AIDG）、应用框架（VisionAgent/AQVision）到软硬一体系统（SV2000）及云端平台（AQCloud）的完整链路，是国内工业AI视觉领域产品线最全的公司之一。</p>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>场景分类</th><th>子场景/行业</th><th>典型应用</th><th>标杆客户</th></tr>
+          <tr><td>消费电子（3C）</td><td>外观缺陷检测、组装质检</td><td>手机/平板外壳划痕、凹陷检测，连接器错位检测</td><td>富士康、立讯精密</td></tr>
+          <tr><td>动力电池</td><td>电芯/模组缺陷检测</td><td>极片缺陷、焊缝气泡、封装异常检测（全球前三电池厂采用）</td><td>全球头部新能源电池工厂</td></tr>
+          <tr><td>半导体/PCB</td><td>晶圆缺陷、PCB线路检测</td><td>半导体精密加工缺陷检测（与华工激光合作），PCB行业覆盖Top30客户70%+</td><td>多家PCB行业头部</td></tr>
+          <tr><td>光伏</td><td>硅片/电池片检测</td><td>隐裂、断栅、黑斑检测</td><td>—</td></tr>
+          <tr><td>汽车</td><td>零部件质检</td><td>新能源汽车零配件缺陷检测（获美国客户2000万订单）</td><td>美国新能源汽车企业</td></tr>
+          <tr><td>医药</td><td>药片/胶囊外观检测</td><td>药品外观缺陷、异物检测</td><td>—</td></tr>
+          <tr><td>食品/农产品</td><td>分级分拣、异物检测</td><td>水果分级、食品包装完整性检测</td><td>—</td></tr>
+          <tr><td>包装/物流</td><td>标签识别、分拣</td><td>OCR识别、条码验证、包裹分拣</td><td>—</td></tr>
+        </table>
+      </div>
+      <p>阿丘科技以3C电子为起点，逐步横向拓展至动力电池、半导体、光伏等高端制造行业，再延伸至汽车、医药、食品等更广泛的工业场景。在动力电池行业，其AI视觉方案将缺陷率从百万分之一降至十亿分之一，为行业最优水平。</p>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>维度</th><th>数据</th></tr>
+          <tr><td>累计服务工厂</td><td>1200+家</td></tr>
+          <tr><td>累计部署AI系统</td><td>20000+套</td></tr>
+          <tr><td>覆盖细分行业</td><td>50+个</td></tr>
+          <tr><td>交付AI场景</td><td>约600+个</td></tr>
+          <tr><td>近5年产值年均增速</td><td>40-50%+</td></tr>
+          <tr><td>年研发投入</td><td>近亿元人民币</td></tr>
+          <tr><td>2025年海外单笔最大合同</td><td>2000万元（美国新能源汽车零配件企业）</td></tr>
+          <tr><td>PCB行业设备升级量</td><td>累计超1000台，导入超100个工厂</td></tr>
+        </table>
+      </div>
+      <p>国际化方面，公司已在德国柏林、新加坡、日本东京、韩国首尔设立海外分部并投入运营，产品进入美国、德国、日本、韩国等发达国家市场。2025-2026年间，先后亮相日本IMAGE SENSING SHOW、美国NVIDIA GTC、VisionChina上海展等国际展会，海外影响力快速提升。</p>
+
+      <h3 id="finance">1.8 财务数据</h3>
+      <p>阿丘科技为非上市公司，未公开披露详细财务数据。以下为公开信息汇总：</p>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>指标</th><th>说明</th></tr>
+          <tr><td>营收</td><td>未公开披露具体数字；近5年产值年均增速40-50%+</td></tr>
+          <tr><td>净利润/毛利率</td><td>未公开披露</td></tr>
+          <tr><td>研发投入</td><td>年研发投入近亿元人民币</td></tr>
+          <tr><td>账面资金</td><td>未公开披露（最近一轮融资为2021年B+轮，距今已逾4年）</td></tr>
+          <tr><td>员工规模</td><td>未公开披露；以研发投入推测，团队规模可能在数百人级别</td></tr>
+          <tr><td>知识产权</td><td>200+项</td></tr>
+        </table>
+      </div>
+      <div class="callout"><div class="callout-title">注意</div>以上财务信息均来自媒体报道及公司公开演讲，未经审计。公司为非上市企业，未披露正式财务报表。</div>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li><strong>荣誉资质：</strong>国家级专精特新"小巨人"企业、国家高新技术企业、胡润全球猎豹企业榜（2023）、IDC中国AI工业质检解决方案市场份额TOP3（2023年）</li>
+        <li><strong>生态认证：</strong>英伟达"Inception Showcase 2024年度优秀创业公司"及"荣耀企业"（黄仁勋亲笔签名证书）；NVIDIA GTC 2026 "Factory AI Pioneer"</li>
+        <li><strong>产业合作：</strong>西门子深度战略合作伙伴（2026年西门子首届科技大会联合参展）、华工激光半导体业务战略合作（2026年2月）</li>
+        <li><strong>竞争环境：</strong>国内工业AI视觉赛道竞争激烈，主要竞争对手包括创新奇智、中科慧眼等，国际对标企业包括康耐视（Cognex）、基恩士（Keyence）等传统机器视觉巨头</li>
+        <li><strong>人才基地：</strong>依托清华大学AI实验室人才网络，在苏州昆山设立核心运营基地，江苏省"双创"人才企业</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="analysis1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>阿丘科技创始团队来自清华大学计算机系人工智能实验室，核心专长是计算机视觉和深度学习算法——而非传统自动化或机械工程。这种"AI原生"的学术背景决定了公司从成立之初即以AI软件+算法平台切入，而非从自动化设备硬件起家。团队选择工业质检作为核心场景高度匹配其能力禀赋：工业质检是机器视觉中算法复杂度最高、对AI依赖最强的场景之一，传统视觉厂商依靠规则库的方式在复杂缺陷检测中天然受限，这恰好为AI驱动的方法论提供了差异化空间。CEO黄耀的清华AI实验室背景为公司积累了技术信用，有助于早期获得富士康、立讯精密等头部3C客户的信任。团队的短板可能在于缺乏大规模制造和硬件供应链经验——这或许是其选择"软件平台+伙伴硬件"模式而非全栈硬件自研的深层原因。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>阿丘科技2025-2026年从"一场景一模型"向"工业视觉大模型（AQ-VLM）"转型是一个值得关注的技术路线调整。在早期，针对每个工厂、每条产线单独训练模型虽然保证了精度，但造成了严重的碎片化——一个500人的AI团队同时维护数百个模型，边际成本随场景扩展而递增。引入十亿级参数大模型，试图用一个底座覆盖100+产品型号，本质是在用"通用能力替代专用定制"，这与大模型在NLP/CV领域的逻辑一致。但工业场景的特殊性在于：对误检/漏检的容忍度极低（动力电池缺陷率需达十亿分之一级别），大模型的"幻觉"问题在工业质检中可能致命。阿丘的应对策略是"大模型+小模型混合架构"，大模型提供泛化理解，小模型保证边缘精度——这种"大+小"混合路线在2026年似乎是务实之选。另外，CPU推理加速策略极具场景适配力：中国大量中小型工厂无力采购GPU集群，CPU部署方案使其可渗透中低端市场。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>阿丘科技的股东结构以财务投资者为主（襄禾资本、DCM中国、君联资本均非产业资本），这赋予了公司较强的战略独立性和场景选择的灵活性——可以从3C电子自由扩展至动力电池、半导体、光伏、汽车等多个行业。百度风投（BV）是为数不多的带有产业背景的投资者，但百度在工业制造领域的场景资源有限，该投资更偏向AI技术协同而非产业绑定。缺少产业资本（如制造业巨头、车企、新能源龙头）入股，意味着阿丘在市场拓展中无法像一些竞品那样借助股东的场景资源"天然绑订客户"，这对销售团队的能力要求更高。值得关注的是，2021年B+轮后迄今已逾4年无新增融资公开披露——如果公司在此期间实现了现金流为正，则说明其商业化能力已越过临界点；如果仍在烧钱，则近期存在融资压力。其与西门子、华工激光等工业巨头的战略合作，可视为在缺少产业股东背景下，通过战略联盟获取场景资源的一种替代路径。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>从公开信息来看，阿丘科技的场景选择路径较为稳健，未出现剧烈的行业切换或产品线裁撤。但仍可观察到几个关键的路径调整：（1）从3C单一行业向多行业横向扩展——2019年A+轮时公开定位为"聚焦于3C行业"，但到2020年B轮时已将覆盖行业扩展至50+个，表明其意识到单一行业的TAM天花板。（2）从纯软件平台向"软件+大模型+软硬一体"延伸——早期AIDI是纯粹的软件许可模式，2023年后陆续推出AQ-VLM大模型、SV2000智能视觉系统、VisionAgent统一平台，反映其认识到仅靠算法软件难以建立足够深的护城河。（3）技术架构从"专用小模型"向"大模型+生态整合"演进——2025-2026年密集推出AQ-VLM、VisionAgent，并整合DeepSeek和NVIDIA生态，可视为应对AI 2.0时代范式转换的主动求变。总体而言，阿丘的调整逻辑是从"点状工具"走向"平台化生态"，符合工业软件行业的一般演进规律。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>阿丘科技的竞争定位可概括为：做工业AI视觉的"全栈平台"，而非特定行业的"专用方案商"。这一定位有几个核心取舍：首先，走"平台化"而非"行业垂直化"——放弃在单一行业（如光伏、锂电）做到极致的深度优势，换取跨行业覆盖的广度。其次，以"软件算法"为核心而非"硬件"——这与国际机器视觉巨头（如康耐视、基恩士以硬件为营收主力）形成差异化，但也意味着其营收规模天然受限于纯软件的单价天花板（单个工厂的软件许可费远低于一套硬件系统）。第三，"CPU优先"策略——主动放弃"GPU堆算力"的高端路线，选择以更低成本渗透更广泛的中小制造企业，这在量上具有想象力但在客单价上受限。值得关注的是，2026年推出VisionAgent"企业级AI操作系统"定位，显示出其试图从"工具软件"跃迁至"平台基础设施"的战略野心——如果成功，将大幅提升客户粘性和替换成本。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis6">
+        <h4>2.6 其他重要观察</h4>
+        <p>几点补充观察：（1）阿丘科技的国际化进展在同类AI视觉创业公司中较为突出——德国、日本、韩国、新加坡四地同时运营、美国获得2000万大单、NVIDIA全球背书，这些与大多数国内AI视觉同行形成差异。其国际化策略主要是"借船出海"——通过NVIDIA生态和西门子合作渠道渗透海外市场，而非自建海外直销团队，这降低了国际化风险。（2）与华工激光的"激光+AI"合作是一个有趣的跨界——激光设备加工过程中需要AI视觉实时闭环反馈，这种"工艺+AI"的融合模式可能成为下一个增长点。（3）公司在2021年后停止公开融资可能有两面性：正面看，若已实现正向现金流则表明商业模式成立；负面看，若融资遇阻则存在资金链风险。考虑到其入选胡润猎豹榜（暗示尚需融资成长），叠加年研发投入近亿元，后者可能性不能排除。（4）工业大模型（AQ-VLM）方向的先行者优势值得关注——如果大模型范式在工业领域成立，先发者的数据飞轮效应（越多工厂部署→越多数据→模型越强→越多工厂选择）将构成显著护城河。</p>
+      </div>
+
+      <h2 id="references">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://www.elecfans.com/d/comp-alist-5445553" target="_blank">电子发烧友 — 阿丘科技企业号</a></li>
+          <li><a href="https://www.vision-systems-china.com/deinews.asp?id=18562" target="_blank">视觉系统设计 — 阿丘科技2024新品发布会</a></li>
+          <li><a href="https://www.zidonghua.com.cn/m/news/newproduct/64133.html" target="_blank">中国自动化网 — 阿丘科技上榜CMVU"机器视觉创新产品TOP10"</a></li>
+          <li><a href="https://www.cinn.cn/sz/2024/09-11/XkJO9mX1.html" target="_blank">中国工业新闻网 — 阿丘科技2024新品发布会</a></li>
+          <li><a href="https://www.subaonet.com/2025/szms/0213/gDanOGZk.html" target="_blank">苏州新闻网 — 叫板国际巨头，苏企争做弄潮儿</a></li>
+          <li><a href="https://m.sohu.com/a/933892006_121697575/" target="_blank">搜狐 — 阿丘科技｜黄耀：AI工业视觉赋能全球工厂</a></li>
+          <li><a href="https://m.elecfans.com/article/7759383.html" target="_blank">电子发烧友 — 战略携手西门子：阿丘科技亮相西门子首届科技大会</a></li>
+          <li><a href="https://36kr.com/p/1723278852097" target="_blank">36氪 — 阿丘科技完成千万美元A+轮融资</a></li>
+          <li><a href="https://36kr.com/p/1722195116033" target="_blank">36氪 — 阿丘科技完成800万美元A轮融资</a></li>
+          <li><a href="https://www.sohu.com/a/431407464_400242" target="_blank">搜狐 — 2000万美元B轮融资，工业AI视觉应用标准化</a></li>
+          <li><a href="https://m.lieyunpro.com/archives/471704" target="_blank">猎云网 — 工业AI视觉平台阿丘科技完成2000万美元B轮融资</a></li>
+          <li><a href="https://news.pedata.cn/513284.html" target="_blank">投中网 — AI视觉公司阿丘科技获千万美元A+轮融资</a></li>
+          <li><a href="https://www.xianghecap.com//news/frontier-technology-news/70.html" target="_blank">襄禾资本 — 工业AI视觉平台领先者阿丘科技完成2000万美元B轮融资</a></li>
+          <li><a href="https://www.kczg.org.cn/article/detail?id=4753413" target="_blank">科创中国 — 阿丘科技完成2000万美元B轮融资</a></li>
+          <li><a href="https://www.itiger.com/hans/news/2604806001" target="_blank">iTiger — 90后清华"学霸"，在昆山工厂"炼"出英伟达"荣耀企业"</a></li>
+          <li><a href="http://www.sushang.cn/celebrity/1654.html" target="_blank">苏商网 — 90后清华"学霸"，在昆山工厂"炼"出英伟达"荣耀企业"</a></li>
+          <li><a href="http://m.chinaaet.com/article/3000176997" target="_blank">电子技术应用 — 阿丘科技携Factory AI亮相2026 NVIDIA GTC</a></li>
+          <li><a href="https://news.e-works.net.cn/category802/news133643.htm" target="_blank">e-works — 2026 NVIDIA GTC圆满落幕：阿丘科技携Factory AI亮相</a></li>
+          <li><a href="https://news.ikanchai.com/2026/0331/653478.shtml" target="_blank">砍柴网 — 2026 NVIDIA GTC圆满落幕：阿丘科技携Factory AI亮相</a></li>
+          <li><a href="https://www.hglaser.com/about/news-detail-51479.htm" target="_blank">华工激光 — 华工激光与阿丘科技达成战略合作</a></li>
+          <li><a href="http://www.ic-ceca.org.cn/dongtai/1773507.html" target="_blank">中国电子元件行业协会 — 华工激光×阿丘科技："激光+AI"深度融合</a></li>
+          <li><a href="http://www.innohere.com/index.php/ir/106856.html" target="_blank">英诺天使基金 — 阿丘科技公司详情</a></li>
+          <li><a href="https://m.newseed.cn/news/1352512" target="_blank">新芽 — 聚焦于3C行业，阿丘科技获千万美元A+轮融资</a></li>
+        </ol>
+      </div>
+      <div class="page-footer">
+        本页面最后更新于2026年5月4日 · 内容基于公开信息整理 · 不构成投资建议
+      </div>
+    </article>
+  </div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

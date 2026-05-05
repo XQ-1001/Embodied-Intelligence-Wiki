@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>诺仕机器人 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> › <span>诺仕机器人</span></div>
+  <div class="wiki-header"><h1>诺仕机器人</h1><div class="subtitle">NOUSBOT · 2023年成立 · 精密传动部件供应商 · 全球最小行星滚柱丝杠量产商</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#team">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#finance">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl3"><a href="#a-team">2.1 团队背景与场景选择</a></li>
+        <li class="toc-lvl3"><a href="#a-tech">2.2 技术路线与场景适配</a></li>
+        <li class="toc-lvl3"><a href="#a-capital">2.3 股东资本对战略的影响</a></li>
+        <li class="toc-lvl3"><a href="#a-pivot">2.4 试错过程与路径调整</a></li>
+        <li class="toc-lvl3"><a href="#a-position">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl3"><a href="#a-other">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#refs">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">诺仕机器人</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">深圳市诺仕机器人有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">英文</div><div class="ib-value">NOUSBOT</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2023年7月</div></div>
+        <div class="ib-row"><div class="ib-label">注册地</div><div class="ib-value">广东深圳</div></div>
+        <div class="ib-row"><div class="ib-label">总部/研发</div><div class="ib-value">深圳</div></div>
+        <div class="ib-row"><div class="ib-label">生产基地</div><div class="ib-value">苏州（近10,000㎡）</div></div>
+        <div class="ib-row"><div class="ib-label">创始人</div><div class="ib-value">徐杨（董事长）</div></div>
+        <div class="ib-row"><div class="ib-label">CEO</div><div class="ib-value">王晓斌</div></div>
+        <div class="ib-section">融资信息</div>
+        <div class="ib-row"><div class="ib-label">最新轮次</div><div class="ib-value">A轮（2026年3月）</div></div>
+        <div class="ib-row"><div class="ib-label">融资总额</div><div class="ib-value">超亿元人民币（A轮）</div></div>
+        <div class="ib-row"><div class="ib-label">估值</div><div class="ib-value">未公开披露</div></div>
+        <div class="ib-row"><div class="ib-label">主要投资方</div><div class="ib-value">上海半导体产投、联想创投、上汽金控、琥珀资本、克来机电、鹏翎股份</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">核心产品</div><div class="ib-value">1.5mm行星滚柱丝杠（全球最小量产）</div></div>
+        <div class="ib-row"><div class="ib-label">微型电缸</div><div class="ib-value">8mm×10.2mm（全球最小一体化）</div></div>
+        <div class="ib-row"><div class="ib-label">精度等级</div><div class="ib-value">C5级（≤0.023mm/300mm）</div></div>
+        <div class="ib-row"><div class="ib-label">量产价格</div><div class="ib-value">百元级</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">领域</div><div class="ib-value"><span class="tag">具身智能</span><span class="tag">核心零部件</span></div></div>
+        <div class="ib-row"><div class="ib-label">赛道</div><div class="ib-value"><span class="tag">精密传动</span><span class="tag">行星滚柱丝杠</span><span class="tag">微型电缸</span></div></div>
+        <div class="ib-section">官网</div>
+        <div class="ib-row"><div class="ib-label">网址</div><div class="ib-value"><a href="http://nousbot.tech" target="_blank">nousbot.tech</a></div></div>
+      </aside>
+
+      <p class="article-intro"><strong>诺仕机器人</strong>（英文：NOUSBOT），全称深圳市诺仕机器人有限公司，成立于2023年7月，是一家专注于微型行星滚柱丝杠及微型线性执行器研发与量产的精密传动部件供应商。公司脱胎于一家拥有30余年丝杠制造经验的家族企业，依托创始人团队在法雷奥集团的汽车精密制造经验以及技术顾问徐根林教授50余年的机械制造积累，成功实现全球最小行星滚柱丝杠（直径1.5mm）的稳定量产，并将价格锁定至百元级，被业界视为解决人形机器人灵巧手核心传动"卡脖子"难题的关键力量。公司已形成"人形机器人+汽车"双引擎驱动格局，2026年3月完成超亿元A轮融资。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper">
+        <table class="wikitable infotable">
+          <tr><th>项目</th><th>内容</th></tr>
+          <tr><td>公司全称</td><td>深圳市诺仕机器人有限公司</td></tr>
+          <tr><td>英文名称</td><td>NOUSBOT</td></tr>
+          <tr><td>成立时间</td><td>2023年7月</td></tr>
+          <tr><td>注册地址</td><td>广东省深圳市</td></tr>
+          <tr><td>总部/研发中心</td><td>深圳</td></tr>
+          <tr><td>生产基地</td><td>苏州吴江苏州湾智能制造产业园（近10,000㎡）</td></tr>
+          <tr><td>上市状态</td><td>未上市</td></tr>
+          <tr><td>官方网站</td><td>nousbot.tech</td></tr>
+          <tr><td>主营业务</td><td>行星滚柱丝杠、微型线性电缸、精密传动模组</td></tr>
+        </table>
+      </div>
+      <h4>发展沿革</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>时间</th><th>事件</th></tr>
+          <tr><td>2023年7月</td><td>公司正式注册成立，脱胎于拥有30余年丝杠制造经验的家族企业</td></tr>
+          <tr><td>2024年</td><td>完成核心专利布局，突破C5级精度行星滚柱丝杠稳定量产；推出全球最小1.5mm行星滚柱丝杠</td></tr>
+          <tr><td>2025年4月</td><td>完成天使+轮融资，上汽创投独家投资；拿下头部新势力车企订单</td></tr>
+          <tr><td>2025年7月</td><td>参加WAIC世界人工智能大会，参与具身智能国际化应用对话</td></tr>
+          <tr><td>2025年10月</td><td>获Next Star新加坡赛区一等奖，试水东南亚市场</td></tr>
+          <tr><td>2025年12月</td><td>亮相东京国际机器人展（iREX），展示全球最小微型电缸及反转式行星滚柱丝杠电缸</td></tr>
+          <tr><td>2026年3月</td><td>完成超亿元A轮融资（上海半导体产投领投）；苏州基地正式投产</td></tr>
+          <tr><td>2026年5月</td><td>参加2026第二届杭州人形机器人展（HRTE）</td></tr>
+          <tr><td>2026年（待定）</td><td>计划参加2026世界机器人大会（WRC），展位C515</td></tr>
+        </table>
+      </div>
+
+      <h3 id="team">1.2 创始人及核心团队</h3>
+      <p>诺仕机器人的核心团队呈现"学术世家+产业老兵"的混合结构。公司脱胎于徐根林教授家族经营30余年的丝杠制造企业，第二代创始人徐杨将法雷奥集团的世界级汽车精密制造经验带入人形机器人核心零部件赛道。</p>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+          <tr><td>创始人/董事长</td><td>徐杨</td><td>同济大学硕士，原法雷奥集团（Valeo）亚太研发中心研发部负责人，具备世界级工厂的汽车精密零部件研发及管理经验；家族丝杠企业第二代创始人</td></tr>
+          <tr><td>联合创始人/CEO</td><td>王晓斌</td><td>原法雷奥集团分公司副总经理，负责管理团队；还曾参与创建新能源汽车领域初创公司，具备丰富的企业管理及创业经验</td></tr>
+          <tr><td>技术顾问</td><td>徐根林</td><td>上海大学退休教授，机械制造领域深耕超过50年，拥有逾30年的丝杠理论研究及生产经验；曾为我国军工、汽车、医疗器械、航空航天等行业解决替代进口精密零件问题</td></tr>
+        </table>
+      </div>
+      <p>团队整体呈现明显的<strong>产业背景主导型</strong>特征：高管层多来自法雷奥集团，兼具汽车产业背景与精密制造管理经验；技术底座依托徐根林教授50余年的学术与工程积淀。公司具体员工总数和研发人员占比暂未公开披露。</p>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <h4>融资历史</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>轮次</th><th>时间</th><th>金额</th><th>投资方</th><th>用途</th></tr>
+          <tr><td>天使+轮</td><td>2025年4月</td><td>未披露</td><td>上汽创投（独家）</td><td>C5级行星滚柱丝杠量产落地</td></tr>
+          <tr><td>A轮</td><td>2026年3月</td><td>超亿元人民币</td><td>领投：上海半导体产投（浦东科创）；跟投：联想创投、琥珀资本；战略入股：克来机电、鹏翎股份；追加：上汽金控</td><td>产能扩张、技术研发迭代、市场拓展</td></tr>
+        </table>
+      </div>
+      <h4>股东结构分析</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>股东类别</th><th>代表机构</th><th>战略意义</th></tr>
+          <tr><td>产业资本（汽车）</td><td>上汽创投、上汽金控、克来机电、鹏翎股份</td><td>绑定汽车产业链场景，提供线控制动/转向/悬架等汽车精密传动量产通道</td></tr>
+          <tr><td>国资/政府基金</td><td>上海半导体产投（浦东科创）</td><td>对接长三角机器人与半导体产业集群资源</td></tr>
+          <tr><td>财务投资（VC）</td><td>联想创投、琥珀资本</td><td>联想创投提供本体公司生态网络对接；琥珀资本此前投资宇树科技，提供人形机器人零部件赛道经验</td></tr>
+        </table>
+      </div>
+      <p>公司估值未公开披露。考虑到公司成立仅约2.5年、A轮融资超亿元且已有多家产业资本密集入场，市场对其技术壁垒和产业化前景给予较高认可。公司未上市，无上市计划公开信息。</p>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>技术维度</th><th>说明</th></tr>
+          <tr><td>总体技术定位</td><td>精密传动零部件/模组供应商，聚焦微型行星滚柱丝杠正向设计与全工艺自产</td></tr>
+          <tr><td>AI技术</td><td>不涉及AI算法；专注机械精密传动硬件，定位为具身智能产业链上游核心零部件</td></tr>
+          <tr><td>成型工艺路线</td><td>独创高精度金属轧制/成型工艺替代传统磨削，生产效率提升约10倍；摆脱对进口高精度磨削设备的依赖</td></tr>
+          <tr><td>精度路线</td><td>C5级精度稳定量产（定位误差≤0.023mm/300mm），未来向更高精度迭代</td></tr>
+          <tr><td>微型化路线</td><td>全球唯一实现1.5mm直径行星滚柱丝杠量产的企业；微型电缸尺寸8mm×10.2mm</td></tr>
+          <tr><td>专利体系</td><td>已构建覆盖结构设计（滚柱偏置式、差速式、浮动式稳定导程）、工艺制造、应用集成（EMB、光刻机、灵巧手）的多维专利矩阵，含多项发明专利</td></tr>
+          <tr><td>纵向一体化</td><td>从丝杠→电缸→执行器模组，提供完整传动解决方案而非单一零部件</td></tr>
+          <tr><td>自研程度</td><td>全自研工艺，具备正向设计能力，非逆向仿制路线</td></tr>
+        </table>
+      </div>
+      <p>技术路线的核心差异化在于：以轧制/成型工艺替代行业主流的磨削工艺，在保证C5精度的同时实现10倍效率提升和两个数量级的成本下降。这一路线选择基于徐根林教授30余年的丝杠工艺积累，具有较强的know-how壁垒。专利布局从2024年起密集展开，覆盖了导程稳定性（浮动式）、接触面优化（中经外凸螺纹齿）、承载力分布（滚柱偏置式）等底层技术，呈现出系统性的正向创新能力。</p>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>产品分类</th><th>子类/型号</th><th>关键参数</th><th>适用场景</th></tr>
+          <tr><td rowspan="3">微型行星滚柱丝杠</td><td>全球最小行星滚柱丝杠</td><td>丝杠直径1.5mm，螺母直径5.5mm，C5精度，负载10kg，寿命300万次+，单价百元级</td><td>人形机器人灵巧手核心传动</td></tr>
+          <tr><td>标准行星滚柱丝杠系列</td><td>多规格可选，C5精度，额定载荷较同规格滚珠丝杠提升3-5倍</td><td>工业自动化、半导体设备、医疗器械</td></tr>
+          <tr><td>定制行星滚柱丝杠</td><td>小批量快速响应，满足非标需求</td><td>特殊工业场景</td></tr>
+          <tr><td rowspan="2">微型线性电缸</td><td>全球最小一体化微型电缸</td><td>8mm×10.2mm，集成无刷电机+非接触式传感器</td><td>人形机器人灵巧手每指独立驱动</td></tr>
+          <tr><td>EMB专用行星丝杆移动式电缸</td><td>推力大、位移精度高，适配紧凑空间</td><td>汽车电子机械制动（EMB）</td></tr>
+          <tr><td rowspan="2">反转式行星滚柱丝杠电缸</td><td>大腿/小臂直线电缸</td><td>最大推力8000N，寿命300万次，高负载不发热</td><td>人形机器人腿部、手臂关节</td></tr>
+          <tr><td>特斯拉同款反转式电缸</td><td>大推力、长寿命、紧凑设计</td><td>人形机器人全身关节传动</td></tr>
+        </table>
+      </div>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>场景分类</th><th>具体应用</th><th>合作方/客户</th></tr>
+          <tr><td rowspan="2">人形机器人</td><td>灵巧手核心传动（手指关节）</td><td>多家头部灵巧手技术企业（联合开发标准化模组）</td></tr>
+          <tr><td>腿部/手臂直线关节</td><td>国内头部人形机器人厂商（1.5mm方案被采纳为新一代机型核心执行单元）</td></tr>
+          <tr><td rowspan="4">汽车</td><td>后轮转向系统滚柱丝杠</td><td>上汽集团、多家主机厂核心Tier 1</td></tr>
+          <tr><td>智能座舱零重力座椅执行器</td><td>上汽集团等</td></tr>
+          <tr><td>EMB电子机械制动</td><td>头部新势力车企（已获订单）</td></tr>
+          <tr><td>线控转向/悬架</td><td>上汽集团、计划2026年起为国内主流车企稳定供应</td></tr>
+          <tr><td rowspan="3">工业/其他</td><td>半导体设备（光刻机光学面微调）</td><td>未具名</td></tr>
+          <tr><td>锂电池涂敷设备</td><td>未具名</td></tr>
+          <tr><td>医疗设备、工业机床</td><td>未具名</td></tr>
+        </table>
+      </div>
+      <p>公司与上汽集团形成深度绑定，同时在机器人领域通过联想创投生态网络（联想已投多家本体公司）构建客户关系。创始人徐杨透露，汽车业务与机器人业务目前已形成约五五开的比重。</p>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <p>诺仕机器人目前处于早期商业化阶段，公开渠道未披露具体营收数据。可追踪的商业化进展如下：</p>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>维度</th><th>进展</th></tr>
+          <tr><td>机器人业务</td><td>1.5mm线性关节方案已被国内头部人形机器人厂商采纳为新一代机型核心执行单元；与多家头部灵巧手企业联合开发标准化模组</td></tr>
+          <tr><td>汽车业务</td><td>已获头部新势力车企订单，正加快应用落地和批量出货；计划2026年起为国内主流车企稳定供应底盘刹车等高价值产品</td></tr>
+          <tr><td>产能</td><td>苏州基地2026年3月投产，面积近10,000㎡，满产后年产值3-5亿元</td></tr>
+          <tr><td>业务结构</td><td>汽车与机器人业务约五五开，形成"人形机器人+汽车"双引擎格局</td></tr>
+          <tr><td>市场拓展</td><td>已试水东南亚市场（新加坡Next Star一等奖）；亮相东京iREX展示全球最小微型电缸</td></tr>
+        </table>
+      </div>
+
+      <h3 id="finance">1.8 财务数据</h3>
+      <p>诺仕机器人成立于2023年7月，处于初创期，未公开披露系统性财务数据。公司为非上市公司，无年报披露义务。以下为可获取的财务相关信息：</p>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>维度</th><th>信息</th></tr>
+          <tr><td>营收</td><td>未公开披露。公司处于早期商业化阶段，汽车和机器人业务约各占50%</td></tr>
+          <tr><td>利润</td><td>未公开披露。预计处于投入期（研发密集、产能建设期）</td></tr>
+          <tr><td>融资资金储备</td><td>2026年3月完成超亿元A轮融资，资金用于产能扩张、研发迭代和市场拓展</td></tr>
+          <tr><td>苏州基地产值预期</td><td>满产后年产值3-5亿元</td></tr>
+        </table>
+      </div>
+      <div class="callout"><div class="callout-title">说明</div>由于公司为非上市初创企业，财务数据来源有限。以上信息基于公开融资报道和公司官方披露整理，待后续公开披露后更新。</div>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>公司脱胎于徐根林教授家族经营30余年的丝杠制造企业，徐根林在军工、汽车、医疗器械、航空航天领域积累了大量替代进口精密零件的经验</li>
+        <li>苏州基地2026年3月20日正式投产，同期举办"智造苏州·传动未来"产业链对接会，合作方上汽金控、乐聚机器人、领科汇智等出席</li>
+        <li>公司定位为具身智能核心零部件"隐形冠军"，目标是成长为定义行业标准的精密传动企业</li>
+        <li>微型行星滚柱丝杠的大批量低成本量产被公认为全球制造业"卡脖子"难题，现有磨削工艺设备成本高、效率低且高精度设备依赖进口</li>
+        <li>公司已参加/计划参加多个国际展会：WAIC 2025（上海）、iREX 2025（东京）、HRTE 2026（杭州）、WRC 2026（北京）</li>
+        <li>鹏翎股份（300375.SZ）在投资者互动平台多次确认参股诺仕机器人，并称其具备向机器人提供相关零部件的能力</li>
+        <li>公司英文品牌NOUSBOT已建立英文官网（nousbot.tech/en），显示出国际化品牌意识</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="a-team">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>诺仕机器人的团队配置与其选择的"汽车+人形机器人"双场景高度契合。创始人徐杨和王晓斌均来自法雷奥——全球顶级汽车零部件供应商，天然理解汽车行业对精密传动零部件的严苛要求（可靠性、寿命、一致性）。徐根林教授50余年的机械制造积累解决了"如何低成本高精度地做出来"的工艺难题。这种"汽车精密制造管理经验（法雷奥系）+ 丝杠工艺深度积累（徐氏家族）"的组合，使其在汽车线控制动/转向/悬架场景具备天然准入优势，同时将汽车级的精密制造标准带入人形机器人零部件赛道，形成了独特的跨行业竞争力。团队缺位方面：未发现具身智能AI算法或机器人本体设计相关背景人员，这与公司定位为纯硬件零部件供应商的策略一致。</p>
+      </div>
+
+      <div class="analysis-block" id="a-tech">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>诺仕选择的轧制/成型替代磨削工艺路线，与其目标场景高度适配。人形机器人灵巧手对丝杠的核心要求是：极小体积（毫米级）、适中精度（C5级即可满足）、极低成本（百元级才能规模化）、大批量一致性。磨削工艺可以做到高精度但效率低、成本高，无法满足大规模量产需求；诺仕的轧制工艺恰好以"够用的精度+极致的成本和效率"匹配了灵巧手场景的真正瓶颈。在汽车EMB/线控底盘场景中，核心要求是推力/可靠性而非极限精度，反转式电缸8000N推力+300万次寿命也精准匹配。技术路线与场景之间未发现明显错配。唯一潜在风险是：随着灵巧手对精度要求持续提升，轧制工艺能否进一步逼近C3级精度的天花板尚待验证。</p>
+      </div>
+
+      <div class="analysis-block" id="a-capital">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>诺仕的股东结构呈现鲜明的"产业资本主导"特征。上汽系（上汽创投+上汽金控）连续两轮加注，克来机电和鹏翎股份两家汽车零部件上市公司战略入股，意味着汽车产业链场景已实现深度绑定——这既是优势（订单确定性、量产通道），也可能构成约束（其他主机厂可能因竞品关系产生顾虑）。上海半导体产投（浦东科创）的领投则为诺仕打开了长三角产业集群资源和潜在的国资应用场景。联想创投和琥珀资本（宇树科技投资方）的加入，弥补了公司在人形机器人本体公司生态网络方面的空白。整体来看，资本结构推动公司形成了"汽车保底、机器人增长"的务实双轨战略，相比纯财务投资者主导的公司更具场景确定性，但独立拓展非上汽系汽车客户的能力将是关键考验。</p>
+      </div>
+
+      <div class="analysis-block" id="a-pivot">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>诺仕机器人成立时间仅约2.5年，可追踪的公开信息中未发现明显的场景切换或重大战略转向。其发展路径呈现清晰的线性推进特征：2023年依托家族丝杠技术积累创立公司→2024年突破微型化和C5精度→2025年获得上汽投资、切入汽车场景→2026年A轮融资扩产、苏州基地投产。但值得注意的是，公司在2024-2025年间产品线迅速从单一丝杠拓展到电缸模组再到反转式大推力电缸，覆盖了从灵巧手微型传动到全身关节传动的完整链条，这反映了从"做一个极致零部件"到"做一套传动解决方案"的产品战略升维。这一路径调整的内在逻辑合理：先以1.5mm全球最小丝杠建立品牌制高点，再以电缸模组提升单客户价值量。</p>
+      </div>
+
+      <div class="analysis-block" id="a-position">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>诺仕的竞争定位可以类比为精密传动领域的"零部件隐形冠军"路线——不做机器人本体、不做AI算法、不做系统集成，只做最核心的传动零部件。这种"专而精"的取舍在产业生态中具有明确的合理性：人形机器人产业链正处于分工形成期，零部件标准化是行业规模化前提。诺仕选择聚焦行星滚柱丝杠这一"卡脖子"环节，以极致微型化+低成本构建壁垒，类似于博世在汽车零部件领域的定位。与竞争对手（如日本THK、NSK等）相比，诺仕的核心取舍是"放弃高端磨削精度的天花板，换取轧制工艺的成本和效率优势"，本质上是选择了iPhone路线（不做最顶尖的，但做最大规模可用的）。在中国人形机器人产业"从样品到量产"的关键窗口期，这一取舍具有较高的战略合理性。</p>
+      </div>
+
+      <div class="analysis-block" id="a-other">
+        <h4>2.6 其他重要观察</h4>
+        <p>第一，诺仕的"家族技术传承+职业经理人运营"模式值得关注。徐根林教授的技术积累是公司的核心壁垒来源，但如何将高度依赖个人的工艺know-how转化为可规模化复制的制造体系，是决定公司能否真正成为"隐形冠军"的关键。第二，公司在专利申请上的密集节奏（2024-2025年申请了10余项核心专利）显示出较强的知识产权保护意识，但专利质量（尤其是发明专利占比和授权情况）需要持续跟踪。第三，苏州基地近10,000㎡的产能规模和3-5亿元的年产值目标，表明公司已经从"技术验证"阶段进入"规模复制"阶段，执行能力的考验刚刚开始。第四，公司品牌国际化意识较强（英文品牌NOUSBOT、英文官网、参加东京iREX、新加坡Next Star），但海外业务的实质性落地尚处于早期探索阶段。</p>
+      </div>
+
+      <h2 id="refs">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://36kr.com/p/3719335512585609" target="_blank">36氪 — 自研全球最小行星滚柱丝杠，量产价格降至百元级，「诺仕机器人」完成超亿元A轮融资</a></li>
+          <li><a href="https://36kr.com/p/3254097128796169" target="_blank">36氪 — 拿下头部新势力订单，高端精密传动零部件公司获上汽独家投资</a></li>
+          <li><a href="https://m.36kr.com/p/3713617026199688" target="_blank">36氪 — 全球最小电缸诞生：原法雷奥团队创业、上汽等投资超亿元</a></li>
+          <li><a href="https://www.donews.com/news/detail/8/6462722.html" target="_blank">DoNews — 诺仕机器人完成超亿元人民币A轮融资 上海半导体产投领投</a></li>
+          <li><a href="https://www.jiemian.com/article/14097562.html" target="_blank">界面新闻 — 诺仕机器人完成超亿元人民币A轮融资</a></li>
+          <li><a href="https://www.leaderobot.com/news/5419" target="_blank">高工机器人 — 上汽创投首次布局人形机器人核心零部件</a></li>
+          <li><a href="https://news.pedaily.cn/202504/548548.shtml" target="_blank">投资界 — 诺仕机器人完成天使+轮融资，上汽创投独家投资</a></li>
+          <li><a href="https://finance.eastmoney.com/a/202603113668651522.html" target="_blank">东方财富 — 诺仕机器人完成超亿元A轮融资，上海半导体产投领投</a></li>
+          <li><a href="https://www.dahecube.com/article.html?artid=265815" target="_blank">大河财立方 — 诺仕机器人完成超亿元A轮融资</a></li>
+          <li><a href="http://nousbot.tech/about.php" target="_blank">诺仕机器人官网 — 关于我们</a></li>
+          <li><a href="http://nousbot.tech/news-15.php" target="_blank">诺仕机器人官网 — 苏州基地正式投产</a></li>
+          <li><a href="http://nousbot.tech/newslist.php" target="_blank">诺仕机器人官网 — 新闻中心</a></li>
+          <li><a href="https://www.worldrobotconference.com/expo/company/538.html" target="_blank">2026世界机器人大会 — 诺仕机器人展商信息</a></li>
+          <li><a href="https://www.sensorexpert.com.cn/article/474456.html" target="_blank">传感器专家网 — 诺仕机器人亮相2026第二届杭州人形机器人展</a></li>
+          <li><a href="https://finance.jrj.com.cn/2025/01/06150247146141.shtml" target="_blank">金融界 — 诺仕机器人取得行星滚柱轴承与行星滚柱丝杆组合式机构总成专利</a></li>
+          <li><a href="https://m.jrj.com.cn/madapter/finance/2025/05/17100050469541.shtml" target="_blank">金融界 — 诺仕机器人申请浮动式滚柱丝杠专利</a></li>
+          <li><a href="https://stcn.com/article/detail/3643842.html" target="_blank">证券时报 — 鹏翎股份：已参股武汉理岩及诺仕机器人</a></li>
+          <li><a href="https://finance.sina.com.cn/stock/relnews/cn/2026-02-04/doc-inhkrihr6645675.shtml" target="_blank">新浪财经 — 鹏翎股份参股诺仕机器人生产微型行星滚柱丝杠</a></li>
+          <li><a href="https://www.guandian.cn/article/20260311/547648.html" target="_blank">观点网 — 诺仕机器人完成超亿元人民币A轮融资</a></li>
+          <li><a href="http://www.iheima.com/article-394921.html" target="_blank">i黑马 — 诺仕机器人完成超亿元人民币A轮融资</a></li>
+          <li><a href="https://www.iyiou.com/briefing/202603091885416" target="_blank">亿欧 — 诺仕机器人完成超亿元A轮融资</a></li>
+          <li><a href="https://nuxt.cyzone.cn/article/826599.html" target="_blank">创业邦 — 诺仕机器人完成超亿元人民币A轮融资</a></li>
+          <li><a href="https://www.aibangbots.com/a/7704" target="_blank">艾邦机器人 — 灵巧手微型驱动龙头与诺仕机器人融资动态</a></li>
+          <li><a href="https://china-vision.org/index.php/news-detail/230775.html" target="_blank">机器视觉网 — 上汽创投完成对诺仕机器人独家天使+轮投资</a></li>
+          <li><a href="https://patent.lotut.com/patent/673cbc0303f9cd23683535c9.html" target="_blank">专利数据库 — 滚柱偏置式行星滚柱丝杠专利</a></li>
+        </ol>
+      </div>
+
+      <div class="page-footer">本页面由具身智能Wiki项目自动生成，数据截至2026年5月。内容基于公开报道和公司官方信息整理，仅供参考。</div>
+    </article>
+  </div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

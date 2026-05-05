@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>具识智能 — 具身智能Wiki</title><style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style></head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> › <span>具识智能</span></div>
+  <div class="wiki-header"><h1>具识智能</h1><div class="subtitle">上海具识智能科技有限公司 · 2024年成立 · 具身智能操作系统 · "机器人时代的安卓"</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#team">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financials">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#misc">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#a1">2.1 团队背景与场景选择</a></li>
+        <li class="toc-lvl4"><a href="#a2">2.2 技术路线与场景适配</a></li>
+        <li class="toc-lvl4"><a href="#a3">2.3 股东/资本结构影响</a></li>
+        <li class="toc-lvl4"><a href="#a4">2.4 试错与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#a5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#a6">2.6 其他观察与分析</a></li>
+        <li class="toc-lvl2"><a href="#references">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">具识智能</div>
+        <div class="ib-section">基本信息</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">上海具识智能科技有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2024年9月10日</div></div>
+        <div class="ib-row"><div class="ib-label">注册地</div><div class="ib-value">上海浦东张江科学城</div></div>
+        <div class="ib-row"><div class="ib-label">创始人/董事长</div><div class="ib-value">李治军</div></div>
+        <div class="ib-row"><div class="ib-label">注册资本</div><div class="ib-value">约647万元</div></div>
+        <div class="ib-row"><div class="ib-label">人员规模</div><div class="ib-value">约21-50人</div></div>
+        <div class="ib-section">融资数据</div>
+        <div class="ib-row"><div class="ib-label">累计融资</div><div class="ib-value">约800万-数千万元</div></div>
+        <div class="ib-row"><div class="ib-label">最新轮次</div><div class="ib-value">Pre-A轮（2025.11）</div></div>
+        <div class="ib-row"><div class="ib-label">主要投资方</div><div class="ib-value">乐聚机器人、哈工大资产、长三角国创中心、张江科投</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">核心产品</div><div class="ib-value">InsightOS（琢识）具身智能操作系统</div></div>
+        <div class="ib-row"><div class="ib-label">硬件适配</div><div class="ib-value">10+款机器人平台</div></div>
+        <div class="ib-row"><div class="ib-label">场景</div><div class="ib-value">智能制造、物流、农业、教育</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">赛道</div><div class="ib-value">具身智能操作系统（"大脑"）</div></div>
+        <div class="ib-row"><div class="ib-label">出身</div><div class="ib-value">哈工大系</div></div>
+        <div class="ib-row"><div class="ib-label">阶段</div><div class="ib-value">Pre-A轮/早期商业化</div></div>
+      </aside>
+
+      <p class="article-intro">具识智能（上海具识智能科技有限公司）成立于2024年9月，由哈尔滨工业大学教授、长江学者李治军创立，定位打造中国自主可控的具身智能操作系统底座，被誉为"机器人时代的安卓"。公司核心产品InsightOS（琢识）是全国首个国产具身智能操作系统，2025年7月在WAIC世界人工智能大会正式发布，已适配10余款国产机器人平台，覆盖智能制造、智慧物流、智慧农业、职业教育等场景。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper"><table class="wikitable infotable">
+        <tr><th>项目</th><th>内容</th></tr>
+        <tr><td>公司全称</td><td>上海具识智能科技有限公司</td></tr>
+        <tr><td>成立时间</td><td>2024年9月10日</td></tr>
+        <tr><td>注册地</td><td>上海市浦东新区张江科学城（秀浦路2388号）</td></tr>
+        <tr><td>注册资本</td><td>约647万元人民币</td></tr>
+        <tr><td>人员规模</td><td>约21-50人</td></tr>
+        <tr><td>创始人/董事长</td><td>李治军（哈工大教授、长江学者，操作系统领域30年+）</td></tr>
+        <tr><td>定位</td><td>打造中国自主可控的具身智能系统底座，"机器人时代的安卓"</td></tr>
+      </table></div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>时间</th><th>事件</th></tr>
+        <tr><td>2024年9月</td><td>公司正式成立，注册于上海张江科学城</td></tr>
+        <tr><td>2024年10月</td><td>完成天使轮融资，乐聚机器人、哈工大资产投资</td></tr>
+        <tr><td>2025年7月</td><td>InsightOS（琢识）在WAIC世界人工智能大会正式发布</td></tr>
+        <tr><td>2025年11月</td><td>完成Pre-A轮融资，长三角国创中心、张江科投、科力投资、道禾投资等参与</td></tr>
+        <tr><td>2025年12月</td><td>与安天科技达成合作，InsightOS内置AVL SDK反病毒引擎</td></tr>
+      </table></div>
+
+      <h3 id="team">1.2 创始人及核心团队</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+        <tr><td>创始人/董事长</td><td>李治军</td><td>哈尔滨工业大学计算学部教授、长江学者特聘教授，操作系统领域深耕超30年；曾担任乐聚机器人首席科学家，在操作系统与机器人交叉领域有深厚积累</td></tr>
+      </table></div>
+      <p>团队整体体现"资深学术带头人+工程化团队"结构。李治军教授30余年操作系统研究积累为InsightOS的技术底座提供了坚实基础。团队现有21-50人，研发人员占比未公开披露。核心团队源自哈工大操作系统研究方向，属于典型的<strong>学术深耕型创业</strong>——创始人以数十年领域积累切入产业转化。</p>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>轮次</th><th>时间</th><th>金额</th><th>投资方</th></tr>
+        <tr><td>天使轮</td><td>2024年10月</td><td>数百万-千万级</td><td>乐聚机器人（产业资本）、哈工大资产（高校背景）</td></tr>
+        <tr><td>Pre-A轮</td><td>2025年11月</td><td>未披露</td><td>长三角国创中心、张江科投、科力投资、道禾投资、上海长三角创新技术有限公司</td></tr>
+      </table></div>
+      <p>累计融资约800万-数千万元人民币（不同统计口径有差异）。公司非上市，估值未公开披露。天使轮中乐聚机器人作为产业投资方入股，哈工大资产提供高校背书。Pre-A轮引入长三角国创中心"拨投结合"机制支持——该项目通过长三角国创中心严格遴选，获概念验证阶段百万元级支持及千万元级"从1到10"转化支持。</p>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>维度</th><th>描述</th></tr>
+        <tr><td>总体AI技术路线</td><td>操作系统平台路线——不做硬件，做"机器人时代的安卓"；以OS为底座统一感知-决策-适配-协同四层能力</td></tr>
+        <tr><td>核心技术产品</td><td>InsightOS（琢识）：全国首个国产自主可控具身智能操作系统；Insight Studio：全栈开发平台</td></tr>
+        <tr><td>数据方案</td><td>通过Insight Studio开发平台提供具身数据采集与模型生成工具，构建场景任务评估体系</td></tr>
+        <tr><td>技术特色</td><td>智慧内生与融合（AI能力下沉为OS基础服务）、统一语义理解层（自然语言指挥机器人）、系统动态适应（自主容错）</td></tr>
+        <tr><td>硬件生态</td><td>跨平台适配层已适配10+款国产机器人（乐聚、优必选、小米、星海图等）；芯片适配地平线、华为等国产算力芯片</td></tr>
+      </table></div>
+      <p>公司技术核心在于将AI感知、推理、规划能力作为操作系统基础服务（而非"外挂"），实现毫秒级环境感知与行为响应。相比传统ROS，任务响应速度提升约300%，任务规划成功率超92%，硬件适配周期缩短至ROS的1/3，新应用开发周期从10人/月缩短至3人/天（提升约100倍），总成本降低约50%。</p>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>产品</th><th>类别</th><th>核心能力</th></tr>
+        <tr><td>InsightOS（琢识）</td><td>通用具身智能操作系统</td><td>四维能力体系：全域感知调度层、认知决策引擎层、跨平台适配层、群体智能协同层</td></tr>
+        <tr><td>Insight Studio</td><td>全栈开发平台</td><td>语义任务编排、仿真调试与真机部署、具身数据采集与模型生成、场景任务评估</td></tr>
+        <tr><td>边缘算力盒</td><td>配套硬件</td><td>软硬件协同优化，支持端侧部署</td></tr>
+      </table></div>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>场景领域</th><th>具体应用</th><th>典型落地</th></tr>
+        <tr><td>智能制造</td><td>质检、装配、产线机器人快速部署</td><td>一周部署10个工位，1人维护</td></tr>
+        <tr><td>智慧物流</td><td>仓储分拣</td><td>郑州无人售货仓</td></tr>
+        <tr><td>智慧农业</td><td>水果采摘、环境监测、除草、病虫害识别</td><td>农业机器人集成</td></tr>
+        <tr><td>职业教育</td><td>高校实训场景</td><td>机器人教学平台</td></tr>
+        <tr><td>服务机器人</td><td>零售、导览</td><td>商业服务场景</td></tr>
+        <tr><td>训练场</td><td>机器人测试验证</td><td>上海张江具身智能训练场、国家机器人测评中心</td></tr>
+      </table></div>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <p>公司处于早期商业化阶段，创始人公开表示"还有很长一段时间无法盈利，需要依靠融资"。InsightOS已适配10余款主流机器人平台，与安天科技等达成安全合作。商业化模式为OS授权+开发平台服务+边缘硬件销售。2025年12月获"2026中国机器人产业链先锋奖"提名。具体营收、客户数量未公开披露。</p>
+
+      <h3 id="financials">1.8 财务数据</h3>
+      <p>公司为早期初创企业，未上市，未公开披露营收、利润、毛利率等财务数据。截至2025年11月Pre-A轮融资完成，累计融资约800万-数千万元。长三角国创中心"拨投结合"机制额外提供百万元级验证支持及千万元级转化资金。</p>
+
+      <h3 id="misc">1.9 其他信息</h3>
+      <ul>
+        <li>InsightOS已内置安天AVL SDK反病毒引擎（具身智能专用版本），系国内首个为机器人操作系统集成安全能力的案例</li>
+        <li>公司尚未公开海外业务布局，但InsightOS作为国产自主操作系统，天然具有信创/国产替代叙事</li>
+        <li>2025年7月，InsightOS在WAIC大会引起广泛关注，被媒体称为"机器人安卓系统诞生"</li>
+        <li>公司与长三角国创中心深度绑定，体现了"拨投结合"这一新型科研成果转化模式</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="a1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>创始人李治军教授在操作系统领域深耕30余年，拥有操作系统底层架构的深厚功力，这使得具识智能选择"做OS而非做硬件"的战略高度契合团队基因。操作系统级别的系统抽象、资源调度、安全隔离等能力需要长期学术积累，非短期工程团队可速成。然而，操作系统的价值必须通过广泛的硬件适配和开发者生态来验证，这恰好是学术团队在产业生态运营方面的短板。李治军曾担任乐聚机器人首席科学家的经历，为其提供了从OS到机器人的跨界桥梁，缓解了部分学术-产业间的鸿沟。</p>
+      </div>
+
+      <div class="analysis-block" id="a2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>InsightOS的四层架构（感知调度→认知决策→跨平台适配→群体协同）覆盖了从单机到集群的完整需求谱系，这一设计理念与ROS类似但更强调"AI内生"。在智能制造场景中，一周部署10工位且1人维护的效率指标说明OS在产线快速部署方面确实释放了价值。但跨场景泛化——从制造业到农业再到教育——对OS的抽象层级要求极高，多个领域知识差异巨大，短期内难以在每个场景做到深度优化。此外，"智慧内生"意味着将AI深度嵌入OS内核，这可能带来系统更新与模型迭代的耦合风险。</p>
+      </div>
+
+      <div class="analysis-block" id="a3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>天使轮中乐聚机器人作为产业投资方入股，为具识智能提供了天然的硬件适配伙伴和产业场景验证通道——乐聚人形机器人是InsightOS的首批适配平台之一。哈工大资产的参与提供了高校层面的技术信用背书和人才输送通道。Pre-A轮引入长三角国创中心"拨投结合"机制，使公司获得政府级资金支持和政策背书，但也可能带来对国产化指标和区域产业落地的隐性要求。整体看，股东结构"产业资本+高校+政府"，使公司兼具技术自主性（非纯财务VC驱动）和场景绑定（乐聚），但也限制了其在非国产化路线上的灵活性。</p>
+      </div>
+
+      <div class="analysis-block" id="a4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>公司成立仅一年半，尚未观察到明显的战略转向或产品线调整。从已披露信息看，发展路径较为线性：天使轮获得产业资本支持→研发InsightOS→WAIC发布→适配多款机器人→Pre-A轮获得政府及市场资本认可。值得关注的是，InsightOS从2025年7月发布到年底已适配10+款平台，说明团队在生态拓展速度上有较强执行力。但"一周部署10工位"到"覆盖全行业"之间仍有巨大鸿沟，后续是否会在某些场景上做减法、聚焦更少但更深的垂直领域，是一个值得观察的选择节点。</p>
+      </div>
+
+      <div class="analysis-block" id="a5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>具识智能的定位清晰而独特：在具身智能产业链中做"操作系统层"，不做机器人本体，不做大模型，只做连接"大脑"与"身体"的中间件/OS。这一定位类似于安卓之于智能手机产业链——自己不造手机，但通过OS平台让所有手机都能运行同一套应用生态。核心取舍是：放弃硬件的高毛利率和单品规模效应，换取平台型公司的生态杠杆和多场景渗透能力。但这一模式的隐忧在于：安卓的成功建立在智能手机海量出货的基础上，而具身智能目前尚不存在同等规模的硬件基数，OS的生态价值需要等硬件出货量达到临界点才能兑现。</p>
+      </div>
+
+      <div class="analysis-block" id="a6">
+        <h4>2.6 其他重要观察与分析</h4>
+        <p>几点值得关注：其一，具识智能是全国首个提出"具身智能操作系统"概念的创业公司，具有先发优势和定义权——如果行业最终接受"统一OS"路线，具识智能将占据有利位置。其二，InsightOS内置安天反病毒引擎，说明公司已前瞻性布局机器人安全领域——当人形/工业机器人进入物理世界后，操作系统安全将从"数据风险"升级为"物理安全风险"，这一差异化能力可能成为企业级客户的采购门槛。其三，公司已通过长三角国创中心"拨投结合"机制获得政府背书，在信创/国产替代政策红利下，InsightOS的"国产自主可控"标签是重要的市场准入优势。其四，在2026年具身智能融资狂潮中（Q1已披露超300亿元），具识智能的估值和融资规模相对克制，反映其"OS平台"路线的估值逻辑尚未被资本市场充分定价。</p>
+      </div>
+
+      <h2 id="references">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://vc.pedaily.cn/company/710734.html" target="_blank">具识智能 — 投资界企业页</a></li>
+          <li><a href="https://leaderobot.com/news/6660" target="_blank">机器人迎来安卓时刻：具识智能重磅推出 insightOS — 高工机器人</a></li>
+          <li><a href="https://www.jfdaily.com/wx/detail.do?id=954548" target="_blank">打造"机器人时代的安卓"，上海企业发布国产具身智能操作系统 — 解放日报</a></li>
+          <li><a href="https://www.antiy.cn/About/news/20251201.html" target="_blank">具识智能董事长李治军一行到访安天参观交流 — 安天科技</a></li>
+          <li><a href="https://export.shobserver.com/sgh/detail?id=1619362" target="_blank">从"机器人时代的安卓"到智慧农田 — 上观新闻</a></li>
+          <li><a href="https://www.ofweek.com/award/2026/robot/vote/wap/company.html?companyId=14386" target="_blank">上海具识智能科技有限公司 — OFweek机器人网</a></li>
+          <li><a href="https://finance.ifeng.com/c/8lAtr7cUpxJ" target="_blank">助力机器人加速"进化" — 凤凰财经</a></li>
+          <li><a href="https://www.innohere.com/ir/155242/frame.html" target="_blank">具识智能 — 公司图谱</a></li>
+          <li><a href="https://www.innohere.com/ir/155242/finance.html" target="_blank">具识智能 — 融资历史 — 公司图谱</a></li>
+          <li><a href="https://data.iyiou.com/company/details/ccae1b998fc593886d8a1be0bcf3eff1/profile" target="_blank">具识智能 — 亿欧数据</a></li>
+          <li><a href="https://sh.people.com.cn/n2/2025/0731/c134768-41309207.html" target="_blank">具身智能：从科学走向产业的探索与创新 — 人民网</a></li>
+          <li><a href="https://www.163.com/dy/article/KF00302K05119596.html" target="_blank">上海有两家公司完成天使轮融资，其中一家成立仅3个月 — 网易</a></li>
+          <li><a href="https://m.jfdaily.com/wx/detail.do?id=954488" target="_blank">机器人"安卓系统"诞生！全国首个具身智能操作系统亮相 — 解放日报</a></li>
+          <li><a href="https://www.mycaijing.com/article/detail/567305" target="_blank">百亿估值只是入场券？2026年资本重估具身智能"大脑" — 财经</a></li>
+          <li><a href="http://sh.people.com.cn/BIG5/n2/2025/0731/c134768-41309207.html" target="_blank">具身智能：从科学走向产业的探索与创新（繁） — 人民网</a></li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">此页面基于公开信息整理，数据截至2026年5月。上海具识智能科技有限公司 · 具身智能Wiki</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

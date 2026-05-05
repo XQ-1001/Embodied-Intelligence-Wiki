@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>月泉仿生 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> <span class="breadcrumb-sep">›</span> <span>月泉仿生</span></div>
+  <div class="wiki-header"><h1>月泉仿生</h1><div class="subtitle">MoonSpring Bionics · 2022年成立 · 院士领衔 · 仿生拉压体机器人全球首创 · Pre-A轮近亿元</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#founders">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financials">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#analysis-1">2.1 团队背景与场景选择</a></li>
+        <li class="toc-lvl4"><a href="#analysis-2">2.2 技术路线与场景适配</a></li>
+        <li class="toc-lvl4"><a href="#analysis-3">2.3 股东/资本结构影响</a></li>
+        <li class="toc-lvl4"><a href="#analysis-4">2.4 试错与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#analysis-5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#analysis-6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#references">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">月泉仿生</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">北京达奇月泉仿生科技有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">英文名</div><div class="ib-value">MoonSpring Bionics</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2022年11月</div></div>
+        <div class="ib-row"><div class="ib-label">总部</div><div class="ib-value">北京市昌平区未来科学城</div></div>
+        <div class="ib-row"><div class="ib-label">创始人</div><div class="ib-value">任露泉（院士）、任雷（长江学者）</div></div>
+        <div class="ib-section">融资数据</div>
+        <div class="ib-row"><div class="ib-label">累计融资</div><div class="ib-value">约1.2亿元（4轮）</div></div>
+        <div class="ib-row"><div class="ib-label">最新轮次</div><div class="ib-value">A轮（2025.12）</div></div>
+        <div class="ib-row"><div class="ib-label">主要投资方</div><div class="ib-value">洪泰基金、梅花创投、中关村启航</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">灵巧手自由度</div><div class="ib-value">38个（全球最高）</div></div>
+        <div class="ib-row"><div class="ib-label">专利</div><div class="ib-value">35项申请，23项授权</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">赛道</div><div class="ib-value">仿生机器人·人形机器人</div></div>
+        <div class="ib-row"><div class="ib-label">技术路线</div><div class="ib-value">仿生拉压体机器人理论</div></div>
+        <div class="ib-section">官网</div>
+        <div class="ib-row"><div class="ib-label">来源</div><div class="ib-value">公司公告/媒体报道</div></div>
+      </aside>
+
+      <p class="article-intro"><strong>月泉仿生</strong>（北京达奇月泉仿生科技有限公司）成立于2022年11月，总部位于北京昌平未来科学城，由中国科学院院士任露泉与英国曼彻斯特大学终身教授、长江学者任雷联合创立。公司以任雷教授国际首创的"仿生拉压体机器人理论与技术"为核心，突破传统刚性铰链式机器人设计范式，已发布全球自由度最高的仿生灵巧手（38个自由度）和多款人形机器人产品。累计完成4轮融资约1.2亿元，2026年2月习近平总书记考察时，公司产品参与汇报展示。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper"><table class="wikitable infotable">
+        <tr><th>项目</th><th>内容</th></tr>
+        <tr><td>公司全称</td><td>北京达奇月泉仿生科技有限公司</td></tr>
+        <tr><td>成立时间</td><td>2022年11月3日</td></tr>
+        <tr><td>正式运营</td><td>2023年6月</td></tr>
+        <tr><td>注册地址</td><td>北京市昌平区未来科学城</td></tr>
+        <tr><td>上市状态</td><td>未上市</td></tr>
+        <tr><td>资质</td><td>北京市"专精特新"中小企业、高新技术企业</td></tr>
+      </table></div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>时间</th><th>事件</th></tr>
+        <tr><td>2022年11月</td><td>公司正式注册成立</td></tr>
+        <tr><td>2023年8月</td><td>完成天使轮融资（中关村发展启航基金）</td></tr>
+        <tr><td>2024年4月</td><td>完成天使+轮融资（梅花创投）</td></tr>
+        <tr><td>2024年11月</td><td>完成Pre-A轮近亿元融资（洪泰基金领投）；获数千万元订单</td></tr>
+        <tr><td>2025年</td><td>获评"专精特新"中小企业；与未来科学城集团战略合作</td></tr>
+        <tr><td>2025年12月</td><td>完成A轮融资（北京未来科学城基金、新荣拓展）</td></tr>
+        <tr><td>2026年2月</td><td>习近平总书记考察，应手Y-Hand参与展示</td></tr>
+        <tr><td>2026年3月</td><td>Y-Hand M2（AI Show）和博文W-Bot 2.0（中关村论坛）连续发布</td></tr>
+      </table></div>
+
+      <h3 id="founders">1.2 创始人及核心团队</h3>
+      <p>月泉仿生由两位国际顶尖仿生学学者联合创立。任露泉为中国科学院院士、吉林大学教授、国际仿生工程学会名誉理事长。任雷为英国曼彻斯特大学终身教授、教育部长江学者、国际仿生工程学会常务副理事长，是"仿生拉压体机器人原理与技术"的国际首创者。团队在仿生机器人领域累计获得超300项国际国内专利授权，覆盖研发、生产、供应链管理全链条。</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+        <tr><td>创始人</td><td>任露泉</td><td>中国科学院院士，吉林大学教授，国际仿生工程学会名誉理事长</td></tr>
+        <tr><td>联合创始人/技术核心</td><td>任雷</td><td>英国曼彻斯特大学终身教授，国家特聘专家，教育部长江学者，吉林大学教授，国际仿生工程学会常务副理事长；首创"仿生拉压体机器人原理与技术"</td></tr>
+      </table></div>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>时间</th><th>轮次</th><th>金额</th><th>主要投资方</th></tr>
+        <tr><td>2023年8月</td><td>天使轮</td><td>千万级</td><td>中关村发展启航产业投资基金</td></tr>
+        <tr><td>2024年4月</td><td>天使+轮</td><td>千万级</td><td>梅花创投</td></tr>
+        <tr><td>2024年11月</td><td>Pre-A轮</td><td>近亿元</td><td>洪泰基金（领投）、长兴基金、中关村启航基金（跟投）</td></tr>
+        <tr><td>2025年12月</td><td>A轮</td><td>未披露</td><td>北京未来科学城基金（星科创投）、新荣拓展</td></tr>
+      </table></div>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>维度</th><th>详情</th></tr>
+        <tr><td>核心技术理论</td><td>"仿生拉压体机器人理论与技术"（任雷教授国际首创）：模拟人体骨骼-肌肉-韧带系统，颠覆传统刚性铰链式设计</td></tr>
+        <tr><td>核心驱动</td><td>磁集电驱人工肌肉：重现人体骨骼肌生物力学特性，实现驱动、变速、传动一体化</td></tr>
+        <tr><td>结构设计</td><td>仿生多层多级刚柔耦合系统：系统级动力传输、能量管理和环境交互</td></tr>
+        <tr><td>运动控制</td><td>分布式肌肉神经网络控制架构，结合强化学习+LLM大语言模型，实现语义理解到精确指令规划</td></tr>
+        <tr><td>差异化</td><td>区别于主流刚性关节方案，走"柔性仿生"路线；灵巧手38个自由度全球最高</td></tr>
+      </table></div>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>产品系列</th><th>型号</th><th>关键参数</th><th>适用场景</th></tr>
+        <tr><td>仿生灵巧手</td><td>应手Y-Hand M2</td><td>38自由度，整手握力330N，五指闭合0.2秒，指尖精度0.04mm</td><td>精密抓取、柔性操作</td></tr>
+        <tr><td>刚性灵巧手</td><td>信手X-Hand M1</td><td>40kg提拉负载，472个触觉传感单元</td><td>高负载操作</td></tr>
+        <tr><td>轮式人形</td><td>博文W-Bot 2.0</td><td>0.2㎡底盘，7自由度仿人臂，双臂20kg负载，触及2.2m</td><td>仓储物流、制造</td></tr>
+        <tr><td>全尺寸人形</td><td>博行X-Bot</td><td>全身51个自由度</td><td>通用场景</td></tr>
+        <tr><td>仿生机械臂</td><td>仿生拉压体机械臂</td><td>12自由度，负载高达自重50%</td><td>狭小空间精细作业</td></tr>
+        <tr><td>医疗康复</td><td>仿生足踝</td><td>仿生假肢类</td><td>医疗康复</td></tr>
+      </table></div>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>领域</th><th>典型应用</th><th>合作伙伴</th></tr>
+        <tr><td>能源</td><td>海上风电作业、高空作业（机械臂+灵巧手搭载无人机）</td><td>国家电投</td></tr>
+        <tr><td>特种作业</td><td>无人化防务、高危环境精细化作业</td><td>严格防务科技集团</td></tr>
+        <tr><td>智能制造</td><td>产线柔性抓取、零部件装配</td><td>富维（应用实验室）</td></tr>
+        <tr><td>医疗健康</td><td>仿生假肢、智能康复装备</td><td>—</td></tr>
+        <tr><td>仓储物流</td><td>狭窄空间搬运分拣（博文W-Bot）</td><td>—</td></tr>
+      </table></div>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <p>月泉仿生正式运营仅一年（2024年）即获得数千万元新增订单，商业化速度突出。仿生足踝产品已实现交付并获客户认可。与国家电投达成战略合作，将轻量机械臂+仿生灵巧手搭载无人机用于海上风电作业。与严格防务科技集团合作推进特种机器人智能化操作。博文W-Bot初代已在富维-月泉机器人应用实验室完成场景验证。2026年3月中关村论坛期间达成多项初步合作意向。</p>
+
+      <h3 id="financials">1.8 财务数据</h3>
+      <p>月泉仿生为非上市初创企业，未公开完整财务报表。已知累计融资约1.2亿元（4轮），2024年获得数千万元新增订单。仿生灵巧手和机械臂产品处于商业化早期阶段，仿生足踝为已交付盈利产品线。公司处于从技术研发向规模商业化过渡阶段。</p>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>2026年2月习近平总书记考察北京国家信创园时，月泉仿生"应手Y-Hand"参与汇报展示</li>
+        <li>Y-Hand M2以38个自由度保持全球灵巧手自由度最高纪录</li>
+        <li>2026中关村论坛年会，博文W-Bot 2.0获央视新闻联播报道</li>
+        <li>获评《哈佛商业评论》拉姆·查兰管理实践奖、AI100应用标杆</li>
+        <li>长春设立子公司（长春月泉仿生科技有限公司，注册资本3000万）参与吉林省仿生机器人创新中心建设</li>
+        <li>专利累计申请35项、授权23项，发明专利占比超95%</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="analysis-1"><h4>2.1 团队背景与场景选择的匹配度</h4><p>月泉仿生的创始团队堪称中国仿生学领域的顶级配置——任露泉院士是国际仿生工程学会名誉理事长，任雷教授是"仿生拉压体"理论的开创者。这种学术背景使公司从一开始就站在了仿生机器人基础理论的制高点。然而学术背景也可能带来挑战：如何将实验室的原型技术转化为可量产、有ROI的工业产品，是学术型创业团队的普遍考验。公司选择以灵巧手和特种作业（能源、防务）为切入点，与其"高精度、高柔性"的技术优势匹配合理——这些场景对性能要求极高、价格敏感度相对较低。</p></div>
+      <div class="analysis-block" id="analysis-2"><h4>2.2 技术路线与场景的适配性</h4><p>"仿生拉压体"技术路线是月泉仿生最核心的差异化。传统工业机器人和大多数人形机器人采用刚性铰链关节，而月泉的"人工肌肉"方案在柔顺性、能效（运动能耗CoT仅为人体1-2倍）、安全性（柔性碰撞）方面具有天然优势。这一路线在需要精细力控的场景（如精密装配、医疗康复）和需要柔顺交互的场景（如服务机器人）中适配性极佳。但在需要高刚度、高重复定位精度的工业场景中，柔顺性可能反而成为劣势。公司推出的"信手X-Hand M1"刚性灵巧手，表明其已意识到不能只用一条技术路线覆盖所有场景。</p></div>
+      <div class="analysis-block" id="analysis-3"><h4>2.3 股东/资本结构对战略的影响</h4><p>月泉仿生的股东结构以国资+知名VC为主：中关村发展启航基金从天使轮持续跟投，体现北京国资对仿生机器人赛道的战略布局；洪泰基金（俞敏洪系）和梅花创投的参与增加了市场化背书；北京未来科学城基金的A轮投资将公司与昌平区产业生态深度绑定。值得注意的是，公司融资总额约1.2亿元，在人形机器人赛道中处于中等水平，与智元、银河通用等动辄数亿融资的公司相比存在资金体量差距。这要求月泉必须走"高毛利、低资金消耗"的差异化路径。</p></div>
+      <div class="analysis-block" id="analysis-4"><h4>2.4 试错过程与路径调整</h4><p>月泉仿生展现了从"核心部件→整机"的渐进式路径：先推出仿生灵巧手和足踝（核心部件验证），再推出博文W-Bot轮式人形和博行X-Bot全尺寸人形（整机集成）。2026年产品节奏明显提速，从一年一款到一季度两款。公司也做出了务实的技术路线调整——在推出柔性灵巧手（应手系列）的同时，也推出了刚性灵巧手（信手系列），显示其认识到不同场景对"柔"与"刚"的需求差异，不执着于单一技术路线。</p></div>
+      <div class="analysis-block" id="analysis-5"><h4>2.5 竞争定位与取舍</h4><p>月泉仿生的核心取舍在于：走"仿生柔性"路线而非"刚性通用"路线。在主流人形机器人公司纷纷采用电机+减速器+刚体结构的背景下，月泉是少数坚持仿生驱动原理的公司。这一选择使其在灵巧手领域获得了38自由度的全球领先地位，但其整机产品（博文W-Bot、博行X-Bot）在负载能力、运动速度等指标上可能不及刚性方案。公司似乎接受了这一取舍——以灵巧手和核心部件作为"尖刀产品"突破市场，整机作为技术集成的展示平台，而非短期内的主要收入来源。</p></div>
+      <div class="analysis-block" id="analysis-6"><h4>2.6 其他重要观察、分析</h4><p>月泉仿生获得习近平考察展示是极为罕见的政治背书，可能为公司带来政策、资本和客户资源的多重加持。但需关注的风险包括：（1）仿生拉压体技术的大规模量产工艺尚未验证，"人工肌肉"的批量一致性和寿命是关键挑战；（2）公司Pre-A轮融资近亿元但累计融资仅1.2亿，与竞品存在资金体量差距，可能限制产能扩张速度；（3）灵巧手赛道竞争加剧，智元、因时机器人等均有产品布局；（4）从灵巧手到整机人形机器人的技术跨越难度被行业普遍低估。</p></div>
+
+      <h2 id="references">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://36kr.com/p/3022212992869895">「月泉仿生」获近亿元Pre-A轮融资｜36氪</a></li>
+          <li><a href="https://news.pedaily.cn/202404/533079.shtml">月泉仿生完成千万元天使+轮融资｜投资界</a></li>
+          <li><a href="https://www.ncsti.gov.cn/kjdt/scyq/wlkxc/wldt/202602/t20260212_238196.html">习近平考察科技创新工作，月泉仿生展示创新成果｜国家科技信息中心</a></li>
+          <li><a href="https://robot.ofweek.com/2026-03/ART-8321200-8100-30683802.html">月泉仿生应手Y-Hand M2重磅发布｜OFweek机器人网</a></li>
+          <li><a href="https://tech.cnr.cn/techph/20260328/t20260328_527565301.shtml">博文W-Bot 2.0首发获央视新闻报道｜央广网</a></li>
+          <li><a href="https://leaderobot.com/news/7491">央视新闻联播聚焦月泉仿生｜leaderobot</a></li>
+          <li><a href="https://leaderobot.com/news/4803">通用型仿生人形机器人研发商月泉仿生完成Pre-A轮融资｜leaderobot</a></li>
+          <li><a href="https://www.chinaventure.com.cn/news/114-20241111-383786.html">人形机器人，再融资｜投中网</a></li>
+          <li><a href="http://www.wlkxcgs.com/html/news_center/grassroots_dynamics/468.html">月泉仿生重磅发布Y-Hand M2｜未来科学城</a></li>
+          <li><a href="https://www.sensorexpert.com.cn/article/469908.html">月泉仿生发布应手Y-Hand M2仿生灵巧手｜传感器专家网</a></li>
+          <li><a href="https://www.sohu.com/a/951227496_121034620">未来科学城星科创投基金持续刷新"进度条"｜搜狐</a></li>
+          <li><a href="https://www.bjchp.gov.cn/cpqzf/ywdt26/cpkx/2026032819115935561/index.html">多家昌平企业现身2026中关村论坛年会｜昌平区政府</a></li>
+          <li><a href="https://vc.pedaily.cn/company/688046.html">月泉仿生-投资界企业页</a></li>
+          <li><a href="https://paper.bdcn-media.com/h5/html5/2024-11/22/content_2_1588.htm">中关村发展集团加磅投资月泉仿生｜中关村发展报</a></li>
+          <li><a href="https://www.sohu.com/a/775057967_118792">梅花创投投资，月泉仿生完成千万元天使+轮融资｜搜狐</a></li>
+          <li><a href="https://robot.m.ofweek.com/2024-11/ART-8321206-8120-30650460.html">中科院院士领衔！人形机器人玩家获近亿元｜OFweek</a></li>
+          <li><a href="https://g.pconline.com.cn/x/2122/21226294.html">月泉仿生博文W-Bot 2.0机器人中关村论坛首发｜太平洋科技</a></li>
+          <li><a href="https://agent.ren/2026/0326/10824.shtml">AI Show 2026月泉仿生发布Y-Hand M2获创新应用奖</a></li>
+          <li><a href="https://www.gsjb.com/system/2025/11/06/031273237.shtml">前瞻布局四川"一号工程"点燃智能制造新引擎｜甘肃经济报</a></li>
+          <li><a href="https://www.sohu.com/a/824747587_222256">月泉仿生等创企完成融资｜搜狐</a></li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">此页面由Cowork Wiki Dispatcher自动生成 · 数据截至2026年5月 · 内容仅供参考，不构成投资建议</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

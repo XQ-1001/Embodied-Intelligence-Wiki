@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>智行智能 — 具身智能Wiki</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> › <span>智行智能</span></div>
+  <div class="wiki-header"><h1>智行智能</h1><div class="subtitle">山东智行智能具身有限公司 · 纽氏达特子公司 · 成立于2025年 · 具身智能机器人整机</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#founders">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#finance">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#ana1">2.1 团队背景与场景匹配度</a></li>
+        <li class="toc-lvl4"><a href="#ana2">2.2 技术路线与场景适配性</a></li>
+        <li class="toc-lvl4"><a href="#ana3">2.3 股东/资本结构对战略的影响</a></li>
+        <li class="toc-lvl4"><a href="#ana4">2.4 试错过程与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#ana5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#ana6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#references">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">智行智能</div>
+        <div class="ib-section">基本信息</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">山东智行智能具身有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2025年8月8日</div></div>
+        <div class="ib-row"><div class="ib-label">注册资本</div><div class="ib-value">1,500万元</div></div>
+        <div class="ib-row"><div class="ib-label">法定代表人</div><div class="ib-value">刘奇</div></div>
+        <div class="ib-row"><div class="ib-label">注册地</div><div class="ib-value">山东省淄博市</div></div>
+        <div class="ib-row"><div class="ib-label">母公司</div><div class="ib-value">纽氏达特行星传动</div></div>
+        <div class="ib-section">财务数据</div>
+        <div class="ib-row"><div class="ib-label">独立营收</div><div class="ib-value">未披露（成立不足1年）</div></div>
+        <div class="ib-row"><div class="ib-label">母公司地位</div><div class="ib-value">精密减速机全国第一</div></div>
+        <div class="ib-row"><div class="ib-label">母公司IPO</div><div class="ib-value">辅导验收（2026.4）</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">赛道</div><div class="ib-value">具身智能机器人</div></div>
+        <div class="ib-row"><div class="ib-label">阶段</div><div class="ib-value">早期/商业化试点</div></div>
+        <div class="ib-row"><div class="ib-label">属性</div><div class="ib-value">产业子公司</div></div>
+      </aside>
+
+      <p class="article-intro">智行智能（山东智行智能具身有限公司）是纽氏达特行星传动系统技术（淄博）股份有限公司联合淄博市齐创产业投资基金于2025年8月成立的具身智能机器人子公司，定位为具身智能机器人整机OEM与应用推广平台。公司背靠国内精密减速机龙头纽氏达特，从核心零部件向整机集成延伸，产品聚焦文旅商演和展厅讲解等场景。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper"><table class="wikitable infotable">
+        <tr><th>项目</th><th>内容</th></tr>
+        <tr><td>公司全称</td><td>山东智行智能具身有限公司</td></tr>
+        <tr><td>成立时间</td><td>2025年8月8日</td></tr>
+        <tr><td>注册资本</td><td>1,500万元人民币</td></tr>
+        <tr><td>法定代表人</td><td>刘奇</td></tr>
+        <tr><td>注册地址</td><td>山东省淄博市高新区尊贤路5888号1幢1F</td></tr>
+        <tr><td>公司类型</td><td>其他有限责任公司</td></tr>
+        <tr><td>股东</td><td>纽氏达特行星传动系统技术（淄博）股份有限公司；淄博市齐创产业投资基金合伙企业（有限合伙）</td></tr>
+        <tr><td>经营范围</td><td>智能机器人研发、智能机器人销售、人工智能应用软件开发等</td></tr>
+      </table></div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>时间</th><th>事件</th></tr>
+        <tr><td>2025年8月</td><td>山东智行智能具身有限公司注册成立，注册资本1,500万元</td></tr>
+        <tr><td>2025年</td><td>推出人形机器人展示机，身高1.31米，应用于淄博当地商场、展会</td></tr>
+        <tr><td>2026年初</td><td>机器人亮相多个展会及商场，展示单腿悬空、单腿跳跃等高难度动作</td></tr>
+      </table></div>
+
+      <h3 id="founders">1.2 创始人及核心团队</h3>
+      <p>智行智能作为纽氏达特控股子公司，核心管理团队由母公司高管兼任。纽氏达特英文名NewStart（"新的开始"），以持续创业为企业文化。公开亮相的高管包括：</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+        <tr><td>法定代表人/副总经理</td><td>刘奇</td><td>纽氏达特副总经理兼董事会秘书，多次代表公司出席山东省政府及行业会议，主导IPO及资本运作</td></tr>
+        <tr><td>执行总经理</td><td>李汝科</td><td>纽氏达特执行总经理，负责整体运营管理</td></tr>
+        <tr><td>行政总监</td><td>潘长胜</td><td>纽氏达特行政总监</td></tr>
+        <tr><td>应用推广负责人</td><td>刘浩</td><td>智行智能运营推广负责人，负责机器人在文旅商演、展厅等场景的应用落地</td></tr>
+      </table></div>
+      <p>纽氏达特控股股东安利书持股约72%-73.77%，为公司实际控制人。团队整体呈现产业派特征，核心人员具有深厚的精密传动与机器人零部件行业积累。</p>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <p>智行智能作为2025年8月新设公司，暂无独立对外融资记录。初始资金来自母公司和淄博国资背景基金。母公司纽氏达特已完成数亿元A+轮融资（2024年），投资方包括洪泰基金、国投招商、山东新动能基金、淄博高新产业投资、国家电投、东证资本、兰璞创投、诺华资本、山东高速等，并于2026年4月完成IPO辅导验收，拟冲刺创业板。</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>股东</th><th>持股比例</th><th>类型</th></tr>
+        <tr><td>纽氏达特行星传动系统技术（淄博）股份有限公司</td><td>控股</td><td>产业母公司</td></tr>
+        <tr><td>淄博市齐创产业投资基金合伙企业（有限合伙）</td><td>参股</td><td>地方政府引导基金</td></tr>
+      </table></div>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <p>智行智能依托母公司纽氏达特在精密传动领域的深厚积累，走"核心零部件→机器人本体→应用端"的全链路垂直整合路线。</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>技术维度</th><th>详情</th></tr>
+        <tr><td>AI技术路线</td><td>尚未公开披露自研AI模型；运动控制层面依托母公司的关节模组技术</td></tr>
+        <tr><td>硬件路线</td><td>全自研关节模组（母公司供应），全身30+自由度，精密减速机+伺服电机+传感器一体</td></tr>
+        <tr><td>数据方案</td><td>未公开披露</td></tr>
+        <tr><td>自研程度</td><td>核心零部件（减速机、关节模组）高度自研，母公司为国内主流人形机器人企业的核心供应商</td></tr>
+        <tr><td>技术特色</td><td>已实现单腿悬空、单腿跳跃等高难度运动控制；母公司行星减速机年出货超70万套（全国第一）</td></tr>
+      </table></div>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <p>智行智能目前已展示的具身智能人形机器人参数如下：</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>参数</th><th>数值</th></tr>
+        <tr><td>身高</td><td>1.31米</td></tr>
+        <tr><td>重量</td><td>约39公斤</td></tr>
+        <tr><td>自由度</td><td>全身30+自由度</td></tr>
+        <tr><td>关节模组</td><td>搭载纽氏达特关节模组</td></tr>
+        <tr><td>功能</td><td>舞蹈、太极、握手、敬礼、单腿悬空、单腿跳跃</td></tr>
+        <tr><td>主要适用场景</td><td>工业制造、仓储物流、文娱商演、展厅讲解</td></tr>
+      </table></div>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>场景类别</th><th>具体场景</th><th>落地状态</th></tr>
+        <tr><td>文旅商演</td><td>淄博当地商场、展会展示</td><td>已试点</td></tr>
+        <tr><td>展厅讲解</td><td>展馆导览与互动</td><td>已试点</td></tr>
+        <tr><td>工业制造</td><td>工业场景应用（规划中）</td><td>规划中</td></tr>
+        <tr><td>仓储物流</td><td>仓储物流作业（规划中）</td><td>规划中</td></tr>
+      </table></div>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <p>公司成立不足一年，商业化处于早期验证阶段。目前主要进展包括：</p>
+      <ul>
+        <li>在淄博当地商场、展会零星亮相展示</li>
+        <li>业务模式定位"应用推广 + OEM代工 + 供应链"三位一体</li>
+        <li>尚未披露出货量、订单及独立营收数据</li>
+      </ul>
+
+      <h3 id="finance">1.8 财务数据</h3>
+      <p>智行智能无独立财务披露。母公司纽氏达特核心财务参考：</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>指标</th><th>数据</th><th>说明</th></tr>
+        <tr><td>精密行星减速机年出货</td><td>超70万套</td><td>全国第一、全球第二</td></tr>
+        <tr><td>谐波减速机产能</td><td>30万套</td><td>全国第二</td></tr>
+        <tr><td>扩产项目投资</td><td>16.7亿元</td><td>预计年产150万台核心部件</td></tr>
+        <tr><td>达产后预计收入</td><td>直接销售收入15亿元</td><td>产业链生态50亿元产值</td></tr>
+        <tr><td>IPO状态</td><td>辅导验收（2026年4月）</td><td>辅导机构：东方证券</td></tr>
+      </table></div>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>纽氏达特为国家专精特新"小巨人"企业、国家特种机器人产业链链主单位</li>
+        <li>纽氏达特已内部孵化15家生态企业（规上企业5家），计划2035年培育30家</li>
+        <li>母公司产品覆盖人形机器人、新能源换电（蔚来汽车）、商业航天、半导体等领域</li>
+        <li>为国内主流人形机器人企业（智元、众擎等）提供关节模组，人形机器人关节模组市场份额占全国约70%</li>
+        <li>山东省规划到2027年全省机器人制造产业规模突破500亿元</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="ana1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>智行智能团队根植于纽氏达特的精密传动产业基因，核心人员在减速机、关节模组等机器人核心零部件领域拥有近20年积累。团队选择文旅商演和展厅讲解作为首发场景，与团队本身缺乏AI算法和消费端产品经验的背景匹配——这些场景对机器人的交互智能要求相对较低，更多依赖运动控制能力（这正是纽氏达特关节模组的强项）。母公司为国内主流人形机器人厂商供应关节模组，意味着团队对人形机器人整机集成已有深度理解，但从零部件供应商转型整机品牌仍存在品牌建设和场景运营的能力缺口。</p>
+      </div>
+
+      <div class="analysis-block" id="ana2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>智行智能走的是"母公司供应核心零部件→子公司做整机集成→推向应用场景"的垂直整合路线。这一路线在硬件层面高度自洽：纽氏达特的精密减速机和关节模组已在国内人形机器人市场占据主导份额，成本和质量有规模优势。但AI软件层面——包括感知、决策、交互——尚无公开信息显示自研能力。当前选择的文旅商演场景对AI要求偏低，更多考验运动控制精度，与现有技术栈匹配度较高。若未来向工业制造和仓储物流拓展，对AI感知与自主决策能力的要求将显著提升，可能成为瓶颈。</p>
+      </div>
+
+      <div class="analysis-block" id="ana3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>智行智能的股东结构为"产业母公司控股 + 地方国资参股"。淄博市齐创产业投资基金的参与意味着公司获得山东省及淄博市在机器人产业链上的政策与资源支持，但也可能约束其应用场景优先服务于本地产业需求（如山东制造业智能化改造）。母公司纽氏达特正冲刺IPO，资本市场的诉求将推动智行智能尽快形成可量化的商业化成果。国资背景在政府采购、展厅项目等场景中具有天然优势，但也可能使公司在市场化竞争中的灵活性受限。</p>
+      </div>
+
+      <div class="analysis-block" id="ana4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>智行智能成立时间不足一年，尚未观察到明显的场景或路线切换。其当前路径——从文旅商演等低门槛场景切入，逐步向工业制造和仓储物流拓展——符合具身智能初创公司的典型渐进策略。但随着母公司IPO推进和16.7亿元产能项目落地，2026-2027年可能面临加速商业化的压力，届时是否会出现场景聚焦或路线的调整值得关注。</p>
+      </div>
+
+      <div class="analysis-block" id="ana5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>智行智能的核心取舍在于选择做"整机品牌"而非仅仅停留在"零部件供应商"。母公司纽氏达特作为精密减速机龙头，本可以安心做上游供应商（类似博世在汽车产业链的定位），但成立智行智能意味着向整机端延伸，与现有客户（智元、众擎等）形成潜在的竞合关系。这一选择的风险在于：若整机业务未能快速起量，可能影响与现有OEM客户的关系；但若成功，则打开了从百亿级零部件市场到万亿级整机市场的通道。</p>
+      </div>
+
+      <div class="analysis-block" id="ana6">
+        <h4>2.6 其他重要观察</h4>
+        <p>智行智能是观察中国传统制造业企业向具身智能转型的典型案例。纽氏达特从精密减速机起步，逐步覆盖伺服电机、传感器、关节模组、协作机器人，再到人形机器人整机，走了一条步步为营的产业链延伸路径。这种"从零件到整机"的路径与许多AI背景的具身智能创业公司（先做大脑模型再做硬件）形成镜像。智行智能的长期看点在于：母公司IPO带来的资本加持能否加速其整机业务突破，以及如何在整机品牌与核心零部件供应商的双重身份间找到平衡。</p>
+      </div>
+
+      <div class="references" id="references">
+        <h3>3 参考资料</h3>
+        <ol>
+          <li><a href="https://finance.sina.com.cn/jjxw/2025-08-11/doc-infkqmzi9909710.shtml" target="_blank">山东智行智能具身公司成立，含机器人业务 — 新浪财经</a></li>
+          <li><a href="https://www.egsea.com/news/detail/2102569.html" target="_blank">山东智行智能具身公司成立，含机器人业务 — 亿欧</a></li>
+          <li><a href="https://stock.stockstar.com/IG2025081100011715.shtml" target="_blank">山东智行智能具身公司成立 — 证券之星</a></li>
+          <li><a href="https://finance.ifeng.com/c/8lj9urOwidL" target="_blank">山东智行智能具身公司成立 — 凤凰财经</a></li>
+          <li><a href="https://news.hexun.com/2025-08-11/220831295.html" target="_blank">山东智行智能具身公司成立 — 和讯网</a></li>
+          <li><a href="https://finance.eastmoney.com/a/202508113481152274.html" target="_blank">山东智行智能具身公司成立 — 东方财富网</a></li>
+          <li><a href="https://www.163.com/dy/article/K6M55PB8053469RG.html" target="_blank">山东智行智能具身公司成立 — 网易</a></li>
+          <li><a href="https://innohere.com/ir/160267/business.html" target="_blank">智行智能具身 — 公司详情/业务介绍 — 企知道</a></li>
+          <li><a href="https://finance.sdchina.com/show/2049045757909737474.html" target="_blank">纽氏达特IPO辅导验收 — 山东财经网</a></li>
+          <li><a href="https://app.myzaker.com/news/article.php?pk=69eaee2f8e9f0960ab582b0d" target="_blank">纽氏达特拟上市：精密行星减速机龙头 — Zaker</a></li>
+          <li><a href="https://www.163.com/dy/article/KRHLE4U00519CFU1.html" target="_blank">IPO辅导验收！淄博这家机器人产业链龙头 — 网易</a></li>
+          <li><a href="https://news.qq.com/rain/a/20250716A001LR00" target="_blank">纽氏达特：人形机器人核心零部件山东制造商 — 腾讯新闻</a></li>
+          <li><a href="https://m.dzplus.dzng.com/share/general/0/NEWS2556511VNEKHDEULLUPT" target="_blank">纽氏达特：人形机器人核心零部件山东制造商 — 大众日报</a></li>
+          <li><a href="http://gear001.com/html/news/34/2/6381.html" target="_blank">全国第一！纽氏达特精密行星减速机年出货量超70万套 — 齿轮网</a></li>
+          <li><a href="http://www.chinahightech.com/yuanqu/2025-06/05/content_350597.html" target="_blank">淄博高新区机器人产业"出圈" — 中国高新网</a></li>
+          <li><a href="http://www.sdzdxm.com/index.php/index/index/zixunshow/id/22367.html" target="_blank">淄博：核心零部件领跑 全链路协同突围 — 山东重点项目网</a></li>
+          <li><a href="https://www.sohu.com/a/1018066748_404517" target="_blank">让机器人更"听话"！两位厦门青年以技驭机 — 搜狐</a></li>
+          <li><a href="https://news.xmnn.cn/xmxw/202605/t20260504_424441.html" target="_blank">让机器人更"听话"！ — 厦门网</a></li>
+          <li><a href="https://36kr.com/p/3780226077152256" target="_blank">当机器人不再"纸上谈兵"，Fair Plus 2026上的机器人产业突围 — 36氪</a></li>
+          <li><a href="https://www.ql1d.com/general/26497374.html" target="_blank">加码12亿！海尔卡奥斯加速驶入机器人赛道 — 齐鲁壹点</a></li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">此页面由具身智能Wiki项目自动生成，数据截至2026年5月。内容仅供参考，不构成投资建议。</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

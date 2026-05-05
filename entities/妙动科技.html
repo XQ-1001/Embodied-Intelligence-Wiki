@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>妙动科技 — 具身智能Wiki</title><style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style></head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> › <span>妙动科技</span></div>
+  <div class="wiki-header"><h1>妙动科技</h1><div class="subtitle">Mondo Tech / Mondo Robotics · 2025年成立 · 消费级具身智能 · 估值约6亿美元</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#founders">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#applications">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financials">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#analysis-1">2.1 团队背景与场景选择</a></li>
+        <li class="toc-lvl4"><a href="#analysis-2">2.2 技术路线与场景适配</a></li>
+        <li class="toc-lvl4"><a href="#analysis-3">2.3 股东结构对战略影响</a></li>
+        <li class="toc-lvl4"><a href="#analysis-4">2.4 试错与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#analysis-5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#analysis-6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#references">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">妙动科技</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">深圳市妙动科技有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">英文名</div><div class="ib-value">Mondo Tech</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2025年1月6日</div></div>
+        <div class="ib-row"><div class="ib-label">注册地</div><div class="ib-value">深圳市南山区</div></div>
+        <div class="ib-row"><div class="ib-label">法定代表人</div><div class="ib-value">高建荣</div></div>
+        <div class="ib-row"><div class="ib-label">注册资本</div><div class="ib-value">140.65万元</div></div>
+        <div class="ib-section">财务数据</div>
+        <div class="ib-row"><div class="ib-label">营收</div><div class="ib-value">未披露（尚无产品营收）</div></div>
+        <div class="ib-row"><div class="ib-label">净利润</div><div class="ib-value">未披露</div></div>
+        <div class="ib-section">估值/市值</div>
+        <div class="ib-row"><div class="ib-label">估值</div><div class="ib-value">约6亿美元（市场传闻）</div></div>
+        <div class="ib-row"><div class="ib-label">上市状态</div><div class="ib-value">未上市</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">员工数</div><div class="ib-value">未披露（核心团队6+）</div></div>
+        <div class="ib-row"><div class="ib-label">办公地点</div><div class="ib-value">深圳+硅谷+上海</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">赛道</div><div class="ib-value">具身智能/消费机器人</div></div>
+        <div class="ib-section">官网</div>
+        <div class="ib-row"><div class="ib-label">GitHub</div><div class="ib-value"><a href="https://github.com/Mondo-Robotics" target="_blank">Mondo-Robotics</a></div></div>
+      </aside>
+      <p class="article-intro">妙动科技（Mondo Tech），全称<strong>深圳市妙动科技有限公司</strong>，是一家专注于消费级具身智能机器人的中国初创公司，成立于2025年1月。公司由前特斯拉Optimus人形机器人团队核心工程师杨硕（YY硕）与前大疆高级总监高建荣联合创立，核心团队几乎全部来自大疆。公司采用深圳—硅谷双总部架构，主攻"兼具可玩性与智能化"的小型消费级机器人。2026年4月，妙动科技发布DiT4DiT论文，首次将世界模型成功部署于人形机器人，在LIBERO基准测试中以98.6%的平均成功率刷新SOTA。公司已完成天使轮融资，投资方包括经纬创投、美团龙珠和红杉中国，市场传闻估值约6亿美元，但公司仍处于极早期研发阶段，尚无公开产品量产及商业收入。</p>
+      <h2 id="facts">1 事实层</h2>
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper"><table class="wikitable infotable">
+        <tr><th>项目</th><th>内容</th></tr>
+        <tr><td>公司全称</td><td>深圳市妙动科技有限公司</td></tr>
+        <tr><td>英文名称</td><td>Mondo Tech / Mondo Robotics</td></tr>
+        <tr><td>成立日期</td><td>2025年1月6日</td></tr>
+        <tr><td>注册地址</td><td>深圳市南山区粤海街道（大疆总部所在区域）</td></tr>
+        <tr><td>法定代表人</td><td>高建荣</td></tr>
+        <tr><td>注册资本</td><td>约140.65万元人民币（2025年10月增资后）</td></tr>
+        <tr><td>上市状态</td><td>未上市</td></tr>
+        <tr><td>办公地点</td><td>深圳（硬件/供应链）+美国硅谷Palo Alto（算法/人才）+上海（筹建中）</td></tr>
+        <tr><td>GitHub</td><td>Mondo-Robotics（已开源DiT4DiT代码仓库）</td></tr>
+      </table></div>
+      <h4>发展沿革</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>时间</th><th>事件</th></tr>
+        <tr><td>2025年1月</td><td>深圳市妙动科技有限公司正式注册成立，注册资本100万元</td></tr>
+        <tr><td>2025年4月</td><td>杨硕官宣从特斯拉Optimus团队离职创业，天使轮融资完成（经纬创投、美团龙珠、红杉资本），传闻融资额达5000-6000万美元</td></tr>
+        <tr><td>2025年7月</td><td>大疆10年技术元老李昊南低调加盟，负责嵌入式与飞行系统技术</td></tr>
+        <tr><td>2025年10月</td><td>美团关联公司（汉海信息技术）等入股，注册资本增至140.65万元，完成天使+轮</td></tr>
+        <tr><td>2025年12月</td><td>杨硕发布万字年终总结，透露公司处于静默研发状态</td></tr>
+        <tr><td>2026年3月</td><td>DiT4DiT论文在arXiv预印本发布（arXiv: 2603.10448）</td></tr>
+        <tr><td>2026年4月</td><td>DiT4DiT代码开源，技术细节广泛报道；引发Agility Robotics AI负责人等多位硅谷专家关注</td></tr>
+      </table></div>
+      <h3 id="founders">1.2 创始人及核心团队</h3>
+      <p>妙动科技创始团队具有浓厚的"大疆系"背景，6位核心初始成员全部来自大疆，此外还汇聚了来自华为、OPPO及港科大、港中文、上海交大等知名高校的成员。团队呈现<strong>产业派为主+学术精英赋能</strong>的混合型人才结构。</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+        <tr><td>联合创始人 & CTO</td><td>杨硕（YY硕）</td><td>港科大电子与计算机工程本硕（师从李泽湘教授，与汪滔同门），CMU机器人学院博士（师从Howie Choset和Zachary Manchester，研究方向为四足机器人感知定位）。2015-2018年在大疆历任算法工程师、Phantom产品项目经理、RoboMaster技术总监。2023年博士毕业后加入特斯拉Optimus团队，负责控制核心算法模块开发。知乎机器人领域大V。</td></tr>
+        <tr><td>联合创始人 & CEO</td><td>高建荣</td><td>武汉大学本科，大疆资深高管，曾任总经理助理、高级总监、RoboMaster赛事负责人、供应链负责人、市场部负责人，大疆历史最年轻高管之一。</td></tr>
+        <tr><td>研发核心</td><td>李昊南</td><td>港科大毕业，大疆10年技术元老，飞行系统技术中台核心负责人，先后在大疆视觉、飞控、导航、飞行系统等部门负责嵌入式和测试工作。2025年7月加盟妙动科技。</td></tr>
+      </table></div>
+      <h3 id="funding">1.3 融资与股东</h3>
+      <h4>融资历史</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>轮次</th><th>时间</th><th>金额</th><th>投资方</th><th>备注</th></tr>
+        <tr><td>天使轮</td><td>2025年4月</td><td>数千万美元（传闻达5000-6000万美元）</td><td>经纬创投、美团龙珠、红杉中国</td><td>业内称"带资下场"</td></tr>
+        <tr><td>天使+轮</td><td>2025年10月</td><td>未披露</td><td>美团关联公司（汉海信息技术）等</td><td>注册资本增至140.65万</td></tr>
+        <tr><td>新一轮</td><td>洽谈中（传闻）</td><td>传闻2-3亿美元</td><td>待披露</td><td>市场传闻估值约6亿美元</td></tr>
+      </table></div>
+      <h4>股东结构</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>股东类型</th><th>代表方</th><th>特征</th></tr>
+        <tr><td>创始团队</td><td>杨硕、高建荣等</td><td>控股（具体比例未公开）</td></tr>
+        <tr><td>头部VC</td><td>经纬创投</td><td>约10%</td></tr>
+        <tr><td>互联网产业资本</td><td>美团（汉海信息技术）</td><td>约5%+后续增持</td></tr>
+        <tr><td>头部VC</td><td>红杉中国（HongShan）</td><td>约5%</td></tr>
+      </table></div>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>技术维度</th><th>详情</th></tr>
+        <tr><td>AI技术路线</td><td>以视频世界模型（Video World Model）为核心，采用双Diffusion Transformer（DiT）级联架构：第一个DiT（"想象者"）继承视频生成模型预训练权重，在内部预测场景演化；第二个DiT（"执行者"）读取去噪中间特征并翻译为机器人关节指令。Flow-matching生成式策略，支持跨形态（cross-embodiment）泛化。</td></tr>
+        <tr><td>数据方案</td><td>仅需同类方法约15%的预训练数据量；利用视频生成模型预训练权重注入物理世界先验知识，具身数据效率提升10倍以上。</td></tr>
+        <tr><td>全栈/专用路线</td><td>全栈自研路线：嵌入式和机电系统（李昊南团队）、运动控制与操作控制（杨硕团队）、感知与决策算法（DiT4DiT框架），覆盖完整技术栈。</td></tr>
+        <tr><td>自研特色</td><td>全球首个在人形机器人上成功落地的世界模型；独创"中间去噪"技术（1步去噪+第18层特征提取），仅需RTX 4090+单目RGB相机即可6Hz实时推理；零样本泛化能力显著优于同期方法。</td></tr>
+        <tr><td>开源策略</td><td>DiT4DiT代码已在GitHub开源（Mondo-Robotics/DiT4DiT），论文arXiv: 2603.10448</td></tr>
+      </table></div>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <p>妙动科技目前处于静默研发阶段，尚未公开发布任何商业化产品。根据公开披露，产品方向如下：</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>产品分类</th><th>方向</th><th>特征</th><th>状态</th></tr>
+        <tr><td>消费级娱乐机器人</td><td>小型陪伴/娱乐机器人（含四足机器狗）</td><td>"兼具可玩性与智能化"，提供陪伴、快乐和情感联系</td><td>静默研发中</td></tr>
+        <tr><td>全尺寸人形机器人</td><td>中长期赛道</td><td>运动控制+操作+自主决策</td><td>技术预研中</td></tr>
+      </table></div>
+      <p>DiT4DiT真机验证使用宇树科技G1人形机器人平台（非自有硬件），完成插花、打包、移动勺子、叠杯子、抽屉交互等7项操作任务测试。</p>
+
+      <h3 id="applications">1.6 应用场景</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>场景分类</th><th>当前/规划应用</th><th>合作方/资源</th></tr>
+        <tr><td>消费/家庭</td><td>小型陪伴机器人（娱乐、教育、情感交互）——核心目标场景</td><td>美团生态（潜在家庭服务场景协同）</td></tr>
+        <tr><td>家庭服务操作</td><td>DiT4DiT展示的7项家庭任务操作能力</td><td>宇树科技G1验证平台</td></tr>
+        <tr><td>学术/开源生态</td><td>DiT4DiT模型与代码开源</td><td>港科大（广州）梁俊卫教授团队合作</td></tr>
+      </table></div>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <p>妙动科技目前处于极早期阶段：</p>
+      <ul>
+        <li><strong>产品出货：</strong>无，尚未发布任何商业化产品</li>
+        <li><strong>生产产能：</strong>无公开信息</li>
+        <li><strong>订单/客户：</strong>无公开信息</li>
+        <li><strong>营收：</strong>未产生规模化商业收入</li>
+        <li><strong>2026年预期：</strong>杨硕表示预计2026年公布产品原型和运动算法成果</li>
+      </ul>
+
+      <h3 id="financials">1.8 财务数据</h3>
+      <p>妙动科技为非上市初创公司，未公开披露财务数据：</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>财务指标</th><th>2025年</th><th>备注</th></tr>
+        <tr><td>营业收入</td><td>约0（无产品营收）</td><td>研发阶段</td></tr>
+        <tr><td>净利润</td><td>亏损</td><td>研发投入期</td></tr>
+        <tr><td>账面资金</td><td>估算千万美元级</td><td>基于天使轮融资额推算</td></tr>
+        <tr><td>估值</td><td>约6亿美元（传闻）</td><td>无官方确认</td></tr>
+        <tr><td>注册资本</td><td>约140.65万元</td><td>2025年10月增资后</td></tr>
+      </table></div>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>杨硕以"YY硕"笔名在知乎活跃，长期分享机器人技术文章，是中文具身智能社区有影响力的技术传播者</li>
+        <li>公司名称"妙动"暗含"巧妙运动"与"灵活动作"之意</li>
+        <li>DiT4DiT论文与香港科技大学（广州）梁俊卫教授团队联合署名</li>
+        <li>团队文化与"大疆系"创业圈紧密关联，杨硕与高建荣均深度参与过大疆RoboMaster机器人赛事生态</li>
+        <li>深圳—硅谷双总部架构具备中美双线人才与供应链优势</li>
+        <li>美团在2024-2025年连续出手8笔机器人投资，妙动科技是其中之一</li>
+        <li>2025年6月注册上海分公司，完善中国区布局</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+      <div class="analysis-block" id="analysis-1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>妙动科技创始团队的核心场景选择——消费级娱乐/陪伴机器人——与团队背景高度匹配。杨硕在大疆时期主管消费级无人机（Phantom系列）产品开发，深谙消费电子产品定义、量产节奏和用户运营；高建荣作为大疆供应链负责人，具备将复杂硬件产品从研发推向百万级量产的供应链管理经验；李昊南10年消费级机器人（无人机）底层硬件开发经验可直接迁移。从特斯拉Optimus获得的工业级人形机器人研发经验赋予了团队在运动控制和操作算法上的技术纵深。这种"消费电子量产经验+工业机器人算法深度"的组合，使从小型消费机器人切入的路径具有较高合理性——先用轻量级产品跑通"定义-研发-量产-销售"全流程，再向更大尺寸拓展。</p>
+      </div>
+      <div class="analysis-block" id="analysis-2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>妙动科技选择以视频世界模型（DiT4DiT）作为核心技术路线的决策具有双重考量：其一，消费级机器人对成本高度敏感，DiT4DiT仅需RTX 4090+单目RGB相机即可6Hz实时推理的超低硬件门槛，天然适配消费级产品的成本约束；其二，通过"看视频理解物理世界"而非"手把手遥操作"的训练范式，理论上可在数据采集成本上获得数量级优势。然而，从DiT4DiT展示的7项实验室任务到可量产的消费级产品，中间仍存在显著鸿沟——真实家庭环境的环境泛化、任务多样性扩展、以及可靠性从论文指标到消费者可接受的99.9%+，都是2026年产品亮相时需要观察的关键验证点。</p>
+      </div>
+      <div class="analysis-block" id="analysis-3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>妙动科技的股东结构呈现"头部VC+互联网产业资本"的混合格局。经纬创投和红杉中国作为顶级财务投资者，为团队提供了较强的独立决策空间；而美团（龙珠+战略投资部）的入局带有明确的产业协同信号——美团在本地生活、即时配送、餐饮服务等场景拥有海量家庭和商业服务机器人潜在落地场景。美团在2024-2025年连续出手8笔机器人投资，正在系统性地构建具身智能生态，妙动科技消费/家庭方向的定位恰好填补其版图中的关键板块。此外，第一轮即获得5000-6000万美元级别融资，使得公司拥有充足的资金燃烧时间，可以更从容地打磨产品。</p>
+      </div>
+      <div class="analysis-block" id="analysis-4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>妙动科技成立仅一年有余，尚未观察到明显的场景切换或技术路线转向。但有两个值得注意的演进趋势：一是在产品定位上，从"消费级人形机器人"叙事逐步聚焦为"先做小型消费机器人（含四足机器狗），再推进全尺寸人形"，体现了从小到大的务实节奏调整；二是在技术展示策略上，分阶段推进（先发论文建立技术品牌，再公布产品原型），与消费电子行业的惯用做法一致。中美双团队的组织架构（硅谷算法+深圳硬件）在实际协作效率上是否顺畅，是值得持续跟踪的内部组织变量。</p>
+      </div>
+      <div class="analysis-block" id="analysis-5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>妙动科技的竞争定位呈现鲜明的差异化特征：其一，在全球具身智能赛道中，绝大多数初创公司（Figure、1X、Apptronik、智元等）瞄准工业和商业服务场景，妙动科技几乎是唯一一家明确聚焦消费娱乐场景且获得顶级资本背书的中国初创，处于竞争相对稀疏的蓝海赛道；其二，选择以"大脑"（世界模型/算法）而非硬件本体为核心竞争力——DiT4DiT的跨形态特性暗示其算法可适配不同硬件平台，这种"算法优先、硬件开放"的策略与iPhone模式有相似之处；其三，先从小型机器人切入的"iPod先行"策略，避免在资本和技术未成熟时直接挑战全尺寸人形机器人的高风险路径。</p>
+      </div>
+      <div class="analysis-block" id="analysis-6">
+        <h4>2.6 其他重要观察</h4>
+        <p>三个值得额外关注的变量。第一，开源策略的双刃剑效应：DiT4DiT代码开源短期内有利于建立学术影响力、吸引顶级人才和潜在合作伙伴，但也可能加速竞争者模仿。第二，杨硕的个人品牌价值：作为知乎机器人大V和特斯拉Optimus核心工程师，其个人影响力是妙动科技独特的无形资产，在产品未面世时持续输出技术内容有助于维持市场关注和人才吸引力。第三，时间窗口与泡沫风险：全球具身智能赛道正经历资本泡沫期，妙动科技6亿美元估值建立在天使轮且尚无产品的基础上，一旦行业降温或产品亮相低于预期，估值回调压力不可忽视。</p>
+      </div>
+
+      <h2 id="references">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://36kr.com/p/3242390096592518" target="_blank">李泽湘弟子出走特斯拉机器人，联手大疆高管深圳创业，瞄准消费级具身智能 — 36氪</a></li>
+          <li><a href="https://www.donews.com/news/detail/4/6495355.html" target="_blank">妙动科技发布 DiT4DiT：机器人首个世界模型成功落地 — DoNews</a></li>
+          <li><a href="https://m.ithome.com/html/935216.htm" target="_blank">妙动科技 DiT4DiT 刷新 SOTA，成功率高达 98.6% — IT之家</a></li>
+          <li><a href="https://news.pedaily.cn/20260402/126961.shtml" target="_blank">妙动 DiT4DiT 实现机器人世界模型落地 — 投资界</a></li>
+          <li><a href="https://www.chinaz.com/2026/0402/1744365.shtml" target="_blank">前特斯拉团队杨硕创业首作登顶 SOTA — Chinaz</a></li>
+          <li><a href="https://www.donews.com/news/detail/8/5678477.html" target="_blank">大疆10年技术元老李昊南，低调加盟妙动科技 — DoNews</a></li>
+          <li><a href="https://www.stcn.com/article/detail/3403997.html" target="_blank">美团关联公司等入股机器人研发商妙动科技 — 证券时报</a></li>
+          <li><a href="https://m.jiemian.com/article/12587326.html" target="_blank">特斯拉擎天柱项目中国工程师离职创业 — 界面新闻</a></li>
+          <li><a href="https://www.cls.cn/detail/1998023" target="_blank">特斯拉机器人中国工程师创业 计划做消费级机器人 — 财联社</a></li>
+          <li><a href="https://www.qbitai.com/2025/04/272149.html" target="_blank">李泽湘门徒出走特斯拉机器人，联手大疆高管深圳创业 — 量子位</a></li>
+          <li><a href="https://vc.pedaily.cn/company/817598.html" target="_blank">[妙动科技]深圳市妙动科技有限公司 — 投资界</a></li>
+          <li><a href="https://www.x-techcon.com/article/44591.html" target="_blank">这家具身智能机器人创企估值已达6亿美元 — X-TechCon</a></li>
+          <li><a href="https://arxiv.org/html/2603.10448v2" target="_blank">DiT4DiT: Jointly Modeling Video Dynamics and Actions — arXiv</a></li>
+          <li><a href="https://github.com/Mondo-Robotics/DiT4DiT" target="_blank">Mondo-Robotics/DiT4DiT: Official code repo — GitHub</a></li>
+          <li><a href="https://www.21jingji.com/article/20250801/herald/dfc440f9cc14f33ea82e74578520720e.html" target="_blank">美团在机器人领域连投8笔 — 21世纪经济报道</a></li>
+          <li><a href="https://www.9fzt.com/724info/11ffea55936be6f5d5cc5f560eebcca7.html" target="_blank">特斯拉机器人中国工程师创业 — 九方智投</a></li>
+          <li><a href="https://www.yilantop.com/news/58969" target="_blank">大疆前技术总监计划做消费级机器人 — 一览</a></li>
+          <li><a href="https://finance.eastmoney.com/a/202510243543204386.html" target="_blank">美团关联公司等入股妙动科技 — 东方财富</a></li>
+          <li><a href="https://www.bilibili.com/video/BV1em3XznEFx/" target="_blank">杨硕：妙动科技，特斯拉Optimus，CMU，大疆 — WhynotTV Podcast B站</a></li>
+          <li><a href="https://m.x-techcon.com/article/17970.html" target="_blank">美团押注！杨硕成立具身智能机器人创企 — X-TechCon</a></li>
+          <li><a href="https://sdxw.iqilu.com/share/YS0yMS0xNjgzNzY2NA==.html" target="_blank">美团入股机器人研发商妙动科技 — 闪电新闻</a></li>
+          <li><a href="https://finance.ifeng.com/c/8nhtSJz2E4I" target="_blank">美团关联公司等入股妙动科技 — 凤凰网财经</a></li>
+          <li><a href="https://zhuanlan.zhihu.com/p/1988378058944704608" target="_blank">记忆、模型、机器人 — 知乎专栏</a></li>
+          <li><a href="http://www.myzaker.com/article/69c32730b15ec015380c0de3" target="_blank">离职特斯拉"隐身"14个月，杨硕创业终于亮牌 — ZAKER</a></li>
+          <li><a href="https://m.163.com/dy/article/JSN0PI8C05528FMI.html" target="_blank">李泽湘门徒出走特斯拉机器人，联手大疆高管深圳创业 — 网易</a></li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">本页面内容基于公开信息整理，数据截止至2026年5月。妙动科技 — 具身智能Wiki</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

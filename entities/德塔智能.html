@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>德塔智能 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> › <span>德塔智能</span></div>
+  <div class="wiki-header"><h1>德塔智能</h1><div class="subtitle">Delta Intelligence · 未上市 · 2026年成立 · 三轮超亿元融资 · BIGAI孵化</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#team">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#finance">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#analysis1">2.1 团队与场景匹配度</a></li>
+        <li class="toc-lvl4"><a href="#analysis2">2.2 技术与场景适配性</a></li>
+        <li class="toc-lvl4"><a href="#analysis3">2.3 股东对战略的影响</a></li>
+        <li class="toc-lvl4"><a href="#analysis4">2.4 试错与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#analysis5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#analysis6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#references">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">德塔智能</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">北京德塔源创智能科技有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">英文名</div><div class="ib-value">Delta Intelligence</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2026年1月16日</div></div>
+        <div class="ib-row"><div class="ib-label">注册地</div><div class="ib-value">北京市海淀区</div></div>
+        <div class="ib-row"><div class="ib-label">注册资本</div><div class="ib-value">100万元</div></div>
+        <div class="ib-row"><div class="ib-label">孵化机构</div><div class="ib-value">BIGAI</div></div>
+        <div class="ib-section">融资数据</div>
+        <div class="ib-row"><div class="ib-label">融资轮次</div><div class="ib-value">三轮（2026年）</div></div>
+        <div class="ib-row"><div class="ib-label">累计融资</div><div class="ib-value">超亿元人民币</div></div>
+        <div class="ib-row"><div class="ib-label">估值</div><div class="ib-value">数亿元级别</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">创始人</div><div class="ib-value">马晓健（CEO）</div></div>
+        <div class="ib-row"><div class="ib-label">首席科学家</div><div class="ib-value">黄思远</div></div>
+        <div class="ib-row"><div class="ib-label">核心技术</div><div class="ib-value">HFMs基础模型</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">技术路线</div><div class="ib-value">原生人形基础模型</div></div>
+        <div class="ib-row"><div class="ib-label">营收阶段</div><div class="ib-value">pre-revenue</div></div>
+      </aside>
+
+      <p class="article-intro">德塔智能（Delta Intelligence，全称北京德塔源创智能科技有限公司）是一家专注于通用人形机器人基础模型研发的初创企业，由北京通用人工智能研究院（BIGAI）于2026年1月孵化成立。公司独创原生人形机器人基础模型（HFMs），整合类人大小脑架构与原生3D世界引擎，打通从空间感知、推理到全身协同操控的全栈能力。成立仅三个月即完成三轮超亿元融资，投资方包括高瓴创投、乐聚机器人、智元机器人和星海图等头部机构与产业方，并联合发起"通智大脑联盟"。创始团队三人均毕业于UCLA，兼具清华/北大等国内顶尖高校与Google Robotics、DeepMind、NVIDIA Research等全球顶级AI实验室背景。团队获CoRL 2025最佳论文奖，在人形机器人基础模型领域处于国内前沿梯队。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper">
+        <table class="wikitable infotable">
+          <tr><th>项目</th><th>内容</th></tr>
+          <tr><td>公司全称</td><td>北京德塔源创智能科技有限公司</td></tr>
+          <tr><td>英文名称</td><td>Delta Intelligence</td></tr>
+          <tr><td>成立时间</td><td>2026年1月16日</td></tr>
+          <tr><td>注册地</td><td>北京市海淀区中关村东升大厦</td></tr>
+          <tr><td>注册资本</td><td>100万元人民币</td></tr>
+          <tr><td>上市状态</td><td>未上市</td></tr>
+          <tr><td>孵化机构</td><td>北京通用人工智能研究院（BIGAI）</td></tr>
+          <tr><td>行业定位</td><td>通用人形机器人基础模型研发商</td></tr>
+        </table>
+      </div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>时间</th><th>事件</th></tr>
+          <tr><td>2023年</td><td>"眼里有活"自主机器人首次亮相中关村论坛</td></tr>
+          <tr><td>2024年</td><td>TongVerse具身智能平台发布，奠定世界引擎技术基础</td></tr>
+          <tr><td>2025年</td><td>机器人科技舞蹈引爆中关村论坛开幕式；团队获CoRL 2025最佳论文奖（Loco-manipulation力位混合控制统一框架）</td></tr>
+          <tr><td>2026年1月</td><td>北京德塔源创智能科技有限公司正式注册成立</td></tr>
+          <tr><td>2026年3-4月</td><td>三个月内连续完成三轮超亿元融资；"通脑"入选2026中关村论坛重大成果</td></tr>
+          <tr><td>2026年4月</td><td>发起成立"通智大脑联盟"，汇聚十余家具身智能头部产业方与场景方</td></tr>
+        </table>
+      </div>
+
+      <h3 id="team">1.2 创始人及核心团队</h3>
+      <p>德塔智能创始团队三人均毕业于UCLA，具备清华/北大等国内顶尖高校与Google Robotics、DeepMind、NVIDIA Research等全球顶级AI实验室的双重背景，是典型的"学术+产业"复合型团队，且均在北京通用人工智能研究院（BIGAI）有深度任职经历。团队整体呈现高度学术化特点，研发人员占比高，具备从AI理论到机器人系统工程的全栈能力。</p>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+          <tr><td>创始人兼CEO</td><td>马晓健</td><td>清华大学计算机系本科，UCLA博士；曾任职Google Robotics、NVIDIA Research，长期从事大规模机器学习与具身智能基础模型研究；在BIGAI期间主导首个原生空间通才具身智能体及跨本体数据采集场等核心项目</td></tr>
+          <tr><td>联合创始人</td><td>刘航欣</td><td>Virginia Tech本科，UCLA机械工程硕士及计算机科学博士；现任北京大学智能学院助理教授；曾任BIGAI研究员、机器人实验室主任；主导研发全球首个全手视触觉灵巧手F-TAC；在Science Robotics、Nature Machine Intelligence等顶刊发表多篇论文</td></tr>
+          <tr><td>联合创始人兼首席科学家</td><td>黄思远</td><td>清华大学自动化系本科，UCLA博士；现任BIGAI具身机器人中心主任；曾任职DeepMind、Meta（FAIR）；提出首个空间智能统一模型及力-位混合控制统一理论；获CoRL最佳论文奖</td></tr>
+        </table>
+      </div>
+      <p>团队人才结构呈现学术派主导特征：核心成员均具有海外顶尖高校博士学位及全球顶级AI实验室研发经历。团队深度参与DAPRA、ONR、NSF等美国国家级机器人项目，归国后以BIGAI为大本营，形成"清北学术基因+UCLA连接+硅谷产业经验"的人才组合。公司人数未公开披露，研发人员占比据行业估计应在80%以上。</p>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>轮次</th><th>时间</th><th>金额</th><th>估值</th><th>主要投资方</th></tr>
+          <tr><td>第一轮</td><td>2026年初</td><td>未单独披露</td><td>—</td><td>高瓴创投</td></tr>
+          <tr><td>第二轮</td><td>2026年初</td><td>未单独披露</td><td>—</td><td>高瓴创投（持续加注）、复星锐正资本</td></tr>
+          <tr><td>第三轮</td><td>2026年4月</td><td>三轮合计超亿元</td><td>数亿元级别</td><td>乐聚机器人、智元机器人、星海图（产业战略投资）</td></tr>
+        </table>
+      </div>
+      <p>三轮融资累计超亿元人民币（部分来源引用约1400万美元以上）。高瓴创投在连续轮次中持续加注，第三轮引入乐聚机器人、智元机器人、星海图三家头部人形机器人主机厂商作为产业战略投资方，形成"财务资本+产业场景"双重绑定。公司目前未上市。</p>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>股东类型</th><th>代表机构</th><th>角色定位</th></tr>
+          <tr><td>孵化/技术母体</td><td>北京通用人工智能研究院（BIGAI）</td><td>技术孵化、人才供给</td></tr>
+          <tr><td>财务投资</td><td>高瓴创投、复星锐正资本</td><td>资金支持、资本背书</td></tr>
+          <tr><td>产业战略投资</td><td>乐聚机器人、智元机器人、星海图</td><td>场景绑定、产业协同</td></tr>
+        </table>
+      </div>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>技术维度</th><th>具体内容</th></tr>
+          <tr><td>核心AI架构</td><td>原生人形机器人基础模型（HFMs），采用类人大小脑架构——"决策中枢"（大脑）+ "运控系统"（小脑），实现「边想边动」的实时协同</td></tr>
+          <tr><td>数据方案</td><td>原生人形机器人数据训练，拒绝仿真数据主导，强调真实机器人本体数据的规模化采集与训练</td></tr>
+          <tr><td>空间智能</td><td>原生3D世界引擎，具备实时空间推理能力，实现类人空间环境感知与动态关系理解</td></tr>
+          <tr><td>核心突破</td><td>Loco-manipulation力位混合控制统一框架（CoRL 2025最佳论文），打通从"会动"到"能干活"的关键技术路径，实现全身协同操控</td></tr>
+          <tr><td>全栈能力</td><td>「数据采集 → 基础模型 → 端侧部署」三位一体闭环</td></tr>
+          <tr><td>自研程度</td><td>高度自研——HFMs模型、3D世界引擎、力位混合控制框架均为自主研发；硬件本体由合作伙伴提供</td></tr>
+        </table>
+      </div>
+      <p>德塔智能的技术路线核心特征是"原生性"——从数据（真实人形机器人数据）、架构（类人大小脑）、到空间理解（3D世界引擎）三个层面强调为"人形"而生，而非从通用大模型或仿真环境迁移。该路线区别于行业主流的"LLM/VLM + 机器人"思路，试图构建真正面向物理世界的人形基础模型。在Loco-manipulation方面，其统一力位混合控制框架代表了从分立模块控制向全身协同操控的范式转变。</p>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>产品类别</th><th>产品名称</th><th>说明</th><th>发布时间</th></tr>
+          <tr><td>基础模型</td><td>HFMs（原生人形机器人基础模型）</td><td>公司核心产品，提供大小脑统一架构的人形机器人智能核心</td><td>2026年</td></tr>
+          <tr><td>世界引擎</td><td>原生3D世界引擎</td><td>实时空间推理引擎，为机器人提供类人空间感知能力</td><td>2024年（TongVerse平台）</td></tr>
+          <tr><td>具身智能体</td><td>"通脑"人形机器人</td><td>搭载HFMs的通用人形机器人，入选2026中关村论坛重大成果</td><td>2026年</td></tr>
+          <tr><td>具身平台</td><td>TongVerse具身智能平台</td><td>早期平台化产品，为世界引擎奠定技术基础</td><td>2024年</td></tr>
+        </table>
+      </div>
+      <p>德塔智能的产品形态以软件/模型层为核心，硬件本体由合作方（乐聚机器人等）提供。其HFMs模型可适配多种人形机器人本体，体现了"模型为王、软硬解耦"的产品策略。产品线覆盖从底层的世界引擎（空间感知）到中层的决策运控模型（HFMs）再到上层的具身智能体（通脑机器人），形成完整技术栈。</p>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>场景分类</th><th>具体场景</th><th>合作方/客户</th><th>说明</th></tr>
+          <tr><td>工业制造</td><td>汽车制造产线</td><td>一汽红旗</td><td>联合乐聚机器人在红旗产线完成工业场景高价值任务交付</td></tr>
+          <tr><td>工业制造</td><td>自动化装备</td><td>新时达</td><td>面向工业自动化场景的协同部署</td></tr>
+          <tr><td>能源电力</td><td>电力运维</td><td>南方电网</td><td>电力行业特种场景的机器人应用</td></tr>
+          <tr><td>通信</td><td>通信设施运维</td><td>中国移动</td><td>通信基础设施的智能化巡检与维护</td></tr>
+          <tr><td>国家级展示</td><td>重大活动/赛事</td><td>中关村论坛、世界人形机器人运动会、全运会</td><td>技术成果在国家级平台的展示验证</td></tr>
+        </table>
+      </div>
+      <p>德塔智能的应用场景目前以工业制造为主赛道，辅以能源、通信等特种行业场景。通过与乐聚机器人等本体厂商深度合作，将HFMs模型部署到头部央企/国企的实际产线和运维场景中。其场景策略具有明确的"to B+国家队客户"导向，与创始团队的BIGAI背景和学术网络资源高度协同。</p>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <p>德塔智能成立于2026年1月，目前处于pre-revenue阶段，尚未产生规模化营收。商业化进展主要体现在以下方面：</p>
+      <ul>
+        <li><strong>工业交付验证：</strong>联合乐聚机器人，已为一汽红旗、新时达、南方电网、中国移动等头部客户完成工业场景高价值任务交付，验证了HFMs模型在真实工业环境中的可行性</li>
+        <li><strong>联盟生态构建：</strong>发起"通智大脑联盟"，汇聚十余家具身智能产业方与场景方，构建从技术研发到场景验证的协同网络</li>
+        <li><strong>数据基础设施建设：</strong>深度参与国内最大的人形机器人数据训练中心建设，为模型持续迭代提供数据支持</li>
+        <li><strong>国家级平台背书：</strong>技术成果在中关村论坛、世界人形机器人运动会、全运会等国家级平台多次展示，获取政策与品牌势能</li>
+      </ul>
+
+      <h3 id="finance">1.8 财务数据</h3>
+      <p>德塔智能成立于2026年1月，尚无公开财务数据（未上市且未发布年报）。公司处于pre-revenue阶段，营收未规模化。</p>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>指标</th><th>情况</th></tr>
+          <tr><td>累计融资</td><td>超亿元人民币（约1400万美元以上）</td></tr>
+          <tr><td>最新估值</td><td>数亿元级别（未正式披露具体数字）</td></tr>
+          <tr><td>营收</td><td>pre-revenue，尚未产生规模化收入</td></tr>
+          <tr><td>现金流</td><td>依靠2026年三轮融资维持，账面资金应较为充裕</td></tr>
+          <tr><td>注册资本</td><td>100万元人民币</td></tr>
+        </table>
+      </div>
+      <p>从融资节奏看，公司资本储备充足：成立三个月内即完成三轮超亿元融资，高瓴创投持续加注，产业资本战略入股，资金跑道预计可支撑1-2年研发及场景验证投入。</p>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li><strong>学术荣誉：</strong>团队获CoRL 2025最佳论文奖（Loco-manipulation统一框架），刘航欣在Science Robotics和Nature Machine Intelligence发表论文3篇，获ACM中国图灵大会最佳论文奖（2019）、IROS最佳论文提名（2023）</li>
+        <li><strong>政策背书：</strong>公司孵化自北京通用人工智能研究院（BIGAI），具备"国家队"科研基因；入选2026中关村论坛重大成果</li>
+        <li><strong>技术差异化：</strong>HFMs是当前国内少有的明确以"原生人形基础模型"为旗帜的技术路线，与"LLM/VLM+机器人"的行业主流范式形成差异化定位</li>
+        <li><strong>国际化基因：</strong>创始团队均毕业于UCLA，核心成员曾参与DAPRA、ONR、NSF等美国国家级机器人项目，具备显著的国际化视野和学术网络</li>
+        <li><strong>机器人运动能力：</strong>基于HFMs统一控制策略，人形机器人已实现回旋踢、连续空翻、单手旋转等高难度动态动作</li>
+        <li><strong>跨本体数据采集：</strong>团队在BIGAI期间主导建设了跨本体数据采集场，为多本体兼容的HFMs模型训练提供了数据基础设施</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="analysis1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>德塔智能创始团队具有鲜明的学术研究导向特征：三位创始人均为UCLA博士，在Google Robotics、DeepMind、NVIDIA Research等顶级AI实验室有长期研发经历，学术成果集中于具身智能基础理论（空间智能统一模型、力位混合控制）而非特定行业应用。这种纯学术背景使得公司选择了"人形基础模型"这一技术制高点作为切入点——强调通用性而非垂直场景深度，与团队在基础研究层面的核心竞争力高度匹配。然而，团队缺乏汽车制造、能源电力等工业场景的产业经验，当前依托乐聚机器人等合作伙伴交付的一汽红旗、南方电网等工业场景更多是借力产业合作伙伴的渠道资源，而非团队自身场景理解驱动的自然延伸。这种"学术做技术底座+产业伙伴做场景落地"的分工模式在早期是合理的，但长期可能需要团队自身积累场景理解或吸纳产业背景人才以降低对合作伙伴的依赖。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>德塔智能的HFMs技术路线强调"原生性"——原生数据、原生架构、原生世界引擎，这与工业制造、能源电力等对可靠性和稳定性要求极高的场景之间，存在一定的适配性张力。HFMs追求通用能力（回旋踢、空翻等动态动作），而当前的实际落地场景（产线装配、电力巡检）更倾向于专用、可预测、低成本的操作能力。这种"技术上限高、场景聚焦窄"的错配可能是团队需要逐步调和的矛盾。不过，HFMs的Loco-manipulation统一框架对于需要全身协同的复杂工业操作（如狭小空间装配、不规则物体搬运）确实具有理论优势，如果能在特定场景中证明其不可替代性，则技术路线的长线价值将得到验证。当前阶段的技术-场景适配更像是在用"高维打低维"——用通用能力去做专用任务，关键在于能否在降维过程中保持稳定性和成本竞争力。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>德塔智能的股东结构呈现独特的"国家队孵化+财务资本+产业主机厂"三位一体格局。BIGAI作为孵化母体提供了技术源头和人才供给，但同时可能对公司的独立商业化决策形成一定的"学术惯性"约束。高瓴创投的持续加注表明财务投资者对技术路线的长期信心，但也意味着未来存在退出压力驱动的商业化加速预期。最值得注意的是第三轮引入的三家产业战略投资方——乐聚机器人、智元机器人、星海图——三者在人形机器人领域各有分工：乐聚侧重本体制造与工业交付，智元在通用人形机器人领域有广泛布局，星海图则可能提供特定场景资源。这种"三主机厂入股"的结构可能带来一个潜在挑战：如何在多个本体合作方之间平衡资源分配，避免站队某一硬件平台而限制了HFMs作为"跨本体通用大脑"的开放性定位。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>德塔智能的演进路径呈现清晰的"从实验室到公司化"三阶段过渡：2023-2024年为学术探索期，以中关村论坛展示和TongVerse平台发布为主要输出形式，定位偏展示性；2025年为关键转折年，CoRL 2025最佳论文标志着从"能做酷炫展示"到"有理论突破"的跨越；2026年为公司化元年，1月注册成立、3个月完成三轮融资，标志着从研究项目到商业实体的正式转型。值得注意的是，公司成立前的三年技术积累全部在BIGAI这一非营利研究机构内完成，这意味着大量核心IP可能存在知识产权归属的复杂性问题。此外，从"展示型机器人"到"工业可交付产品"的切换是当前阶段最大的路径调整，目前尚处于验证早期。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>德塔智能在中国人形机器人产业中的定位可类比为"做大脑操作系统而非做整机"——以HFMs基础模型为核心产品，通过技术授权或联合开发的方式适配多种人形本体，而非自研硬件。这一策略类似于操作系统厂商的定位，与全栈自研（如特斯拉Optimus）和本体优先（如宇树科技）的路线形成差异化。核心取舍在于：放弃硬件本体的话语权以换取更广阔的平台化空间，但这也意味着对本体合作伙伴的依赖度较高，且存在被本体厂商自研模型替代的风险。在竞争格局中，德塔智能的直接对标可能是智元机器人的"大脑+小脑"模型体系及Figure AI的Helix模型——三者都在试图定义"人形机器人的操作系统层"。差异在于德塔更强调"原生性"，而智元和Figure更侧重从通用大模型向机器人域的迁移。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis6">
+        <h4>2.6 其他重要观察、分析</h4>
+        <p>首先，德塔智能的融资节奏（三个月三轮超亿元）在国内具身智能初创公司中极为罕见，这一方面反映了BIGAI品牌背书和创始团队学术光环的强大吸金能力，另一方面也意味着资本对"人形基础模型"这一叙事的高度追捧——与2025-2026年中国人形机器人投资热潮的宏观背景高度相关。其次，公司虽注册于2026年1月，但实际技术积累可以追溯到2023年甚至更早（BIGAI时期的通才具身智能体和TongVerse平台），这种"老技术、新公司"的模式在知识产权归属、团队利益分配等方面可能存在潜在的法律和治理风险。第三，"通智大脑联盟"汇集了十余家产业和场景方，联盟模式下德塔智能作为发起方实际扮演了"平台运营者"角色——这一架构如果成功可能形成强大的生态壁垒，但也面临联盟成员利益协调和贡献度不均衡的管理挑战。最后，当前全球人形机器人基础模型领域的竞争正在加速——Figure AI的Helix、Physical Intelligence的π0、Tesla的Optimus大脑——德塔智能能否在激烈的国际竞争中保持技术领先并实现商业闭环，将是未来1-2年最关键的观察窗口。</p>
+      </div>
+
+      <h2 id="references">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://www.ncsti.gov.cn/kjdt/xwjj/202604/t20260416_244072.html">北京通研院孵化！德塔智能连续三轮融资超亿元 — 国家科技信息中心</a></li>
+          <li><a href="https://tech.ifeng.com/c/8sLNtIgph5V">创业仅三月，融资超亿元！清北双强联手打造人形机器人 — 凤凰科技</a></li>
+          <li><a href="https://www.zhidx.com/p/548866.html">创业仅三月，融资超亿元！清北双强联手打造人形机器人，智元、星海图入局 — 智东西</a></li>
+          <li><a href="https://www.eefocus.com/article/1992709.html">乐聚、智元与星海图抢着投！这家初创公司从0到超亿元，只用三个月 — 与非网</a></li>
+          <li><a href="https://www.zidonghua.com.cn/news/Finance/84223.html">德塔智能连续三轮融资超亿元，押注原生人形机器人基础模型 — 自动化网</a></li>
+          <li><a href="https://www.frzcapital.cn/content/details5_1383.html">复星锐正资本 — 德塔智能投资案例</a></li>
+          <li><a href="https://finance.eastmoney.com/a/202604153706048951.html">通用人形机器人研发商德塔智能完成三轮超亿元融资 — 东方财富</a></li>
+          <li><a href="https://pandaily.com/delta-intelligence-raises-usd-14-million-to-build-humanoid-foundation-models">Delta Intelligence Raises USD 14 Million+ — Pandaily</a></li>
+          <li><a href="https://www.163.com/dy/article/KQIHAEPA051180F7.html">创业仅三月，融资超亿元！清北双强联手打造人形机器人 — 网易</a></li>
+          <li><a href="https://www.sohu.com/a/1009694293_129720">"国家队"下场，德塔智能连续三轮融资超亿元 — 搜狐</a></li>
+          <li><a href="https://www.ijiwei.com/n/1013131">德塔智能完成三轮超亿元融资 — 集微网</a></li>
+          <li><a href="https://d1ev.com/news/shichang/295380">Seeds | 德塔智能连续三轮融资超亿元 — D1EV</a></li>
+          <li><a href="https://i.gasgoo.com/news/70453755.html">Seeds | 德塔智能连续三轮融资超亿元 — 盖世汽车</a></li>
+          <li><a href="https://vc.pedaily.cn/company/893106.html">「德塔智能」致力于研发原生人形机器人基础模型 — 投资界</a></li>
+          <li><a href="https://mp.ofweek.com/auto/a356714922637">【智能化】德塔智能完成超亿元融资 — OFweek</a></li>
+          <li><a href="https://news.qq.com/rain/a/20260415A075L200">【智能化】德塔智能完成超亿元融资 — 腾讯新闻</a></li>
+          <li><a href="https://zhuanlan.zhihu.com/p/2027761683053978271">创业仅三月，融资超亿元！清北双强联手打造人形机器人 — 知乎</a></li>
+          <li><a href="http://www.sai.pku.edu.cn/info/1362/9405.htm">刘航欣 — 北京大学智能学院</a></li>
+          <li><a href="http://www.robotsj.cn/brand/1659.html">德塔智能 Delta Intelligence — 机器人世纪网</a></li>
+          <li><a href="https://aipfia.zhidx.com/p/548866.html">智元，投了一家刚成立三个月的人形机器人创企 — 智东西AI频道</a></li>
+          <li><a href="http://www.penghoo.cn/a/10747.html">三轮超亿元！「德塔智能」获乐聚机器人、智元、星海图投资 — 朋湖网</a></li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">此页面最后编辑于2026年5月4日 · 内容基于公开报道与可信来源 · 具身智能Wiki</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

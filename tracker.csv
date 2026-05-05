@@ -1,4 +1,4 @@
-tier,source,company_name,english_name,notes,status,assigned_to,file_path
+﻿tier,source,company_name,english_name,notes,status,assigned_to,file_path
 1,海外#1,Tesla (Optimus),Tesla,Tesla AI / Tesla IR / Tesla AI Day,completed,,wiki/entities/Tesla-Optimus.html
 1,海外#2,Figure AI,Figure,Figure官方Series C,completed,,wiki/entities/Figure-AI.html
 1,海外#3,发那科,FANUC,待补FANUC官网/年报/合作公告,completed,,wiki/entities/发那科.html
@@ -66,134 +66,134 @@ tier,source,company_name,english_name,notes,status,assigned_to,file_path
 1,国内#48,XYZ Robotics星猿哲,XYZ Robotics,媒体报道,completed,wiki-xyz-robotics,wiki/entities/XYZ-Robotics星猿哲.html
 1,国内#49,破壳机器人,,网易,completed,wiki-poke-robot,wiki/entities/破壳机器人.html
 1,国内#50,乐享科技,,媒体报道,completed,wiki-lexiang-tech,wiki/entities/乐享科技.html
-2,国内#51,微亿智造,,港股招股书,pending,,
-2,国内#52,迦智科技,,招股书/媒体报道,pending,,
-2,国内#53,斯坦德机器人,,媒体报道,pending,,
-2,国内#54,赛那德,,媒体报道,pending,,
-2,国内#55,诺因智能,,投资界/36氪,pending,,
-2,国内#56,仝人智能,,投资方: 未透露,pending,,
-2,国内#57,优艾智合,Youibot,港股招股书,pending,,
-2,国内#58,中科第五纪,,媒体报道,pending,,
-2,国内#59,机器科学（RoboScience）,RoboScience,媒体报道,pending,,
-2,国内#60,具微科技,,界面新闻,pending,,
-2,国内#61,戴盟机器人,,媒体报道,pending,,
-2,国内#62,维他动力,,投资界/36氪,pending,,
-2,国内#63,小雨智造,,媒体报道,pending,,
-2,国内#64,蓝芯科技,,蓝芯官网/经济观察网/高工移动机器人,pending,,
-2,国内#65,大界机器人,,媒体报道,pending,,
-2,国内#66,柏奥尼克机器人（PNDbotics）,PNDbotics,媒体报道,pending,,
-2,国内#67,零次方机器人,,投资界,pending,,
-2,国内#68,诺仕机器人,,36氪/投资界,pending,,
-2,国内#69,星源智机器人,,投资界,pending,,
-2,国内#70,诺亦腾机器人,,新华社/投资界,pending,,
-2,国内#71,璇玑动力,,投资方: 云岫资本、上汽集团、东方精工 等2家,pending,,
-2,国内#72,国自机器人,,媒体报道,pending,,
-2,国内#73,木蚁机器人,,媒体报道,pending,,
-2,国内#74,聆动通用,,36氪,pending,,
-2,国内#75,优宝特机器人,,投资界,pending,,
-2,国内#76,颗粒进化xLean,,投资界,pending,,
-2,国内#77,格松科技,,投资界/36氪,pending,,
-2,国内#78,妙动科技,,36氪,pending,,
-2,国内#79,天创机器人,,媒体报道,pending,,
-2,国内#80,吉泰智能,,投资方: 北京橙铭科技有限公司,pending,,
-2,国内#81,启玄科技,,投资方: 势能资本、燕融国际、简投集团,pending,,
-2,国内#82,卓益得机器人,,投资界,pending,,
-2,国内#83,动易科技,,钛媒体/投资界,pending,,
-2,国内#84,青心意创,,36氪/投资界,pending,,
-2,国内#85,飞阔科技,,投资界,pending,,
-2,国内#86,有鹿机器人,,投资方: 创新工场、元璟资本、百度风投,pending,,
-2,国内#87,具身数据,,投资方: 聆动通用、乐聚机器人、合肥产投 等1家,pending,,
-2,国内#88,灵生科技,,投资方: 万物为创投、宁波方正、鸿瑞投资,pending,,
-2,国内#89,贝塔无限,,媒体报道,pending,,
-2,国内#90,双良睿能机器人,,投资方: 双良节能,pending,,
-2,国内#91,开普勒机器人,,光明网/证券时报,pending,,
-2,国内#92,浩海星空,,投资方: 浙江仙通,pending,,
-2,国内#93,德塔智能,,媒体报道,pending,,
-2,国内#94,天太机器人,,媒体报道,pending,,
-2,国内#95,隆盛唯睿,,投资方: 大德重工、隆盛科技、蔚瀚智能,pending,,
-2,国内#96,境智具身,,投资界,pending,,
-2,国内#97,具脑磐石,,投资方: 乐聚机器人、东方精工、道禾投资 等1家,pending,,
-2,国内#98,万勋科技,,媒体报道,pending,,
-2,国内#99,派宝机器人,,投资方: 湛江产投,pending,,
-2,国内#100,灵启万物,,36氪/投资界,pending,,
-3,国内#101,阿丘科技,,媒体报道,pending,,
-3,国内#102,若贝特,,媒体报道,pending,,
-3,国内#103,格蓝若机器人,,投资界/猎云网,pending,,
-3,国内#104,源络科技,,媒体报道,pending,,
-3,国内#105,朗毅机器人,,长江日报/投资界,pending,,
-3,国内#106,灵御智能,,36氪/投资界,pending,,
-3,国内#107,数字华夏,,深圳新闻网/36氪,pending,,
-3,国内#108,斜跃智能,,界面新闻,pending,,
-3,国内#109,深穹星核,,投资界,pending,,
-3,国内#110,天元兴,,投资方: 弘德投资、海愿资本、盛世投资,pending,,
-3,国内#111,可派机器人,,投资界,pending,,
-3,国内#112,悟时创新,,投资界,pending,,
-3,国内#113,玉树智能机器人,,投资方: 智元机器人,pending,,
-3,国内#114,欧拉万象,,投资方: 五源资本、高瓴创投,pending,,
-3,国内#115,易择智擎,,投资方: 光点资本、梅花创投、清石资管,pending,,
-3,国内#116,和晖机器人,,投资方: 锦聚投资、银杏谷资本、拜罗伊特科技,pending,,
-3,国内#117,大晓机器人,,投资界,pending,,
-3,国内#118,梦伴机器人（Somnia Lab）,Somnia Lab,投资方: 未透露,pending,,
-3,国内#119,萝博派对,,证券时报,pending,,
-3,国内#120,佳安智能,,媒体报道,pending,,
-3,国内#121,鹿明机器人,,媒体报道,pending,,
-3,国内#122,国巡机器人,,投资方: 粤科金融、玖兆投资,pending,,
-3,国内#123,飒智智能,,投资方: 小橡创投,pending,,
-3,国内#124,月泉仿生,,媒体报道,pending,,
-3,国内#125,成都人形机器人创新中心,,媒体报道,pending,,
-3,国内#126,具身科技,,投资界,pending,,
-3,国内#127,清宝机器人,,投资界,pending,,
-3,国内#128,超维动力,,投资界,pending,,
-3,国内#129,灵童机器人,,媒体报道,pending,,
-3,国内#130,正奇未来,,投资界,pending,,
-3,国内#131,知有无界,,投资界/36氪,pending,,
-3,国内#132,具识智能,,投资界,pending,,
-3,国内#133,晨昏线,,深圳新闻网,pending,,
-3,国内#134,求之科技,,投资方: 京国瑞、联想创投,pending,,
-3,国内#135,亚历山大智能,,投资方: 山东财金集团,pending,,
-3,国内#136,墨奇智能,,投资界,pending,,
-3,国内#137,荆楚人形机器人,,投资方: 长江资本-长江证券,pending,,
-3,国内#138,智动力机器人,,投资方: 招银国际,pending,,
-3,国内#139,橡树清溪科技,,投资方: 麟阁创投,pending,,
-3,国内#140,阿米嘎嘎,,投资方: 奇绩创坛、明月湖国际智能产业科创基地,pending,,
-3,国内#141,蒙楷特科技,,投资方: 武汉科投,pending,,
-3,国内#142,矩阵超智,,投资方: 宏润建设、浙海德曼、中山金马 等2家,pending,,
-3,国内#143,理工华汇,,投资方: 深创投、软通动力、方广资本,pending,,
-3,国内#144,金智机器人,,投资方: 金坛投资,pending,,
-3,国内#145,赛博格机器人,,投资方: 中芯聚源、奋达科技,pending,,
-3,国内#146,跃瓦创新,,投资方: XVC创投,pending,,
-3,国内#147,里工,,投资方: 零壹资管、白云基金,pending,,
-3,国内#148,融海微机器人,,投资方: 金凯同运创投,pending,,
-3,国内#149,另山居,,投资方: 未透露,pending,,
-3,国内#150,Jacobi.ai 雅可比机器人,Jacobi.ai,媒体报道,pending,,
-3,国内#151,灵宝CASBOT,CASBOT,人民日报/蓝思科技公告,pending,,
-3,国内#152,新奇机器人,,投资方: 云晖资本、厦门建发、厚雪资本 等1家,pending,,
-3,国内#153,穹彻智能,Noematrix,阿里公告/36氪,pending,,
-3,国内#154,蚂蚁灵波,,官方公告,pending,,
-3,国内#155,知跃空间智能,,猎云网/投资界,pending,,
-3,国内#156,荣耀机器人,,新华网/界面新闻,pending,,
-3,国内#157,高德具身业务部(阿里),,每日经济新闻,pending,,
-3,国内#158,重庆凤凰技术(赛力斯),,东方财富网,pending,,
-3,国内#159,光向科技,,钛媒体,pending,,
-3,国内#160,华为极目机器,,工商登记,pending,,
-3,国内#161,智在无界,,投资方: 考拉基金、灵心巧手、领航新界,pending,,
-3,国内#162,一立方机器人,,投资方: 美御资本,pending,,
-3,国内#163,Ai.Frame人形机器人矩阵动力,,投资方: 博派资本,pending,,
-3,国内#164,心图机器人,,投资方: 汇纳科技,pending,,
-3,国内#165,章鱼动力,,36氪/证券时报,pending,,
-3,国内#166,智行智能,,投资方: 兰璞创投、淄博高新国创基金,pending,,
-3,国内#167,逸璟科技,,投资方: 凡卓资本(小饭桌),pending,,
-3,国内#168,艨码科技,,投资方: 探针资本、拓新界投资,pending,,
-3,国内#169,阿帕奇机器人,,投资方: 拓邦股份、嘉祐基金,pending,,
-3,国内#170,富唯智能,,投资方: 和而泰、华山汇基金,pending,,
-3,国内#171,深圳探真智能,,投资方: 未透露,pending,,
-3,国内#172,智动未来科技,,投资方: 奇绩创坛,pending,,
-3,国内#173,灵机数字,,投资方: 毓道投资,pending,,
-3,国内#174,擎仓机器人,,投资方: 隐山资本、纵腾集团、钟鼎资本 等3家,pending,,
-3,国内#175,日冕机器人,,投资方: 武岳峰科创、百度风投,pending,,
-3,国内#176,泛化世,,投资方: 桂树创投,pending,,
-3,国内#177,九光智能,,投资方: 华业天成、基石资本,pending,,
-3,国内#178,纽娲机器人,,投资方: 未透露,pending,,
-3,国内#179,纳意维,,投资方: 南山资本,pending,,
-3,国内#180,中露科技,,投资方: 会同资本,pending,,
-3,国内#181,VLAI未来动力,,投资方: 奇绩创坛,pending,,
+2,国内#51,微亿智造,,港股招股书,completed,,wiki/entities/微亿智造.html
+2,国内#52,迦智科技,,招股书/媒体报道,completed,,wiki/entities/迦智科技.html
+2,国内#53,斯坦德机器人,,媒体报道,completed,,wiki/entities/斯坦德机器人.html
+2,国内#54,赛那德,,媒体报道,completed,,wiki/entities/赛那德.html
+2,国内#55,诺因智能,,投资界/36氪,completed,,wiki/entities/诺因智能.html
+2,国内#56,仝人智能,,投资方: 未透露,completed,,wiki/entities/仝人智能.html
+2,国内#57,优艾智合,Youibot,港股招股书,completed,,wiki/entities/优艾智合.html
+2,国内#58,中科第五纪,,媒体报道,completed,,wiki/entities/中科第五纪.html
+2,国内#59,机器科学（RoboScience）,RoboScience,媒体报道,completed,,wiki/entities/机器科学.html
+2,国内#60,具微科技,,界面新闻,completed,,wiki/entities/具微科技.html
+2,国内#61,戴盟机器人,,媒体报道,completed,,wiki/entities/戴盟机器人.html
+2,国内#62,维他动力,,投资界/36氪,completed,,wiki/entities/维他动力.html
+2,国内#63,小雨智造,,媒体报道,completed,wiki-d2-4,entities/小雨智造.html
+2,国内#64,蓝芯科技,,蓝芯官网/经济观察网/高工移动机器人,completed,wiki-d2-4,entities/蓝芯科技.html
+2,国内#65,大界机器人,,媒体报道,completed,,,entities/大界机器人.html
+2,国内#66,柏奥尼克机器人（PNDbotics）,PNDbotics,媒体报道,completed,,,entities/柏奥尼克机器人.html
+2,国内#67,零次方机器人,,投资界,completed,,,entities/零次方机器人.html
+2,国内#68,诺仕机器人,,36氪/投资界,completed,,wiki/entities/诺仕机器人.html
+2,国内#69,星源智机器人,,投资界,completed,,wiki/entities/星源智机器人.html
+2,国内#70,诺亦腾机器人,,新华社/投资界,completed,,wiki/entities/诺亦腾机器人.html
+2,国内#71,璇玑动力,,投资方: 云岫资本(FA)、上汽集团、东方精工 等,completed,,wiki/entities/璇玑动力.html
+2,国内#72,国自机器人,,媒体报道,completed,,wiki/entities/国自机器人.html
+2,国内#73,木蚁机器人,,媒体报道,completed,,wiki/entities/木蚁机器人.html
+2,国内#74,聆动通用,,36氪,completed,,wiki/entities/聆动通用.html
+2,国内#75,优宝特机器人,,投资界,completed,,wiki/entities/优宝特机器人.html
+2,国内#76,颗粒进化xLean,,投资界,completed,,wiki/entities/颗粒进化.html
+2,国内#77,格松科技,,投资界/36氪,completed,,wiki/entities/格松科技.html
+2,国内#78,妙动科技,,36氪,completed,,wiki/entities/妙动科技.html
+2,国内#79,天创机器人,,媒体报道,completed,,wiki/entities/天创机器人.html
+2,国内#80,吉泰智能,,投资方: 北京橙铭科技有限公司,completed,,wiki/entities/吉泰智能.html
+2,国内#81,启玄科技,,投资方: 势能资本、燕融国际、简投集团,completed,,wiki/entities/启玄科技.html
+2,国内#82,卓益得机器人,,投资界,completed,,wiki/entities/卓益得机器人.html
+2,国内#83,动易科技,,钛媒体/投资界,completed,wiki-dispatcher-t2-d,wiki/entities/动易科技.html
+2,国内#84,青心意创,,36氪/投资界,completed,wiki-dispatcher-t2-d,wiki/entities/青心意创.html
+2,国内#85,飞阔科技,,投资界,completed,wiki-dispatcher-t2-d,wiki/entities/飞阔科技.html
+2,国内#86,有鹿机器人,,投资方: 创新工场、元璟资本、百度风投,completed,wiki-dispatcher-t2-d,wiki/entities/有鹿机器人.html
+2,国内#87,具身数据,,投资方: 聆动通用、乐聚机器人、合肥产投 等1家,completed,wiki-dispatcher-t2-d,wiki/entities/具身数据.html
+2,国内#88,灵生科技,,投资方: 万物为创投、宁波方正、鸿瑞投资,completed,wiki-dispatcher-t2-c,wiki/entities/灵生科技.html
+2,国内#89,贝塔无限,,媒体报道,completed,wiki-dispatcher-t2-c,wiki/entities/贝塔无限.html
+2,国内#90,双良睿能机器人,,投资方: 双良节能,completed,wiki-dispatcher-t2-c,wiki/entities/双良睿能机器人.html
+2,国内#91,开普勒机器人,,光明网/证券时报,completed,wiki-dispatcher-t2-c,wiki/entities/开普勒机器人.html
+2,国内#92,浩海星空,,投资方: 浙江仙通,completed,wiki-dispatcher-t2-c,wiki/entities/浩海星空.html
+2,国内#93,德塔智能,,媒体报道,completed,wiki-dispatcher-t2,wiki/entities/德塔智能.html
+2,国内#94,天太机器人,,媒体报道,completed,wiki-dispatcher-t2,wiki/entities/天太机器人.html
+2,国内#95,隆盛唯睿,,投资方: 大德重工、隆盛科技、蔚瀚智能,completed,wiki-dispatcher-t2,wiki/entities/隆盛唯睿.html
+2,国内#96,境智具身,,投资界,completed,wiki-dispatcher-t2,wiki/entities/境智具身.html
+2,国内#97,具脑磐石,,投资方: 乐聚机器人、东方精工、道禾投资 等1家,completed,wiki-dispatcher-t2,wiki/entities/具脑磐石.html
+2,国内#98,万勋科技,,媒体报道,completed,wiki-dispatcher-t2-d,wiki/entities/万勋科技.html
+2,国内#99,派宝机器人,,投资方: 湛江产投,completed,wiki-dispatcher-t2-d,wiki/entities/派宝机器人.html
+2,国内#100,灵启万物,,36氪/投资界,completed,wiki-dispatcher-t2-d,wiki/entities/灵启万物.html
+3,国内#101,阿丘科技,,媒体报道,completed,wiki-dispatcher-t3-c,entities/阿丘科技.html
+3,国内#102,若贝特,,媒体报道,completed,wiki-dispatcher-t3-c,entities/若贝特.html
+3,国内#103,格蓝若机器人,,投资界/猎云网,completed,wiki-dispatcher-t3-c,entities/格蓝若机器人.html
+3,国内#104,源络科技,,媒体报道,completed,wiki-dispatcher-t3-c,entities/源络科技.html
+3,国内#105,朗毅机器人,,长江日报/投资界,completed,wiki-dispatcher-t3-c,entities/朗毅机器人.html
+3,国内#106,灵御智能,,36氪/投资界,completed,wiki-dispatcher-t3-a,wiki/entities/灵御智能.html
+3,国内#107,数字华夏,,深圳新闻网/36氪,completed,wiki-dispatcher-t3-a,wiki/entities/数字华夏.html
+3,国内#108,斜跃智能,,界面新闻,completed,wiki-dispatcher-t3-a,wiki/entities/斜跃智能.html
+3,国内#109,深穹星核,,投资界,completed,wiki-dispatcher-t3-a,wiki/entities/深穹星核.html
+3,国内#110,天元兴,,投资方: 弘德投资、海愿资本、盛世投资,completed,wiki-dispatcher-t3-a,wiki/entities/天元兴.html
+3,国内#111,可派机器人,,投资界,completed,wiki-dispatcher-t3-b,wiki/entities/可派机器人.html
+3,国内#112,悟时创新,,投资界,completed,wiki-dispatcher-t3-b,wiki/entities/悟时创新.html
+3,国内#113,玉树智能机器人,,投资方: 智元机器人,completed,wiki-dispatcher-t3-b,wiki/entities/玉树智能机器人.html
+3,国内#114,欧拉万象,,投资方: 五源资本、高瓴创投,completed,wiki-dispatcher-t3-b,wiki/entities/欧拉万象.html
+3,国内#115,易择智擎,,投资方: 光点资本、梅花创投、清石资管,completed,wiki-dispatcher-t3-b,wiki/entities/易择智擎.html
+3,国内#116,和晖机器人,,投资方: 锦聚投资、银杏谷资本、拜罗伊特科技,completed,wiki-dispatcher-t3-d,wiki/entities/和晖机器人.html
+3,国内#117,大晓机器人,,投资界,completed,wiki-dispatcher-t3-d,wiki/entities/大晓机器人.html
+3,国内#118,梦伴机器人（Somnia Lab）,Somnia Lab,投资方: 未透露,completed,wiki-dispatcher-t3-d,wiki/entities/梦伴机器人.html
+3,国内#119,萝博派对,,证券时报,completed,wiki-dispatcher-t3-d,wiki/entities/萝博派对.html
+3,国内#120,佳安智能,,媒体报道,completed,wiki-dispatcher-t3-d,wiki/entities/佳安智能.html
+3,国内#121,鹿明机器人,,媒体报道,completed,wiki-dispatcher-t3-e,wiki/entities/鹿明机器人.html
+3,国内#122,国巡机器人,,投资方: 粤科金融、玖兆投资,completed,wiki-dispatcher-t3-e,wiki/entities/国巡机器人.html
+3,国内#123,飒智智能,,投资方: 小橡创投,completed,wiki-dispatcher-t3-e,wiki/entities/飒智智能.html
+3,国内#124,月泉仿生,,媒体报道,completed,wiki-dispatcher-t3-e,wiki/entities/月泉仿生.html
+3,国内#125,成都人形机器人创新中心,,媒体报道,completed,wiki-dispatcher-t3-e,wiki/entities/成都人形机器人创新中心.html
+3,国内#126,具身科技,,投资界,completed,wiki-dispatcher-t3-d,entities/具身科技.html
+3,国内#127,清宝机器人,,投资界,completed,wiki-dispatcher-t3-d,entities/清宝机器人.html
+3,国内#128,超维动力,,投资界,completed,wiki-dispatcher-t3-d,entities/超维动力.html
+3,国内#129,灵童机器人,,媒体报道,completed,wiki-dispatcher-t3-d,entities/灵童机器人.html
+3,国内#130,正奇未来,,投资界,completed,wiki-dispatcher-t3-d,entities/正奇未来.html
+3,国内#131,知有无界,,投资界/36氪,completed,wiki-dispatcher-t3-a,entities/知有无界.html
+3,国内#132,具识智能,,投资界,completed,wiki-dispatcher-t3-a,entities/具识智能.html
+3,国内#133,晨昏线,,深圳新闻网,completed,wiki-dispatcher-t3-a,entities/晨昏线.html
+3,国内#134,求之科技,,投资方: 京国瑞、联想创投,completed,wiki-dispatcher-t3-a,entities/求之科技.html
+3,国内#135,亚历山大智能,,投资方: 山东财金集团,completed,wiki-dispatcher-t3-a,entities/亚历山大智能.html
+3,国内#136,墨奇智能,,投资界,completed,wiki-dispatcher-t3-e,entities/墨奇智能.html
+3,国内#137,荆楚人形机器人,,投资方: 长江资本-长江证券,completed,wiki-dispatcher-t3-e,entities/荆楚人形机器人.html
+3,国内#138,智动力机器人,,投资方: 招银国际,completed,wiki-dispatcher-t3-e,entities/智动力机器人.html
+3,国内#139,橡树清溪科技,,投资方: 麟阁创投,completed,wiki-dispatcher-t3-e,entities/橡树清溪科技.html
+3,国内#140,阿米嘎嘎,,投资方: 奇绩创坛、明月湖国际智能产业科创基地,completed,wiki-dispatcher-t3-e,entities/阿米嘎嘎.html
+3,国内#141,蒙楷特科技,,投资方: 武汉科投,completed,wiki-dispatcher-t3-b,entities/蒙楷特科技.html
+3,国内#142,矩阵超智,,投资方: 宏润建设、浙海德曼、中山金马 等2家,completed,wiki-dispatcher-t3-b,entities/矩阵超智.html
+3,国内#143,理工华汇,,投资方: 深创投、软通动力、方广资本,completed,wiki-dispatcher-t3-b,entities/理工华汇.html
+3,国内#144,金智机器人,,投资方: 金坛投资,completed,wiki-dispatcher-t3-b,entities/金智机器人.html
+3,国内#145,赛博格机器人,,投资方: 中芯聚源、奋达科技,completed,wiki-dispatcher-t3-b,entities/赛博格机器人.html
+3,国内#146,跃瓦创新,,投资方: XVC创投,completed,wiki-dispatcher-t3-c,entities/跃瓦创新.html
+3,国内#147,里工,,投资方: 零壹资管、白云基金,completed,wiki-dispatcher-t3-c,entities/里工.html
+3,国内#148,融海微机器人,,投资方: 金凯同运创投,completed,wiki-dispatcher-t3-c,entities/融海微机器人.html
+3,国内#149,另山居,,投资方: 未透露,completed,wiki-dispatcher-t3-c,entities/另山居.html
+3,国内#150,Jacobi.ai 雅可比机器人,Jacobi.ai,媒体报道,completed,wiki-dispatcher-t3-c,entities/Jacobi.ai-雅可比机器人.html
+3,国内#151,灵宝CASBOT,CASBOT,人民日报/蓝思科技公告,completed,wiki-dispatcher-t3-d,wiki/entities/灵宝CASBOT.html
+3,国内#152,新奇机器人,,投资方: 云晖资本、厦门建发、厚雪资本 等1家,completed,wiki-dispatcher-t3-d,wiki/entities/新奇机器人.html
+3,国内#153,穹彻智能,Noematrix,阿里公告/36氪,completed,wiki-dispatcher-t3-d,wiki/entities/穹彻智能.html
+3,国内#154,蚂蚁灵波,,官方公告,completed,wiki-dispatcher-t3-d,wiki/entities/蚂蚁灵波.html
+3,国内#155,知跃空间智能,,猎云网/投资界,completed,wiki-dispatcher-t3-d,wiki/entities/知跃空间智能.html
+3,国内#156,荣耀机器人,,新华网/界面新闻,completed,wiki-dispatcher-t3-a,entities/荣耀机器人.html
+3,国内#157,高德具身业务部(阿里),,每日经济新闻,completed,wiki-dispatcher-t3-a,entities/高德具身.html
+3,国内#158,重庆凤凰技术(赛力斯),,东方财富网,completed,wiki-dispatcher-t3-a,entities/赛力斯凤凰.html
+3,国内#159,光向科技,,钛媒体,completed,wiki-dispatcher-t3-a,entities/光向科技.html
+3,国内#160,华为极目机器,,工商登记,completed,wiki-dispatcher-t3-a,entities/华为极目机器.html
+3,国内#161,智在无界,,投资方: 考拉基金、灵心巧手、领航新界,completed,wiki-dispatcher-t3-e,wiki/entities/智在无界.html
+3,国内#162,一立方机器人,,投资方: 美御资本,completed,wiki-dispatcher-t3-e,wiki/entities/一立方机器人.html
+3,国内#163,Ai.Frame人形机器人矩阵动力,,投资方: 博派资本,completed,wiki-dispatcher-t3-e,wiki/entities/Ai.Frame人形机器人矩阵动力.html
+3,国内#164,心图机器人,,投资方: 汇纳科技,completed,wiki-dispatcher-t3-e,wiki/entities/心图机器人.html
+3,国内#165,章鱼动力,,36氪/证券时报,completed,wiki-dispatcher-t3-e,wiki/entities/章鱼动力.html
+3,国内#166,智行智能,,投资方: 兰璞创投、淄博高新国创基金,completed,wiki-dispatcher-t3-b,wiki/entities/智行智能.html
+3,国内#167,逸璟科技,,投资方: 凡卓资本(小饭桌),completed,wiki-dispatcher-t3-b,wiki/entities/逸璟科技.html
+3,国内#168,艨码科技,,投资方: 探针资本、拓新界投资,completed,wiki-dispatcher-t3-b,wiki/entities/艨码科技.html
+3,国内#169,阿帕奇机器人,,投资方: 拓邦股份、嘉祐基金,completed,wiki-dispatcher-t3-b,wiki/entities/阿帕奇机器人.html
+3,国内#170,富唯智能,,投资方: 和而泰、华山汇基金,completed,wiki-dispatcher-t3-b,wiki/entities/富唯智能.html
+3,国内#171,深圳探真智能,,投资方: 未透露,completed,wiki-dispatcher-t3-b,wiki/entities/深圳探真智能.html
+3,国内#172,智动未来科技,,投资方: 奇绩创坛,in_progress,wiki-dispatcher-t3-b,
+3,国内#173,灵机数字,,投资方: 毓道投资,in_progress,wiki-dispatcher-t3-b,
+3,国内#174,擎仓机器人,,投资方: 隐山资本、纵腾集团、钟鼎资本 等3家,in_progress,wiki-dispatcher-t3-b,
+3,国内#175,日冕机器人,,投资方: 武岳峰科创、百度风投,in_progress,wiki-dispatcher-t3-b,
+3,国内#176,泛化世,,投资方: 桂树创投,in_progress,wiki-dispatcher-t3-b,
+3,国内#177,九光智能,,投资方: 华业天成、基石资本,in_progress,wiki-dispatcher-t3-b,
+3,国内#178,纽娲机器人,,投资方: 未透露,in_progress,wiki-dispatcher-t3-b,
+3,国内#179,纳意维,,投资方: 南山资本,in_progress,wiki-dispatcher-t3-b,
+3,国内#180,中露科技,,投资方: 会同资本,in_progress,wiki-dispatcher-t3-b,
+3,国内#181,VLAI未来动力,,投资方: 奇绩创坛,in_progress,wiki-dispatcher-t3-b,

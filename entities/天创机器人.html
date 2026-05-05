@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>天创机器人 — 具身智能Wiki</title><style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style></head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> › <span>天创机器人</span></div>
+  <div class="wiki-header"><h1>天创机器人</h1><div class="subtitle">TetraBOT · 南京天创智能科技股份有限公司 · 2011年成立 · 特种巡检机器人全球出货量第一 · 专精特新"小巨人"</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#founders">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#applications">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financials">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#analysis-1">2.1 团队背景与场景选择</a></li>
+        <li class="toc-lvl4"><a href="#analysis-2">2.2 技术路线与场景适配</a></li>
+        <li class="toc-lvl4"><a href="#analysis-3">2.3 股东结构对战略影响</a></li>
+        <li class="toc-lvl4"><a href="#analysis-4">2.4 试错与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#analysis-5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#analysis-6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#references">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">天创机器人</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">南京天创智能科技股份有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">英文名</div><div class="ib-value">TetraBOT</div></div>
+        <div class="ib-row"><div class="ib-label">曾用名</div><div class="ib-value">南京天创电子技术有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2011年（2016年转型机器人）</div></div>
+        <div class="ib-row"><div class="ib-label">注册地</div><div class="ib-value">南京市雨花台区</div></div>
+        <div class="ib-row"><div class="ib-label">创始人/CEO</div><div class="ib-value">刘爽</div></div>
+        <div class="ib-section">财务数据</div>
+        <div class="ib-row"><div class="ib-label">营收增速</div><div class="ib-value">近3年年增幅30%+</div></div>
+        <div class="ib-row"><div class="ib-label">盈利状态</div><div class="ib-value">连续三年盈利</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">累计出货</div><div class="ib-value">超5000台/套（全球第一）</div></div>
+        <div class="ib-row"><div class="ib-label">服务客户</div><div class="ib-value">超1000家</div></div>
+        <div class="ib-row"><div class="ib-label">员工数</div><div class="ib-value">未披露（七成毕业于南京高校）</div></div>
+        <div class="ib-section">估值/市值</div>
+        <div class="ib-row"><div class="ib-label">C轮估值</div><div class="ib-value">超10亿元</div></div>
+        <div class="ib-row"><div class="ib-label">上市状态</div><div class="ib-value">未上市（已完成股改）</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">赛道</div><div class="ib-value">特种机器人/工业智能运维</div></div>
+        <div class="ib-row"><div class="ib-label">企业认定</div><div class="ib-value">国家级专精特新"小巨人"</div></div>
+      </aside>
+      <p class="article-intro">天创机器人（TetraBOT），全称<strong>南京天创智能科技股份有限公司</strong>（原南京天创电子技术有限公司），是一家专注于特种具身智能机器人的中国企业，成立于2011年，总部位于南京市雨花台区。公司深耕工业智能运维领域，聚焦4D场景（Distant偏远/Dirty肮脏/Dangerous危险/Dull枯燥），核心产品涵盖10余个系列的巡检机器人和2025年发布的全球首款IIC T6级防爆认证人形机器人"天魁1号"。自2021年起，天创巡检机器人出货量居全球第一，累计交付超5000台/套，服务超1000家客户（含国家管网、中石油、中石化、南方电网等近百家央国企），产品运行里程超1亿公里。公司是国家级专精特新"小巨人"企业、南京市"培育独角兽"，2025年9月完成股份制改造，2026年3月完成超亿元D轮融资（金洲管道、超达装备战略入股）。</p>
+      <h2 id="facts">1 事实层</h2>
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper"><table class="wikitable infotable">
+        <tr><th>项目</th><th>内容</th></tr>
+        <tr><td>公司全称</td><td>南京天创智能科技股份有限公司（2025年9月股改后）</td></tr>
+        <tr><td>曾用名</td><td>南京天创电子技术有限公司</td></tr>
+        <tr><td>英文品牌</td><td>TetraBOT</td></tr>
+        <tr><td>成立日期</td><td>2011年12月5日（2016年刘爽加入后全面转型工业巡检机器人）</td></tr>
+        <tr><td>注册地址</td><td>南京市雨花台区安德门大街23号B幢8层（中国南京软件谷）</td></tr>
+        <tr><td>法定代表人/CEO</td><td>刘爽</td></tr>
+        <tr><td>上市状态</td><td>未上市（2025年9月完成股份制改造，被视为IPO前奏）</td></tr>
+        <tr><td>企业认定</td><td>国家级专精特新"小巨人"企业、国家高新技术企业、南京市"培育独角兽"</td></tr>
+        <tr><td>生产基地</td><td>4500平方米，10条产线，60条测试线</td></tr>
+        <tr><td>专利</td><td>149项专利技术（含66项发明专利）</td></tr>
+      </table></div>
+      <h4>发展沿革</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>时间</th><th>事件</th></tr>
+        <tr><td>2011年</td><td>公司由刘爽的两位高中好友在南京创立，最初从事数控系统研发</td></tr>
+        <tr><td>2016年</td><td>刘爽加入公司任总经理，带领团队全面转型工业巡检机器人赛道，创业初期仅5人</td></tr>
+        <tr><td>2017年</td><td>完成天使轮（凯风创投）和A轮（盛宇投资）融资</td></tr>
+        <tr><td>2021年</td><td>特种巡检机器人全球出货量跃居第一，超过行业第二至第五名总和</td></tr>
+        <tr><td>2023年2月</td><td>B+轮融资近亿元（毅达资本、凯风创投）</td></tr>
+        <tr><td>2023年10月</td><td>C轮融资超亿元（工创汇吉基金、海创汇基金领投），估值超10亿</td></tr>
+        <tr><td>2025年1月</td><td>发布全球首款IIC T6级防爆认证人形机器人"天魁1号"</td></tr>
+        <tr><td>2025年9月</td><td>完成股份制改造，更名"南京天创智能科技股份有限公司"；与阿里云达成全面合作</td></tr>
+        <tr><td>2025年11月</td><td>与华为联合参展新加坡CEPSI电力大会，拓展海外市场</td></tr>
+        <tr><td>2026年1月</td><td>与软通天枢达成战略合作（具身智能+数字孪生）</td></tr>
+        <tr><td>2026年3月</td><td>D轮融资超亿元（金洲管道、超达装备战略入股），亮相华为中国合作伙伴大会2026</td></tr>
+      </table></div>
+      <h3 id="founders">1.2 创始人及核心团队</h3>
+      <p>天创机器人创始团队经历了从"同学合伙"到"产业专家领军"的演进。公司最初由刘爽的两位高中好友于2011年创立，2016年刘爽加入后全面转型。团队呈现<strong>产业深耕型</strong>特征，核心成员多来自东南大学、南京大学等南京本地高校，员工七成毕业于南京高校，人才结构以工程落地为主。</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+        <tr><td>创始人/董事长/CEO</td><td>刘爽</td><td>"85后"。东南大学热能与动力工程学士，南京大学项目管理工程硕士。2010年进入苏州热工研究院从事核电技术研究6年，牵头编写两项国家标准。2016年加入天创任总经理，带领公司全面转型工业智能运维赛道。获江苏省科技进步一等奖、江苏省"333高层次人才"、紫金山英才"创新型企业家"。发表论文12篇，申请专利21项。</td></tr>
+        <tr><td>早期联合创始人/股东</td><td>闵济海</td><td>刘爽高中好友，2011年共同创立公司，持股6.14%。最初团队从事数控系统研发。</td></tr>
+        <tr><td>员工持股平台</td><td>南京美太嘉智能技术合伙企业（有限合伙）</td><td>持股12.53%，体现核心技术团队的股权激励</td></tr>
+      </table></div>
+      <h3 id="funding">1.3 融资与股东</h3>
+      <h4>融资历史</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>轮次</th><th>时间</th><th>金额</th><th>领投方</th><th>跟投方</th></tr>
+        <tr><td>天使轮</td><td>2017年</td><td>千万级</td><td>凯风创投</td><td>贝极投资</td></tr>
+        <tr><td>A轮</td><td>2017年11月</td><td>未披露</td><td>盛宇投资、凯风创投</td><td>上海宛能实业</td></tr>
+        <tr><td>A+轮</td><td>2018年8月</td><td>数千万</td><td>华泰紫金投资</td><td>南京道丰</td></tr>
+        <tr><td>B轮</td><td>2021年8月</td><td>近亿元</td><td>新松投资、赛天资本</td><td>瑞奕资本、毅达资本、陕投集团</td></tr>
+        <tr><td>B+轮</td><td>2023年2月</td><td>近亿元</td><td>毅达资本、凯风创投</td><td>（老股东加注）</td></tr>
+        <tr><td>C轮</td><td>2023年10月</td><td>超亿元</td><td>工创汇吉基金（广州工控资本）、海创汇基金（海尔集团）</td><td>置柏投资、福茂投资</td></tr>
+        <tr><td>D轮</td><td>2026年3月</td><td>超亿元</td><td>金洲管道(002443)、超达装备(301186)战略入股</td><td>南京市创新投资集团、益华资本、置柏投资、金湖金发集团</td></tr>
+      </table></div>
+      <h4>股东结构</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>股东类型</th><th>代表方</th><th>特征</th></tr>
+        <tr><td>创始团队</td><td>刘爽及创始团队</td><td>控股（具体比例未完全公开）</td></tr>
+        <tr><td>员工持股平台</td><td>南京美太嘉智能技术合伙企业</td><td>约12.53%</td></tr>
+        <tr><td>早期联合创始人</td><td>闵济海</td><td>约6.14%</td></tr>
+        <tr><td>上市公司（产业资本）</td><td>金洲管道(002443)、超达装备(301186)</td><td>D轮战略入股，形成"市场牵引+技术反哺"</td></tr>
+        <tr><td>国资/政府基金</td><td>南京市创新投资集团、广州工控资本、陕投集团</td><td>多轮参与</td></tr>
+        <tr><td>VC/PE</td><td>毅达资本、凯风创投、华泰紫金等</td><td>多轮跟投</td></tr>
+      </table></div>
+      <h3 id="tech">1.4 技术路线</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>技术维度</th><th>详情</th></tr>
+        <tr><td>AI技术路线</td><td>「天算」智能算法底座：融合机理模型与多模态大模型，含7大类100+种高精度算法。2024年12月完成「天算智能巡检大模型」在江苏省网信办的AI备案登记，规划2025年Q3发布「天算具身智能运维大模型」。综合识别精度>95%，缺陷识别准确率99.9%。</td></tr>
+        <tr><td>数据方案</td><td>8000TB工业现场数据积累，管理超40万个设备点。利用5000+台机器人的真实工业场景运行数据（超1亿公里运行里程）持续训练算法模型，形成数据飞轮效应。</td></tr>
+        <tr><td>感知体系</td><td>多模态融合感知：可见光+红外热成像+声学+气体光谱，适配复杂工业环境。</td></tr>
+        <tr><td>全栈/专用路线</td><td>全栈式工业智能运维路线：T-BOT（机器人本体）+T-RADE（识别算法库）+T-IM（智能硬件）+T-ONE（工业互联网平台），从硬件到算法到平台全链条自研。</td></tr>
+        <tr><td>差异化技术</td><td>全球首款IIC T6级防爆认证人形机器人（最高防爆等级），"半人半车"架构（轮式/履带底盘+类人双臂），柔顺力控技术（感知力度避免损坏设备），遥操作+预训练结合。</td></tr>
+      </table></div>
+      <h3 id="products">1.5 产品形态</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>产品分类</th><th>子类/型号</th><th>核心参数</th><th>应用场景</th></tr>
+        <tr><td>轮式巡检机器人</td><td>室内外轮式/T7-S系列</td><td>四轮八驱，升降臂1.65m</td><td>电力、石化常规巡检，赛事/场馆巡检</td></tr>
+        <tr><td>轨道巡检机器人</td><td>T5-E等</td><td>挂轨式</td><td>管廊、隧道等线性场景</td></tr>
+        <tr><td>防爆巡检机器人</td><td>T9-W系列</td><td>防爆认证</td><td>油气化工易燃易爆环境</td></tr>
+        <tr><td>矿井巡检机器人</td><td>T9-E</td><td>煤矿井下适配</td><td>煤矿井下替代人工巡检</td></tr>
+        <tr><td>光伏清扫机器人</td><td>—</td><td>智能清洁</td><td>光伏电站</td></tr>
+        <tr><td><strong>天魁1号</strong>防爆人形</td><td>天魁1号（2025年1月）</td><td>IIC T6防爆，高2.2m，重260kg，单臂负载25kg，续航8h，16种末端工具</td><td>核电站、矿山、石化、超高压电网</td></tr>
+        <tr><td>巡操一体人形</td><td>T12（2025年）</td><td>操作+巡检一体</td><td>工业运维</td></tr>
+        <tr><td>挂轨式移动充电桩</td><td>—</td><td>新能源充电解决方案</td><td>充电站50+座，充电机器人300+台</td></tr>
+      </table></div>
+      <h4>2026年规划新品</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>产品</th><th>定位</th></tr>
+        <tr><td>天佑</td><td>消控室值班人形机器人</td></tr>
+        <tr><td>机器豹</td><td>全地形四轮足机器人（特种机器狗）</td></tr>
+        <tr><td>天A</td><td>工业运维智能体（AI Agent）</td></tr>
+        <tr><td>天魁二代</td><td>底盘从轮式升级为履带式，提升应急救援越障能力</td></tr>
+      </table></div>
+      <h3 id="applications">1.6 应用场景</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>行业</th><th>应用场景</th><th>标杆客户/项目</th></tr>
+        <tr><td>电力新能源</td><td>变电站/输电线路巡检</td><td>南方电网、国家电网超高压环境</td></tr>
+        <tr><td>油气化工</td><td>炼化厂/油气管网防爆巡检</td><td>国家管网、中石油天津、中石化、斯尔邦石化</td></tr>
+        <tr><td>核能</td><td>核电站环境巡检与操作</td><td>中国广核</td></tr>
+        <tr><td>冶金矿山</td><td>矿井巡检、冶炼环境巡检</td><td>滕州盛隆化工、泰兴黄桥气田</td></tr>
+        <tr><td>市政/安防</td><td>赛事保电、场馆巡检</td><td>南京奥体"苏超"赛事、国家应急救援中心</td></tr>
+        <tr><td>新能源充电</td><td>挂轨式移动充电桩</td><td>50+充电站</td></tr>
+        <tr><td>港口/轨交/水务</td><td>基础设施巡检</td><td>多个行业项目落地</td></tr>
+      </table></div>
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <ul>
+        <li><strong>累计出货：</strong>超5000台/套特种运维机器人，巡检机器人出货量全球第一</li>
+        <li><strong>落地项目：</strong>累计超1000个项目</li>
+        <li><strong>服务客户：</strong>超1000家，覆盖近百家央国企</li>
+        <li><strong>客户复购率：</strong>超30%</li>
+        <li><strong>天魁1号订单：</strong>截至2025年中已获应急管理系统及多家能源央国企20+台订单</li>
+        <li><strong>海外起步：</strong>2025年与华为联合参展新加坡CEPSI电力大会，亮相东盟博览会；已在韩国、泰国及中东市场拓展</li>
+      </ul>
+      <h3 id="financials">1.8 财务数据</h3>
+      <p>天创机器人为非上市公司，财务数据来自公开报道：</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>指标</th><th>数据</th><th>备注</th></tr>
+        <tr><td>近3年营收增速</td><td>年增幅保持30%以上</td><td>2023年同比增长50%+</td></tr>
+        <tr><td>2024年合同金额</td><td>约2.6亿元</td><td>公开报道数据</td></tr>
+        <tr><td>2025年预期</td><td>突破3亿元</td><td>预计目标</td></tr>
+        <tr><td>盈利状况</td><td>连续三年盈利</td><td>未上市同行中少有</td></tr>
+        <tr><td>累计融资</td><td>估约4-6亿元</td><td>含D轮</td></tr>
+        <tr><td>C轮估值</td><td>超10亿元</td><td>2023年10月</td></tr>
+      </table></div>
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>刘爽曾在核电系统工作6年，牵头编写两项国家标准，核工业背景深刻塑造了天创对安全标准的极致追求</li>
+        <li>"天魁1号"70%以上整机零部件由南京本地企业提供，体现南京机器人产业集群的供应链深度</li>
+        <li>2025年3月，国务院发展研究中心企业研究所专程赴南京调研天创机器人</li>
+        <li>天魁1号发布当天网络浏览量超千万次，被央视《Hi！机器人》栏目专题报道</li>
+        <li>公司被外界评价为南京继埃斯顿之后的机器人"双子星"潜力股</li>
+        <li>与软通天枢、阿里云、华为、京东工业、华荣股份等建立多维度战略合作生态</li>
+      </ul>
+      <h2 id="analysis">2 分析层</h2>
+      <div class="analysis-block" id="analysis-1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>刘爽在核电系统6年的技术研究与标准制定经历，直接塑造了天创机器人聚焦高危、防爆工业场景的核心基因。核电行业对"零事故"的极致追求和对IEC/国标的深刻理解，使得刘爽带领团队从巡检机器人切入工业安全赛道具备了独特的知识壁垒——这种壁垒不是纯技术性的，而是对行业know-how（标准、流程、风险点）的深度掌握。公司团队七成毕业于南京高校，扎根南京雨花台区软件谷，与东南大学、南京大学等形成人才闭环，这种"本地高校+本地产业"的模式使得团队稳定性较高，但对顶级AI人才的吸引力可能不及北上深。整体来看，团队是典型的"场景驱动型"而非"技术突破型"，与公司选择的工业高危场景高度适配。</p>
+      </div>
+      <div class="analysis-block" id="analysis-2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>天创选择"半人半车"架构（轮式/履带底盘+类人上半身）而非双足人形方案，充分体现了"场景优先于技术炫酷"的务实哲学。在工业厂房、管廊、变电站等结构化环境中，轮式/履带移动效率远高于双足行走，且防爆认证对电气元件有严苛要求，简化下肢结构降低了认证难度和故障率。多模态融合感知（可见光+红外+声学+气体）而非纯视觉方案，适配了工业场景中仅靠视觉无法检测的热异常、气体泄漏等关键风险。但"天算"大模型的AI能力目前仍以传统机理模型+判别式AI为主，向真正的具身智能大模型（感知-规划-执行一体化）演进仍需观察。</p>
+      </div>
+      <div class="analysis-block" id="analysis-3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>天创机器人的股东结构呈现出"国资+产业资本+VC"的三层嵌套特征，对其战略有明确的定向影响。D轮引入的金洲管道（油气管道龙头）和超达装备（汽车零部件/自动化设备），属于典型的"下游场景+上游供应链"产业股东搭配：金洲管道为天创打开了油气管道巡检的天然应用场景，超达装备则可能在精密零部件制造和量产方面提供支持。海尔（海创汇）的入股为天创连接了家电制造和智能制造场景；广州工控资本、南京创新投资集团等国资背景基金的参与，则为天创在央国企客户的招投标中提供了信用背书。这种"产业资源先于财务回报"的股东结构，推动天创走"深挖垂直场景、先盈利再考虑更大资本故事"的路径。</p>
+      </div>
+      <div class="analysis-block" id="analysis-4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>天创的路径调整具有明确的阶段性特征。第一阶段的"数控系统→巡检机器人"转型（2016年）是公司历史上最关键的战略调整：从通用数控系统转向细分场景的巡检机器人，这一决策使公司从一个小型数控系统集成商变成了特种机器人赛道龙头。第二阶段是"巡检→作业"的升级（2023-2025年），从"看"（巡检）到"做"（操作），天魁1号的发布标志着公司从信息采集层向物理操作层的能力跃迁。第三阶段是"工业→民生"的拓展，挂轨式移动充电桩的布局意味着公司在寻找巡检之外的第二增长曲线。这种"深耕一个场景→从巡检到操作→横向拓展新赛道"的渐进式演进节奏，与刘爽的核电系统工程思维一脉相承。</p>
+      </div>
+      <div class="analysis-block" id="analysis-5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>天创机器人在具身智能赛道的竞争定位表现为三个清晰的"取舍"：其一，选择"防爆"这一稀缺能力作为核心壁垒——IIC T6防爆认证在全球人形机器人中独此一家，这一定位使其避开了与Figure、智元等通用人形机器人公司在C端或通用工业场景的直接竞争，专注于对手难以快速复制的防爆认证壁垒；其二，选择"巡检→作业"而非"直接通用操作"作为能力递进路径，以巡检积累的数据和客户关系为基础，渐进式增加操作能力；其三，选择"南京深耕"而非"北上深布局"，以南京高校人才和本地供应链为核心资源池，与埃斯顿形成南京机器人"双子星"的地方产业叙事。这一定位的风险在于，如果通用人形机器人的性价比快速提升并攻入工业巡检场景，天创的硬件壁垒（防爆认证除外）可能面临挑战。</p>
+      </div>
+      <div class="analysis-block" id="analysis-6">
+        <h4>2.6 其他重要观察</h4>
+        <p>三个值得关注的维度。第一，股改→D轮→IPO的节奏：2025年9月股改、2026年3月D轮、上市公司战略入股，天创正在为2026-2027年的IPO窗口做准备。2026年已有超30家机器人公司在港股排队，天创若能以"连续三年盈利+全球出货第一"的差异化质地冲击资本市场，估值逻辑将与亏损型具身智能公司形成显著区别。第二，华为生态的价值：天创与华为在2025-2026年连续合作（新加坡电力大会、华为中国合作伙伴大会2026），华为在电力、能源、矿山等行业的政企客户资源与天创的场景高度重合，这一合作渠道的分量可能超越一般的战略合作协议。第三，防爆人形机器人的护城河深度：IIC T6防爆认证本身就是市场准入壁垒，从认证申请到获批通常需要数年时间和大量测试投入，这意味着天魁1号在短期内拥有事实上的市场独占窗口。</p>
+      </div>
+      <h2 id="references">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://36kr.com/p/2478291336288128" target="_blank">天创机器人完成超亿元C轮融资，加速工业智能运维落地应用 — 36氪</a></li>
+          <li><a href="https://m.36kr.com/newsflashes/3711130085290370" target="_blank">天创机器人完成超亿元D轮融资，两家上市公司战略入股 — 36氪</a></li>
+          <li><a href="http://www.js.xinhuanet.com/20251215/01a9863a68f54994ada1301c4bb90230/c.html" target="_blank">江苏新质生产力观察丨天创智能：特种机器人激活工业动能、提质民生服务 — 新华网</a></li>
+          <li><a href="http://www.eeo.com.cn/2026/0311/809208.shtml" target="_blank">超达装备战略入股天创机器人，参与超亿元D轮融资 — 经济观察网</a></li>
+          <li><a href="https://www.laohu8.com/post/542064270140648" target="_blank">天创机器人D轮融资过亿，未来准备上市吗？ — 老虎社区</a></li>
+          <li><a href="https://www.sohu.com/a/998653829_121443483" target="_blank">继埃斯顿后，南京要造机器人"双子星"？ — 搜狐</a></li>
+          <li><a href="https://www.163.com/dy/article/KPCIHESO05119LOG.html" target="_blank">南京市委书记上门调研！这个东大"85后"完成超亿元新融资 — 网易</a></li>
+          <li><a href="https://www.yzwb.net/news/jiangsu/nanjing/202508/t20250823_253976.html" target="_blank">我的天啊，全球销冠！ — 扬子晚报</a></li>
+          <li><a href="https://www.stcn.com/article/detail/1501309.html" target="_blank">华荣股份与天创机器人签署战略合作协议 — 证券时报</a></li>
+          <li><a href="https://www.iyiou.com/briefing/202510281839681" target="_blank">天创机器人与阿里云达成全面合作伙伴关系 — 亿欧</a></li>
+          <li><a href="https://www.sohu.com/a/939720096_121084251" target="_blank">天创机器人受邀参加云栖大会 与阿里云达成全面合作 — 搜狐</a></li>
+          <li><a href="http://www.sxstzb.com/news/524.html" target="_blank">天创机器人亮相华为中国合作伙伴大会2026 — 陕投资本</a></li>
+          <li><a href="http://www.sxstzb.com/news/456.html" target="_blank">天创机器人正式完成股改更名 — 陕投资本</a></li>
+          <li><a href="https://www.chinaventure.com.cn/news/114-20260313-390474.html" target="_blank">天创机器人完成战略轮融资 — 投中网</a></li>
+          <li><a href="https://news.pedaily.cn/202310/523755.shtml" target="_blank">天创机器人完成超亿元C轮融资 — 投资界</a></li>
+          <li><a href="https://baijiahao.baidu.com/s?id=1780261101917778197" target="_blank">南京"培育独角兽"，做出细分赛道"第一"，C轮拿下超亿元 — 百度百家</a></li>
+          <li><a href="https://www.ihaier.com/news/detail/1994.html" target="_blank">天创机器人亮相世界智能制造大会并获殊荣 — 海尔官网</a></li>
+          <li><a href="https://tzb.nanjing.gov.cn/txyd/rwfc/202508/t20250811_5625460.html" target="_blank">铁甲先锋：南京天创的工业安全革新 — 南京统战部</a></li>
+          <li><a href="http://www.jsgjzx.com.cn/TodayJiangsu/202504/t20250410_8474940.shtml" target="_blank">短短几十秒，收获"好友申请"百余条 — 江苏国际在线</a></li>
+          <li><a href="http://invest.nanjing.gov.cn/gzdt/202502/t20250220_5079132.html" target="_blank">抢占新"风口"，加速布局人形机器人 — 南京投资促进局</a></li>
+          <li><a href="https://c.gongkong.com/PhoneVersion/NewDetail?newsId=440407" target="_blank">产品Q&A | 天创天魁系列防爆人形机器人的热点问答 — 中国工控网</a></li>
+          <li><a href="https://baike.baidu.com/item/%E5%A4%A9%E9%AD%811%E5%8F%B7/65312877" target="_blank">天魁1号 — 百度百科</a></li>
+          <li><a href="https://www.yangtse.com/news/ch/202508/t20250813_249807.html" target="_blank">又猛又飒！"带六块腹肌"的大力士机器人来了 — 扬子晚报</a></li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">本页面内容基于公开信息整理，数据截止至2026年5月。天创机器人 — 具身智能Wiki</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

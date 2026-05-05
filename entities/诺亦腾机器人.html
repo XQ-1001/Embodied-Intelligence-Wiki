@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>诺亦腾机器人 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> › <span>诺亦腾机器人</span></div>
+  <div class="wiki-header"><h1>诺亦腾机器人</h1><div class="subtitle">Noitom Robotics · 2025年分拆独立 · 具身智能数据基础设施供应商 · "不造机器人的机器人公司"</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#team">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#finance">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl3"><a href="#a-team">2.1 团队背景与场景选择</a></li>
+        <li class="toc-lvl3"><a href="#a-tech">2.2 技术路线与场景适配</a></li>
+        <li class="toc-lvl3"><a href="#a-capital">2.3 股东资本对战略的影响</a></li>
+        <li class="toc-lvl3"><a href="#a-pivot">2.4 试错过程与路径调整</a></li>
+        <li class="toc-lvl3"><a href="#a-position">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl3"><a href="#a-other">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#refs">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">诺亦腾机器人</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">诺亦腾机器人科技（北京）有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">英文</div><div class="ib-value">Noitom Robotics</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2025年初（从母公司分拆）</div></div>
+        <div class="ib-row"><div class="ib-label">母公司</div><div class="ib-value">诺亦腾科技（Noitom Ltd.，2012年成立）</div></div>
+        <div class="ib-row"><div class="ib-label">注册地</div><div class="ib-value">北京</div></div>
+        <div class="ib-row"><div class="ib-label">创始人/CEO</div><div class="ib-value">戴若犁博士</div></div>
+        <div class="ib-row"><div class="ib-label">首席科学家</div><div class="ib-value">韩磊（前腾讯Robotics X Lab）</div></div>
+        <div class="ib-row"><div class="ib-label">企业定位</div><div class="ib-value">"不造机器人的机器人公司"——具身智能数据基础设施供应商</div></div>
+        <div class="ib-section">融资信息</div>
+        <div class="ib-row"><div class="ib-label">最新轮次</div><div class="ib-value">Pre-A+轮（2025年12月）</div></div>
+        <div class="ib-row"><div class="ib-label">累计融资</div><div class="ib-value">数亿元人民币</div></div>
+        <div class="ib-row"><div class="ib-label">估值</div><div class="ib-value">未公开披露</div></div>
+        <div class="ib-row"><div class="ib-label">主要投资方</div><div class="ib-value">启明创投、五源资本、君联资本、经纬创投、英诺天使基金、阿尔法公社</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">母公司积淀</div><div class="ib-value">全球70%专业动作捕捉市场份额</div></div>
+        <div class="ib-row"><div class="ib-label">客户覆盖</div><div class="ib-value">全球60-70家机器人头部企业</div></div>
+        <div class="ib-row"><div class="ib-label">数据采集能力</div><div class="ib-value">并行20组以上本体，亚毫米精度</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">领域</div><div class="ib-value"><span class="tag">具身智能</span><span class="tag">数据基础设施</span></div></div>
+        <div class="ib-row"><div class="ib-label">赛道</div><div class="ib-value"><span class="tag">动作捕捉</span><span class="tag">遥操作</span><span class="tag">训练数据</span><span class="tag">数据工厂</span></div></div>
+        <div class="ib-section">官网</div>
+        <div class="ib-row"><div class="ib-label">网址</div><div class="ib-value">未公开独立域名（母公司 noitom.com）</div></div>
+      </aside>
+
+      <p class="article-intro"><strong>诺亦腾机器人</strong>（英文：Noitom Robotics），全称诺亦腾机器人科技（北京）有限公司，2025年初从母公司诺亦腾科技（Noitom Ltd.）分拆独立运营。公司定位为具身智能数据基础设施供应商，以"不造机器人的机器人公司"为核心策略，依托母公司在动作捕捉领域十多年的技术积累（全球约70%专业动捕市场份额），为人形机器人和具身智能行业提供高精度遥操作设备、规模化数据采集工厂及训练数据集。创始团队由动作捕捉技术先驱戴若犁博士领衔，核心成员来自腾讯Robotics X Lab、字节跳动新石实验室、商汤、百度等一线科技企业。2025年完成从天使轮到Pre-A+轮的三轮融资，累计募资数亿元，投资方包括启明创投、五源资本、君联资本等顶级VC。已服务全球60-70家机器人领域头部企业，2025年前8个月营收同比增长5倍。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper">
+        <table class="wikitable infotable">
+          <tr><th>项目</th><th>内容</th></tr>
+          <tr><td>公司全称</td><td>诺亦腾机器人科技（北京）有限公司</td></tr>
+          <tr><td>英文名称</td><td>Noitom Robotics</td></tr>
+          <tr><td>成立时间</td><td>2025年初（从诺亦腾科技分拆为独立法人）</td></tr>
+          <tr><td>母公司</td><td>诺亦腾科技（Noitom Ltd.，2012年成立，全球动作捕捉龙头企业）</td></tr>
+          <tr><td>注册地址</td><td>北京市</td></tr>
+          <tr><td>入驻园区</td><td>中关村（海淀）具身智能创新产业园（全国首家以具身智能命名的产业园）</td></tr>
+          <tr><td>上市状态</td><td>未上市</td></tr>
+          <tr><td>企业定位</td><td>"不造机器人的机器人公司"——具身智能数据基础设施供应商</td></tr>
+          <tr><td>主营业务</td><td>遥操作设备与系统、高精度数据采集工厂、具身智能训练数据集授权</td></tr>
+        </table>
+      </div>
+      <h4>发展沿革</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>时间</th><th>事件</th></tr>
+          <tr><td>2012年</td><td>母公司诺亦腾科技成立，专注动作捕捉与人机交互技术</td></tr>
+          <tr><td>2012-2024年</td><td>诺亦腾科技发展为全球专业动捕市场龙头（约70%份额），产品用于《金刚狼》《权力的游戏》等好莱坞制作，积累十余年高精度动作捕捉技术</td></tr>
+          <tr><td>2025年初</td><td>机器人数据业务从母公司分拆，诺亦腾机器人独立运营；完成天使轮融资（阿尔法公社领投）</td></tr>
+          <tr><td>2025年6月</td><td>36氪独家报道分拆消息：腾讯、字节大牛加盟，定位具身智能数据底座</td></tr>
+          <tr><td>2025年</td><td>完成Pre-A轮融资；深圳数据工厂投入使用（数千平米）</td></tr>
+          <tr><td>2025年12月</td><td>完成Pre-A+轮融资（启明创投领投，超额认购），累计募资数亿元</td></tr>
+          <tr><td>2026年3月</td><td>与智象未来（HiDream.ai）达成战略合作；入驻中关村具身智能产业园；亮相2026中关村论坛年会</td></tr>
+          <tr><td>2026年</td><td>与香港大学等共建具身智能联合实验室；北京海淀新一代数据工厂及机器人训练场规划中</td></tr>
+        </table>
+      </div>
+
+      <h3 id="team">1.2 创始人及核心团队</h3>
+      <p>诺亦腾机器人的核心团队堪称"技术深度×产业宽度"的精英集结。戴若犁博士是母公司诺亦腾科技的核心创始人，将全球动捕龙头的技术基因注入机器人数据赛道；韩磊博士作为前腾讯Robotics X Lab一号位，为团队带来顶尖的具身智能研究与工程能力；许安民则贡献了字节跳动/细红线级别的消费硬件工程经验。</p>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+          <tr><td>创始人/CEO</td><td>戴若犁博士</td><td>中国科学技术大学学士、香港中文大学博士，诺亦腾科技联合创始人。全球动作捕捉行业资深技术专家，主导了诺亦腾产品从0到全球70%市场份额的技术研发进程</td></tr>
+          <tr><td>首席科学家</td><td>韩磊博士</td><td>前腾讯Robotics X Lab具身智能中心负责人（T13级），北京大学博士，前密西西比州立大学助理教授；在具身智能、机器人操作与控制领域拥有深厚学术与工程积淀</td></tr>
+          <tr><td>硬件工程负责人</td><td>许安民</td><td>前字节跳动新石实验室硬件负责人（4-1级），曾任罗永浩「细红线」公司硬件负责人，在消费级和工业级硬件产品设计与量产方面拥有丰富经验</td></tr>
+          <tr><td>联合创始人/VP</td><td>唐新民</td><td>对外代表之一，负责战略合作与产学研协同（如与港大联合实验室签约）</td></tr>
+        </table>
+      </div>
+      <p>团队整体呈现鲜明的<strong>"学术+大厂+硬件"混合型精英结构</strong>：戴若犁代表动作捕捉技术原力，韩磊代表机器人与AI前沿研究，许安民代表硬件产品化及量产经验。产品、开发、销售团队亦来自商汤、百度、阿里巴巴等一线企业。公司具体员工总数和研发人员占比暂未公开披露。</p>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <h4>融资历史</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>轮次</th><th>时间</th><th>金额</th><th>投资方</th><th>用途</th></tr>
+          <tr><td>天使轮</td><td>2025年初</td><td>数千万元</td><td>阿尔法公社领投，经纬创投等参投</td><td>公司分拆启动、核心团队组建</td></tr>
+          <tr><td>Pre-A轮</td><td>2025年</td><td>（纳入累计）</td><td>阿尔法公社等</td><td>技术研发、数据采集体系建设</td></tr>
+          <tr><td>Pre-A+轮</td><td>2025年12月</td><td>超额认购（数亿元累计）</td><td>启明创投领投；五源资本、君联资本跟投；经纬创投、英诺天使基金追加投资</td><td>具身智能多模态数据采集/处理/交付技术研发、规模化数据生产体系与工程化平台建设、核心团队配置扩充</td></tr>
+        </table>
+      </div>
+      <h4>股东结构分析</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>股东类别</th><th>代表机构</th><th>战略意义</th></tr>
+          <tr><td>顶级VC</td><td>启明创投（领投Pre-A+）、五源资本、君联资本、经纬创投</td><td>启明、五源均为具身智能赛道头部VC，带来品牌背书和产业网络</td></tr>
+          <tr><td>早期/天使</td><td>阿尔法公社、英诺天使基金</td><td>从天使轮持续加注至Pre-A+，体现对团队和技术路线的深度信任</td></tr>
+        </table>
+      </div>
+      <p>公司估值未公开披露。考虑到累计融资数亿元、Pre-A+轮超额认购且投资方阵容豪华，市场给予较高估值预期。公司未上市。投资方评价中，启明创投称团队为"行业内极少数具备全栈数据能力的玩家"，五源资本认为诺亦腾是"最早看到Data Thirsty趋势的团队"。</p>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>技术维度</th><th>说明</th></tr>
+          <tr><td>总体技术定位</td><td>具身智能数据基础设施——为机器人和AI模型提供高质量训练数据及数据生产工具</td></tr>
+          <tr><td>数据金字塔理论</td><td>戴若犁提出四层数据金字塔：L1真机遥操作数据（最高质量）→ L2高精度真人交互数据 → L3低精度人机交互数据 → L4互联网合成/仿真数据（每层比上一层大两个数量级）</td></tr>
+          <tr><td>动作捕捉技术</td><td>继承母公司十余年动捕技术积累，亚毫米级精度，支持全身运动、手指微动作、力触觉等多模态同步采集</td></tr>
+          <tr><td>数据采集模式</td><td>"工厂采集"（In-the-factory，超高精度全模态）+ "野采"（In-the-wild，真实日常场景）双模式并行；以人类动作为中心（Human-centric）原子化——抓、拿、抛、捏、推等</td></tr>
+          <tr><td>规模化能力</td><td>支持并行20组以上本体同时开展高精度训练数据采集；正制作数十万小时数据集，计划部分开源</td></tr>
+          <tr><td>生成式数据融合</td><td>与智象未来合作"真实数据+生成式视频数据"融合，年内预计生成数万小时具身智能视频数据</td></tr>
+          <tr><td>未来技术方向</td><td>VLA模型规模化演进、视频建模与动作预测协同驱动的世界模型、从虚拟生成到物理验证的完整数据闭环</td></tr>
+        </table>
+      </div>
+      <p>技术路线的核心差异化在于"以动捕技术为底座的数据金字塔"——诺亦腾不参与本体或大脑模型的竞争，而是专注于解决当前行业最核心的瓶颈：高质量训练数据的规模化生产。母公司诺亦腾科技在动作捕捉领域十多年的技术积累（精度、可靠性、多模态同步）构成了难以复制的护城河。</p>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <p>诺亦腾机器人采用双轨商业模式，两条产品线相互协同：</p>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>产品线</th><th>子类</th><th>说明</th><th>定位</th></tr>
+          <tr><td rowspan="2">Project T（遥操作）</td><td>遥操作硬件设备</td><td>高精度动作捕捉设备（手套、全身动捕服等），用于人类远程控制机器人采集训练数据</td><td>卖硬件</td></tr>
+          <tr><td>安全席位服务</td><td>远程操作端侧设备+管控软件+BPO人力外包全套方案</td><td>卖服务</td></tr>
+          <tr><td rowspan="2">Project D（数据工厂）</td><td>数据采集工厂</td><td>规模化数据采集基础设施（已启用深圳工厂数千平米，北京工厂规划中），全模态数据生产</td><td>卖数据</td></tr>
+          <tr><td>训练数据集授权</td><td>数十万小时级数据集制作中，计划部分开源，其余通过授权模式交付</td><td>卖授权</td></tr>
+        </table>
+      </div>
+      <p>两条产品线形成飞轮效应：Project T销售的遥操作设备被客户用于数据采集，产生的数据验证和需求反馈又推动Project D数据工厂的标准化和规模化建设。</p>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>场景分类</th><th>具体应用</th><th>典型客户/合作方</th></tr>
+          <tr><td rowspan="3">机器人训练数据</td><td>遥操作数据采集（人类远程控制机器人执行任务）</td><td>智元、千寻、宇树、小鹏、腾讯、达摩院等国内头部机器人厂商</td></tr>
+          <tr><td>机器人示教（人类动作映射到机器人本体）</td><td>全球60-70家机器人企业</td></tr>
+          <tr><td>通用训练数据集授权</td><td>李飞飞团队等学术机构；海外机器人独角兽A公司、汽车巨头B公司</td></tr>
+          <tr><td>远程作业</td><td>危险/人力不可达环境的遥操作</td><td>未具名工业客户</td></tr>
+          <tr><td>研发验证</td><td>数字孪生与量测（大空间多目标实时量测）</td><td>机器人研发团队</td></tr>
+        </table>
+      </div>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>维度</th><th>进展</th></tr>
+          <tr><td>营收增速</td><td>2025年前8个月实现数千万签单，同比增长5倍</td></tr>
+          <tr><td>客户覆盖</td><td>国内几乎所有机器人厂商都曾采购诺亦腾设备采集数据；累计服务全球60-70家机器人头部企业</td></tr>
+          <tr><td>数据工厂</td><td>深圳工厂已投入使用（数千平米）；北京海淀新一代数据工厂及机器人训练场规划中</td></tr>
+          <tr><td>收入目标</td><td>Project T常态化年收入目标亿级别；Project D目标十亿级别</td></tr>
+          <tr><td>数据产出</td><td>正在制作数十万小时数据集，计划部分开源；与智象未来合作年内生成数万小时视频数据</td></tr>
+        </table>
+      </div>
+
+      <h3 id="finance">1.8 财务数据</h3>
+      <p>诺亦腾机器人为未上市初创企业，未公开披露系统性财务数据。以下为可获取的财务相关信息：</p>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>维度</th><th>信息</th></tr>
+          <tr><td>营收</td><td>2025年前8个月数千万签单，同比增长5倍；全年营收预计达数千万级别</td></tr>
+          <tr><td>利润</td><td>未公开披露。预计处于高投入期（数据工厂建设、研发密集）</td></tr>
+          <tr><td>融资储备</td><td>累计融资数亿元，Pre-A+轮超额认购，资金储备充裕</td></tr>
+          <tr><td>长期目标</td><td>Project T年收入亿级别，Project D十亿级别</td></tr>
+        </table>
+      </div>
+      <div class="callout"><div class="callout-title">说明</div>以上信息基于公开融资报道和媒体报道整理。公司为非上市企业，财务数据待后续公开披露后更新。</div>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>母公司诺亦腾科技是全球动作捕捉行业的绝对龙头，产品曾用于《金刚狼》《权力的游戏》等好莱坞顶级影视制作，在专业动捕市场拥有约70%份额</li>
+        <li>公司自称"不造机器人的机器人公司"，创始人戴若犁强调不与任何客户（机器人本体厂商）构成竞争关系</li>
+        <li>戴若犁提出的"数据金字塔"理论在具身智能行业获得了广泛关注和引用，被认为是该领域数据基础设施建设的指导性框架</li>
+        <li>2026年3月入驻的中关村（海淀）具身智能创新产业园是全国首个以具身智能命名的专业产业园，"上下楼即上下游"</li>
+        <li>首席科学家韩磊从腾讯离职加盟诺亦腾是2025年具身智能赛道的重要人才流动事件之一</li>
+        <li>投资方对团队的共识评价是"具身智能数据领域国际第一梯队"、"最早看到Data Thirsty趋势"</li>
+        <li>与智象未来的战略合作代表了"真实数据+AI生成数据"两种数据生产方式融合的行业趋势</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="a-team">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>诺亦腾机器人的团队配置与"具身智能数据基础设施"的定位高度契合。戴若犁博士将母公司在动作捕捉领域十多年的技术积累和客户关系（全球约70%动捕份额、好莱坞级精度标准）无缝迁移至机器人训练数据场景——动作捕捉技术本质上就是"记录人类动作并将其数字化"，与机器人遥操作训练数据的核心需求完全一致。韩磊博士在腾讯Robotics X Lab的具身智能研究经历，使团队在理解"机器人需要什么样的数据"方面具备了顶级的技术判断力。许安民的消费硬件工程经验（字节新石实验室、细红线）则保证了遥操作设备的产品化量产能力。这种"动捕权威+机器人学术+硬件工程"的三角形能力结构，精准覆盖了数据基础设施全链条的技术需求。</p>
+      </div>
+
+      <div class="analysis-block" id="a-tech">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>诺亦腾的"数据金字塔"路线与具身智能行业当前的发展阶段高度适配。2025年被行业普遍视为具身智能的"Data Thirsty"元年——大模型驱动的机器人需要海量高质量训练数据，但数据采集成本高、效率低、标准化程度低。诺亦腾以L1（真机遥操作）和L2（高精度真人交互）为切入点，恰好卡位在"最高价值但最稀缺"的数据层。L3（AI眼镜等消费设备）和L4（生成式/仿真）的布局则为未来的规模化降本提供了路径。与智象未来的生成式数据合作进一步打通了从真实数据到AI生成数据的完整闭环。潜在风险在于：不同机器人本体对数据格式和模态的需求存在差异，"跨本体泛化"的数据价值尚需更多实际案例验证。</p>
+      </div>
+
+      <div class="analysis-block" id="a-capital">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>诺亦腾的股东结构以顶级VC为主，暂未发现本体厂商或下游场景方的产业资本介入。这一结构赋予公司较强的独立性和战略灵活性——与星源智（智元持股）相比，诺亦腾不存在与特定本体厂商的绑定关系，理论上可以作为全行业的"中立数据底座"。但这也意味着缺乏"投资+订单"的锁定效应，需要在商业化上完全依靠市场竞争力获取客户。Pre-A+轮超额认购（启明创投领投、五源/君联/经纬跟投）表明VC圈对"具身智能数据基础设施"这一赛道的共识正在快速形成，充裕的资金储备为公司在数据工厂建设等重资产投入上提供了时间窗口。</p>
+      </div>
+
+      <div class="analysis-block" id="a-pivot">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>诺亦腾机器人最大的战略转折发生在公司成立之前——即2025年初将机器人数据业务从母公司分拆独立的决策本身。母公司诺亦腾科技此前的主航道是好莱坞影视动捕、VR/AR交互、运动科学等，机器人遥操作是其中的一个业务方向。将这一方向独立成公司、并明确"不造机器人"的定位，是一个重大的战略取舍：放弃本体整机的大市场，专注数据这一基础设施层。分拆后的产品线从最初以遥操作设备（Project T）为主，迅速拓展到数据工厂（Project D）的规模化建设，体现了从"卖工具"到"卖数据/卖授权"的商业模式升维。这一调整的内在逻辑清晰：工具的天花板是亿级市场，数据授权则是十亿级的平台生意。</p>
+      </div>
+
+      <div class="analysis-block" id="a-position">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>诺亦腾的核心竞争取舍可以用一句话概括：做具身智能时代的"数据军火商"而非"参战国"。这种取舍的战略逻辑是：机器人行业的终局可能有多个本体赢家，但高质量训练数据的需求是普适的、持续增长的，且数据资产的积累具有时间壁垒。与星源智（做大脑Tier 1）、智元（做本体+大脑全栈）形成清晰的差异化——诺亦腾不与它们竞争，反而可以同时服务它们。类比上一波AI浪潮中的Scale AI，诺亦腾试图在具身智能赛道复制"数据标注/数据基础设施"的平台模式。关键风险在于：具身智能的数据需求是否足够标准化、能否形成网络效应、以及本体厂商是否会自建数据能力（类比特斯拉自建Dojo），这些问题的答案将决定诺亦腾的天花板。</p>
+      </div>
+
+      <div class="analysis-block" id="a-other">
+        <h4>2.6 其他重要观察</h4>
+        <p>第一，诺亦腾机器人是一个典型的"分拆式创业"案例——母公司诺亦腾科技在一个成熟市场（影视动捕）达到天花板后，将核心技术能力迁移至一个爆发式增长的新赛道（具身智能数据）。这种模式的成功率通常高于从零开始的创业，因为技术、客户关系、行业认知都有可迁移的资产。第二，创始人戴若犁提出的"数据金字塔"理论框架具有行业思想领导力价值——它不仅是一个产品策略，更是一种"定义赛道标准"的认知塑造行为，有助于公司抢占"行业方法论制定者"的心智定位。第三，2025年前8个月营收同比增长5倍的增速表明，市场需求真实存在且快速增长。但关键指标是这一增速能否在2026年持续，以及能否从"数千万"级别跨越到"亿级"门槛。第四，数据工厂是重资产模式（场地、设备、人员），在确保数据质量的同时控制单位成本将是规模化的核心工程挑战。</p>
+      </div>
+
+      <h2 id="refs">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="http://jjckb.xinhuanet.com/20251222/b2f0f16dcb324dc9b209277124e5456d/c.html" target="_blank">经济参考报（新华社） — 诺亦腾机器人完成Pre-A+轮融资 多家顶级投资机构参投</a></li>
+          <li><a href="https://stcn.com/article/detail/3550945.html" target="_blank">证券时报 — "不造机器人的机器人公司"诺亦腾机器人完成Pre-A+轮融资</a></li>
+          <li><a href="https://finance.eastmoney.com/a/202512223598272535.html" target="_blank">东方财富 — 诺亦腾机器人完成Pre-A+轮融资 多家顶级投资机构参投</a></li>
+          <li><a href="https://w.geekpark.net/news/358365" target="_blank">极客公园 — 诺亦腾机器人完成Pre-A+轮融资 加速构建具身智能时代数据基础设施</a></li>
+          <li><a href="https://www.chinaz.com/ainews/21507.shtml" target="_blank">站长之家 — 动作捕捉巨头诺亦腾杀入机器人赛道：独立数据业务瞄准十亿级市场</a></li>
+          <li><a href="https://www.163.com/dy/article/KA59BUP205118DFD.html" target="_blank">36氪/网易 — 《金刚狼》《权游》供应商分拆机器人数据业务，腾讯、字节大牛加入</a></li>
+          <li><a href="https://www.chinaz.com/ainews/23894.shtml" target="_blank">站长之家 — 造硬件造数据:诺亦腾机器人完成 Pre-A+ 轮融资，加速攻克具身智能数据荒</a></li>
+          <li><a href="https://m.lieyunpro.com/archives/499803" target="_blank">猎云网 — "不造机器人的机器人公司"诺亦腾机器人获启明创投领投Pre-A+轮融资</a></li>
+          <li><a href="https://www.stnn.cc/c/2025-12-23/4025305.shtml" target="_blank">星岛日报 — 腾讯、字节系大佬带队，诺亦腾机器人完成Pre-A+轮融资</a></li>
+          <li><a href="https://www.qimingvc.com/en/node/7544" target="_blank">启明创投官网 — 诺亦腾机器人完成Pre-A+轮融资，启明创投领投</a></li>
+          <li><a href="https://vr.zhidx.com/p/523155.html" target="_blank">智东西 — 中科大博士联手腾讯高管创业，获数亿元融资</a></li>
+          <li><a href="https://www.leiphone.com/category/ai/YtVGfQm8tNDHbynP.html" target="_blank">雷锋网 — 智象未来携手诺亦腾机器人，共创具身智能数据新范式</a></li>
+          <li><a href="https://www.donews.com/news/detail/4/6489472.html" target="_blank">DoNews — 智象未来携手诺亦腾机器人，共创具身智能数据新范式</a></li>
+          <li><a href="https://www.geekpark.net/news/361893" target="_blank">极客公园 — 智象未来与诺亦腾机器人达成战略合作</a></li>
+          <li><a href="https://tech.ifeng.com/c/8rumTYxx9t7" target="_blank">凤凰科技 — 智象未来联手诺亦腾机器人：年内预计生成超数万小时具身智能训练数据</a></li>
+          <li><a href="http://stock.stockstar.com/IG2026032000039446.shtml" target="_blank">证券之星 — 全国首家具身智能产业园探访：机器人如何像人一样动？</a></li>
+          <li><a href="http://finance.china.com.cn/industry/20260331/6301124.shtml" target="_blank">中国网 — "人工智能+"深度渗透 推动产业模式创新变革</a></li>
+          <li><a href="https://www.bjnews.com.cn/detail/1772415009129635.html" target="_blank">新京报 — 强脑科技与港大达成战略合作（提及诺亦腾与港大联合实验室）</a></li>
+          <li><a href="https://media.qimingpian.cn/2025/12/22/043704c075c22717c3a8a3d155d6e99c.html" target="_blank">企名片 — 诺亦腾机器人获启明创投领投Pre-A+轮融资</a></li>
+          <li><a href="https://finance.ifeng.com/c/8pIXqNdOPNa" target="_blank">凤凰财经 — 多家顶级投资机构，投了一个"不造机器人的机器人公司"</a></li>
+          <li><a href="https://www.zhineng518.com/page108?article_id=13113" target="_blank">智能518 — 数亿融资落袋！诺亦腾机器人凭"动捕+数据工厂"领跑具身智能赛道</a></li>
+          <li><a href="https://www.doit.com.cn/p/555622.html" target="_blank">DOIT — 真实数据+生成式数据融合 智象未来与诺亦腾机器人赋能具身智能</a></li>
+          <li><a href="https://finance.sina.com.cn/tob/2026-03-30/doc-inhsukny2730490.shtml" target="_blank">新浪财经 — 智象未来与诺亦腾机器人宣布达成战略合作</a></li>
+          <li><a href="http://epaper.zqrb.cn/html/2026-03/31/content_1227927.htm" target="_blank">证券日报 — "人工智能+"深度渗透 推动产业模式创新变革</a></li>
+          <li><a href="https://photo.china.com.cn/2026-03/30/content_118409562.shtml" target="_blank">中国网 — 突破数据规模瓶颈 让具身智能数据从"可用"到"好用"</a></li>
+        </ol>
+      </div>
+
+      <div class="page-footer">本页面由具身智能Wiki项目自动生成，数据截至2026年5月。内容基于公开报道和公司官方信息整理，仅供参考。</div>
+    </article>
+  </div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

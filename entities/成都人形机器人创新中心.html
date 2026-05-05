@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>成都人形机器人创新中心 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> <span class="breadcrumb-sep">›</span> <span>成都人形机器人创新中心</span></div>
+  <div class="wiki-header"><h1>成都人形机器人创新中心</h1><div class="subtitle">Chengdu Humanoid Robot Innovation Center · 2024年成立 · 四川"一号创新工程"原点项目 · 链主企业 · A轮超亿元</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#founders">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financials">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#analysis-1">2.1 团队背景与场景选择</a></li>
+        <li class="toc-lvl4"><a href="#analysis-2">2.2 技术路线与场景适配</a></li>
+        <li class="toc-lvl4"><a href="#analysis-3">2.3 股东/资本结构影响</a></li>
+        <li class="toc-lvl4"><a href="#analysis-4">2.4 试错与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#analysis-5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#analysis-6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#references">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">成都人形机器人创新中心</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">成都人形机器人创新中心有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2024年4月11日</div></div>
+        <div class="ib-row"><div class="ib-label">总部</div><div class="ib-value">四川天府新区成都科创生态岛</div></div>
+        <div class="ib-row"><div class="ib-label">创始人/董事长</div><div class="ib-value">张睿睿（伦敦大学国王学院博士）</div></div>
+        <div class="ib-section">融资数据</div>
+        <div class="ib-row"><div class="ib-label">A轮金额</div><div class="ib-value">超亿元（东方富海）</div></div>
+        <div class="ib-row"><div class="ib-label">累计融资规模</div><div class="ib-value">多轮（含政府支持超5亿元）</div></div>
+        <div class="ib-row"><div class="ib-label">主要投资方</div><div class="ib-value">东方富海、成都产投、锦江发展</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">团队规模</div><div class="ib-value">不足百人，计划扩至200人</div></div>
+        <div class="ib-row"><div class="ib-label">核心技术成果</div><div class="ib-value">30余项国际顶尖成果</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">赛道</div><div class="ib-value">人形机器人·新型研发机构</div></div>
+        <div class="ib-row"><div class="ib-label">技术路线</div><div class="ib-value">"大脑+小脑+肢体"全栈自研</div></div>
+        <div class="ib-section">官网</div>
+        <div class="ib-row"><div class="ib-label">来源</div><div class="ib-value">媒体报道/政府公告</div></div>
+      </aside>
+
+      <p class="article-intro"><strong>成都人形机器人创新中心</strong>成立于2024年4月，是中西部地区首个人形机器人新型研发机构，也是四川省"一号创新工程"的首个原点项目。由伦敦大学国王学院机器人学博士张睿睿创立，获省市区政府综合支持超5亿元。中心聚焦人形机器人"大脑、小脑、肢体"三大方向，累计取得30余项国际顶尖研发成果，已推出贡嘎一号、鸿鹄、镋钯等多款人形机器人整机，并发布全球首个全尺寸重载双轮足机器人开源平台。2025年完成A轮超亿元融资（东方富海），是成都市人工智能与机器人产业链链主企业。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper"><table class="wikitable infotable">
+        <tr><th>项目</th><th>内容</th></tr>
+        <tr><td>公司全称</td><td>成都人形机器人创新中心有限公司</td></tr>
+        <tr><td>成立时间</td><td>2024年4月11日</td></tr>
+        <tr><td>注册地址</td><td>四川天府新区成都科创生态岛W7楼</td></tr>
+        <tr><td>上市状态</td><td>未上市</td></tr>
+        <tr><td>定位</td><td>中西部地区首个人形机器人新型研发机构，成都AI与机器人产业链链主企业</td></tr>
+      </table></div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>时间</th><th>事件</th></tr>
+        <tr><td>2024年4月</td><td>公司注册成立，获中西部地区首个人形机器人创新中心资质</td></tr>
+        <tr><td>2024年6月</td><td>发布全国首个R-DDPRM扩散架构任务生成模型</td></tr>
+        <tr><td>2024年8月</td><td>发布中国首个多模态模型RRMM及双臂协作系统RTACS</td></tr>
+        <tr><td>2024年10月</td><td>发布贡嘎一号（Konka-1）超轻量级人形机器人整机</td></tr>
+        <tr><td>2024年11月</td><td>发布中国首个高速推理模型R-DDIRM</td></tr>
+        <tr><td>2024年12月</td><td>发布鸿鹄（全尺寸双足）、灵蛟龙、灵鸮等多款整机</td></tr>
+        <tr><td>2025年3月</td><td>Raydiculous-1系统入选全球AI五大前沿成果</td></tr>
+        <tr><td>2025年4月</td><td>完成A轮超亿元融资（东方富海）</td></tr>
+        <tr><td>2025年</td><td>全球首款AI神经网络电子皮肤发布；镋钯文旅机器人面世</td></tr>
+        <tr><td>2026年2月</td><td>发布全球首个全尺寸重载双轮足机器人开源平台RW-02OP</td></tr>
+        <tr><td>2026年3月</td><td>与中国电建共建央地具身智能工程机器人创新中心揭牌</td></tr>
+      </table></div>
+
+      <h3 id="founders">1.2 创始人及核心团队</h3>
+      <p>创始人张睿睿为伦敦大学国王学院机器人学博士，师从国际机器人学泰斗戴建生院士（英国皇家工程院院士/欧洲科学院院士）。张睿睿是工信部人形机器人与具身智能标准化技术委员会委员（四川及西部地区唯一受聘委员），正高级工程师，成都市政协委员。2018年回蓉创立睿乐达机器人公司，打造"蓉宝"机器人。核心创始团队7名均为国内外知名院士专家，团队成员来自中美英德瑞等国顶尖学府，计划扩展至200人。</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+        <tr><td>创始人/董事长</td><td>张睿睿</td><td>伦敦大学国王学院机器人学博士；师从戴建生院士；工信部人形机器人标准化技术委员会委员；正高级工程师；深圳市创新创业大赛总冠军；2018年创立睿乐达机器人</td></tr>
+        <tr><td>产品总监</td><td>吕童</td><td>海外机器人学博士；主导AI神经网络电子皮肤研发</td></tr>
+        <tr><td>运动控制领头人</td><td>马学思</td><td>负责机器人"小脑"核心技术</td></tr>
+      </table></div>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>时间</th><th>轮次</th><th>金额</th><th>主要投资方</th></tr>
+        <tr><td>2025年2月</td><td>股权转让</td><td>未披露</td><td>成都天投</td></tr>
+        <tr><td>2025年4月</td><td>A轮</td><td>超亿元</td><td>东方富海</td></tr>
+        <tr><td>2025年7月</td><td>A+轮</td><td>未披露</td><td>锦江发展集团（成都兴锦产业投资）</td></tr>
+        <tr><td>2025年12月</td><td>战略投资</td><td>未披露</td><td>成都产投集团旗下成都未来产业天使基金</td></tr>
+      </table></div>
+      <p>除市场化融资外，公司获省市区政府综合支持超5亿元，体现了四川省对人形机器人产业的高度战略重视。</p>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>维度</th><th>详情</th></tr>
+        <tr><td>总体架构</td><td>"大脑+小脑+肢体"三层全栈自研：大脑（推理决策）、小脑（运动控制）、肢体（硬件本体）</td></tr>
+        <tr><td>大脑技术</td><td>R-DDPRM（扩散架构任务生成模型）、RRMM（多模态模型）、R-DDIRM（高速推理模型）、Raydiculous-1（基于3DSGs的推理规划执行系统，入选全球AI五大前沿成果）</td></tr>
+        <tr><td>小脑技术</td><td>RTACS双臂协作系统、R-WMES世界模型任务执行系统</td></tr>
+        <tr><td>核心硬件</td><td>AI神经网络电子皮肤（全球首款，每cm²10万个感应点，精度0.005N，1500Hz）</td></tr>
+        <tr><td>开源战略</td><td>RW-02OP双轮足机器人全栈开源（全球首个）</td></tr>
+        <tr><td>标准制定</td><td>分层式"大脑架构"被采纳为中国人形机器人国家标准基准；牵头制定大脑部分国家标准</td></tr>
+      </table></div>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>产品名称</th><th>类型</th><th>关键特征</th></tr>
+        <tr><td>贡嘎一号（Konka-1）</td><td>超轻量级轮臂式人形机器人</td><td>国内唯一、全球唯三带"最强大脑"的整机；已完成四代迭代</td></tr>
+        <tr><td>鸿鹄（贡嘎二号）</td><td>全尺寸双足人形机器人</td><td>首个"成都造"全栈自研双足人形整机</td></tr>
+        <tr><td>镋钯（TangPa）</td><td>文商旅体专用双足机器人</td><td>走姿酷似"萌萌的鸭子"；用于安全巡逻、文旅导览</td></tr>
+        <tr><td>灵蛟龙/灵鸮</td><td>双足人形机器人</td><td>多形态产品矩阵成员</td></tr>
+        <tr><td>RW-02OP</td><td>全尺寸重载双轮足机器人</td><td>高1.1m/重21kg/负载10kg；全球首个全栈开源平台</td></tr>
+        <tr><td>AI神经网络电子皮肤</td><td>核心零部件</td><td>全球首款；每cm²10万个感应点；精度0.005N</td></tr>
+        <tr><td>仿生恐龙机器人</td><td>双足仿生机器人</td><td>全球首款双足独立行走仿生恐龙</td></tr>
+      </table></div>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>领域</th><th>具体应用</th><th>代表产品</th></tr>
+        <tr><td>文商旅体</td><td>安全巡逻、文旅导览、互动表演</td><td>镋钯</td></tr>
+        <tr><td>工业制造</td><td>柔性产线操作、重载搬运</td><td>贡嘎一号、RW-02OP</td></tr>
+        <tr><td>工程建筑</td><td>具身智能工程机器人（与中国电建共建）</td><td>央地共建创新中心</td></tr>
+        <tr><td>家庭/养老</td><td>二代轮式双臂机器人（2026年上半年规划）</td><td>规划中</td></tr>
+        <tr><td>科研教育</td><td>开源平台、技术验证</td><td>RW-02OP</td></tr>
+      </table></div>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <p>作为新型研发机构，成都人形机器人创新中心的商业化处于早期阶段。2025年贡嘎一号已进入发售阶段。公司与中国电建共建"央地共建具身智能工程机器人创新中心"，聚焦工程建筑行业应用落地。2026年3月揭牌仪式上合资公司智成睿锦机器人科技（成都）有限公司成立，同时启动中国首个具身智能工程机器人行业标准编制。2026年上半年计划推出二代轮式双臂机器人面向家庭和养老场景。RW-02OP开源平台已被百度百科收录为独立词条。</p>
+
+      <h3 id="financials">1.8 财务数据</h3>
+      <p>成都人形机器人创新中心为非上市新型研发机构。A轮融资超亿元（东方富海），此外获得省市区政府综合支持超5亿元。公司目前处于从研发向商业化过渡阶段，具体营收数据尚未公开披露。2025年全年完成3轮融资，资金主要用于技术研发、团队扩展（从不足百人扩至200人）和产品迭代。</p>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>四川省"一号创新工程"首个原点项目，获省市区三级政府高度重视</li>
+        <li>成都市人工智能与机器人重点产业链链主企业，成都市机器人产业协会会长单位</li>
+        <li>Raydiculous-1系统入选全球AI五大前沿成果（与OpenAI o3/o4-mini并列）</li>
+        <li>提出的分层式"大脑架构"被采纳为中国人形机器人国家标准基准</li>
+        <li>全球首个全尺寸重载双轮足机器人开源平台RW-02OP已发布</li>
+        <li>2026年3月发起中国首个央国企具身智能产业联盟</li>
+        <li>全球首款双足独立行走仿生恐龙机器人已发布</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="analysis-1"><h4>2.1 团队背景与场景选择的匹配度</h4><p>张睿睿的学术背景（伦敦大学国王学院机器人学博士，师从戴建生院士）和创业经验（2018年创立睿乐达机器人、深圳创新创业大赛总冠军）构成了一种"学术+产业"的混合基因。团队核心创始人员7名均为国内外院士专家，技术深度有保障。中心选择文商旅体（镋钯机器人）和工程建筑（中国电建合作）作为早期落地场景，与成都作为文旅名城和西部基建中心的城市定位高度契合。同时，张睿睿参与国家标准制定的身份（工信部标准化技术委员会委员）也为中心在行业话语权方面建立了先发优势。</p></div>
+      <div class="analysis-block" id="analysis-2"><h4>2.2 技术路线与场景的适配性</h4><p>中心选择"大脑优先"的技术路线——在整机产品尚未大规模出货前，已在AI推理模型（R-DDPRM、RRMM、R-DDIRM、Raydiculous-1）上取得了多项"全国首个"成果。这种"重大脑、轻肢体"的策略在标准制定和学术影响力方面有利，但在实际工业落地中可能面临"大脑能力远超肢体能力"的错配——即机器人理解指令但无法精准执行。RW-02OP开源平台的推出是一个战略性举措，通过开源吸引开发者生态，弥补"肢体"端的不足。</p></div>
+      <div class="analysis-block" id="analysis-3"><h4>2.3 股东/资本结构对战略的影响</h4><p>中心的股东结构以"地方政府资本+市场化VC"为特征。成都天投、锦江发展、成都产投等本地国资的深度参与，意味着中心的战略方向将高度受成都市产业政策影响——优先服务本地制造业升级、文旅产业、智慧城市建设等。东方富海作为市场化VC的参与则提供了外部视角和资本市场对接能力。省市区政府综合支持超5亿元，这种"不计短期回报"的政府投入模式使中心能够承担高技术风险，但也可能降低商业化紧迫感。</p></div>
+      <div class="analysis-block" id="analysis-4"><h4>2.4 试错过程与路径调整</h4><p>中心成立仅两年，产品线已快速扩展至七八个方向（贡嘎、鸿鹄、镋钯、灵蛟龙、灵鸮、RW-02OP、仿生恐龙等），展现了明显的"广撒网"策略。从最初的超轻量级轮臂式（贡嘎一号）到全尺寸双足（鸿鹄），再到文商旅专用（镋钯）和开源平台（RW-02OP），产品线覆盖了多个差异化场景。这种策略在探索期是合理的，但需警惕资源分散的风险。2026年转向央地共建工程机器人创新中心，表明中心在向"行业垂直深耕"方向收敛。</p></div>
+      <div class="analysis-block" id="analysis-5"><h4>2.5 竞争定位与取舍</h4><p>成都人形机器人创新中心的核心取舍在于：定位为"新型研发机构+链主企业"而非纯粹的商业公司。这一定位使其获得了独特优势——国家标准制定权、央地共建资源、政府综合支持——但也带来了定位模糊的挑战：它既要做基础研究（对标高校实验室），又要做产品化（对标智元/宇树），还要做产业生态（对标平台公司）。如何在三者间分配资源并建立清晰的商业模式，是中心面临的核心战略问题。与中国电建的央地共建是一个向"行业应用"聚焦的积极信号。</p></div>
+      <div class="analysis-block" id="analysis-6"><h4>2.6 其他重要观察、分析</h4><p>成都人形机器人创新中心代表了一种"地方政府主导的人形机器人发展范式"——以新型研发机构为载体，整合院士资源、政策支持和资本力量，试图在区域竞争中弯道超车。这一范式在获取早期资源方面效率极高（成立两年即获超5亿政府支持+超亿市场化融资），但也面临可持续性考验：当政府支持退坡后，中心能否建立自循环的商业闭环？与中国电建的央地共建是一个务实的方向——工程建筑行业的"机器换人"需求真实且迫切，如果能在这个万亿级市场中建立壁垒，中心将获得独立于政府支持的商业生命力。</p></div>
+
+      <h2 id="references">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://cbgc.scol.com.cn/news/7121517">西部唯一受聘！成都这位企业家参与人形机器人国家标准制定｜川观新闻</a></li>
+          <li><a href="https://cbgc.scol.com.cn/news/7219330">他们把"最强大脑"装进机器人｜川观新闻</a></li>
+          <li><a href="https://www.cditv.cn/show/4813-2089878.html">锚定机器人产业的海归"创一代"｜成都电视台</a></li>
+          <li><a href="https://www.scjjrb.com/2025/11/04/99448828.html">探访成都人形机器人创新中心："智慧大脑"赋能机器人产业｜四川经济日报</a></li>
+          <li><a href="https://www.nbd.com.cn/articles/2024-12-29/3703507.html">"成都造"人形机器人矩阵亮相｜每日经济新闻</a></li>
+          <li><a href="https://www.stdaily.com/web/gdxw/2026-03/24/content_491699.html">央地共建具身智能工程机器人创新中心落户成都｜科技日报</a></li>
+          <li><a href="https://finance.eastmoney.com/a/202603023658442830.html">成都首发全尺寸重载双轮足机器人开源平台｜东方财富</a></li>
+          <li><a href="https://www.thepaper.cn/newsDetail_forward_32674052">全球首个！成都人形机器人创新中心发布开源平台｜澎湃新闻</a></li>
+          <li><a href="https://www.163.com/dy/article/KJCQ79OD0514D3UH.html">2025成都未来产业投融资：人形机器人大热｜网易</a></li>
+          <li><a href="http://sc.people.com.cn/n2/2024/0414/c379471-40809386.html">成都人形机器人创新中心取证｜人民网</a></li>
+          <li><a href="https://www.chengdu.gov.cn/cdsrmzf/c174133/2025-02/08/content_6aa5c5a0c48b41af8c6b871ec9794327.shtml">多款"成都造"人形机器人产品今年面世｜成都市政府</a></li>
+          <li><a href="https://e.thecover.cn/shtml/hxdsb/20250407/227646.shtml">让机器人"自主思考"走进现实｜封面新闻</a></li>
+          <li><a href="https://www.cnii.com.cn/dzxx/202603/t20260331_728175.html">央地共建具身智能工程机器人创新中心落户成都锦江｜中国工业报</a></li>
+          <li><a href="https://www.donews.com/news/detail/4/6446368.html">全球首个全尺寸重载双轮足机器人RW-02OP开源发布｜DoNews</a></li>
+          <li><a href="https://www.scjjrb.com/2026/02/28/wap_99457994.html">填补行业空白全球首个全尺寸重载双轮足机器人开源平台在蓉发布｜四川经济日报</a></li>
+          <li><a href="https://news.qq.com/rain/a/20251125A057VH00">2人拟任委员！中国人形机器人国家标准有了"成都声音"｜腾讯新闻</a></li>
+          <li><a href="http://district.ce.cn/newarea/roll/202503/25/t20250325_39330165.shtml">0→1 四川人形机器人成长记｜中国经济网</a></li>
+          <li><a href="https://www.innohere.com/ir/159851/finance.html">成都人形机器人创新中心-融资历史｜鲸准</a></li>
+          <li><a href="https://news.chengdu.cn/2026/0325/69c3463a3a56c94052c5abbf.shtml">全国首个央地共建具身智能工程机器人创新中心落户成都｜成都日报</a></li>
+          <li><a href="https://www.jiemian.com/article/14050974.html">填补空白成都首发全尺寸重载双轮足机器人开源平台｜界面新闻</a></li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">此页面由Cowork Wiki Dispatcher自动生成 · 数据截至2026年5月 · 内容仅供参考，不构成投资建议</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

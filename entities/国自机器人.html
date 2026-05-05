@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>国自机器人 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> › <span>国自机器人</span></div>
+  <div class="wiki-header"><h1>国自机器人</h1><div class="subtitle">Guozi Robotics · 2011年成立 · 国家级专精特新"小巨人" · 2025年被杭叉集团收购 · 智能巡检市占率约85%</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#team">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#finance">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl3"><a href="#a-team">2.1 团队背景与场景选择</a></li>
+        <li class="toc-lvl3"><a href="#a-tech">2.2 技术路线与场景适配</a></li>
+        <li class="toc-lvl3"><a href="#a-capital">2.3 股东资本对战略的影响</a></li>
+        <li class="toc-lvl3"><a href="#a-pivot">2.4 试错过程与路径调整</a></li>
+        <li class="toc-lvl3"><a href="#a-position">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl3"><a href="#a-other">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#refs">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">国自机器人</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">浙江国自机器人技术股份有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">英文</div><div class="ib-value">Guozi Robotics</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2011年11月</div></div>
+        <div class="ib-row"><div class="ib-label">注册地</div><div class="ib-value">杭州滨江区</div></div>
+        <div class="ib-row"><div class="ib-label">创始人</div><div class="ib-value">郑洪波（"海宝机器人之父"）</div></div>
+        <div class="ib-row"><div class="ib-label">前身</div><div class="ib-value">浙大系中控研究院机器人事业部</div></div>
+        <div class="ib-row"><div class="ib-label">企业荣誉</div><div class="ib-value">国家级专精特新"小巨人"</div></div>
+        <div class="ib-row"><div class="ib-label">专利</div><div class="ib-value">累计超1500件</div></div>
+        <div class="ib-section">并购信息（2025年7月）</div>
+        <div class="ib-row"><div class="ib-label">收购方</div><div class="ib-value">杭叉集团（603298.SH）旗下杭叉智能</div></div>
+        <div class="ib-row"><div class="ib-label">交易价格</div><div class="ib-value">约3.98亿元（收购99.23%股份）</div></div>
+        <div class="ib-row"><div class="ib-label">100%股权评估值</div><div class="ib-value">4.01亿元</div></div>
+        <div class="ib-row"><div class="ib-label">整合品牌</div><div class="ib-value">"杭叉国自智能"</div></div>
+        <div class="ib-section">财务数据（2024年）</div>
+        <div class="ib-row"><div class="ib-label">营业收入</div><div class="ib-value">3.34亿元</div></div>
+        <div class="ib-row"><div class="ib-label">归母净利润</div><div class="ib-value">6636万元（扭亏为盈）</div></div>
+        <div class="ib-row"><div class="ib-label">净利率</div><div class="ib-value">19.8%</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">领域</div><div class="ib-value"><span class="tag">具身智能</span><span class="tag">移动机器人</span></div></div>
+        <div class="ib-row"><div class="ib-label">赛道</div><div class="ib-value"><span class="tag">智能巡检</span><span class="tag">AGV/AMR</span><span class="tag">人形机器人</span></div></div>
+        <div class="ib-section">官网</div>
+        <div class="ib-row"><div class="ib-label">网址</div><div class="ib-value"><a href="https://www.gzrobot.com" target="_blank">gzrobot.com</a></div></div>
+      </aside>
+
+      <p class="article-intro"><strong>国自机器人</strong>（全称浙江国自机器人技术股份有限公司），成立于2011年11月，总部位于杭州滨江区，前身为浙大系中控研究院机器人事业部。公司是国家工信部认定的专精特新"小巨人"企业，累计专利申请超1500件。公司聚焦智能巡检与智能物流两大业务板块，电网巡检机器人市占率约85%，物流AGV/AMR覆盖从料箱到托盘的全系列场景。2025年7月，杭叉集团（603298.SH）旗下杭叉智能以约3.98亿元增资扩股方式收购国自机器人99.23%股份，整合为"杭叉国自智能"品牌，并发布首款物流人形机器人X1系列。2024年公司营收3.34亿元，实现扭亏为盈（净利润6636万元），与杭叉集团签署三年累计净利润不低于8708万元的业绩对赌。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper">
+        <table class="wikitable infotable">
+          <tr><th>项目</th><th>内容</th></tr>
+          <tr><td>公司全称</td><td>浙江国自机器人技术股份有限公司</td></tr>
+          <tr><td>成立时间</td><td>2011年11月</td></tr>
+          <tr><td>注册地址</td><td>浙江省杭州市滨江区</td></tr>
+          <tr><td>前身</td><td>浙大系中控研究院机器人事业部（2000年起从事移动机器人研究）</td></tr>
+          <tr><td>实际控制人</td><td>仇建平（"巨星系"——巨星科技、杭叉集团实控人）</td></tr>
+          <tr><td>上市状态</td><td>未独立上市（2025年7月被杭叉集团收购，放弃IPO）</td></tr>
+          <tr><td>官网</td><td>gzrobot.com</td></tr>
+          <tr><td>主营业务</td><td>智能巡检机器人、智能物流AGV/AMR、智能制造整体解决方案</td></tr>
+        </table>
+      </div>
+      <h4>发展沿革</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>时间</th><th>事件</th></tr>
+          <tr><td>2000年</td><td>前身团队在中控研究院开始移动机器人基础技术研究</td></tr>
+          <tr><td>2010年</td><td>团队为上海世博会打造37台"海宝机器人"</td></tr>
+          <tr><td>2011年11月</td><td>浙江国自机器人技术有限公司正式注册成立</td></tr>
+          <tr><td>2014年</td><td>巨星科技首次收购国自股权，仇建平"巨星系"开始实际控制</td></tr>
+          <tr><td>2019年8月</td><td>美的资本领投数亿元战略融资</td></tr>
+          <tr><td>2023年</td><td>美的资本退出；营收4.38亿元但巨额亏损2.6亿元</td></tr>
+          <tr><td>2024年1月</td><td>正泰新能源领投超2亿元战略融资</td></tr>
+          <tr><td>2024年</td><td>营收3.34亿元，扭亏为盈（净利润6636万元）</td></tr>
+          <tr><td>2025年7月</td><td>杭叉集团旗下杭叉智能以约3.98亿元收购99.23%股份；放弃原IPO计划</td></tr>
+          <tr><td>2025年10月</td><td>"杭叉国自"品牌亮相CeMAT ASIA，发布首款物流人形机器人X1系列</td></tr>
+          <tr><td>2026年3月</td><td>EzGo欧洲首秀（LogiMAT德国展）；中标东风物流AMR集采（2977万元）</td></tr>
+        </table>
+      </div>
+
+      <h3 id="team">1.2 创始人及核心团队</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+          <tr><td>创始人/总经理</td><td>郑洪波</td><td>被誉为"海宝机器人之父"。2009年率团队与浙江大学合作打造上海世博会37台"海宝机器人"。2010年世博会后正式创立国自机器人，深耕移动机器人领域超15年</td></tr>
+          <tr><td>高级副总裁</td><td>王霞</td><td>负责公司战略与运营管理</td></tr>
+          <tr><td>杭叉国自总经理</td><td>任海华</td><td>2025年杭叉收购整合后的新实体负责人，杭叉集团背景</td></tr>
+        </table>
+      </div>
+      <p>团队具有鲜明的<strong>"浙大系+研究院背景"</strong>技术基因。核心技术团队源自2000年的国内前沿机器人研究机构，依托浙江大学的科研优势，早期参与多项国家级重点机器人项目。公司具体员工总数暂未公开披露。</p>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <h4>融资/并购历史</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>事件</th><th>时间</th><th>金额</th><th>相关方</th></tr>
+          <tr><td>天使轮/Pre-A轮/A轮</td><td>2011-2014年</td><td>未披露</td><td>浙江中控技术、巨星科技、宁波新锐浙商等</td></tr>
+          <tr><td>战略融资</td><td>2019年8月</td><td>数亿元</td><td>美的资本领投（2023年已退出）</td></tr>
+          <tr><td>战略融资</td><td>2024年1月</td><td>超2亿元</td><td>正泰新能源领投，老股东跟投</td></tr>
+          <tr><td>被收购</td><td>2025年7月</td><td>约3.98亿元</td><td>杭叉集团（603298.SH）旗下杭叉智能增资扩股收购99.23%股份，100%股权评估值4.01亿元</td></tr>
+          <tr><td>累计融资</td><td>—</td><td>约6.14亿元</td><td>含收购金额</td></tr>
+        </table>
+      </div>
+      <h4>业绩对赌</h4>
+      <p>收购协议中含业绩承诺条款：实际控制人仇建平承诺国自机器人2025-2027年净利润分别不低于1292万元、2601万元、4815万元，三年累计不低于8708万元（年复合增长率85.2%）。若未达标，差额部分由仇建平现金补偿。</p>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>技术维度</th><th>说明</th></tr>
+          <tr><td>导航技术</td><td>SLAM激光导航、自然轮廓导航、立体全息检测云台；应对复杂动态环境</td></tr>
+          <tr><td>集群调度</td><td>GRACE集群调度系统（自研），支持单场景2000台AGV混场调度</td></tr>
+          <tr><td>感知融合</td><td>3D视觉+激光雷达360°全向安全防护，多传感器融合；首创双激光安全防护</td></tr>
+          <tr><td>定位精度</td><td>毫米级定位（±3mm），满足小米汽车7mm对接精度要求</td></tr>
+          <tr><td>自主部件</td><td>核心部件自主研发（控制板卡、调度软件、导航算法），快速换电系统（约20秒）</td></tr>
+          <tr><td>软件平台</td><td>iWMS智慧仓储管理平台、智能巡检AI算法平台</td></tr>
+          <tr><td>人形机器人</td><td>2025年10月发布X1系列轮式物流人形机器人，专用工业场景，单人可操作</td></tr>
+          <tr><td>自恢复技术</td><td>巡检机器人"自诊断自恢复"技术，提升复杂环境下的无人化可靠性</td></tr>
+        </table>
+      </div>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>产品分类</th><th>子类/型号</th><th>关键参数</th><th>适用场景</th></tr>
+          <tr><td rowspan="3">智能巡检</td><td>电网巡检机器人</td><td>市占率约85%，表计识别率99%+，人员安全识别率95%+</td><td>变电站、配电室、地下管廊</td></tr>
+          <tr><td>防爆巡检系列（EXDM200/EXHR300）</td><td>Ex d IIC T6 Gb防爆等级，极寒型-40℃至55℃宽温运行</td><td>煤化工、危化园区、极寒环境</td></tr>
+          <tr><td>挂轨升降式/隧道巡检机器人</td><td>连续巡检无停顿，长距离高精度检测</td><td>深中通道、海上风电、隧道管廊</td></tr>
+          <tr><td rowspan="4">智能物流AGV/AMR</td><td>料箱拣选系列（云梯YT50、Ants+Picking）</td><td>±5mm定位精度</td><td>仓储拣选、医药分拣</td></tr>
+          <tr><td>潜伏顶升AMR</td><td>负载600斤，精度7mm</td><td>小米汽车超级工厂（94台）</td></tr>
+          <tr><td>EzGo搬运机器人</td><td>15分钟入场投用，20秒快换电池，CE认证</td><td>物流搬运、海外市场</td></tr>
+          <tr><td>无人叉车/堆垛AGV</td><td>全系列覆盖（迷你型、重载型、三支点平衡重式）</td><td>酒水、轮胎、新能源工厂</td></tr>
+          <tr><td>人形机器人</td><td>X1系列轮式物流人形机器人</td><td>专用工业场景，单人操作，轻部署模式</td><td>物流仓库、制造产线</td></tr>
+        </table>
+      </div>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>场景分类</th><th>具体应用</th><th>标杆客户/项目</th></tr>
+          <tr><td rowspan="3">电力/能源</td><td>变电站/电厂智能巡检</td><td>国家电网、南方电网（内蒙古累计50余套，合同超5000万元）</td></tr>
+          <tr><td>海上风电/新能源场站</td><td>MR200挂轨机器人，"巡检机器人+无人机"空地协同</td></tr>
+          <tr><td>储能工厂</td><td>海辰储能美国德州工厂（UL认证全场景方案，单项目近4000万元）</td></tr>
+          <tr><td>交通基建</td><td>隧道/跨海通道巡检</td><td>深中通道（14台巡检机器人，创多项行业纪录）</td></tr>
+          <tr><td rowspan="2">汽车制造</td><td>超级工厂全产线物流</td><td>小米汽车北京工厂（94台AMR）</td></tr>
+          <tr><td>工程机械工厂AGV</td><td>太重集团智能化工厂</td></tr>
+          <tr><td rowspan="3">仓储物流</td><td>医药物流</td><td>国科恒泰天津仓储（库容提升34%，效率提升1.5倍，拣选准确率99.99%）</td></tr>
+          <tr><td>轮胎/橡胶</td><td>中策橡胶"黑灯工厂"式智能仓储</td></tr>
+          <tr><td>电商/快消</td><td>史泰博北美（2000+台AGV部署）、娃哈哈</td></tr>
+          <tr><td>酒水行业</td><td>酒曲物料转运AGV、智能化立体仓库</td><td>多家酒水头部企业</td></tr>
+        </table>
+      </div>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>维度</th><th>进展</th></tr>
+          <tr><td>电网巡检</td><td>市占率约85%，产品覆盖从漠河到南沙群岛</td></tr>
+          <tr><td>物流AGV</td><td>2026年3月中标东风物流AMR集采2977.21万元；小米汽车94台AMR已部署</td></tr>
+          <tr><td>海外市场</td><td>史泰博北美续签五年战略合作（2000+台）；海辰储能美国德州工厂；EzGo获CE认证并欧洲首秀</td></tr>
+          <tr><td>人形机器人</td><td>X1系列2025年10月发布，预计2026年起每年推5-8款共研新车型</td></tr>
+          <tr><td>杭叉整合</td><td>"杭叉国自"品牌联合参展，形成"无人叉车+物流机器人+人形机器人"协同体系</td></tr>
+        </table>
+      </div>
+
+      <h3 id="finance">1.8 财务数据</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>指标</th><th>2023年</th><th>2024年</th><th>2025年Q1</th><th>2025年（承诺）</th><th>2026年（承诺）</th></tr>
+          <tr><td>营业收入</td><td>4.38亿元</td><td>3.34亿元</td><td>1517.66万元</td><td>—</td><td>—</td></tr>
+          <tr><td>归母净利润</td><td>-2.6亿元</td><td>6636万元</td><td>227.51万元</td><td>≥1292万元</td><td>≥2601万元</td></tr>
+          <tr><td>总资产</td><td>—</td><td>6.34亿元</td><td>6.49亿元</td><td>—</td><td>—</td></tr>
+          <tr><td>应收账款</td><td>—</td><td>1.69亿元</td><td>1.41亿元</td><td>—</td><td>—</td></tr>
+          <tr><td>净资产</td><td>—</td><td>-5234万元</td><td>-5004万元</td><td>—</td><td>—</td></tr>
+        </table>
+      </div>
+      <div class="callout"><div class="callout-title">财务要点</div>2023年巨额亏损2.6亿元与之前的财务处理有关（美的资本退出时的资产减值等）。2024年完成扭亏后实现19.8%的净利率。公司资不抵债（资产负债率超100%），被杭叉集团收购具有"纾困+整合"的双重性质。三年对赌净利润复合增长率高达85.2%，执行压力较大。</div>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>创始人郑洪波是"科技新浙商"代表，曾获评浙江省科技型企业家</li>
+        <li>国自在放弃IPO后选择被杭叉收购，与当前资本市场对机器人公司估值偏低、单独上市不确定性较高有关</li>
+        <li>杭叉集团收购国自后，将人形机器人定位为AI战略入口，计划用AI能力反哺AGV/AMR等传统产品线</li>
+        <li>公司与浙江大学保持长期产学研合作关系，在移动机器人无轨导航等领域有深厚技术积累</li>
+        <li>深中通道项目创下行业纪录：单项目使用巡检机器人台套数第一（14台）、行驶速度最高</li>
+        <li>EzGo搬运机器人是收购整合后推出的首款创新产品，15分钟投用体现了"叉车+机器人"融合的工程化能力</li>
+        <li>"巡检机器人+无人机"空地协同方案已在新能源场站落地，实现了广域快巡与重点精检的结合</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="a-team">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>国自机器人的"浙大系+研究院"技术基因与智能巡检（电网/能源/交通）场景高度匹配。巡检场景的核心要求是：在复杂工业环境中实现长期无人值守的高可靠性自主运行——这需要导航算法、传感器融合和环境适应性的深厚积累。团队从2000年即开始移动机器人基础研究，2010年世博会海宝机器人验证了大规模多机协同运行能力，此后十余年深耕电网巡检场景，构建了从极寒（-40℃漠河）到酷热（南沙群岛）的全气候适应性技术体系。但团队在智能物流AGV领域的拓展（特别是电商仓储和汽车产线）与巡检的技术栈存在差异——物流场景更注重集群调度效率（2000台混场调度）、快速部署（15分钟投用）和作业节拍优化，这对团队的工程化和产品化能力提出了不同维度的要求。</p>
+      </div>
+
+      <div class="analysis-block" id="a-tech">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>国自的"全系列物流机器人+智能巡检"双线并进策略，在技术路线上存在合理的协同但也有资源分散的风险。巡检业务的优势在于高壁垒（电网、防爆、极寒等特种认证）、高粘性（设备生命周期长、牌照型客户）和高毛利，但市场天花板受限于电网等基础设施的投资周期。物流AGV/AMR市场规模更大但竞争也更为激烈（极智嘉、快仓、海柔等已占据先发优势），国自2024年营收3.34亿元（同比下滑24%）表明在物流AGV领域的增长面临挑战。X1人形机器人的推出是一个有意义的战略信号——将巡检和物流的技术积累向更具话题性和想象空间的"具身智能"方向延伸，但其实际的工程价值（是否真正提升了作业效率）和商业价值（是否形成独立收入）尚待验证。</p>
+      </div>
+
+      <div class="analysis-block" id="a-capital">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>国自机器人的股权演变是中国机器人创业公司的一个典型案例：从浙大系学术团队创业→仇建平"巨星系"产业资本控股→美的资本战略入局→美的退出→正泰新能源接盘→最终被杭叉集团收购放弃IPO。这一路径折射出独立机器人公司在当前资本环境下的困境：单独上市的不确定性高、投资回报周期长。被杭叉集团收购后，国自获得了确定性：杭叉的全球叉车销售网络和制造能力可直接赋能物流AGV产品线，业绩对赌条款虽然带来短期利润压力但也提供了明确的发展目标。但风险在于：作为子公司后，国自的创新自主性可能受限；杭叉集团作为传统制造企业，其文化和管理体系与机器人科技公司之间可能存在磨合成本。</p>
+      </div>
+
+      <div class="analysis-block" id="a-pivot">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>国自的发展历程包含几次重要的战略调整。第一次：从纯巡检业务向物流AGV拓展（约2017-2019年），这一调整的逻辑是巡检市场天花板有限，物流自动化是更大市场。第二次：从独立IPO到接受杭叉收购（2025年），这是对公司独立发展路径的根本性调整——放弃独立上市梦想，选择成为产业集团的一部分。2023年的巨额亏损（-2.6亿元）可能是推动这一决策的关键因素。第三次：从传统AGV向人形机器人延伸（2025年10月发布X1系列），这是在"具身智能"浪潮下的品牌和战略升级尝试。这三次调整整体反映了行业趋势的变化（从移动机器人到具身智能）以及独立机器人公司在规模化过程中面临的资本和竞争压力。</p>
+      </div>
+
+      <div class="analysis-block" id="a-position">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>国自机器人在被杭叉收购后的竞争定位发生了根本性变化：从"独立的全场景移动机器人公司"转变为"杭叉集团的智能化触角"。这一转变的核心取舍是：牺牲独立性和更高的估值上限，换取产业资源的确定性和短期财务的稳健性。在物流AGV领域，杭叉国自的差异化定位在于"叉车+AMR+人形机器人"三位一体——杭叉集团在叉车领域的制造能力和全球销售网络（特别是海外渠道）是纯AGV创业公司不具备的资源。在巡检领域，国自保持了相对独立的竞争力，市占率约85%的电网巡检业务是被收购前就已建立的核心壁垒。从竞争格局看，国自的定位更像"产业集团赋能的专业机器人公司"而非独立的平台型公司，这一定位的天花板取决于杭叉集团的智能化转型意愿和速度。</p>
+      </div>
+
+      <div class="analysis-block" id="a-other">
+        <h4>2.6 其他重要观察</h4>
+        <p>第一，国自机器人的"扭亏为盈→被收购→业绩对赌"路径在中国机器人行业具有一定的代表性。2023年亏损2.6亿元后2024年迅速实现6636万元净利润（净利率19.8%），这一剧烈波动的背后可能包含非经常性损益（如资产减值的一次性处理）和/或激进的成本削减（可能以牺牲中长期研发投入为代价）。第二，三年对赌净利润复合增长率85.2%（2025年1292万元→2027年4815万元）的承诺压力不容小觑——在营收可能下滑的背景下（2024年3.34亿 vs 2023年4.38亿），实现利润快速增长主要依赖毛利率提升和成本管控，这可能会限制新业务（如人形机器人X1系列）的投入力度。第三，杭叉收购国自后的人形机器人布局值得持续关注：从"叉车→无人叉车→物流AGV→轮式人形机器人"的产品进化路径在逻辑上是自洽的（都服务于物流搬运场景），但人形形态是否对比传统AGV有显著的效率提升，是决定这一战略能否成立的关键技术问题。</p>
+      </div>
+
+      <h2 id="refs">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://stcn.com/article/detail/2520955.html" target="_blank">证券时报 — 杭叉集团加快智慧物流与机器人赛道布局 拟通过增资扩股方式控股国自机器人</a></li>
+          <li><a href="https://finance.eastmoney.com/a/202507083451338792.html" target="_blank">东方财富 — 巨星系资产腾挪，国自机器人放弃IPO委身杭叉集团</a></li>
+          <li><a href="https://api3.cls.cn/share/article/2078395" target="_blank">财联社 — 杭叉集团子公司拟收购实控人旗下机器人资产</a></li>
+          <li><a href="http://m.epaper.zqrb.cn/html/2025-07/09/content_1163431.htm" target="_blank">证券日报 — 杭叉集团子公司拟收购国自机器人99.23%股份</a></li>
+          <li><a href="https://m.agv-amr.com/news/show.php?itemid=1981" target="_blank">移动机器人产业联盟 — 国自机器人：扭亏为盈！</a></li>
+          <li><a href="https://www.eet-china.com/mp/a378126.html" target="_blank">EET电子工程专辑 — 国自机器人：扭亏为盈！</a></li>
+          <li><a href="https://www.zidonghua.com.cn/news/exhibition/78605.html" target="_blank">自动化网 — 让搬运更轻松 让物流更智能 | 杭叉国自智能亮相CeMAT ASIA 2025</a></li>
+          <li><a href="https://www.gzrobot.com/news/708275604058181/760735771430981" target="_blank">国自机器人官网 — 杭叉国自智能亮相CeMAT ASIA</a></li>
+          <li><a href="https://www.163.com/dy/article/J1RBE754051492LM.html" target="_blank">网易 — 从最北的漠河到最南的南沙群岛，都有"杭州造"机器人在工作</a></li>
+          <li><a href="https://www.cnenergynews.cn/article/4QyIj4n6Yz6" target="_blank">中国能源网 — 内蒙"最严考场"通关！国自机器人凭定制方案筑牢能源安全防线</a></li>
+          <li><a href="https://www.eet-china.com/mp/a468136.html" target="_blank">EET — 杭叉的万亿棋局：用数据驱动具身智能的未来</a></li>
+          <li><a href="https://m.21-sun.com/news/detail/2026/03/20260320165004786.htm" target="_blank">铁甲工程机械网 — 杭叉国自为国科恒泰打造仓储无人化作业首个标杆项目</a></li>
+          <li><a href="http://forkliftyp.com/?show=7058" target="_blank">叉车杂志 — EzGo欧洲首秀，杭叉国自智能携多款核心产品亮相德国LogiMAT</a></li>
+          <li><a href="https://m.chinaforklift.com/news/detail/202604/92867.html" target="_blank">中叉网 — 杭叉国自智能深耕酒水智慧物流</a></li>
+          <li><a href="https://www.eet-china.com/mp/a491501.html" target="_blank">EET — 5月杭州，无人叉车与轮式人形机器人"双雄会"来了！</a></li>
+          <li><a href="https://www.eet-china.com/mp/a486414.html" target="_blank">EET — 40项！3月AGV/AMR领域中标项目一览（含国自2977万元中标）</a></li>
+          <li><a href="https://m.sohu.com/a/161521209_99967819" target="_blank">搜狐 — "海宝机器人之父"，科技新浙商郑洪波</a></li>
+          <li><a href="https://kjjrw.com.cn/system/2017/08/01/012840588.shtml" target="_blank">科技金融网 — 郑洪波：一个自动化人的机器人梦</a></li>
+          <li><a href="http://www.egsea.com/news/detail/2078443.html" target="_blank">格隆汇 — 杭叉集团子公司拟增资扩股 收购国自机器人99.23%股份</a></li>
+          <li><a href="http://news.10jqka.com.cn/20250709/c669511041.shtml" target="_blank">同花顺 — 收购国自机器人，杭叉集团加速人形机器人开发</a></li>
+          <li><a href="https://data.iyiou.com/company/details/c7c14205e93cbf4f8e259e4e2b6cd956/profile" target="_blank">亿欧数据 — 国自机器人公司详情页</a></li>
+          <li><a href="https://pitchhub.36kr.com/project/1818807421128834" target="_blank">36氪 — 国自机器人项目信息</a></li>
+          <li><a href="https://caifuhao.eastmoney.com/news/20251019180328932789900" target="_blank">东方财富 — 杭叉集团 典型的机器人概念</a></li>
+          <li><a href="https://news.d1cm.com/20250822181614.shtml" target="_blank">第一工程机械网 — 杭叉国自智能：实力亮相第七届国际移动机器人集成应用大会</a></li>
+          <li><a href="https://www.chinalet.cn/home/news_x.html?id=1210" target="_blank">中国物流装备网 — 杭叉智能与速锐智能战略合作签约</a></li>
+        </ol>
+      </div>
+
+      <div class="page-footer">本页面由具身智能Wiki项目自动生成，数据截至2026年5月。内容基于公开报道、公司公告和官方信息整理，仅供参考。财务数据来源于杭叉集团收购公告中的审计报告。</div>
+    </article>
+  </div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

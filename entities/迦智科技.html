@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>迦智科技 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style></head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> <span class="breadcrumb-sep">›</span> <span>迦智科技</span></div>
+  <div class="wiki-header">
+    <h1>迦智科技</h1>
+    <div class="subtitle">浙江迦智科技股份有限公司 · HKEX递表中（第18C章） · 2016年成立 · 全球工业智能移动机器人前五</div>
+  </div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#founders">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#financing">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#technology">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#applications">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercialization">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financials">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#analysis1">2.1 团队背景与场景匹配度</a></li>
+        <li class="toc-lvl4"><a href="#analysis2">2.2 技术路线与场景适配性</a></li>
+        <li class="toc-lvl4"><a href="#analysis3">2.3 股东资本结构影响</a></li>
+        <li class="toc-lvl4"><a href="#analysis4">2.4 试错与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#analysis5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#analysis6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#references">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+
+      <aside class="infobox">
+        <div class="infobox-title">迦智科技</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">浙江迦智科技股份有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">英文</div><div class="ib-value">Zhejiang Jiazhi Technology Co., Ltd.</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2016年7月</div></div>
+        <div class="ib-row"><div class="ib-label">总部</div><div class="ib-value">浙江杭州</div></div>
+        <div class="ib-row"><div class="ib-label">上市状态</div><div class="ib-value">港交所递表中（2026.1，第18C章）</div></div>
+        <div class="ib-section">财务数据（2025前9月）</div>
+        <div class="ib-row"><div class="ib-label">营收</div><div class="ib-value">2.01亿元</div></div>
+        <div class="ib-row"><div class="ib-label">净利润</div><div class="ib-value">-7,208万元（经调整-3,560万）</div></div>
+        <div class="ib-row"><div class="ib-label">毛利率</div><div class="ib-value">28.0%</div></div>
+        <div class="ib-row"><div class="ib-label">现金储备</div><div class="ib-value">2.21亿元（截至2025.9）</div></div>
+        <div class="ib-section">估值与市场地位</div>
+        <div class="ib-row"><div class="ib-label">估值</div><div class="ib-value">21.3亿元（C++轮投后）</div></div>
+        <div class="ib-row"><div class="ib-label">行业排名</div><div class="ib-value">全球智能移动机器人第7</div></div>
+        <div class="ib-row"><div class="ib-label">工业领域</div><div class="ib-value">全球前5、中国前3</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">赛道</div><div class="ib-value">智能移动机器人（AMR）</div></div>
+        <div class="ib-row"><div class="ib-label">定位</div><div class="ib-value">通用智能移动机器人专家</div></div>
+        <div class="ib-section">官网</div>
+        <div class="ib-row"><div class="ib-label">官网</div><div class="ib-value"><a href="https://www.jiazhi-tech.com" target="_blank">jiazhi-tech.com</a></div></div>
+      </aside>
+
+      <p class="article-intro"><strong>迦智科技</strong>（全称：浙江迦智科技股份有限公司）是一家专注于通用智能移动机器人（AMR）研发与制造的中国科技企业，成立于2016年，总部位于浙江省杭州市。公司由浙江大学控制学院教授熊蓉博士创办，源自浙大机器人实验室，核心团队以浙大系技术人才为主。迦智科技是全球少数具备全栈自研能力的智能移动机器人解决方案提供商，按2024年订单额计位列全球智能移动机器人第7名、工业领域全球前5。公司于2026年1月向港交所递交招股书，拟通过第18C章（特专科技通道）上市，中金公司独家保荐。创始人熊蓉同时于2023年创办浙江人形机器人创新中心，形成"移动底盘+人形操作"的具身智能双线布局。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper">
+        <table class="wikitable infotable">
+          <tr><th>项目</th><th>内容</th></tr>
+          <tr><td>公司全称</td><td>浙江迦智科技股份有限公司</td></tr>
+          <tr><td>英文名称</td><td>Zhejiang Jiazhi Technology Co., Ltd.</td></tr>
+          <tr><td>成立时间</td><td>2016年7月</td></tr>
+          <tr><td>注册地</td><td>浙江省杭州市</td></tr>
+          <tr><td>上市状态</td><td>港交所主板递表中（2026年1月23日受理），第18C章特专科技通道，中金公司独家保荐</td></tr>
+          <tr><td>官网</td><td>jiazhi-tech.com</td></tr>
+          <tr><td>创始人</td><td>熊蓉博士（浙江大学控制学院教授/博导，机器人实验室主任）</td></tr>
+          <tr><td>主营业务</td><td>智能移动机器人（AMR）及解决方案：AMR、叉取式机器人、室外移动机器人、移动操作机器人</td></tr>
+        </table>
+      </div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>时间</th><th>事件</th></tr>
+          <tr><td>2016年7月</td><td>公司在杭州成立，源自浙江大学控制学院机器人实验室</td></tr>
+          <tr><td>2020-2022年</td><td>完成多轮早期融资，引入联想基金、字节跳动（量子跃动）等知名股东</td></tr>
+          <tr><td>2023年</td><td>营收7,495万元，机器人发货1,015台；熊蓉创办浙江人形机器人创新中心</td></tr>
+          <tr><td>2024年</td><td>营收破亿达1.15亿元（+53.2%），发货1,294台；跻身全球智能移动机器人前10</td></tr>
+          <tr><td>2025年9月</td><td>完成C轮2.5亿元融资，投后估值19.5亿元</td></tr>
+          <tr><td>2025年11月</td><td>改制为股份公司，为港股IPO做准备</td></tr>
+          <tr><td>2026年1月</td><td>完成C++轮1.8亿元融资，投后估值21.3亿元；同月23日递交港股招股书（第18C章）</td></tr>
+          <tr><td>2026年3月</td><td>中国证监会备案状态更新为"已接收"</td></tr>
+        </table>
+      </div>
+
+      <h3 id="founders">1.2 创始人及核心团队</h3>
+      <p>迦智科技由浙江大学控制学院教授熊蓉博士创办，团队以浙大系技术人才为骨干，呈现典型的"学术派"人才结构。熊蓉教授深耕机器人领域25年，2026年3月获国际机器人联合会（IFR）颁发"2026年塑造机器人未来的女性"奖项，为中国年度唯一入选者（全球仅11位）。她同时担任浙江人形机器人创新中心负责人，形成"迦智科技（移动底盘）+浙江人形（人形操作）"的双轨创业格局。</p>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+          <tr><td>创始人/控股股东</td><td>熊蓉</td><td>浙江大学控制科学与工程学院教授、博导，智能系统与控制研究所机器人实验室主任，深耕机器人领域25年。国家杰出青年科学基金获得者，国际机器人研究领域知名学者。带领团队在移动机器人导航、运动规划、多机协作等方向取得多项国际领先成果。2026年获IFR"塑造机器人未来的女性"奖（中国唯一）。</td></tr>
+          <tr><td>核心团队</td><td>浙大系工程师</td><td>核心研发团队多来自浙江大学控制学院机器人实验室，在移动机器人导航、运动控制、多机调度领域具有深厚学术积累。具体高管名单未在公开资料中详细披露。</td></tr>
+        </table>
+      </div>
+      <p>熊蓉通过直接持股及一致行动安排控制公司约29.61%投票权。公司2025年前9月研发费用占收入18.0%，拥有182项已授权专利及14项待批专利申请。团队同时支持迦智科技和浙江人形机器人创新中心两家公司，呈现出"教授创业+双轨并行"的独特治理结构。</p>
+
+      <h3 id="financing">1.3 融资与股东</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>轮次</th><th>时间</th><th>金额</th><th>估值</th><th>投资方</th></tr>
+          <tr><td>早期融资</td><td>2020-2024年</td><td>多轮约3.67亿元</td><td>—</td><td>联想基金、字节跳动（量子跃动）、深创投、中控技术、褚健等</td></tr>
+          <tr><td>C轮</td><td>2025年9月</td><td>2.5亿元</td><td>投后19.5亿元</td><td>衢州高质量基金（衢州国资委）等</td></tr>
+          <tr><td>C++轮</td><td>2026年1月</td><td>1.8亿元</td><td>投后21.3亿元</td><td>未完全披露</td></tr>
+        </table>
+      </div>
+      <p><strong>主要股东结构</strong>（招股书披露）：熊蓉控制29.61%投票权，衢州高质量（衢州国资委）7.04%，联想基金5.80%，玉环财通5.63%，西藏庆瑞5.32%，量子跃动（字节跳动）4.93%，共青城苏襄4.20%，云翼投资4.13%，褚健（中控技术创始人）3.67%，中控技术（688777.SH）0.94%，深创投通过宁波红土等间接持有。</p>
+      <p><strong>IPO信息</strong>：2026年1月23日向港交所递交招股书，通过第18C章（特专科技通道）申请上市，中金公司独家保荐。募集资金计划用于研发推进、产能扩张与数字化升级、海外销售网络建设、产业链战略投资收购及补充营运资金。截至2026年5月尚未公布上市代码。中国证监会已于2026年3月接收备案材料。</p>
+
+      <h3 id="technology">1.4 技术路线</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>维度</th><th>详情</th></tr>
+          <tr><td>总体架构</td><td>"4C"核心技术架构：Core Components（核心零部件自研）、Control Technologies（自适应高精度空间感知与运动控制）、Centralized Fleet Management（大规模集群调度）、Commissioning & Application Software（智能配置与应用软件）</td></tr>
+          <tr><td>感知系统</td><td>多模态感知技术，融合激光雷达、视觉、IMU等多种传感器，实现室内外全场景自主导航</td></tr>
+          <tr><td>集群调度</td><td>CLOUDIA大规模智能移动机器人集群调度系统，支持超过2,500台机器人集群部署，行业领先</td></tr>
+          <tr><td>自研程度</td><td>全栈自研（感知-控制-调度-应用），182项已授权专利，核心零部件自研率较高</td></tr>
+          <tr><td>软件系统</td><td>CARLY（可视化调试）、CLOUDIA（集群调度）、iMCS（数字物料流控制）、OWL（库存管理）四大软件平台</td></tr>
+          <tr><td>具身智能</td><td>NERA系列移动操作机器人，通用移动底盘+感知控制系统可服务于具身智能下游企业；创始人熊蓉同步推进浙江人形机器人创新中心（VLM+VLA+VLN三位一体大脑模型）</td></tr>
+        </table>
+      </div>
+      <p>迦智科技的技术路线以"移动能力"为核心，聚焦于让机器人在复杂工业环境中自主移动。其技术壁垒主要体现在大规模集群调度能力（2500+台机器人协同）和全栈自研的软硬件体系。在具身智能方向上，公司通过NERA系列和创始人熊蓉的浙江人形布局，形成了"移动底盘+人形操作"的互补战略。</p>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>产品线</th><th>品牌系列</th><th>核心功能</th><th>适用场景</th></tr>
+          <tr><td>自主移动机器人（AMR）</td><td>EMMA（标准）、OMNI（全向重型）、行业专用型</td><td>自主导航、物料搬运、产线对接</td><td>锂电、光伏、3C电子、显示面板等高端制造</td></tr>
+          <tr><td>叉取式机器人</td><td>FOLA系列</td><td>托盘搬运、堆高、前移式、高架存储，全自动仓库物流</td><td>仓储物流、制造车间</td></tr>
+          <tr><td>室外移动机器人</td><td>LUNA系列</td><td>支持高达60吨有效载荷，室内外自主移动</td><td>工业园区、物流枢纽、港口</td></tr>
+          <tr><td>移动操作机器人（具身智能）</td><td>NERA系列</td><td>移动底盘+机械臂，面向先进制造和家政服务</td><td>先进制造、家政服务</td></tr>
+        </table>
+      </div>
+
+      <h3 id="applications">1.6 应用场景</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>场景分类</th><th>典型应用</th><th>覆盖行业</th></tr>
+          <tr><td>高端制造</td><td>产线物料搬运、设备对接、在制品流转</td><td>锂电、光伏、3C电子、显示面板、半导体</td></tr>
+          <tr><td>仓储物流</td><td>自动叉取、堆高、高架存储、出入库</td><td>电子、汽车、制药、快消品</td></tr>
+          <tr><td>室外物流</td><td>园区内重载物料运输（最高60吨）</td><td>工业园区、物流枢纽、港口</td></tr>
+          <tr><td>商业服务</td><td>室内配送、引导、盘点</td><td>商业综合体、医院、酒店</td></tr>
+          <tr><td>具身智能探索</td><td>移动操作（移动底盘+机械臂协同）</td><td>先进制造、家政服务</td></tr>
+        </table>
+      </div>
+      <p>产品远销20余个国家和地区（中国、日本、韩国、东南亚、北美、欧洲），2025年前9月超过85%收入来自中国内地。</p>
+
+      <h3 id="commercialization">1.7 商业化进展</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>指标</th><th>2023年</th><th>2024年</th><th>2025年前9月</th></tr>
+          <tr><td>机器人发货量</td><td>1,015台</td><td>1,294台</td><td>未披露</td></tr>
+          <tr><td>机器人解决方案收入占比</td><td>—</td><td>—</td><td>82.6%</td></tr>
+          <tr><td>覆盖国家数</td><td colspan="3">20+个国家和地区</td></tr>
+        </table>
+      </div>
+      <p>前五大客户收入占比61.3%（2025年前9月），单一最大客户占比28.4%，客户集中度偏高。</p>
+
+      <h3 id="financials">1.8 财务数据</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>指标</th><th>2023年</th><th>2024年</th><th>2025年前9月</th></tr>
+          <tr><td>营业收入</td><td>7,495万元</td><td>1.15亿元</td><td>2.01亿元</td></tr>
+          <tr><td>营收增速</td><td>—</td><td>+53.2%</td><td>约+294%同比</td></tr>
+          <tr><td>毛利率</td><td>19.7%</td><td>24.2%</td><td>28.0%</td></tr>
+          <tr><td>净利润</td><td>-1.14亿元</td><td>-1.18亿元</td><td>-7,208万元</td></tr>
+          <tr><td>经调整净亏损</td><td>-7,845万元</td><td>-7,844万元</td><td>-3,560万元</td></tr>
+          <tr><td>累计亏损</td><td colspan="3">约3.04亿元（截至2025.9）</td></tr>
+          <tr><td>研发费用占收入</td><td>48.3%</td><td>38.8%</td><td>18.0%</td></tr>
+          <tr><td>销售费用占收入</td><td>61.7%</td><td>43.1%</td><td>22.9%</td></tr>
+          <tr><td>现金及等价物</td><td colspan="3">2.21亿元（截至2025.9）</td></tr>
+        </table>
+      </div>
+      <p>公司连续三个报告期亏损，累计亏损超3亿元，但亏损幅度持续收窄（经调整净亏损从7,845万元降至3,560万元）。毛利率从19.7%持续攀升至28.0%，盈利能力改善趋势明确但尚未转正。</p>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li><strong>双轨创业</strong>：创始人熊蓉同时运营迦智科技和浙江人形机器人创新中心（2023年12月成立），后者在过去一年半累计融资22亿元</li>
+        <li><strong>国际认可</strong>：2026年3月熊蓉获IFR"2026年塑造机器人未来的女性"奖项，为中国年度唯一入选者（全球仅11人）</li>
+        <li><strong>数据安全</strong>：截至2025年9月，公司在中国拥有182项已授权专利及14项待批专利申请</li>
+        <li><strong>行业前景</strong>：全球智能移动机器人市场预计从2024年352亿元增至2030年2,536亿元（CAGR 34.0%），具身智能机器人市场CAGR高达109.9%</li>
+        <li><strong>风险因素</strong>：持续亏损累计超3亿元；存货周转天数长（468天，存货2.08亿元）；客户集中度过高（前五大61.3%）；经营现金流持续为负</li>
+        <li><strong>上市进展</strong>：证监会备案于2026年3月更新为"已接收"，第18C章上市审核仍在推进中</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="analysis1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>迦智科技是典型的"教授创业"模式——创始人熊蓉在浙大深耕机器人领域25年，团队核心来自浙大机器人实验室。这一学术背景与公司选择的"智能移动机器人"赛道高度匹配，尤其在导航、运动规划、多机调度等核心技术方向，学术积累可直接转化为产品竞争力（如2500+台集群调度能力）。但学术团队的短板同样明显：商业化经验不足，销售费用率一度超过研发费用率（2023年61.7% vs 48.3%），说明技术和产品虽有竞争力，但市场推广仍需大量投入。熊蓉同时运营两家公司（迦智科技+浙江人形），这种"双轨并行"模式对创始人的精力分配构成挑战。选择移动机器人而非人形机器人作为第一家公司，是务实的学术派路径——先从自己最擅长的导航与控制做起，再向难度更高的操作延伸。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>"4C"架构（核心零部件+控制+集群调度+应用软件）体现了全栈自研的技术理念，与工业移动机器人场景高度适配。工业场景的核心需求是可靠性和规模化——2500+台集群调度能力正是应对大型工厂多机器人协同的核心竞争力。全栈自研也使得公司在面对不同行业的定制化需求时能灵活适配。但在具身智能方向，NERA系列目前仍偏早期——移动底盘+机械臂的组合在技术上延续了公司在移动能力上的优势，但机械臂操作能力需要不同的技术栈（如力控、精细操作），这是与公司传统强项不同的新领域。熊蓉通过浙江人形机器人创新中心布局VLM+VLA+VLN三位一体大脑模型，可能是对迦智科技现有技术路线的战略补充。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>迦智科技的股东结构呈现"学术创始人+产业资本+互联网资本+国资"的多元组合。字节跳动（4.93%）和联想基金（5.80%）的入股体现了互联网/科技巨头对移动机器人赛道的战略关注——字节的仓储物流需求和联想的智能制造生态都可能成为业务协同点。衢州国资委（7.04%）的地方国资背景则可能在华东制造业集群提供场景资源和政策支持。中控技术（0.94%）和褚健（3.67%）的参与具有特殊意义——中控是中国流程工业自动化龙头，其产业资源可能帮助迦智科技切入化工、制药等流程工业场景。创始人仅控制29.61%投票权，股权相对分散，上市后可能面临一定的控制权稳定性挑战。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>迦智科技的发展路径呈现出"从实验室到产品化到资本化"的经典硬科技公司轨迹。从浙大实验室孵化起步，完成核心技术验证后逐步产品化和商业化，最终走向IPO。2023年熊蓉创办浙江人形机器人创新中心是一个重要的路径分叉——原有移动机器人业务（迦智科技）的盈利拐点尚未到来，就同时启动了一个更需要烧钱的人形机器人项目。这可以理解为"用确定性业务冲IPO，用高风险业务赌未来"的双线战略。从招股书数据看，研发费用占比从48.3%降至18.0%——这可能不是研发投入的减少，而是营收快速增长的稀释效应，但也可能反映出公司在IPO前控制成本、改善财务指标的意图。公司能否在盈利能力与研发投入之间找到平衡，是后续发展的关键。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>迦智科技的核心取舍是："做移动底盘专家，不做全能机器人"。与Figure AI、Tesla Optimus等追求通用人形机器人的公司不同，迦智科技聚焦于移动能力这一细分领域，以工业AMR为核心产品，是一条"专用务实"路线。在高度碎片化的移动机器人市场（全球前十大厂商合计仅占17%份额），迦智科技的1%市占率虽然不高，但已跻身全球前10。公司的差异化优势在于全栈自研+大规模集群调度——2500+台集群部署能力是全球少数企业具备的技术壁垒。NERA系列的推出和浙江人形的布局，表明公司正在从"纯移动"向"移动+操作"拓展，但这种拓展需要大量新的人才和资本投入，可能分散对核心AMR业务的聚焦。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis6">
+        <h4>2.6 其他重要观察</h4>
+        <p>首先是"双轨创业"模式。熊蓉同时作为迦智科技创始人和浙江人形机器人创新中心负责人，两家公司在战略上互补但在资源上存在潜在竞争——人才、资金、精力都是有限的。虽然招股书将浙江人形定位为迦智科技的"具身智能合作伙伴"，但这种创始人同时操盘两家公司的安排在资本市场上较为罕见，可能引发治理结构和利益冲突的考量。其次是盈利拐点的症结——毛利率28%仍偏低，销售费用率22.9%仍偏高，客户集中度61.3%意味着与少数大客户的绑定过深。如果大客户流失或采购节奏变化，将对收入造成显著冲击。第三是第18C章上市通道——特专科技通道允许未盈利企业上市，这为公司提供了宝贵的时间窗口，但同时也意味着市场对其盈利能力的验证需求更为迫切。公司需要在上市后证明：移动机器人赛道的规模效应能否支撑其从亏损到盈利的跨越。</p>
+      </div>
+
+      <h2 id="references">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://news.pedaily.cn/202601/560414.shtml" target="_blank">投资界：浙江杭州冲出一家机器人IPO，估值21亿</a></li>
+          <li><a href="http://hk.stockstar.com/IG2026020200009823.shtml" target="_blank">证券之星/智通财经：营收翻倍仍陷亏损泥潭，具身智能是迦智科技的盈利解药吗</a></li>
+          <li><a href="https://www.163.com/dy/article/KK1EAT3F0511A0EF.html" target="_blank">网易：迦智科技冲刺港股，9个月营收2亿亏损7208万</a></li>
+          <li><a href="https://m.36kr.com/p/3656199646880131" target="_blank">36氪：浙江杭州冲出一家机器人IPO，估值21亿，深创投、联想押注</a></li>
+          <li><a href="https://www.stcn.com/article/detail/3610813.html" target="_blank">证券时报：浙大系机器人公司冲刺港股IPO，字节跳动、联想加持</a></li>
+          <li><a href="https://www.fx168news.com/article/%E4%BA%9A%E5%A4%AA%E8%82%A1%E5%B8%82-988851" target="_blank">FX168/时空之星：工业智能移动机器人全球前五，迦智科技冲港股</a></li>
+          <li><a href="https://www.itiger.com/hans/news/2606420671" target="_blank">老虎证券：字节联想加持的迦智科技冲刺港股18C章</a></li>
+          <li><a href="https://x.stockstar.com/detail/20260306102536000012" target="_blank">证券之星：迦智科技闯港股——超2500台智能调度集群的底色</a></li>
+          <li><a href="https://www.newtimespace.com/zh-hk/research/1368842.html" target="_blank">时空之星：工业智能移动机器人全球前五，迦智科技冲港股</a></li>
+          <li><a href="https://news.fx168news.com/cooperate/2601/7411350.shtml" target="_blank">FX168：迦智科技冲击IPO，专注智能移动机器人领域</a></li>
+          <li><a href="http://jjckb.xinhuanet.com/20260123/db7e1207902344a0800570141d46eeb2/c.html" target="_blank">经济参考报/新华社：浙江人形机器人创新中心获4.5亿元Pre-A轮融资</a></li>
+          <li><a href="https://www.leiphone.com/category/robot/tHdd4OZPUUy0tL8F.html" target="_blank">雷锋网：浙江人形再获4.5亿元Pre-A轮融资，聚焦可泛化的精准作业</a></li>
+          <li><a href="https://zhidx.com/p/530383.html" target="_blank">智东西：4.5亿元！浙大教授造机器人，多家国资集体押注</a></li>
+          <li><a href="https://www.donews.com/news/detail/1/6389860.html" target="_blank">DoNews：浙江人形完成4.5亿元Pre-A轮融资</a></li>
+          <li><a href="http://scitoday.cn/htmlnews/2026/5/61400.shtm" target="_blank">科技日报：本年度中国唯一入选者——浙大女教授熊蓉获IFR奖</a></li>
+          <li><a href="http://aastocks.com/tc/mobile/news.aspx?newsid=GLH5157297N&newstype=61&newssource=GLH" target="_blank">华富财经：迦智科技冲击IPO，专注于智能移动机器人领域</a></li>
+          <li><a href="https://wap.stockstar.com/detail/IG2026012600023872" target="_blank">证券之星：迦智科技冲击IPO，行业竞争较为激烈</a></li>
+          <li><a href="https://www.mitrade.com/zh/insights/news/live-news/article-8-1660733-20260423" target="_blank">Mitrade：翼菲智能过聆讯，9家排队IPO机器人企业</a></li>
+          <li><a href="https://120.55.168.28/article/detail/3610813.html" target="_blank">证券时报：浙大系机器人公司冲刺港股IPO</a></li>
+          <li><a href="https://www.ikanchai.com/article/20260126/649009.shtml" target="_blank">砍柴网：浙江人形再获4.5亿元Pre-A轮融资</a></li>
+        </ol>
+      </div>
+
+    </article>
+  </div>
+  <div class="page-footer">
+    <p>本页面由具身智能Wiki自动分发系统基于公开信息生成 · 数据截止日期：2026年5月 · 仅供参考，不构成投资建议</p>
+  </div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

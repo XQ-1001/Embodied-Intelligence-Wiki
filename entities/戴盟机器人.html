@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>戴盟机器人 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> › <span>戴盟机器人</span></div>
+  <div class="wiki-header"><h1>戴盟机器人</h1><div class="subtitle">Daimon Robotics · 成立于2023年 · 全球视触觉传感器出货量第一 · 单色光视触觉技术首创者 · 累计融资数亿元</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#founders">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financials">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#analysis-1">2.1 团队背景与场景选择匹配度</a></li>
+        <li class="toc-lvl4"><a href="#analysis-2">2.2 技术路线与场景适配性</a></li>
+        <li class="toc-lvl4"><a href="#analysis-3">2.3 股东/资本结构对战略影响</a></li>
+        <li class="toc-lvl4"><a href="#analysis-4">2.4 试错过程与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#analysis-5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#analysis-6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#references">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">戴盟机器人</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">戴盟（深圳）机器人科技有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">英文名</div><div class="ib-value">Daimon Robotics</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2023年8月</div></div>
+        <div class="ib-row"><div class="ib-label">注册地</div><div class="ib-value">广东省深圳市宝安区</div></div>
+        <div class="ib-row"><div class="ib-label">创始人&CEO</div><div class="ib-value">段江哗（博士）</div></div>
+        <div class="ib-row"><div class="ib-label">联合创始人</div><div class="ib-value">王煜（港科大教授）</div></div>
+        <div class="ib-row"><div class="ib-label">CCO</div><div class="ib-value">张栋</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">传感器出货</div><div class="ib-value">全球第一（同类产品）</div></div>
+        <div class="ib-row"><div class="ib-label">传感器单价</div><div class="ib-value">1299元起（千元级）</div></div>
+        <div class="ib-row"><div class="ib-label">传感器寿命</div><div class="ib-value">500万次按压</div></div>
+        <div class="ib-row"><div class="ib-label">数据集规模</div><div class="ib-value">Daimon-Infinity（全球最大触觉数据集）</div></div>
+        <div class="ib-section">融资</div>
+        <div class="ib-row"><div class="ib-label">累计轮次</div><div class="ib-value">4轮</div></div>
+        <div class="ib-row"><div class="ib-label">累计金额</div><div class="ib-value">数亿元</div></div>
+        <div class="ib-row"><div class="ib-label">最新轮次</div><div class="ib-value">战略轮（2025.12，中国移动）</div></div>
+        <div class="ib-section">分类</div>
+        <div class="ib-row"><div class="ib-label">行业</div><div class="ib-value">具身智能 · 触觉传感器</div></div>
+        <div class="ib-row"><div class="ib-label">核心技术</div><div class="ib-value">单色光视触觉感知</div></div>
+        <div class="ib-row"><div class="ib-label">定位</div><div class="ib-value">具身智能基础设施提供商</div></div>
+        <div class="ib-section">官方链接</div>
+        <div class="ib-row"><div class="ib-label">官网</div><div class="ib-value">未公开</div></div>
+      </aside>
+
+      <p class="article-intro">戴盟（深圳）机器人科技有限公司（Daimon Robotics）是一家专注于视触觉感知与灵巧操作的具身智能核心技术公司，2023年8月正式运营，总部位于深圳宝安区，在香港和美国波士顿设有研发办公室。公司孵化于香港科技大学科研团队，由港科大机器人研究院创院院长王煜教授与段江哗博士联合创立。戴盟以全球首创的"单色光视触觉感知"技术路线突破MIT三色光方案垄断，视触觉传感器同类产品出货量全球第一。公司累计完成四轮数亿元融资，投资方包括中国移动链长基金、招商局创投、联想创投等产业巨头。2026年4月联合Google DeepMind等发布全球最大触觉数据集Daimon-Infinity，被媒体誉为"深圳具身智能八大金刚"之一。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 基本信息</h3>
+      <div class="table-wrapper">
+        <table class="wikitable infotable">
+          <tr><th>项目</th><th>内容</th></tr>
+          <tr><td>公司全称</td><td>戴盟（深圳）机器人科技有限公司</td></tr>
+          <tr><td>英文名称</td><td>Daimon Robotics</td></tr>
+          <tr><td>成立时间</td><td>2023年8月（正式运营）</td></tr>
+          <tr><td>注册地</td><td>广东省深圳市宝安区</td></tr>
+          <tr><td>研发办公室</td><td>深圳（总部）、香港、美国波士顿</td></tr>
+          <tr><td>上市状态</td><td>未上市</td></tr>
+          <tr><td>所属赛道</td><td>具身智能 · 触觉传感器 · 灵巧操作</td></tr>
+          <tr><td>行业地位</td><td>"深圳具身智能八大金刚"之一；全球视触觉传感器出货量第一</td></tr>
+        </table>
+      </div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>时间</th><th>事件</th></tr>
+          <tr><td>2023年8月</td><td>公司正式运营，孵化于港科大科研团队</td></tr>
+          <tr><td>2024年11月</td><td>完成天使+轮亿元级融资（金鼎资本、国中资本、联想创投等）</td></tr>
+          <tr><td>2025年4月</td><td>发布DM-Tac W视触觉传感器、DM-Hand1灵巧手、DM-Exton遥操作系统</td></tr>
+          <tr><td>2025年5月</td><td>首次进入美国市场，ICRA 2025展会斩获国际订单</td></tr>
+          <tr><td>2025年7月</td><td>加入中国移动发起的"具身智能产业合作计划"</td></tr>
+          <tr><td>2025年8月</td><td>完成天使++轮亿元级融资（招商局创投领投）</td></tr>
+          <tr><td>2025年10月</td><td>人形机器人Sparky 1在联想南方工厂量产下线</td></tr>
+          <tr><td>2025年11月</td><td>高交会发布新一代DM-Tac W2系列（IP65防护）和DM-Flux端侧AI平台</td></tr>
+          <tr><td>2025年12月</td><td>完成战略轮亿元级融资（中国移动链长基金独家投资）</td></tr>
+          <tr><td>2026年1月</td><td>CES 2026首发全球首款力/触觉反馈遥操作系统DM-EXton2</td></tr>
+          <tr><td>2026年4月</td><td>联合Google DeepMind、中国移动等发布全球最大触觉数据集Daimon-Infinity</td></tr>
+        </table>
+      </div>
+
+      <h3 id="founders">1.2 创始人及核心团队</h3>
+      <p>戴盟机器人孵化于香港科技大学机器人研究院，由学术权威与产业博士联合创立。团队核心成员在视触觉传感器、灵巧手设计、类人行为学习等领域深耕超十年，研发占比高。公司被誉为"深圳具身智能八大金刚"之一，是典型的学术派创业团队，具备从基础科研到工程落地的全链能力。</p>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+          <tr><td>创始人&CEO</td><td>段江哗</td><td>博士，师从王煜教授，长期专注机器人感知与操作研究。曾在港科大从事视触觉传感器与灵巧操作方向的前沿研究，带领戴盟完成从实验室技术到产业化落地的全过程</td></tr>
+          <tr><td>联合创始人</td><td>王煜</td><td>香港科技大学机器人研究院创院院长，先进运动控制与机器人领域国际权威。曾主导港科大与MIT CSAIL长达6年的合作项目（GelSight视触觉技术），为戴盟提供了深厚的技术源头积累</td></tr>
+          <tr><td>CCO（首席商业官）</td><td>张栋</td><td>合伙人，负责商业化战略与市场落地，主导公司从"技术秀场"向"产业战场"转型</td></tr>
+          <tr><td>研发团队</td><td>—</td><td>港科大背景为主，覆盖视触觉传感器设计、灵巧手机械结构、AI算法、嵌入式系统等领域，在视触觉方向深耕超十年</td></tr>
+        </table>
+      </div>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <p>戴盟机器人累计完成四轮亿元级融资，形成"国有资本+产业资本+市场化机构"的多元支撑生态，持续刷新触觉传感领域融资纪录。</p>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>轮次</th><th>时间</th><th>金额</th><th>投资方</th><th>战略意义</th></tr>
+          <tr><td>天使+轮</td><td>2024年11月</td><td>亿元级</td><td>金鼎资本、国中资本、联想创投及头部银行系机构</td><td>联想华南工厂支撑产品批量化生产</td></tr>
+          <tr><td>天使++轮</td><td>2025年8月</td><td>亿元级</td><td>招商局创投（领投）、东方嘉富、架桥资本（跟投）</td><td>央企体系产业级场景资源</td></tr>
+          <tr><td>战略轮</td><td>2025年12月</td><td>亿元级</td><td>中国移动链长基金（独家投资）</td><td>算力、云、数据、网络、终端部署与大规模场景资源</td></tr>
+        </table>
+      </div>
+      <p>累计融资达数亿元。目前未上市，估值未公开披露。中国移动、招商局创投、联想创投三大"链主"的集体押注，为戴盟提供了从技术研发到量产落地、从场景部署到全球化的完整生态支撑。</p>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <p>戴盟机器人以全球首创的"单色光视触觉感知"技术突破MIT主导的三色光GelSight方案垄断，建立自主知识产权路线。单色光方案在算力需求、发热量、系统频率、传感器厚度、耐用性和成本等多维度实现数量级进步。公司构建了以VTLA（Vision-Tactile-Language-Action）多模态模型为核心的AI能力，并以"3D战略"（Device-Data-Deployment）驱动商业闭环。</p>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>技术维度</th><th>路线选择</th><th>说明</th></tr>
+          <tr><td>触觉感知原理</td><td>单色光视触觉（全球首创）</td><td>突破MIT GelSight三色光方案垄断，系统频率提升4倍至120Hz+，传感器厚度从厘米级降至毫米级，成本降至1/4</td></tr>
+          <tr><td>AI模型</td><td>VTLA多模态模型</td><td>融合视觉、触觉、语言、动作的多模态感知操作大模型，构建"聪明的大脑+灵巧的操作能力"</td></tr>
+          <tr><td>数据战略</td><td>DaaS + 开源数据集</td><td>Daimon-Infinity全球最大触觉数据集，开源1万小时，目标数百万小时/近十亿条；以DaaS驱动灵巧技能规模化交付</td></tr>
+          <tr><td>传感器技术指标</td><td>DM-Tac系列</td><td>每cm²集成4万个感知单元（远超人类手指2500个/cm²）；切向力分辨率320×240（MIT方案仅9×7）；500万次寿命</td></tr>
+          <tr><td>端侧计算</td><td>DM-Flux平台</td><td>10 TOPS算力，支持同时接入五路视触觉传感器，构建"感知-决策-控制"闭环</td></tr>
+          <tr><td>遥操作数采</td><td>DM-EXton2力/触反馈</td><td>全球首款力/触觉反馈遥操作系统，毫牛级接触力差异反馈，1000Hz采样，异构兼容</td></tr>
+        </table>
+      </div>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>产品</th><th>发布时间</th><th>定位</th><th>关键参数</th></tr>
+          <tr><td>DM-Tac W</td><td>2025年4月</td><td>全球首款多维高分辨率高频率视触觉传感器</td><td>每cm²集成4万感知单元；频率120Hz+；毫米级超薄；500万次寿命；多模态感知（形貌/纹理/软硬/滑移/压力/切向力）</td></tr>
+          <tr><td>DM-Tac W2</td><td>2025年11月</td><td>全球首款IP65防护视触觉传感器</td><td>IP65防尘防水；抗电磁干扰；可应对液体泼溅、粉尘覆盖；获CE、FCC认证</td></tr>
+          <tr><td>DM-Hand1</td><td>2025年4月</td><td>多维触觉感知五指灵巧手</td><td>搭载DM-Tac传感器阵列；类人手指尖集成触觉；精细抓取与力控能力</td></tr>
+          <tr><td>DM-Exton</td><td>2025年4月</td><td>便携穿戴式遥操作数据采集系统</td><td>第一代遥操作数采设备，面向高质量训练数据采集</td></tr>
+          <tr><td>DM-Flux</td><td>2025年11月</td><td>端侧AI计算平台</td><td>10 TOPS；支持五路视触觉传感器同时接入</td></tr>
+          <tr><td>DM-EXton2</td><td>2026年1月</td><td>全球首款力/触觉反馈遥操作数采系统</td><td>毫牛级力反馈；1000Hz采样；快换设计（手柄/手套模式数秒切换）；异构兼容夹爪/灵巧手；三档运动比例缩放；移动工位版+固定工位版</td></tr>
+          <tr><td>Sparky 1</td><td>2025年10月</td><td>人形机器人整机</td><td>联想南方工厂量产下线；可抓取组装精密部件、平稳倒水等精细操作</td></tr>
+        </table>
+      </div>
+      <p>传感器定价1299元起，以"千元级"价格定位推动触觉感知从高端选配走向工业标配。</p>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>场景领域</th><th>具体应用</th><th>典型客户/环境</th></tr>
+          <tr><td>智能制造</td><td>3C精密插接与装配、轴孔装配、表面擦拭、手机边框异物检测等</td><td>特斯拉供应链工厂、手机制造产线（联想南方工厂）</td></tr>
+          <tr><td>智慧物流</td><td>异形件分拣、软包装抓取</td><td>仓储物流自动化</td></tr>
+          <tr><td>实验室自动化</td><td>精密操作自动化</td><td>科研实验室</td></tr>
+          <tr><td>柔性生产</td><td>小批量多品种柔性制造，替代传统固定程序自动化</td><td>多品种工业产线</td></tr>
+        </table>
+      </div>
+      <p>戴盟目标三阶段：任务类通用（3年内，工业现场任意装配/打磨等）→ 场景类通用（3-5年，工厂全流程搬运组装+家庭综合服务）→ 跨场景通用（5-10年，终极形态）。</p>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <p>戴盟机器人2026年Q1收入已超2025年全年，增长势头强劲。视触觉传感器同类产品出货量全球第一，实现万片级规模化出货。传感器成本降至千元级，寿命从行业平均1000次提升至500万次。产品通过欧盟CE和美国FCC双认证，2025年首次进入美国市场后持续获得海外订单。2026年4月与Google DeepMind合作开源Daimon-Infinity数据集，加速全球具身智能产业应用，在阿里云魔搭社区同步上线。中国移动合作提供5G+算力+场景资源，联想南方工厂负责量产支撑。</p>
+
+      <h3 id="financials">1.8 财务数据</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>指标</th><th>2025年</th><th>2026年</th></tr>
+          <tr><td>收入增长</td><td>基准年</td><td>Q1已超2025年全年</td></tr>
+          <tr><td>传感器出货</td><td>已实现万片级出货</td><td>持续增长（全球第一）</td></tr>
+          <tr><td>传感器定价</td><td>1299元起</td><td>千元级，目标工业标配</td></tr>
+        </table>
+      </div>
+      <p>公司尚未上市，未公开披露完整财务报表。累计融资数亿元，账面资金储备较为充裕。</p>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>戴盟明确战略定位：不做整机、不做大脑，专注做具身智能的基础设施——以触觉感知为核心的"最灵敏的手"和"最懂世界的触觉底座"，类比"具身时代的英特尔/宁德时代"</li>
+        <li>2025年7月，中国移动联合戴盟、宇树科技、智元、众擎等发起"具身智能产业合作计划"，构建全产业链布局</li>
+        <li>CEO段江哗提出具身智能三阶段判断：任务类通用（3年内广泛应用）→ 场景类通用（3年内初步探索）→ 跨场景通用（10年内走进生活）</li>
+        <li>2026年被公司定义为"闭环之年"——从硬件出货、数据开源、模型训练到场景部署的商业闭环正在加速跑通</li>
+        <li>公司认为"机器人的形态并不是核心，真正的价值在于聪明的大脑和灵巧的操作能力"</li>
+        <li>全球触觉传感器市场规模：2024年153.3亿美元；人形机器人达1亿台时视触觉路线市场约3.76万亿元</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="analysis-1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>戴盟的团队结构是典型的"顶尖学术+工程转化"模式。王煜教授在港科大机器人研究院的学术积累为公司在视触觉感知这一前沿方向建立先发优势提供了不可替代的理论支撑。更重要的是，港科大与MIT CSAIL长达6年的GelSight合作使团队对这一技术路线有最深刻的理解，能够精准识别三色光方案的瓶颈并提出颠覆性的单色光替代方案。段江哗博士的产业化执行力体现在从2025年4月首发产品到2026年Q1收入超全年完整的商业化加速曲线上。团队在触觉感知这一高壁垒细分领域的学术积累深度，与公司选择的"不做整机、专注触觉基础设施"定位高度匹配——在一个需要十年积累才能出成果的领域，学术深度本身就是最坚固的护城河。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>单色光方案替代三色光方案的本质是选择了"低频高精度"向"高频实用化"的技术路线切换。三色光(GelSight)方案依赖光学原理获取高分辨率，但以牺牲系统频率（20-30Hz）和耐用性（约1000次）为代价。单色光路线在保持足够分辨精度（320×240切向力分辨率）的同时，将频率提升至120Hz+、寿命提升至500万次——这使得视触觉传感器从"实验室demo"变成"工厂产线上的工业品"。VTLA多模态模型的提出和Daimon-Infinity数据集的构建，表明戴盟认识到触觉感知的价值不在于传感器本身，而在于触觉数据驱动的AI能力。从技术路线与场景匹配的角度，单色光+VTLA+数据集三者形成了"传感器采样→数据积累→模型泛化"的完美飞轮，适配性在当前行业中属一流。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>戴盟的资本结构呈现罕见的高度的"平台型产业资本"特征——中国移动提供通信基础设施和场景入口，联想提供量产制造能力，招商局提供港口/物流等央企级场景。与具微科技等"场景绑定型"投资不同，戴盟的投资方更多扮演"能力赋能者"而非"需求定义者"角色。这给予戴盟更大的场景选择自由度——不需要为任何单一客户定制产品，而是以基础设施提供商的定位服务全行业。但这也意味着戴盟需要自己寻找和定义PMF（产品市场契合度），而非由投资方直接导入订单。从结果看，2026年Q1收入已超2025年全年，说明其独立寻找场景的能力在快速验证中。三大链主的集体押注在具身智能创业公司中极为罕见，这也构成了戴盟最重要的竞争壁垒之一。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>戴盟的公开发展历程表现出清晰的战略递进：从传感器硬件（2025年4月DM-Tac W）→ 灵巧手整机（DM-Hand1）→ 人形机器人Sparky 1（2025年10月）→ 回归数据采集系统（DM-EXton2，2026年1月）→ 开源数据集（Daimon-Infinity，2026年4月）。Sparky 1的量产下线是一次重要的"试水"——验证了触觉技术在整机上的可行性，但公司随后迅速回归"专注触觉基础设施"的核心定位，没有陷入人形机器人整机竞争的泥潭。这种"试探后迅速收敛"的决策纪律非常值得注意。开源Daimon-Infinity数据集的决策也反映了战略进化——从单纯卖硬件到建立"数据生态+硬件标准"双轮驱动的平台模式，这类似于Android的策略：开放底层能力，建立行业标准，在规模中获取收益。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>戴盟做了一系列明确的"减法"：不做通用机器人整机、不做大模型大脑、不做消费级市场。其核心取舍是选择成为具身智能产业链中的"触觉标准件供应商"——类似于智能手机产业中的指纹识别/触摸屏芯片厂商。这一取舍的智慧在于避开与宇树、智元、优必选等整机厂商的直接竞争，同时建立了一个几乎所有整机厂商都需要的技术模块。但风险也是明显的：如果未来整机厂商选择自研触觉模块（类似苹果自研芯片），或行业出现替代性技术路线（如电子皮肤），戴盟的TAM（可寻址市场）将受到挤压。不过，在触觉传感器这一需要长期学术积累的方向上，戴盟通过单色光技术的代际优势和开源数据集的行业标准效应，正在构建起了极高的护城河——后来者即便投入同等资源，追赶的不仅是技术参数，更是隐藏在百万小时数据集中的工程经验。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-6">
+        <h4>2.6 其他重要观察</h4>
+        <p>戴盟与Google DeepMind的合作开源是2026年具身智能领域最具标志性的事件之一。这不仅是技术合作，更意味着戴盟获得了国际顶级AI实验室的背书，提升了其在全球触觉传感器市场的品牌信用。从产业周期看，2026年被业界称为"具身智能数据之年"——各家公司纷纷构建大规模数据集以训练通用操作模型，戴盟的Daimon-Infinity数据集恰好卡位这一关键时间窗口。另一个值得关注的动态是戴盟的"不做整机"定位与人形机器人赛道的火热之间的张力——当行业泡沫消退时，基础设施提供商往往比终端产品公司更具抗周期能力。风险方面，戴盟的收入规模仍然较小（2025年全年基数不高），能否在2026-2027年实现从"千万级"到"亿级"收入的跨越，将是验证其商业模式可持续性的关键节点。此外，国际政治环境变化可能影响其海外市场拓展节奏。</p>
+      </div>
+
+      <h2 id="references">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://m.newseed.cn/news/1376675">新种子：戴盟机器人完成新一轮战略融资，中国移动链长基金投资</a></li>
+          <li><a href="https://stcn.com/article/detail/3522010.html">证券时报：戴盟机器人获中国移动链长基金投资，完成新一轮亿元级战略融资</a></li>
+          <li><a href="https://news.pedaily.cn/202512/558191.shtml">投资界：戴盟机器人又获亿元级投资！三大「链主」为何集体押注？</a></li>
+          <li><a href="http://jjckb.xinhuanet.com/20251208/124c2d5f21304314a4253c0206067260/c.html">经济参考报：戴盟机器人又获亿元级投资</a></li>
+          <li><a href="https://www.lieyunpro.com/archives/499577">猎云网：中国移动链长基金，战略投资戴盟机器人</a></li>
+          <li><a href="https://www.eetrend.com/content/2026/100597893.html">电子工程专辑：戴盟于CES 2026首发全球首款力/触反馈遥操作数采系统DM-EXton2</a></li>
+          <li><a href="https://www.leaderobot.com/news/7043">机器人邦：CES 2026直击 | 戴盟发布全球首款力/触反馈系统</a></li>
+          <li><a href="https://capital.lenovo.com/news/detail/id/1176/s/2.html">联想创投：戴盟机器人项目详情</a></li>
+          <li><a href="https://www.chnfund.com/article/AR2d17a964-3f79-ae91-f8c3-3a1ed75b9c04">中国基金报：湾区创客说·发现独角星芒｜走进戴盟机器人</a></li>
+          <li><a href="https://huacheng.gz-cmc.com/pages/2026/04/16/3eb87cdb6f9744aeaa0a6a771dd0ac1d.html">全球最大具身触觉数据集发布，戴盟开源数据助力机器人训练效率提升10倍</a></li>
+          <li><a href="https://biz.haiwainet.cn/n/2026/0423/c3545083-32947702.html">海外网：联合谷歌，戴盟发布数百万小时触觉具身数据集</a></li>
+          <li><a href="https://www.163.com/dy/article/KQT804DT055280CT.html">对话戴盟CEO段江哗：我为何免费开源机器人"胜负手"</a></li>
+          <li><a href="https://www.egsea.com/news/detail/2209478.html">戴盟机器人发布新款遥操作数采系统，直击具身智能高质量训练数据瓶颈</a></li>
+          <li><a href="https://www.tmtnews.tech/archives/53811">TMT新闻：戴盟机器人发布全球首款力/触觉反馈遥操作数据采集系统</a></li>
+          <li><a href="https://www.shujiaowang.cn/home/article/detail.html?id=1260">数据角：前海发布全球最大触觉数据集，加速具身智能产业化</a></li>
+          <li><a href="http://www.robotsci.com.cn/detail/1995696479997661184">机器人科学：港科大系具身机器人公司戴盟获亿元级战略轮融资</a></li>
+          <li><a href="https://www.dutenews.com/n/article/10410594">读特新闻：CES上首发首秀！宝安智造凭实力抢占全球C位</a></li>
+          <li><a href="http://www.sz-qb.com/PC/content/202601/12/content_81643.html">深圳商报：深圳"科技军团"拉斯维加斯集结，圈粉又圈单</a></li>
+          <li><a href="https://guba.eastmoney.com/news,cjpl,1658985191.html">专访戴盟机器人张栋：今年行业的关键，在于谁能跑通商业闭环</a></li>
+          <li><a href="https://www.prnasia.com/mediaroom/25622-1.shtml">美通社：戴盟（深圳）机器人科技有限公司企业新闻室</a></li>
+          <li><a href="https://www.ainet.cn/znw/_01-ABC00000000000368687.shtml">人工智能网：CES 2026重磅首发！戴盟DM-EXton2</a></li>
+          <li><a href="https://m.mp.oeeee.com/a/BAAFRD0000202512021486929.html">南方都市报：戴盟机器人获中国移动亿元级投资，触觉赛道再迎产业巨头入局</a></li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">本页面数据截至2026年5月，来源为公开报道与公司披露信息。具身智能Wiki · 自动分发系统生成</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

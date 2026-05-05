@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>灵御智能 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style></head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> › <span>灵御智能</span></div>
+  <div class="wiki-header"><h1>灵御智能</h1><div class="subtitle">DexTeleop · 2025年成立 · 累计融资近亿元 · 清华系具身智能基础设施企业</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#founders">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financials">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#a1">2.1 团队背景与场景选择</a></li>
+        <li class="toc-lvl4"><a href="#a2">2.2 技术路线与场景适配性</a></li>
+        <li class="toc-lvl4"><a href="#a3">2.3 股东结构对战略影响</a></li>
+        <li class="toc-lvl4"><a href="#a4">2.4 试错与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#a5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#a6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#sources">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">灵御智能</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">北京灵御智能科技有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">英文名</div><div class="ib-value">DexTeleop</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2025年2月</div></div>
+        <div class="ib-row"><div class="ib-label">总部</div><div class="ib-value">北京海淀区</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">累计融资</div><div class="ib-value">近1亿元人民币</div></div>
+        <div class="ib-row"><div class="ib-label">员工人数</div><div class="ib-value">未披露</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">赛道</div><div class="ib-value">具身智能基础设施</div></div>
+        <div class="ib-row"><div class="ib-label">机器人形态</div><div class="ib-value">轮式双臂</div></div>
+        <div class="ib-row"><div class="ib-label">技术路线</div><div class="ib-value">遥操作+数据飞轮</div></div>
+        <div class="ib-section">官网</div>
+        <div class="ib-row"><div class="ib-label">官网</div><div class="ib-value">未公开</div></div>
+      </aside>
+      <p class="article-intro"><strong>灵御智能</strong>（DexTeleop），全称北京灵御智能科技有限公司，成立于2025年2月，是一家清华系具身智能企业。公司聚焦具身智能基础设施建设，以"高性能本体+云端操控混合智能+数据飞轮"三位一体技术架构为核心，主打万元级轮式双臂机器人TeleAvatar及遥操作系统TeleDroid。成立一年内完成三轮融资，累计近亿元人民币，已获得千台级商业订单并斩获CES 2026海外首单。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper"><table class="wikitable infotable">
+        <tr><th>项目</th><th>内容</th></tr>
+        <tr><td>公司全称</td><td>北京灵御智能科技有限公司</td></tr>
+        <tr><td>英文名称</td><td>DexTeleop</td></tr>
+        <tr><td>成立时间</td><td>2025年2月</td></tr>
+        <tr><td>注册地</td><td>北京海淀区</td></tr>
+        <tr><td>上市情况</td><td>未上市</td></tr>
+        <tr><td>官网</td><td>未公开</td></tr>
+        <tr><td>定位</td><td>具身智能基础设施建设者</td></tr>
+        <tr><td>行业标签</td><td>具身智能、遥操作、数据飞轮、轮式双臂机器人</td></tr>
+      </table></div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>时间</th><th>事件</th></tr>
+        <tr><td>2025年2月</td><td>公司成立，总部设于北京海淀区</td></tr>
+        <tr><td>2025年5月</td><td>完成种子轮融资，英诺天使基金领投</td></tr>
+        <tr><td>2025年9月</td><td>完成种子+轮融资，华映资本领投</td></tr>
+        <tr><td>2025年11月</td><td>与苏州穿山甲机器人签署千台级战略合作协议</td></tr>
+        <tr><td>2025年</td><td>入选EAI-100"具身智能·十大落地典范"</td></tr>
+        <tr><td>2026年1月</td><td>携TeleAvatar亮相CES 2026，斩获海外首单</td></tr>
+        <tr><td>2026年3月</td><td>完成天使轮融资，银河创新资本领投</td></tr>
+      </table></div>
+
+      <h3 id="founders">1.2 创始人及核心团队</h3>
+      <p>灵御智能由清华系团队创立，核心人物兼具学术深度与产业经验。团队整体呈现"清华学术派+产业经验型"混合结构，覆盖自动化控制、机器人操作及创投管理等多领域。</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+        <tr><td>联合创始人&CEO</td><td>金戈</td><td>清华大学自动化系学士、清华经管MBA；曾任远镜创投管理合伙人、奥量光子副总裁；兼具创业投资和企业管理经验</td></tr>
+        <tr><td>联合创始人&首席科学家</td><td>莫一林</td><td>清华大学自动化系长聘副教授；师从美国工程院院士、机器人操作先驱Richard M. Murray教授；谷歌学术引用超1万次；2021-2025连续五年入选Elsevier中国高被引学者；发表高水平论文100余篇</td></tr>
+      </table></div>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>轮次</th><th>时间</th><th>金额</th><th>领投方</th><th>跟投/参投方</th></tr>
+        <tr><td>种子轮</td><td>2025年5月</td><td>千万元级</td><td>英诺天使基金</td><td>—</td></tr>
+        <tr><td>种子+轮</td><td>2025年9月</td><td>千万元级</td><td>华映资本</td><td>英诺天使基金、水木清华校友种子基金、远镜创投</td></tr>
+        <tr><td>天使轮</td><td>2026年3月</td><td>数千万元</td><td>银河创新资本</td><td>国海创新资本、天鹰资本、厦门思明科创基金；老股东英诺天使、华映资本、远镜创投持续加注</td></tr>
+      </table></div>
+      <p>累计融资金额近亿元人民币，估值未公开披露。投资方组合以早期科技投资机构为主，英诺天使和华映资本多轮加注表明对公司方向的高度认可。</p>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>技术维度</th><th>说明</th></tr>
+        <tr><td>总体AI架构</td><td>"高性能本体+云端操控混合智能+数据飞轮"三位一体</td></tr>
+        <tr><td>遥操作技术</td><td>TeleDroid遥操作系统，图传延迟控制在100毫秒以内，支持"真远程、零延迟、高精度"操控</td></tr>
+        <tr><td>数据方案</td><td>通过遥操作持续生产高质量、长序列真实世界操作数据，解决具身智能数据稀缺瓶颈</td></tr>
+        <tr><td>智能路径</td><td>L0→L2→L4渐进式智能演进路线，从遥操作辅助逐步过渡到自主操作</td></tr>
+        <tr><td>全栈/专用</td><td>专用路线——不做通用大模型，聚焦"低成本本体+高质量数据采集"基础设施定位</td></tr>
+      </table></div>
+      <p>灵御智能的技术特色在于"不做模型内卷"，而是围绕数据基础设施构建壁垒。其遥操作技术不仅用于远程操控本身，更作为真实世界数据采集的手段，构建数据飞轮闭环，为后续AI能力提升提供燃料。</p>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>产品</th><th>类型</th><th>关键参数</th><th>适用场景</th></tr>
+        <tr><td>TeleAvatar</td><td>万元级轮式双臂机器人本体</td><td>轮式底盘+双臂；价格定位"万元级"；已实现量产交付</td><td>酒店、零售、公共服务、迎宾导览、产品咨询</td></tr>
+        <tr><td>TeleDroid</td><td>软硬云一体化遥操作系统</td><td>图传延迟&lt;100ms；支持远程操控+数据闭环迭代</td><td>数据采集、远程操控、工业巡检</td></tr>
+      </table></div>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>场景分类</th><th>具体应用</th><th>合作伙伴/客户</th></tr>
+        <tr><td>商业服务</td><td>酒店迎宾互动、零售产品导览、公共服务咨询</td><td>穿山甲机器人（千台订单）</td></tr>
+        <tr><td>数据采集</td><td>高价值真实世界操作数据采集</td><td>北美数据采集机构（CES 2026意向合作）</td></tr>
+        <tr><td>智慧物流</td><td>仓储物流场景的远程操控</td><td>海外物流机构（意向合作）</td></tr>
+        <tr><td>连锁零售</td><td>连锁门店智能服务</td><td>海外连锁零售机构（意向合作）</td></tr>
+      </table></div>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>时间</th><th>进展</th></tr>
+        <tr><td>2025年11月</td><td>与苏州穿山甲机器人签署千台级战略合作协议，采购1000台TeleAvatar部署于酒店、零售、公共服务及海外市场</td></tr>
+        <tr><td>2026年1月</td><td>CES 2026首秀，斩获公司成立以来首笔海外销售订单；来自数据采集、智慧物流、连锁零售等领域的十余家海外机构表达合作意向</td></tr>
+        <tr><td>2025年度</td><td>入选EAI-100"具身智能·十大落地典范"</td></tr>
+      </table></div>
+      <p>商业模式设计为"卖本体→卖数据→卖能力"三步走。当前处于第一阶段，通过高性价比本体快速铺量，积累数据资产。</p>
+
+      <h3 id="financials">1.8 财务数据</h3>
+      <p>公司成立于2025年2月，运营不足一年半，处于早期商业化阶段，未公开披露财务数据。主要收入来源预计为TeleAvatar本体销售及穿山甲机器人千台订单交付。截至2026年3月累计融资近亿元人民币，资金储备可支撑研发与市场拓展。</p>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>CEO金戈兼任远镜创投管理合伙人背景，使公司在资本运作和融资节奏把握上具备独特优势</li>
+        <li>首席科学家莫一林师从机器人操作领域权威Richard M. Murray，技术基因深厚</li>
+        <li>CES 2026首秀标志着公司从中国本土走向全球化的第一步</li>
+        <li>公司在具身智能赛道中的差异化定位是"不做模型内卷，做底层数据基础设施"</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="a1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>灵御智能的创始团队呈现典型的"技术权威+资本操盘"组合。首席科学家莫一林在机器人控制理论领域有深厚积累，师从操作领域先驱Richard M. Murray，其学术背景与遥操作技术方向高度匹配。CEO金戈的创投背景则使公司在融资节奏和商业路径上更为老练。团队选择商业服务场景（酒店、零售）作为切入点，而非更高技术门槛的工业制造场景，这一选择与团队规模及早期资源禀赋相适应——以万元级高性价比产品降低客户试错成本，快速获取部署规模和真实场景数据。</p>
+      </div>
+
+      <div class="analysis-block" id="a2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>灵御智能的"遥操作+数据飞轮"路线与商业服务场景有天然的适配逻辑：商业服务场景对自主性要求相对较低（允许人机共驾），但对成本敏感度高。万元级轮式双臂本体大幅降低了部署门槛。更关键的是，遥操作系统的本质是数据生产工具——每次远程操控都在生成高质量操作数据，这些数据可以训练更强的自主模型，形成"更多部署→更多数据→更强AI→更多部署"的正循环。这一路线避开了当前具身智能大模型能力不足的瓶颈，采用了务实的渐进式智能路径。</p>
+      </div>
+
+      <div class="analysis-block" id="a3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>灵御智能的投资方以早期科技VC为主（英诺天使、华映资本、银河创新资本等），暂无产业资本介入。这种财务投资者主导的股东结构赋予公司较高的战略独立性，可以选择不被特定产业场景绑定的发展路径。但这也意味着公司需要自行开拓场景合作伙伴（如穿山甲机器人），缺乏产业资本自带订单的优势。厦门思明科创基金的参与可能为公司东南沿海区域拓展提供一定的政府资源支持。</p>
+      </div>
+
+      <div class="analysis-block" id="a4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>灵御智能成立仅一年，目前尚未观察到明显的战略转向或产品线调整。公司从创立之初就定位"具身智能基础设施"，以遥操作为技术主线，这一方向保持了连贯性。值得关注的是，公司在CES 2026后开始接触海外数据采集、智慧物流等新场景，暗示可能从国内商业服务向海外工业数据服务延伸。但这一拓展尚处于早期，尚未构成实质性的路径调整。</p>
+      </div>
+
+      <div class="analysis-block" id="a5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>灵御智能的核心取舍非常清晰：不做通用人形机器人的大模型竞赛，不追求全自主操作能力，而是做"数据基础设施层"。这一定位类似AI时代的"数据石油提供商"——卖铲子而非淘金。在行业普遍追求大模型参数和全自主能力的背景下，灵御智能选择了更底层、更务实的路径。万元级定价策略也是重要取舍：牺牲单台毛利换取快速铺量和数据资产积累，这需要资本端的耐心配合。</p>
+      </div>
+
+      <div class="analysis-block" id="a6">
+        <h4>2.6 其他重要观察、分析</h4>
+        <p>灵御智能的"穿山甲机器人千台订单"是其商业化的重要里程碑，但穿山甲机器人自身是机器人行业公司而非终端用户，这意味着订单的最终消化取决于穿山甲在其客户网络中的部署能力。此外，公司在CES 2026斩获的"海外首单"未披露具体金额和客户名称，实际海外商业化进度有待验证。公司目前处于从"技术叙事"向"商业验证"转换的关键阶段，2026年的千台交付和海外订单落地质量将是决定下一轮估值的关键变量。</p>
+      </div>
+
+      <h2 id="sources">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://www.163.com/dy/article/KO4TACLU05118HJE.html" target="_blank">清华系具身智能企业灵御智能完成数千万元天使轮融资 — 网易</a></li>
+          <li><a href="http://www.investorscn.com/2026/03/26/128330/" target="_blank">灵御智能完成数千万元天使轮融资，发力具身智能基础设施 — 投资者网</a></li>
+          <li><a href="https://m.lieyunpro.com/archives/500709" target="_blank">清华系具身智能企业灵御智能完成数千万元天使轮融资 — 猎云网</a></li>
+          <li><a href="https://www.itheat.com/index.php/view/58908.html" target="_blank">灵御智能TeleAvatar首秀拉斯维加斯：斩获海外首单 — IT热点资讯</a></li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">本页面由具身智能Wiki维护，最后更新于2026年5月。内容基于公开资料整理，仅供参考。</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

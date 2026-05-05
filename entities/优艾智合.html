@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>优艾智合 — 具身智能Wiki</title><style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style></head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a><span class="breadcrumb-sep"> › </span><span>优艾智合</span></div>
+  <div class="wiki-header"><h1>优艾智合</h1><div class="subtitle">Youibot · 港股递表(18C) · 2017年成立 · 2025年营收3.40亿 · 全球工业移动操作机器人第一</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#founders">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#finance">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#an1">2.1 团队背景与场景选择的匹配度</a></li>
+        <li class="toc-lvl4"><a href="#an2">2.2 技术路线与场景的适配性</a></li>
+        <li class="toc-lvl4"><a href="#an3">2.3 股东/资本结构对战略的影响</a></li>
+        <li class="toc-lvl4"><a href="#an4">2.4 试错过程与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#an5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#an6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#refs">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">优艾智合</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">合肥优艾智合机器人股份有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">英文</div><div class="ib-value">Youibot Robotics Co., Ltd.</div></div>
+        <div class="ib-row"><div class="ib-label">成立</div><div class="ib-value">2017年5月</div></div>
+        <div class="ib-row"><div class="ib-label">总部</div><div class="ib-value">合肥（深圳/湖州/苏州设子公司）</div></div>
+        <div class="ib-row"><div class="ib-label">创始人</div><div class="ib-value">张朝辉（CEO，1992年生）</div></div>
+        <div class="ib-row"><div class="ib-label">员工人数</div><div class="ib-value">约416人（研发144人，34.6%）</div></div>
+        <div class="ib-section">财务数据</div>
+        <div class="ib-row"><div class="ib-label">2025年营收</div><div class="ib-value">3.40亿元</div></div>
+        <div class="ib-row"><div class="ib-label">2025年毛利率</div><div class="ib-value">36.5%</div></div>
+        <div class="ib-row"><div class="ib-label">2025年净亏损</div><div class="ib-value">3.84亿元</div></div>
+        <div class="ib-row"><div class="ib-label">现金储备</div><div class="ib-value">约2.43亿元（2025年底）</div></div>
+        <div class="ib-section">估值/IPO</div>
+        <div class="ib-row"><div class="ib-label">上市前估值</div><div class="ib-value">约18.6亿元</div></div>
+        <div class="ib-row"><div class="ib-label">上市后估值</div><div class="ib-value">约20.8亿元</div></div>
+        <div class="ib-row"><div class="ib-label">IPO状态</div><div class="ib-value">港股18C章二次递表（2026.3.31）</div></div>
+        <div class="ib-section">市场地位</div>
+        <div class="ib-row"><div class="ib-label">全球排名</div><div class="ib-value">工业移动操作机器人第一（6.1%）</div></div>
+        <div class="ib-row"><div class="ib-label">中国排名</div><div class="ib-value">移动操作机器人第一（7.1%）</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">行业</div><div class="ib-value"><span class="tag tag-info">工业机器人</span><span class="tag tag-info">移动操作机器人</span><span class="tag tag-info">具身智能</span></div></div>
+        <div class="ib-row"><div class="ib-label">官网</div><div class="ib-value"><a href="https://www.youibot.com" target="_blank">youibot.com</a></div></div>
+        <div class="ib-row"><div class="ib-label">技术路线</div><div class="ib-value">一脑多态·MAIC具身智能大模型</div></div>
+      </aside>
+
+      <p class="article-intro"><strong>优艾智合</strong>（Youibot），全称合肥优艾智合机器人股份有限公司，是一家中国工业具身智能科技公司，专注于移动操作机器人及解决方案的研发与商业化。公司由西安交通大学4名90后博士于2017年创立，以"一脑多态"MAIC（Mobile AI Comprehension）具身智能模型为核心技术架构，产品覆盖工业物流与巡检运维两大业务线，并已推出人形机器人矩阵"天演"系列。按2024年收入计，优艾智合在全球工业移动操作机器人市场排名第一（弗若斯特沙利文）。公司经历9轮融资，上市前估值约20.8亿元，目前正在冲刺港股"移动操作机器人第一股"。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper">
+        <table class="wikitable infotable">
+          <tr><th>项目</th><th>内容</th></tr>
+          <tr><td>公司全称</td><td>合肥优艾智合机器人股份有限公司</td></tr>
+          <tr><td>英文名称</td><td>Youibot Robotics Co., Ltd.</td></tr>
+          <tr><td>成立时间</td><td>2017年5月</td></tr>
+          <tr><td>注册地</td><td>安徽省合肥市</td></tr>
+          <tr><td>总部地址</td><td>合肥市肥东县（深圳龙岗、浙江湖州、江苏苏州设子公司）</td></tr>
+          <tr><td>上市情况</td><td>港股18C章递表（2026年3月31日二次递表，独家保荐人中金公司）</td></tr>
+          <tr><td>股票代码</td><td>待定</td></tr>
+          <tr><td>官网</td><td><a href="https://www.youibot.com" target="_blank">www.youibot.com</a></td></tr>
+          <tr><td>企业资质</td><td>国家级专精特新"小巨人"企业、国家高新技术企业</td></tr>
+        </table>
+      </div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>时间</th><th>事件</th></tr>
+          <tr><td>2017年5月</td><td>张朝辉与3名西交大同门在深圳华强北创立优艾智合</td></tr>
+          <tr><td>2017年</td><td>完成种子轮融资（西交一八九六资本/HAX/PNP）</td></tr>
+          <tr><td>2018年</td><td>完成天使轮融资（西交一八九六资本/英诺天使基金）</td></tr>
+          <tr><td>2020年</td><td>完成Pre-A/A/A+轮（蓝驰创投/SIG海纳亚洲/真格基金等）</td></tr>
+          <tr><td>2021年</td><td>完成B/B+/B++轮（软银亚洲/IDG资本/SIG等），同年入选深圳"专精特新"</td></tr>
+          <tr><td>2023-2024年</td><td>完成B++后续轮及C轮融资（合肥东城产投/吴兴人才产业集团/松禾资本），C轮14亿元创行业纪录</td></tr>
+          <tr><td>2024年11月</td><td>与西安交大联合成立"优艾智合-西安交大具身智能机器人研究院"</td></tr>
+          <tr><td>2025年</td><td>总部正式落户合肥肥东；日本子公司成立；发布人形机器人"凌枢""巡霄"</td></tr>
+          <tr><td>2025年7月</td><td>完成C+轮融资（松禾资本）</td></tr>
+          <tr><td>2025年9月26日</td><td>首次向港交所递交上市申请（18C章）</td></tr>
+          <tr><td>2026年3月31日</td><td>更新招股书，二次递表港交所</td></tr>
+        </table>
+      </div>
+
+      <h3 id="founders">1.2 创始人及核心团队</h3>
+      <p>优艾智合由4名西安交通大学机器人学实验室同门于2017年联合创立，核心创始人至今全部在职。团队被市场广泛定性为"学院派"创业公司，人才结构以学术驱动为核心、产业经验为补充的混合型人才队伍。截至2025年，公司员工总数约416人，其中研发人员144人，占员工总数的34.6%，平均工作经验约7.5年。</p>
+
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+          <tr><td>创始人/CEO/董事会主席</td><td>张朝辉</td><td>1992年生，安徽宿州人，西安交大机械工程博士研究生（在读）；福布斯亚洲U30；2025年福布斯中国新时代颠覆力创始人；中国自动化学会制造系统控制专业委员会副秘书长</td></tr>
+          <tr><td>联合创始人/CTO</td><td>边旭</td><td>32岁，西安交大校友，入选福布斯中国U30；负责公司技术架构与产品研发</td></tr>
+          <tr><td>联合创始人</td><td>许瑨</td><td>西安交大校友，入选福布斯中国U30；负责产品方向</td></tr>
+          <tr><td>联合创始人/首席科学家</td><td>赵万秋</td><td>西安交大校友，入选2024年度"36Under36科学家型创业者"</td></tr>
+          <tr><td>执行董事/副总经理</td><td>郑昊</td><td>2018年加入；曾任米其林（中国）孵化器CTO、欧唯特信息系统项目经理</td></tr>
+          <tr><td>执行董事/首席战略官</td><td>梅婉箐</td><td>2020年加入；曾任大疆企业发展经理</td></tr>
+          <tr><td>首席科学家/顾问</td><td>梅雪松</td><td>西安交大教授、长江学者特聘教授、陕西省智能机器人重点实验室主任、国家重大项目专家组成员</td></tr>
+        </table>
+      </div>
+      <p>团队特点：四位创始人均出自西安交大同一实验室，师从梅雪松教授，核心研究课题为移动机器人自主定位与导航。公司核心技术（高精度SLAM导航）直接源于实验室成果的产业化转化。后期引入的产业背景高管（郑昊来自米其林、梅婉箐来自大疆）为团队补充了制造业/消费电子行业的商业经验。</p>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <h4>融资历史</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>轮次</th><th>时间</th><th>主要投资方</th><th>金额</th></tr>
+          <tr><td>种子轮</td><td>2017年</td><td>西交一八九六资本、HAX、PNP</td><td>百万元级</td></tr>
+          <tr><td>天使轮</td><td>2018年</td><td>西交一八九六资本、英诺天使基金</td><td>—</td></tr>
+          <tr><td>Pre-A/A/A+</td><td>2020年</td><td>蓝驰创投、SIG海纳亚洲、真格基金等</td><td>—</td></tr>
+          <tr><td>B/B+/B++</td><td>2021年</td><td>软银亚洲、IDG资本、SIG、方广资本等</td><td>—</td></tr>
+          <tr><td>B++后续轮</td><td>2023年</td><td>合肥东城产投、吴兴人才产业集团</td><td>—</td></tr>
+          <tr><td>C轮</td><td>2024年</td><td>合肥东城产投、吴兴人才产业集团</td><td>14亿元（行业纪录）</td></tr>
+          <tr><td>C+轮</td><td>2025年7月</td><td>松禾资本</td><td>—</td></tr>
+        </table>
+      </div>
+      <p>累计完成9轮融资，总融资额近20亿元人民币。2024年C轮14亿元创下工业移动操作机器人领域单笔融资纪录。</p>
+
+      <h4>主要股东结构（IPO前）</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>股东</th><th>持股比例</th><th>性质</th></tr>
+          <tr><td>一致行动人集团（张朝辉+西安优艾+梅雪松+边旭）</td><td>约28.53%</td><td>创始团队控制</td></tr>
+          <tr><td>SIG海纳亚洲</td><td>11.51%</td><td>领航资深独立投资者</td></tr>
+          <tr><td>蓝驰创投</td><td>7.26%</td><td>领航资深独立投资者</td></tr>
+          <tr><td>SOSV实体</td><td>6.48%</td><td>财务投资者</td></tr>
+          <tr><td>松禾资本</td><td>6.18%</td><td>财务投资者</td></tr>
+          <tr><td>SBVA（软银亚洲）</td><td>5.22%</td><td>财务投资者</td></tr>
+          <tr><td>北京新动力</td><td>5.18%</td><td>产业/国资</td></tr>
+          <tr><td>方广资本</td><td>4.35%</td><td>财务投资者</td></tr>
+          <tr><td>真格基金（真格景源）</td><td>4.33%</td><td>财务投资者</td></tr>
+          <tr><td>IDG中国（Sharp Dynasty）</td><td>未公开</td><td>财务投资者</td></tr>
+          <tr><td>英诺天使基金</td><td>2.10%</td><td>财务投资者</td></tr>
+        </table>
+      </div>
+
+      <div class="callout">
+        <div class="callout-title">IPO进展</div>
+        <p>2025年9月26日首次递表港交所主板（18C章），6个月有效期届满失效。2026年3月31日更新2025年全年财务数据后二次递表，独家保荐人为中金公司。募资用途包括：推进具身智能技术研发、多功能中心建设升级、国际市场拓展、产业链战略联盟及并购机会、补充营运资金。</p>
+      </div>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <div class="table-wrapper">
+        <table class="wikitable infotable">
+          <tr><th>维度</th><th>详情</th></tr>
+          <tr><td>总体AI技术</td><td>"一脑多态"MAIC（Mobile AI Comprehension）工业具身智能模型，采用多模态大模型与混合专家架构（VLM+MoE），实现跨场景学习与迁移</td></tr>
+          <tr><td>数据方案</td><td>"Data Ocean"海量真实工业数据集，基于600+工业场景落地项目积累；自研数据采集与标注方案</td></tr>
+          <tr><td>感知与导航</td><td>高精度SLAM激光/视觉融合导航技术（源自西安交大实验室）；多传感器融合感知</td></tr>
+          <tr><td>操作能力</td><td>移动操作一体化，复合机器人自主作业（移动底盘+机械臂协同）</td></tr>
+          <tr><td>全栈/专用路线</td><td>全栈自研——从底层SLAM导航算法到上层MAIC大模型，再到人形/轮式/复合多种硬件形态</td></tr>
+          <tr><td>软硬件协同</td><td>自研YOUI TMS（物流调度系统）和YOUI INS（巡检系统）软件平台</td></tr>
+        </table>
+      </div>
+      <p>"一脑多态"是优艾智合的核心技术概念——"一脑"指统一的MAIC具身智能大脑，可在多种硬件形态（"多态"：移动操作机器人、轮式人形、双足人形等）之间迁移复用。该架构旨在实现跨场景集群作业——同一AI模型同时调度半导体洁净室内的物流机器人、能源配电房内的巡检人形机器人等不同终端。</p>
+      <p>公司累计研发投入超2.5亿元（2022-2025H1），2025年全年研发投入8,302万元（占收入24.44%）。拥有217项中国注册专利（含30项发明专利、134项实用新型专利）、1项海外专利、约130项在申请专利、67项软件著作权。</p>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>产品分类</th><th>子类</th><th>主要型号</th><th>参数/特点</th><th>主要场景</th></tr>
+          <tr><td rowspan="2">工业物流</td><td>移动操作机器人</td><td>OW系列、ATS系列</td><td>自主导航+机械臂操作；半导体/锂电洁净室兼容</td><td>半导体晶圆搬运、锂电产线物料转运、3C制造</td></tr>
+          <tr><td>调度软件</td><td>YOUI TMS</td><td>多机器人协同调度；对接MES/WMS</td><td>工厂级物流调度</td></tr>
+          <tr><td rowspan="3">巡检运维</td><td>室内轮式机器人</td><td>—</td><td>配电机房操作；防爆/高防护等级</td><td>能源配电间、化工巡检</td></tr>
+          <tr><td>室外轮式机器人</td><td>—</td><td>户外复杂环境作业</td><td>公用事业设施巡检</td></tr>
+          <tr><td>巡检软件</td><td>YOUI INS</td><td>多传感器数据融合分析；预测性维护</td><td>能源/化工/公用事业设施管理</td></tr>
+          <tr><td rowspan="2">天演系列<br>（人形机器人）</td><td>轮式人形</td><td>巡霄</td><td>轮式底盘+仿人上肢；Sub-FAB运维/配电操作</td><td>半导体洁净室下层运维、能源设施操作</td></tr>
+          <tr><td>双足人形</td><td>凌枢</td><td>身高1.66m/体重40kg/33自由度；2025年8月合肥首发</td><td>半导体/能源行业跨场景集群作业</td></tr>
+        </table>
+      </div>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>场景分类</th><th>具体场景</th><th>代表客户</th><th>场景特色</th></tr>
+          <tr><td rowspan="2">工业制造</td><td>半导体晶圆制造</td><td>全球前三大晶圆代工厂中的两家（含台积电）、中芯国际、华天科技</td><td>高洁净度要求，AMHS替代，晶圆搬运自动化</td></tr>
+          <tr><td>锂电/3C制造</td><td>头部锂电企业、3C电子代工厂</td><td>产线柔性物流，多品种小批量场景</td></tr>
+          <tr><td rowspan="2">能源化工</td><td>电力配电运维</td><td>中国头部电网集团</td><td>高风险设施无人化巡检与操作</td></tr>
+          <tr><td>化工设施巡检</td><td>头部能源/化工企业</td><td>防爆环境巡检，替代人工作业</td></tr>
+          <tr><td>公用事业</td><td>基础设施巡检</td><td>—</td><td>室外/室内混合场景</td></tr>
+          <tr><td>商业服务</td><td>国际物流</td><td>米其林、Meta、DHL</td><td>仓储物流自动化</td></tr>
+        </table>
+      </div>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <p>优艾智合是具身智能赛道商业化落地最为扎实的企业之一。截至2025年底，公司已覆盖30多个国家和地区，累计服务400多家行业领先企业（含50多家《财富》500强），累计完成600多个工业场景落地项目。</p>
+
+      <div class="table-wrapper">
+        <table class="wikitable infotable">
+          <tr><th>指标</th><th>数据</th></tr>
+          <tr><td>累计服务客户</td><td>400+家（含50+家《财富》500强）</td></tr>
+          <tr><td>累计项目数</td><td>600+个工业场景</td></tr>
+          <tr><td>覆盖国家/地区</td><td>30+（中日韩德等，日本东京设子公司）</td></tr>
+          <tr><td>全球渠道合作伙伴</td><td>60+家（含山善、日本机材、Daido等）</td></tr>
+          <tr><td>生产基地</td><td>湖州/合肥/深圳三大基地</td></tr>
+          <tr><td>合肥总部满产年产值</td><td>预计16亿元</td></tr>
+          <tr><td>客户复购率（2024年）</td><td>半导体83%/锂电92%/3C及其他83%，整体超70%</td></tr>
+          <tr><td>人形机器人订单</td><td>2025年已推出人形机器人解决方案并录得首批订单</td></tr>
+        </table>
+      </div>
+      <p>人形机器人业务：2025年8月发布"凌枢"双足人形机器人及"巡霄"轮式人形机器人，并于2025年8月携"巡霄"亮相首届世界人形机器人运动会开幕式。2025年已开始录得人形机器人订单，标志着从移动操作机器人向人形机器人赛道正式延伸。</p>
+
+      <h3 id="finance">1.8 财务数据</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>指标</th><th>2022年</th><th>2023年</th><th>2024年</th><th>2025年</th></tr>
+          <tr><td>营业收入</td><td>0.78亿元</td><td>1.08亿元</td><td>2.55亿元</td><td>3.40亿元</td></tr>
+          <tr><td>同比增长</td><td>—</td><td>+38.5%</td><td>+136.7%</td><td>+33.3%</td></tr>
+          <tr><td>毛利</td><td>0.09亿元</td><td>0.28亿元</td><td>0.90亿元</td><td>1.24亿元</td></tr>
+          <tr><td>毛利率</td><td>11.2%</td><td>26.1%</td><td>35.2%</td><td>36.5%</td></tr>
+          <tr><td>净亏损</td><td>—</td><td>2.60亿元</td><td>2.00亿元</td><td>3.84亿元</td></tr>
+          <tr><td>经调整净亏损</td><td>—</td><td>1.31亿元</td><td>0.81亿元</td><td>1.06亿元</td></tr>
+          <tr><td>研发开支</td><td>—</td><td>0.67亿元</td><td>0.62亿元</td><td>0.83亿元</td></tr>
+        </table>
+      </div>
+      <p>三年收入复合增长率约80.3%（2022-2024年为80.9%），毛利率从2022年11.2%持续提升至2025年36.5%。但亏损问题突出：2025年净亏损扩大至3.84亿元（同比+92%），累计亏损总额已达11.82亿元（截至2025年6月）。截至2025年底，公司持有现金及现金等价物约2.43亿元，经营性现金流持续为负（2025年全年-1.85亿元）。</p>
+      <p>收入结构（2025年）：工业物流解决方案2.02亿元（59.4%），巡检运维解决方案1.38亿元（40.6%）。行业维度（2025上半年）：能源化工34.9%、半导体27.1%、锂电池约25%、3C及其他制造业/公用事业约13%。</p>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>国家级专精特新"小巨人"企业，国家高新技术企业。</li>
+        <li>2025年启动"产教融合实践中心建设项目"（通过子公司上海优艾博特具身智能科技有限公司运营），面向全国招募合作院校及伙伴。</li>
+        <li>公司名称"优艾智合"来源于英文YOU I BOT，寓意"你、我、机器人"协同共生。</li>
+        <li>发展路径被总结为"起于西安、长于深圳、成于合肥"。</li>
+        <li>早期标杆项目：全球首款商用车辆巡检机器人ARIS-V拿下米其林百万订单；海关危化品检测机器人。</li>
+        <li>2026年产教融合实践中心覆盖六大维度：培养方案研制、教学资源开发、双师团队打造、实训基地建设、国际交流合作、合作模式创新。</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="an1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>优艾智合是典型的"学院派"创业公司，四位联合创始人全部出自西安交大梅雪松教授实验室，核心研究方向为移动机器人SLAM自主导航。这一学术背景与公司早期选定工业巡检和物流场景实现了高度匹配——SLAM导航技术正好解决工厂/能源设施中的自主移动需求。创始人张朝辉在读机器人学博士，团队带有以学术创新驱动产业落地的价值观，这也解释了公司为何愿意在研发上持续高投入（研发占收入比24.44%）。但学术团队的一个天然短板是缺乏产业订单资源和大客户销售经验，公司后续引入来自米其林和大疆的产业高管（郑昊/梅婉箐）正是在弥补这一缺口。总体来看，团队"移动机器人导航"的学术专长→"工业物流/巡检"的场景选择路径清晰，匹配度较高。</p>
+      </div>
+
+      <div class="analysis-block" id="an2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>"一脑多态"MAIC架构在理论上非常适合半导体和能源两大场景的跨品类渗透——半导体洁净室需要轮式移动操作机器人搬运晶圆，能源配电间需要人形/轮式机器人执行开关柜操作，而MAIC的跨形态迁移能力使同一AI大脑可以调度这些不同硬件。但该路线面临的实际挑战也很明显：工业场景对精度和可靠性要求极高（半导体洁净室容错率近乎零），大模型在当前阶段仍存在幻觉和不可解释性问题，如何在"具身智能"的灵活性与工业级的确定性之间取得平衡是核心考验。此外，"Data Ocean"依赖600+项目积累的真实数据，这使得公司在扩展全新场景时需要先经历一段部署学习期，一定程度上制约了新品类的快速铺开。</p>
+      </div>
+
+      <div class="analysis-block" id="an3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>优艾智合的股东结构呈现出"创始人控制+顶级VC+地方国资"的三层格局。一致行动人集团控制28.53%投票权确保了创始团队的战略主导权。合肥东城产投（地方国资）和吴兴人才产业集团（湖州国资）的入股直接绑定了两大生产基地（合肥总部、湖州基地），形成"国资出地+企业出技术"的重资产绑定模式，这在一定程度上锁定了公司的区域重心。另一方面，SIG、蓝驰、软银亚洲、IDG、真格等顶级VC作为纯财务投资者，对公司战略方向的影响力有限但提供了资本背书。值得注意的是，公司股东中没有产业资本（如半导体厂商、能源集团），这意味着优艾智合在面对客户时有较强的独立性，不绑定任何单一产业方的场景资源——但同时也意味着所有客户关系均需从零自建。</p>
+      </div>
+
+      <div class="analysis-block" id="an4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>优艾智合的路径调整有一个清晰的特征：从"点状项目"→"双赛道聚焦"→"人形升级"。创业初期，公司产品线较杂——车辆巡检、海关检测、安防巡检等多点开花。随着2019-2020年半导体和锂电行业需求爆发，公司迅速收敛至"工业物流+巡检运维"双赛道，并以半导体和能源化工为核心行业。2025年发布人形机器人"凌枢""巡霄"是其最显著的战略升级——从移动操作机器人向人形机器人延伸。这一调整的逻辑是合理的：公司现有客户（半导体厂、能源设施）恰好也是人形机器人优先落地的场景，利用已有客户关系和行业Know-how进行品类拓展，边际成本较低。但人形机器人赛道竞争激烈且商业化周期尚早，这一路径调整的实际回报尚需时间验证。</p>
+      </div>
+
+      <div class="analysis-block" id="an5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>优艾智合在具身智能行业的定位是"移动操作机器人务实派"——不走C端消费路线，不追求通用人形机器人，而是以工业场景为锚点，在半导体和能源两个垂直行业做深做透。"一脑多态"战略使其兼顾硬件多样性和软件平台化，属于"全栈+垂直深耕"的混合路线。与优必选（重C端+教育）、越疆（协作机械臂）、极智嘉（仓储物流）等竞品相比，优艾智合最鲜明的取舍是"锁定工业B端+双行业聚焦"，放弃广撒网的行业覆盖策略。这一取舍在2024年全球工业移动操作机器人第一的市场地位上得到了阶段性验证，但也意味着其成长天花板受制于目标行业的扩产周期和自动化升级节奏。</p>
+      </div>
+
+      <div class="analysis-block" id="an6">
+        <h4>2.6 其他重要观察</h4>
+        <p>优艾智合面临的最突出挑战是"高增长伴随高亏损"的二元局面——2025年营收3.40亿元同比增长33%，但净亏损3.84亿元同比扩大92%。三年半累计烧掉11.82亿元，账面现金仅剩2.43亿元，在经营性现金流持续为负的背景下，若港股IPO再度失效，公司将面临较大的资金链压力。客户集中度风险同样值得关注——2025年上半年前五大客户贡献收入46.5%，最大客户占比25.0%，这意味着丢失任何关键客户均可能对业绩产生显著冲击。人形机器人是公司最新的战略方向，从"移动操作机器人第一股"转向"人形机器人+移动操作"双线叙事，短期能提升资本市场关注度，但长期需证明人形机器人在工业场景中的实际投入产出比。</p>
+      </div>
+
+      <h2 id="refs">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://www.chinaventure.com.cn/news/114-20251010-388309.html" target="_blank">投中网——估值超20亿，4名90后西交大校友冲刺港股IPO</a></li>
+          <li><a href="https://finance.eastmoney.com/a/202509293526643424.html" target="_blank">东方财富——优艾智合递表港交所 营收高增长与减亏并行</a></li>
+          <li><a href="https://www.cls.cn/detail/2158513" target="_blank">财联社——"移动操作机器人第一股"或将诞生！优艾智合冲刺港股IPO</a></li>
+          <li><a href="https://www.donews.com/news/detail/4/6496125.html" target="_blank">DoNews——优艾智合更新IPO招股书：2025年营收增33%</a></li>
+          <li><a href="https://www.donews.com/news/detail/8/6496134.html" target="_blank">DoNews——优艾智合更新招股书冲刺港交所</a></li>
+          <li><a href="https://news.10jqka.com.cn/20260331/c675671750.shtml" target="_blank">同花顺——优艾智合递表港交所 在全球及中国移动操作机器人市场中排名第一</a></li>
+          <li><a href="https://m.rccaijing.com/news-7377976541454201880.html" target="_blank">日经中文网——优艾智合闯关港交所：估值20.8亿</a></li>
+          <li><a href="https://s.lanjinger.com/de/1759930973287410602.html" target="_blank">蓝鲸财经——机器人再冲港交所，优艾智合能否破行业困局？</a></li>
+          <li><a href="https://finance.sina.cn/cj/2025-10-27/detail-infvhvut5395188.d.html" target="_blank">新浪财经——优艾智合：7年"烧光"11.82亿，资金链或已亮起"红灯"</a></li>
+          <li><a href="https://www.stcn.com/article/detail/3363880.html" target="_blank">证券时报——移动操作机器人第一股来了？优艾智合冲刺港股</a></li>
+          <li><a href="http://m.nbd.com.cn/articles/2025-09-29/4079360.html" target="_blank">每日经济新闻——西交大校友，"闯关"港股IPO</a></li>
+          <li><a href="http://www.ce.cn/xwzx/gnsz/gdxw/202510/t20251017_2521469.shtml" target="_blank">中国经济网——90后安徽小伙机器人创业8年，闯关港交所</a></li>
+          <li><a href="https://www.chnfund.com/article/AR7324d0cc-b4de-1dd7-6649-3a1ca2dd5835" target="_blank">中国基金报——优艾智合冲刺港股IPO，2024年以收入计排名全球第一</a></li>
+          <li><a href="https://lieyunpro.com/archives/498908" target="_blank">猎云网——估值超20亿，4名90后西交大校友冲刺港股IPO</a></li>
+          <li><a href="https://zidonghua.com.cn/news/newproduct/75292.html" target="_blank">自动化网——人形机器人凌枢全球首发，工业具身智能迈入跨场景集群作业时代</a></li>
+          <li><a href="https://www.jiemian.com/article/13134380.html" target="_blank">界面新闻——全球首发！优艾智合"凌枢"人形机器人在合肥亮相</a></li>
+          <li><a href="https://www.bjnews.com.cn/detail/1755236793129985.html" target="_blank">新京报——优艾智合巡霄亮相首届世界人形机器人运动会开幕式</a></li>
+          <li><a href="https://baike.baidu.com/item/张朝辉/54354442" target="_blank">百度百科——张朝辉</a></li>
+          <li><a href="https://leaderobot.com/news/4327" target="_blank">Leaderobot——为上市做准备？西交大孵化优艾智合完成C轮融资</a></li>
+          <li><a href="https://zh.youibot.com/news/180.html" target="_blank">优艾智合官网——"巡霄"亮相首届世界人形机器人运动会</a></li>
+          <li><a href="https://www.finet.hk/newscenter/news_content/68db29a55a771272ee2a670c" target="_blank">财华社——港股18C再迎一家头部机器人企业</a></li>
+          <li><a href="https://zhineng518.com/page108?article_id=10423" target="_blank">智能518——优艾智合日本子公司成立，加速推进国际化布局</a></li>
+          <li><a href="https://finance.sina.cn/2026-03-14/detail-inhqxfkv3581480.d.html" target="_blank">新浪财经——优艾智合产教融合实践中心建设项目正式启动</a></li>
+          <li><a href="https://www.sohu.com/a/1004909036_430392" target="_blank">搜狐——优艾智合冲刺港股：年营收3.4亿亏3.8亿</a></li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">本页面最后更新于2026年5月4日 · 数据来源截至公司2026年3月31日二次递表招股书 · 具身智能Wiki</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

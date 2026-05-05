@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>蓝芯科技 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> <span class="breadcrumb-sep">›</span> <span>蓝芯科技</span></div>
+  <div class="wiki-header"><h1>蓝芯科技</h1><div class="subtitle">Lanxin Robotics · 成立于2016年 · 3D视觉移动机器人 · 专精特新小巨人 · C+轮</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#founder">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#product">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenario">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financial">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#others">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl3"><a href="#a21">2.1 团队背景与场景匹配</a></li>
+        <li class="toc-lvl3"><a href="#a22">2.2 技术路线与场景适配</a></li>
+        <li class="toc-lvl3"><a href="#a23">2.3 股东/资本结构的影响</a></li>
+        <li class="toc-lvl3"><a href="#a24">2.4 试错与路径调整</a></li>
+        <li class="toc-lvl3"><a href="#a25">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl3"><a href="#a26">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#refs">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">蓝芯科技</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">杭州蓝芯机器人技术股份有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">英文名</div><div class="ib-value">Lanxin Robotics</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2016年6月</div></div>
+        <div class="ib-row"><div class="ib-label">总部</div><div class="ib-value">浙江杭州余杭区</div></div>
+        <div class="ib-row"><div class="ib-label">创始人/CEO</div><div class="ib-value">高勇</div></div>
+        <div class="ib-section">融资与估值</div>
+        <div class="ib-row"><div class="ib-label">最新轮次</div><div class="ib-value">C+轮（2025.05）</div></div>
+        <div class="ib-row"><div class="ib-label">C+轮金额</div><div class="ib-value">数亿元人民币</div></div>
+        <div class="ib-row"><div class="ib-label">C+轮领投</div><div class="ib-value">鲲鹏基金</div></div>
+        <div class="ib-row"><div class="ib-label">累计融资</div><div class="ib-value">超2.15亿元（已披露）</div></div>
+        <div class="ib-row"><div class="ib-label">投后估值</div><div class="ib-value">约15亿元（估算）</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">员工规模</div><div class="ib-value">300+人，研发45%</div></div>
+        <div class="ib-row"><div class="ib-label">营收CAGR</div><div class="ib-value">80%+（2019-2024）</div></div>
+        <div class="ib-row"><div class="ib-label">全球客户</div><div class="ib-value">1000+家，覆盖30+国</div></div>
+        <div class="ib-section">官网</div>
+        <div class="ib-row"><div class="ib-label">网站</div><div class="ib-value">www.lanxincn.com</div></div>
+      </aside>
+
+      <p class="article-intro">蓝芯科技（杭州蓝芯机器人技术股份有限公司）成立于2016年，总部位于浙江杭州，是国内3D视觉感知移动机器人的开创者和领导品牌。公司由中科院自动化所博士高勇创立，以自研LX-MRDVS®（移动机器人深度视觉系统）为核心技术，构建了从3D视觉传感器到移动机器人整机再到系统方案的"一体两翼"全栈能力。产品覆盖潜伏式搬运机器人、无人叉车、复合机器人和纯视觉人形机器人VersaBot（威宝）。2019-2024年营收复合增长率超80%，拥有华为、比亚迪、富士康、LG新能源等全球1000+客户，2025年完成C+轮数亿元融资，正冲刺"国内3D视觉感知机器人第一股"。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper"><table class="wikitable infotable">
+        <tr><th>项目</th><th>内容</th></tr>
+        <tr><td>公司全称</td><td>杭州蓝芯机器人技术股份有限公司（前身：杭州蓝芯科技有限公司）</td></tr>
+        <tr><td>英文名称</td><td>Lanxin Robotics / Lanxin Technology</td></tr>
+        <tr><td>成立时间</td><td>2016年6月1日</td></tr>
+        <tr><td>注册地</td><td>浙江省杭州市余杭区</td></tr>
+        <tr><td>法定代表人</td><td>高勇</td></tr>
+        <tr><td>上市状态</td><td>未上市（IPO筹备中）</td></tr>
+        <tr><td>企业资质</td><td>国家级专精特新"小巨人"企业 · 杭州准独角兽 · 浙江省"科技新小龙"</td></tr>
+        <tr><td>核心定位</td><td>3D视觉感知移动机器人 · 工业柔性物流解决方案 · "纯视觉"路线</td></tr>
+      </table></div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>时间</th><th>事件</th></tr>
+        <tr><td>2016年6月</td><td>公司成立，押注3D视觉感知技术路线</td></tr>
+        <tr><td>2017年</td><td>成功研发移动机器人专属3D视觉传感器</td></tr>
+        <tr><td>2021年11月</td><td>完成B轮过亿元融资，腾讯投资、德赛电池参投</td></tr>
+        <tr><td>2022年</td><td>入选杭州准独角兽企业榜单</td></tr>
+        <tr><td>2023年</td><td>LX-MRDVS®入选浙江省"尖兵""领雁"研发攻关计划；完成C轮融资</td></tr>
+        <tr><td>2024年</td><td>SMT上下料机器人获评浙江省首台（套）装备；获评国家级专精特新"小巨人"</td></tr>
+        <tr><td>2024年8月</td><td>发布全球首款纯视觉类人形机器人VersaBot（威宝）</td></tr>
+        <tr><td>2024年底</td><td>贵安新区第二运营中心及制造基地投产</td></tr>
+        <tr><td>2025年5月</td><td>完成C+轮数亿元融资，鲲鹏基金领投</td></tr>
+        <tr><td>2025年8月</td><td>发布人形机器人头部模组OmniHead（奥视知脑），与豪森智能签署战略合作</td></tr>
+        <tr><td>2026年初</td><td>入选浙江省96家"科技新小龙"企业</td></tr>
+        <tr><td>2026年4月</td><td>亮相MODEX 2026（亚特兰大）和汉诺威工业博览会</td></tr>
+      </table></div>
+
+      <h3 id="founder">1.2 创始人及核心团队</h3>
+      <p>蓝芯科技创始团队来自中科院、复旦大学、浙江大学及国内外知名机器人企业，兼具学术深度和产业经验，属于学术派+产业派的<strong>混合型</strong>人才结构。员工总数300+人，研发人员占比约45%。</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+        <tr><td>创始人 & CEO</td><td>高勇</td><td>中科院自动化所模式识别与人工智能系统博士，先后在日本理光（Ricoh）、微软亚洲工程院从事计算机视觉产品研发，在视觉感知领域有深厚学术和产业积累。直接持股约15.74%。</td></tr>
+        <tr><td>核心团队</td><td>—</td><td>汇聚中科院、复旦大学、浙江大学等高校人才，核心成员曾在国内外知名机器人企业担任研发和管理职务，深耕移动机器人领域近十年。</td></tr>
+      </table></div>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>轮次</th><th>时间</th><th>金额</th><th>主要投资方</th></tr>
+        <tr><td>种子轮</td><td>2017年1月</td><td>400万元</td><td>天使投资人</td></tr>
+        <tr><td>天使轮</td><td>2018年6月</td><td>1000万元</td><td>丰厚资本、泰恒投资</td></tr>
+        <tr><td>战略投资</td><td>2019年2月</td><td>未披露</td><td>余杭产业基金（国资）</td></tr>
+        <tr><td>Pre-A轮</td><td>2019年12月</td><td>数千万元</td><td>维思资本</td></tr>
+        <tr><td>A轮</td><td>2021年3月</td><td>数千万元</td><td>蓝驰创投、维思资本</td></tr>
+        <tr><td>B轮</td><td>2021年11月</td><td>过亿元</td><td>腾讯投资、德赛电池、维思资本、蓝驰创投</td></tr>
+        <tr><td>B+轮</td><td>2022年3月</td><td>近亿元</td><td>尚珹投资、蓝驰创投、腾讯投资</td></tr>
+        <tr><td>C轮</td><td>2023年7月</td><td>未披露</td><td>吴兴人才产业集团（国资）</td></tr>
+        <tr><td>C+轮</td><td>2025年4月</td><td>数亿元</td><td>鲲鹏基金、科创城产业基金</td></tr>
+      </table></div>
+
+      <h4>股东结构特征</h4>
+      <p>蓝芯科技的股东结构兼具产业资本与国资背景：腾讯投资（互联网巨头）提供技术和生态资源，德赛电池（新能源产业链企业）带来锂电池制造场景，蓝驰创投和维思资本（VC）持续多轮追投显示信心，余杭产业基金和吴兴人才产业集团的国资背景增强了政府关系和政策获取能力。2025年C+轮引入鲲鹏基金和科创城产业基金，进一步强化了国有资本支持。公司已正式启动IPO进程，目标成为"国内3D视觉感知机器人第一股"。</p>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>维度</th><th>详情</th></tr>
+        <tr><td>AI技术架构</td><td>自研LX-MRDVS®（蓝芯-移动机器人深度视觉系统），以3D视觉替代传统激光雷达为核心路径，"纯视觉"路线</td></tr>
+        <tr><td>视觉能力</td><td>四大核心：3D视觉导航（自然特征建图，无需磁条/二维码）、3D视觉避障（360°语义识别）、3D视觉对接（±0.1mm精度）、3D视觉抓取（±1cm定位）</td></tr>
+        <tr><td>人形机器人AI</td><td>VersaBot集成DeepSeek+通义千问双大模型，自然语言交互准确率>95%，多步骤任务规划</td></tr>
+        <tr><td>控制平台</td><td>自研VMR核心控制器，基于Nvidia Jetson/Intel Ultra/Rockchip等芯片平台，面向多场景</td></tr>
+        <tr><td>调度系统</td><td>RCS机器人集群调度系统，单场景可调度1500台机器人</td></tr>
+        <tr><td>知识产权</td><td>168项国家专利及软著，含64项发明专利</td></tr>
+        <tr><td>差异化特色</td><td>国内首个研发移动机器人3D视觉感知并规模化商用的公司，打破激光雷达垄断</td></tr>
+      </table></div>
+      <p>蓝芯科技是国内最早押注3D视觉路线的移动机器人公司之一。传统工业移动机器人以激光雷达为核心传感器，蓝芯选择以RGB-D深度视觉全面替代激光雷达，实现从感知到决策的纯视觉闭环。在人形机器人领域延续"纯视觉"基因，VersaBot是全球首款不依赖激光雷达的纯视觉人形机器人。</p>
+
+      <h3 id="product">1.5 产品形态</h3>
+      <p>蓝芯科技采用<strong>"一体两翼"</strong>架构：母公司蓝芯机器人（MRS系统集成方案）为"一体"，迈尔微视MRDVS（3D视觉传感器模块）和威迈尔VMR（移动机器人/人形机器人整机）为"两翼"，覆盖从核心部件到整机到方案的全链条。</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>产品类别</th><th>代表型号</th><th>关键参数</th><th>适用场景</th></tr>
+        <tr><td>3D视觉传感器</td><td>V系列 / S系列 / M系列 / H系列</td><td>定位精度±0.1mm@350mm，算力6TOPS，感知距离30m</td><td>赋能各类机器人的视觉感知</td></tr>
+        <tr><td>潜伏式搬运机器人</td><td>FR系列（300KG-2T负载）</td><td>自然导航SLAM，3D视觉避障360°</td><td>工厂内物料搬运</td></tr>
+        <tr><td>无人叉车</td><td>FL系列（1.5T-2T负载）</td><td>视觉SLAM导航，托盘视觉对接，窄通道作业</td><td>仓库托盘货物搬运</td></tr>
+        <tr><td>复合机器人</td><td>移动底盘+六轴机械臂</td><td>3D视觉抓取，负载3-15KG</td><td>多工序柔性作业</td></tr>
+        <tr><td>人形机器人</td><td>VersaBot VB1/VB2（威宝）</td><td>身高1.55-1.7m，臂展2m（双臂），纯视觉，续航8h+，30-40万元</td><td>商超拣选、非结构化搬运</td></tr>
+        <tr><td>头部模组</td><td>OmniHead（奥视知脑）</td><td>360°全景视觉感知</td><td>人形机器人感知中枢</td></tr>
+      </table></div>
+
+      <h3 id="scenario">1.6 应用场景</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>场景领域</th><th>状态</th><th>典型客户/案例</th><th>说明</th></tr>
+        <tr><td>3C电子</td><td><span class="tag tag-info">成熟商用</span></td><td>华为、富士康、德赛、立讯精密</td><td>SMT上下料、产线物料搬运</td></tr>
+        <tr><td>新能源（光伏/锂电）</td><td><span class="tag tag-info">成熟商用</span></td><td>比亚迪、隆基绿能、LG新能源</td><td>占营收60%+，花篮自动转运</td></tr>
+        <tr><td>包装印刷</td><td><span class="tag tag-info">成熟商用</span></td><td>杭州数创等</td><td>印刷机/涂布机上下料</td></tr>
+        <tr><td>半导体</td><td><span class="tag tag-info">成熟商用</span></td><td>东芝、海力士、日月光</td><td>晶圆盒搬运</td></tr>
+        <tr><td>家电制造</td><td><span class="tag tag-info">成熟商用</span></td><td>美的、东磁</td><td>产线物料配送</td></tr>
+        <tr><td>商超零售（新场景）</td><td><span class="tag">拓展中</span></td><td>VersaBot威宝</td><td>非结构化环境拣选搬运</td></tr>
+        <tr><td>具身智能联合研发</td><td><span class="tag">推进中</span></td><td>豪森智能联合实验室</td><td>2025年8月成立</td></tr>
+        <tr><td>海外场景</td><td><span class="tag">拓展中</span></td><td>MODEX 2026 / 汉诺威工博会</td><td>覆盖全球30+国家，1000+客户</td></tr>
+      </table></div>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <p>蓝芯科技2019-2024年营收复合增长率超80%，3D视觉传感器出货量年增150%。截至2026年，全球合作客户超1000家，覆盖30+国家。新能源/光伏领域营收占比超60%。2024年底贵安新区第二总部投产，累计生产机器人2000+台；2026年贵安工厂年产目标1万台，三年目标总产值超5亿元。公司采用"湖州+贵安"双制造基地模式，在长三角和珠三角布局4小时供应生态圈。2026年首次深度亮相北美（MODEX）和欧洲（汉诺威）顶级展会，加速全球化进程。</p>
+
+      <h3 id="financial">1.8 财务数据</h3>
+      <p>蓝芯科技未公开上市，财务数据披露有限。已知2019-2024年营收CAGR超80%，3D视觉传感器年增150%出货量。</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>指标</th><th>2021</th><th>2022</th><th>2023</th><th>2024</th><th>2025-2026</th></tr>
+        <tr><td>营收增长</td><td>—</td><td>—</td><td>—</td><td>—</td><td>CAGR 80%+（2019-2024）</td></tr>
+        <tr><td>年度融资</td><td>过亿元（B轮）</td><td>近亿元（B+轮）</td><td>未披露（C轮）</td><td>—</td><td>数亿元（C+轮）</td></tr>
+        <tr><td>产能</td><td>—</td><td>—</td><td>—</td><td>贵安2000+台累计</td><td>贵安年产目标1万台</td></tr>
+        <tr><td>累计融资</td><td>过亿元</td><td>近2亿元</td><td>超2亿元</td><td>超2亿元</td><td>超2.15亿元（已披露）</td></tr>
+      </table></div>
+
+      <h3 id="others">1.9 其他信息</h3>
+      <ul>
+        <li>公司使命："让机器人'看懂'世界，服务世界"。以3D视觉赋予机器人环境感知和自主决策能力。</li>
+        <li>2024年获评国家级专精特新"小巨人"企业，标志着技术实力获国家级认可。</li>
+        <li>贵安新区第二总部位于贵州贵安新区，打造中西部机器人制造基地，享受当地产业政策和低成本制造优势。</li>
+        <li>2026年入选浙江省96家"科技新小龙"企业，与蓝芯并称的还包括多家杭州具身智能公司。</li>
+        <li>与豪森智能的具身智能联合实验室（2025年8月成立），聚焦具身智能技术研发与工业应用推广。</li>
+        <li>迈尔微视作为独立子公司运营，其3D视觉方案已拓展至智能割草机器人、商用清洁机器人、无人机等非移动机器人场景。</li>
+        <li>公司官网上线英文版，积极布局海外市场，2026年重点推进北美和欧洲业务。</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="a21">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>创始人高勇的中科院自动化所博士背景（模式识别与人工智能）以及在理光和微软亚洲工程院的视觉产品研发经历，决定了蓝芯科技从创立之初就锁定"3D视觉"作为技术底座。这种学术+产业视觉背景天然导向"给机器人一双慧眼"的定位——解决移动机器人在工业场景中"看不见、看不懂"的核心痛点。团队选择的场景（3C/新能源/包装印刷制造业）正是对"视觉能力"需求最旺盛的领域：光伏电池片生产需要精确定位花篮孔位，SMT产线需要高精度上下料对接，这些场景的传统方案（二维码/磁条导航）恰好是视觉方案的替代目标。团队近十年的移动机器人研发积累也确保了从算法到产品的工程化落地能力。</p>
+      </div>
+
+      <div class="analysis-block" id="a22">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>蓝芯科技坚持"纯视觉"路线，以RGB-D深度视觉替代激光雷达，这在技术适配性上是一个值得审视的选择。优势面：激光雷达在工业移动机器人领域长期主导，但成本高、无法做语义理解、对透明/反光物体识别差——而这恰恰是3D视觉的优势区。在光伏行业（电池片反光）、半导体车间（洁净环境）、包装印刷（多材质识别）等场景，视觉路线具有天然适配性。风险面：纯视觉方案在弱光/黑暗环境、远距离精度等维度仍逊于激光雷达+视觉融合方案。蓝芯将视觉定位精度做到±0.1mm，避障成功率>99.5%，在一定程度上弥补了视觉路线的劣势，但在工业级可靠性上仍需持续验证。</p>
+      </div>
+
+      <div class="analysis-block" id="a23">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>腾讯投资（2021年B轮领投）为蓝芯科技提供了关键的战略背书——腾讯在产业互联网和智慧物流的布局（如腾讯云、企业微信生态）可能为蓝芯提供数字化协同场景。德赛电池的参投则绑定了一个重要的下游应用客户（新能源电池制造）。两次国资参投（余杭产业基金、吴兴人才产业集团、鲲鹏基金）不仅提供资金，更在政策支持、政府客户对接、土地/税收优惠等方面赋能——这直接促成了贵安新区第二总部的落地。但国资占比较高的股东结构也可能在未来IPO时带来一定的审批复杂性，并可能影响公司决策的灵活度和市场化程度。</p>
+      </div>
+
+      <div class="analysis-block" id="a24">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>蓝芯科技的路径演进呈现典型的"技术驱动→场景聚焦→平台化扩张"轨迹。2016-2019年（技术验证期）：专注于3D视觉传感器和移动机器人底层技术研发，积累了核心的LX-MRDVS®系统。2019-2022年（场景验证期）：聚焦3C和新能源等重点行业，验证了视觉方案在工业场景的可行性，获得华为、比亚迪、富士康等标杆客户。2023年至今（平台扩张期）：拆分为"一体两翼"架构（迈尔微视独立运营、威迈尔推出人形机器人），从移动机器人整机公司转型为"视觉平台+机器人整机+系统方案"的生态型企业。特别是2024年推出VersaBot人形机器人和2025年发布OmniHead头部模组，标志着从工业AGV/AMR向更广义的具身智能赛道扩展。</p>
+      </div>
+
+      <div class="analysis-block" id="a25">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>蓝芯科技的核心取舍是"做视觉平台型公司，而非纯整机公司"。通过将3D视觉传感器业务独立为迈尔微视，蓝芯实际上在走"Intel Inside"路线——将LX-MRDVS®视觉系统作为核心部件向行业输出，而不仅是做自己的机器人整机。这与海康机器人（以整机+系统集成为主）、极智嘉（以仓储方案为主）形成了差异化定位。在人形机器人领域，蓝芯选择"轮式上半身人形"而非双足人形，在移动能力上做了务实妥协，换取更快的落地速度和更低的成本（30-40万元售价）。这种"类人形"路线在商超拣选、工厂物料搬运等结构化环境下具有更高的性价比优势，但在通用性和公众感知度上不如双足方案。</p>
+      </div>
+
+      <div class="analysis-block" id="a26">
+        <h4>2.6 其他重要观察</h4>
+        <p>蓝芯科技是杭州具身智能产业集群的重要代表企业之一。2026年被浙江省列入96家"科技新小龙"（与杭州其他机器人企业并行），反映了浙江省/杭州市对具身智能赛道的政策倾斜。贵安新区制造基地的选择体现了"杭州研发+中西部制造"的产能布局逻辑，有效利用了中西部地区的产业政策和低制造成本。VersaBot的推出时间（2024年8月）恰好人形机器人赛道热度飙升期，体现了公司在技术储备之上的市场敏锐度。但需关注：从工业AMR到人形机器人的延伸，技术栈跨度较大，对研发资源和商业化团队的配置提出了更高要求；IPO进程与科创板的审核节奏也是影响公司发展节奏的关键变量。</p>
+      </div>
+
+      <h2 id="refs">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://36kr.com/p/3281993571443331" target="_blank">蓝芯科技宣布完成C+轮融资，加速3D视觉感知机器人产业布局 — 36氪</a></li>
+          <li><a href="https://news.pedaily.cn/202505/549300.shtml" target="_blank">蓝芯科技宣布完成C+轮融资 — 投资界</a></li>
+          <li><a href="https://www.iimedia.cn/c1064/105922.html" target="_blank">蓝芯科技完成数亿元C+轮融资 — 艾媒咨询</a></li>
+          <li><a href="https://m.lieyunpro.com/archives/497186" target="_blank">杭州准独角兽完成数亿元融资，冲击"3D视觉感知机器人第一股" — 猎云网</a></li>
+          <li><a href="https://g.pconline.com.cn/x/1924/19245213.html" target="_blank">蓝芯科技获数亿融资 — 太平洋科技</a></li>
+          <li><a href="https://www.zidonghua.com.cn/m/news/Finance/71363.html" target="_blank">蓝芯科技宣布完成C+轮融资 — 中国工控网</a></li>
+          <li><a href="https://www.lanxincn.com/public/news.html" target="_blank">蓝芯科技官方新闻中心</a></li>
+          <li><a href="https://www.lanxincn.com/news_cont_543.html" target="_blank">浙江电视台《有请领航者》走进蓝芯科技 — 蓝芯官网</a></li>
+          <li><a href="https://baijiahao.baidu.com/s?id=1808327985750126772" target="_blank">威迈尔类人形机器人VersaBot发布 — 百度百家号</a></li>
+          <li><a href="https://news.zol.com.cn/894/8945425.html" target="_blank">首款纯视觉类人形机器人VersaBot在北京发布 — 中关村在线</a></li>
+          <li><a href="https://www.imrobotic.com/news/detail/35362" target="_blank">全球首发 | 威迈尔首款类人形机器人VersaBot — 机器人网</a></li>
+          <li><a href="https://m.chinaagv.com/news/detail/202408/31158.html" target="_blank">全球首发 | 威迈尔首款类人形机器人VersaBot — 中国AGV网</a></li>
+          <li><a href="https://tidenews.com.cn/video.html?id=3359032" target="_blank">探访科技新小龙vlog | 当机器人长"眼睛" — 潮新闻</a></li>
+          <li><a href="https://zjnews.zjol.com.cn/zjnews/202602/t20260209_31498476.shtml" target="_blank">探访科技新小龙 | 蓝芯机器人 — 浙江在线</a></li>
+          <li><a href="https://www.chinaagv.com/news/detail/202603/35538.html" target="_blank">品牌出海 | 蓝芯机器人与您相约顶级盛会 — 中国AGV网</a></li>
+          <li><a href="https://m.chinaforklift.com/news/detail/202604/92820.html" target="_blank">MODEX 2026圆满收官！蓝芯机器人以3D视觉重塑全球智慧物流 — 中国叉车网</a></li>
+          <li><a href="https://www.youuvs.com/news/detail/202508/43952.html" target="_blank">蓝芯科技与豪森智能签署战略合作协议 — 无人系统网</a></li>
+          <li><a href="http://www.xzlrobot.com/c14731.html" target="_blank">脱胎于"杭州准独角兽"，这家3D视觉公司如何布局未来？ — 协作机器人网</a></li>
+          <li><a href="https://china-vision.org/news-detail/225126.html" target="_blank">威迈尔首款类人形机器人VersaBot — 机器视觉网</a></li>
+          <li><a href="https://nuxt.cyzone.cn/article/587523.html" target="_blank">蓝芯科技研发机器视觉系统 — 创业邦</a></li>
+          <li><a href="https://www.inzhejiang.com.cn/Business/202603/t20260310_31544768.shtml" target="_blank">What can robots with eyes achieve — In Zhejiang</a></li>
+          <li><a href="http://szb.eyesnews.cn/pc/cont/202603/27/content_176349.html" target="_blank">"贵安造"机器人，得力！ — 贵州新闻</a></li>
+          <li><a href="https://pitchhub.36kr.com/project/1679735635563269" target="_blank">蓝芯科技 | 项目信息 — 36氪</a></li>
+          <li><a href="https://www.lanchivc.com/projectdetail/?projectid=192" target="_blank">蓝芯科技项目详情 — 蓝驰创投</a></li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">本页面由具身智能Wiki项目自动生成 | 数据截止至2026年5月4日 | 最后更新：2026-05-04</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

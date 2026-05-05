@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>大界机器人 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> <span class="breadcrumb-sep">›</span> <span>大界机器人</span></div>
+  <div class="wiki-header"><h1>大界机器人</h1><div class="subtitle">RoboticPlus.AI · 成立于2016年 · 工业具身智能 · 智能建造 · D轮 · 年营收近2亿元</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#founder">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#product">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenario">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financial">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#others">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl3"><a href="#a21">2.1 团队背景与场景匹配</a></li>
+        <li class="toc-lvl3"><a href="#a22">2.2 技术路线与场景适配</a></li>
+        <li class="toc-lvl3"><a href="#a23">2.3 股东/资本结构的影响</a></li>
+        <li class="toc-lvl3"><a href="#a24">2.4 试错与路径调整</a></li>
+        <li class="toc-lvl3"><a href="#a25">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl3"><a href="#a26">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#refs">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">大界机器人</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">上海大界机器人科技有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">英文名</div><div class="ib-value">RoboticPlus.AI</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2016年8月</div></div>
+        <div class="ib-row"><div class="ib-label">总部</div><div class="ib-value">上海宝山区</div></div>
+        <div class="ib-row"><div class="ib-label">创始人/CEO</div><div class="ib-value">孟浩</div></div>
+        <div class="ib-row"><div class="ib-label">联合创始人</div><div class="ib-value">胡雨辰</div></div>
+        <div class="ib-section">融资与财务</div>
+        <div class="ib-row"><div class="ib-label">最新轮次</div><div class="ib-value">D轮（2026.03）</div></div>
+        <div class="ib-row"><div class="ib-label">D轮金额</div><div class="ib-value">数亿元人民币</div></div>
+        <div class="ib-row"><div class="ib-label">D轮领投</div><div class="ib-value">博华资本、中金资本</div></div>
+        <div class="ib-row"><div class="ib-label">年营收</div><div class="ib-value">近2亿元（2025）</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">员工规模</div><div class="ib-value">150人，研发>1/3</div></div>
+        <div class="ib-row"><div class="ib-label">市场地位</div><div class="ib-value">金属行业机器人系统市占率第一</div></div>
+        <div class="ib-row"><div class="ib-label">客户数量</div><div class="ib-value">数百家头部企业</div></div>
+        <div class="ib-section">官网</div>
+        <div class="ib-row"><div class="ib-label">网站</div><div class="ib-value">未公开</div></div>
+      </aside>
+
+      <p class="article-intro">大界机器人（上海大界机器人科技有限公司，RoboticPlus.AI）成立于2016年，总部位于上海，是一家为广泛机器人构型提供智能软件和系统的工业具身智能科技公司。公司由同济大学土木工程博士孟浩与胡雨辰联合创立，以全自研RoBIM CLOUD工业软件平台为核心，实现"手-眼-脑"协同的智能建造和柔性制造。产品覆盖智能切割、焊接、打磨、装配四大工艺，服务船舶海工、工程机械、能源电力、建筑钢结构四大行业。2025年营收近2亿元并基本实现盈亏平衡，2026年3月完成D轮数亿元融资，金属行业智能化机器人系统市占率稳居行业第一。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper"><table class="wikitable infotable">
+        <tr><th>项目</th><th>内容</th></tr>
+        <tr><td>公司全称</td><td>上海大界机器人科技有限公司</td></tr>
+        <tr><td>英文名称</td><td>RoboticPlus.AI</td></tr>
+        <tr><td>成立时间</td><td>2016年8月</td></tr>
+        <tr><td>注册地</td><td>上海市宝山区</td></tr>
+        <tr><td>上市状态</td><td>未上市</td></tr>
+        <tr><td>核心定位</td><td>工业具身智能 · 智能建造 · 机器人软件平台 · Physical AI</td></tr>
+      </table></div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>时间</th><th>事件</th></tr>
+        <tr><td>2016年8月</td><td>公司成立，由孟浩与胡雨辰联合创立，切入建筑机器人领域</td></tr>
+        <tr><td>2017-2019年</td><td>完成早期多轮融资，研发RoBIM软件平台，服务建筑钢结构行业</td></tr>
+        <tr><td>2020-2022年</td><td>从建筑拓展至船舶、工程机械，完成B/C轮融资</td></tr>
+        <tr><td>2023年</td><td>金属行业智能化机器人系统市占率升至行业第一</td></tr>
+        <tr><td>2024年</td><td>营收快速增长，产品矩阵覆盖切割/焊接/打磨/装配全工艺</td></tr>
+        <tr><td>2025年</td><td>营收近2亿元，基本实现盈亏平衡；与人形机器人企业展开合作</td></tr>
+        <tr><td>2026年3月</td><td>完成D轮数亿元融资，博华资本+中金资本联合领投；布局Physical AI和航空航天</td></tr>
+      </table></div>
+
+      <h3 id="founder">1.2 创始人及核心团队</h3>
+      <p>大界机器人创始团队具有"学术深度+产业实践"的混合型特点。核心团队来自国际顶尖智能实验室，拥有超过15年自适应机器人技术研发经验，覆盖机器人控制、几何算法、计算机视觉、AI等核心领域。员工总数150人，研发人员占比超三分之一。</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+        <tr><td>创始人 & CEO</td><td>孟浩</td><td>同济大学土木工程博士，墨尔本大学/墨尔本皇家理工大学背景，入选2025福布斯中国科创人物、2023《财富》中国40位40岁以下商界精英。在建筑与机器人交叉领域有深厚学术积累，将土木工程领域的工程化思维应用于机器人系统开发。</td></tr>
+        <tr><td>联合创始人</td><td>胡雨辰</td><td>与孟浩联合创立大界机器人，共同主导公司技术方向和产品战略。</td></tr>
+      </table></div>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <p>大界机器人累计完成多轮融资，2026年3月完成D轮数亿元融资，此轮由博华资本管理的梁溪数字产业基金和中金资本旗下基金联合领投，北京顺义科创集团基金、后沙峪"中和润达"产业投资基金跟投。</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>轮次</th><th>时间</th><th>金额</th><th>主要投资方</th></tr>
+        <tr><td>早期轮次</td><td>2017-2019</td><td>未完整披露</td><td>多家VC参投</td></tr>
+        <tr><td>B/C轮</td><td>2020-2024</td><td>未完整披露</td><td>多轮累计融资</td></tr>
+        <tr><td>D轮</td><td>2026年3月</td><td>数亿元</td><td>博华资本（梁溪数字产业基金）、中金资本（联合领投）；北京顺义科创集团基金、后沙峪"中和润达"产业投资基金（跟投）</td></tr>
+      </table></div>
+
+      <h4>股东结构特征</h4>
+      <p>D轮引入的资本方具有鲜明的地域产业背景：博华资本（梁溪→无锡）、顺义科创集团（北京顺义）、后沙峪产业基金（北京顺义）均为地方政府产业引导资本，暗示公司在长三角和京津冀的产业布局获得地方政府背书。中金资本的参与则提供了顶级金融机构的品牌背书和IPO资源储备。</p>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>维度</th><th>详情</th></tr>
+        <tr><td>AI技术架构</td><td>全自研RoBIM CLOUD工业软件平台，从几何内核、运动控制到工艺算法全栈自研，正演进为"工业智能数字底座（Agent Infra）"</td></tr>
+        <tr><td>数据方案</td><td>已积累百万级工业精度真实生产数据，覆盖切割/焊接/打磨/装配全工艺，用于强化学习网络训练</td></tr>
+        <tr><td>感知-决策-执行</td><td>"手-眼-脑"协同架构：机器人能自主理解图纸（从三维模型/二维图纸中提取几何信息），生成作业路径，无需编程示教</td></tr>
+        <tr><td>兼容性</td><td>同一软件平台支持工业机器人、协作机器人、人形机器人等多种构型，实现"群脑网络"多构型协同调度</td></tr>
+        <tr><td>Physical AI</td><td>计划2025年下半年推出金属行业具身工业数据集，加大强化学习等Physical AI技术投入</td></tr>
+        <tr><td>差异化特色</td><td>从CAD/CAM（计算机辅助设计与制造）软件切入，实现"图纸到机器人运动"的端到端自动化；在金属加工行业形成了独特的技术壁垒</td></tr>
+      </table></div>
+      <p>大界机器人的技术路线以RoBIM CLOUD为统一平台底座，融合三维几何建模、机器人运动规划和AI视觉感知三大能力，实现工业机器人从"被编程"到"自主理解任务"的跃迁。</p>
+
+      <h3 id="product">1.5 产品形态</h3>
+      <p>大界机器人交付"软硬一体"解决方案，核心是RoBIM CLOUD软件平台+适配的机器人硬件系统。四大产品线单产品年销售额均可达到5000万元以上。</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>产品线</th><th>核心能力</th><th>适用场景</th></tr>
+        <tr><td>RobimCut 智能坡口切割机器人</td><td>自动解析图纸几何数据，高精度坡口切割，无需固定工装</td><td>船舶、海工、钢结构</td></tr>
+        <tr><td>RobimWeld 智能焊接机器人</td><td>自动读取图纸生成焊缝与焊接路径，自主避障，免编程示教</td><td>船舶、工程机械、钢结构</td></tr>
+        <tr><td>RobimCutProfile 智能型材切割机器人</td><td>型材下料全流程自动管控</td><td>造船、海洋工程、建筑</td></tr>
+        <tr><td>RobimGrind 智能管附件打磨机器人</td><td>多规格管件内外壁坡口精细打磨，线激光扫描+自适应力控</td><td>船舶、能源电力</td></tr>
+      </table></div>
+
+      <h3 id="scenario">1.6 应用场景</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>行业领域</th><th>状态</th><th>典型客户</th><th>说明</th></tr>
+        <tr><td>船舶海工</td><td><span class="tag tag-info">核心行业</span></td><td>江南造船、上海外高桥造船、中远海运重工、振华重工</td><td>船体结构件切割焊接打磨</td></tr>
+        <tr><td>工程机械</td><td><span class="tag tag-info">核心行业</span></td><td>郑煤机、中联重科</td><td>大型结构件坡口切割焊接</td></tr>
+        <tr><td>能源电力</td><td><span class="tag tag-info">核心行业</span></td><td>中国煤科、哈电</td><td>管件打磨、结构件制造</td></tr>
+        <tr><td>建筑钢结构</td><td><span class="tag tag-info">核心行业</span></td><td>中建科工、中建海龙、宝冶钢构</td><td>钢构件切割焊接装配</td></tr>
+        <tr><td>航空航天</td><td><span class="tag">拓展中</span></td><td>—</td><td>D轮资金重点拓展方向</td></tr>
+        <tr><td>人形机器人工业应用</td><td><span class="tag">探索中</span></td><td>多家人形机器人企业</td><td>探索金属焊接、柔性打磨等场景</td></tr>
+      </table></div>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <p>大界机器人2025年营收近2亿元，已基本实现盈亏平衡，这在具身智能初创公司中较为罕见。四大产品线（切割/焊接/打磨/装配）单产品年销售额均可达5000万元以上。金属行业智能化机器人系统市占率稳居行业第一。2025年近一半业务来自老客户复购，验证了产品的高粘性和价值。已服务数百家国央企大客户。D轮融资后，资金将用于Agent Infra建设、航空航天等新行业拓展、人形机器人研发和全球化。</p>
+
+      <h3 id="financial">1.8 财务数据</h3>
+      <p>大界机器人未上市，公开财务信息有限。2025年关键财务里程碑：年营收接近2亿元，基本实现盈亏平衡。</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>指标</th><th>2024及以前</th><th>2025</th><th>2026</th></tr>
+        <tr><td>年营收</td><td>快速增长期</td><td>近2亿元</td><td>未披露</td></tr>
+        <tr><td>盈亏状态</td><td>亏损</td><td>基本盈亏平衡</td><td>未披露</td></tr>
+        <tr><td>复购率</td><td>—</td><td>近50%来自老客户</td><td>—</td></tr>
+        <tr><td>单产品年销售</td><td>—</td><td>四产品线均>5000万元</td><td>—</td></tr>
+        <tr><td>市占率（金属行业）</td><td>增长期</td><td>行业第一</td><td>—</td></tr>
+      </table></div>
+
+      <h3 id="others">1.9 其他信息</h3>
+      <ul>
+        <li>创始人孟浩入选2025福布斯中国科创人物、2023《财富》中国40位40岁以下商界精英。</li>
+        <li>公司规划2025年下半年推出金属行业具身工业数据集，为行业Physical AI训练提供数据基础。</li>
+        <li>RoBIM CLOUD平台已被验证可跨机器人构型运行，从工业机器臂扩展到人形机器人。</li>
+        <li>孟浩预计人形机器人将在未来3-5年内真正进入工厂创造实际价值。</li>
+        <li>公司核心能力在于"图纸理解"——从CAD模型/二维图纸中自动提取几何信息和工艺参数，这是传统工业机器人无法实现的能力。</li>
+        <li>大界机器人与同济大学土木工程学院保持紧密合作关系，D轮融资消息由同济大学土木工程学院官网发布。</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="a21">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>创始人孟浩的同济大学土木工程博士背景直接决定了公司从"建筑"切入的路径选择。建筑行业（特别是钢结构制造）天然存在"构件非标化、图纸驱动、人工依赖高"的特点，这与孟浩的学术背景高度吻合——他清楚建筑行业对自动化最迫切的需求来自"图纸到施工"的链路断裂。联合创始人胡雨辰在机器人控制领域的专长则补齐了从"理解图纸"到"控制机器人执行"的技术闭环。团队选择先从建筑钢结构起步、再横向扩展至船舶和工程机械，是因为这些行业共享相同的金属加工工艺（切割/焊接/打磨），技术复用性极高。土木工程背景带来的"工程化思维"也使公司在产品化能力上强于纯学术派同行。</p>
+      </div>
+
+      <div class="analysis-block" id="a22">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>大界机器人选择以"工业软件平台（RoBIM CLOUD）"而非"机器人本体"作为核心资产，这种技术路线与金属加工行业高度适配。船舶/钢结构等场景中，加工对象多为"小批量、多品种"的非标构件，传统编程示教方式效率低下，而基于几何引擎自主解析图纸、自动生成机器人路径的方案恰好解决了这一痛点。自研几何内核+运动控制+工艺算法的全栈路线技术壁垒极高（需要同时理解CAD、CAM和机器人控制三大领域），但也意味着研发投入巨大——这正是公司人员中研发占比超1/3的原因。从工业数据集和Physical AI的布局看，公司正在将"知识驱动"（图纸解析）与"数据驱动"（强化学习）两条路线融合，这条路如果走通，将形成极强的领先优势。</p>
+      </div>
+
+      <div class="analysis-block" id="a23">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>D轮引入的博华资本（梁溪→无锡制造基地辐射圈）和北京顺义科创集团基金（顺义→航空航天和高端制造集聚区）的地域属性强烈暗示了公司的产能和业务扩张方向：无锡是长三角制造业重镇、顺义是北京的航空航天产业基地。中金资本的参投则为公司未来IPO铺设了路径。与纯VC投资不同，这轮融资的国资属性较强，可能在给予政策支持和产业资源的同时，也带来一定的审批流程和决策灵活度的约束。值得注意的是，公司2025年已基本实现盈亏平衡，这意味着公司对融资的依赖度在降低，与投资方的谈判话语权相应增强。</p>
+      </div>
+
+      <div class="analysis-block" id="a24">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>大界机器人的演化路径清晰展现了"场景收敛→工艺扩张→平台化"的节奏。早期（2016-2019）定位为"建筑机器人"，专注于建筑钢结构单一场景，完成了RoBIM平台的技术闭环。中期（2020-2023）从建筑向船舶、工程机械横向复制，验证了技术平台的行业通用性。当前阶段（2024-2026）定位升级为"工业具身智能"，从工业机器人拓展至人形机器人，从"工艺自动化"向"Physical AI"跃迁。公司几乎没有经历过重大的战略反复，这可能得益于创始人从土木工程到机器人的交叉视角——能够从"制造业共性痛点"（非标加工）而非"特定机器人形态"出发定义产品，天然具备了跨行业拓展的逻辑。</p>
+      </div>
+
+      <div class="analysis-block" id="a25">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>大界机器人最核心的取舍是"做软件平台而非硬件本体"。在工业机器人领域，大多数公司以"机械臂+视觉"的硬件方案交付，大界选择以RoBIM CLOUD软件为核心资产，硬件可灵活适配各类机器人构型。这种"做大脑、不做身体"的路径与小雨智造类似，但大界更侧重"图纸理解→工艺规划"的知识驱动层（CAD/CAM基因），而非端到端学习的数据驱动层（AI基因）。公司年营收近2亿元且基本盈亏平衡的表现，证明软件平台型定位在工业B端市场中具有切实的商业化可行性。但软件平台路线也面临挑战：工业客户对"软硬一体"方案的一站式交付需求，使得纯软件产品难以独立销售，需要配合系统集成和定制化服务。</p>
+      </div>
+
+      <div class="analysis-block" id="a26">
+        <h4>2.6 其他重要观察</h4>
+        <p>大界机器人是这一批5家中唯一一家已实现基本盈亏平衡的公司（年营收近2亿元），这个财务里程碑在具身智能赛道中极为稀缺。公司的成功在很大程度上得益于选择了一条"被忽视的赛道"——金属加工行业的智能化需求长期存在但从科技投资视角不够"性感"，直到具身智能概念爆发才获得资本关注。D轮融资时间（2026年3月）恰好人形机器人赛道热度高点，公司顺势将定位从"智能建造"升级为"工业具身智能+Physical AI"，在资本市场叙事上获得了显著的估值提升空间。未来需要关注：RoBIM CLOUD平台能否真正如管理层预期，从工业机械臂扩展到人形机器人而不损失性能和可靠性。</p>
+      </div>
+
+      <h2 id="refs">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://m.pedaily.cn/news/561340" target="_blank">大界机器人完成数亿元D轮融资，加码工业具身智能 — 投资界</a></li>
+          <li><a href="https://news.e-works.net.cn/category802/news132725.htm" target="_blank">大界机器人完成数亿元D轮融资 — e-works</a></li>
+          <li><a href="https://www.donews.com/news/detail/1/6450702.html" target="_blank">大界机器人完成数亿元D轮融资 — DoNews</a></li>
+          <li><a href="https://civileng.tongji.edu.cn/9f/de/c17997a368606/page.htm" target="_blank">以智能建造革新行业 | 我院校友创立的大界机器人斩获数亿元D轮投资 — 同济大学土木工程学院</a></li>
+          <li><a href="https://fund.eastmoney.com/a/202602093644900516.html" target="_blank">大界机器人孟浩：做"软硬一体"的机器人大脑 — 东方财富</a></li>
+          <li><a href="https://m.x-techcon.com/article/113008.html" target="_blank">工业具身智能公司融资数亿，博华、中金联合投资 — 科技版</a></li>
+          <li><a href="https://www.sohu.com/a/992424226_546816" target="_blank">数亿元！上海，跑出一家具身智能"黑马" — 搜狐</a></li>
+          <li><a href="http://www.robotsci.com.cn/detail/2029017138978754560" target="_blank">工业具身智能公司大界机器人完成数亿元D轮融资 — 机器人科学</a></li>
+          <li><a href="http://www.penghoo.cn/a/10505.html" target="_blank">工业具身智能企业大界机器人完成数亿元融资 — 鹏虎网</a></li>
+          <li><a href="https://www.maas.com.cn/blog/2468.html" target="_blank">大界机器人完成数亿元D轮融资 — MaaS</a></li>
+          <li><a href="https://news.sohu.com/a/991997349_120988576" target="_blank">大界机器人完成数亿元D轮融资 博华、中金联合投资 — 搜狐新闻</a></li>
+          <li><a href="http://gubaf10.eastmoney.com/news,cjpl,1673799606.html" target="_blank">大界机器人完成数亿元D轮融资 — 东方财富股吧</a></li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">本页面由具身智能Wiki项目自动生成 | 数据截止至2026年5月4日 | 最后更新：2026-05-04</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

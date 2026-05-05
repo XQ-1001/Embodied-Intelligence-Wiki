@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>天元兴 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style></head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> › <span>天元兴</span></div>
+  <div class="wiki-header"><h1>天元兴</h1><div class="subtitle">深圳天元兴科技有限公司 · 2024年成立 · 前商汤工业机器人团队 · 宁德时代核心供应商</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#founders">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financials">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#a1">2.1 团队背景与场景选择</a></li>
+        <li class="toc-lvl4"><a href="#a2">2.2 技术路线与场景适配性</a></li>
+        <li class="toc-lvl4"><a href="#a3">2.3 股东结构对战略影响</a></li>
+        <li class="toc-lvl4"><a href="#a4">2.4 试错与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#a5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#a6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#sources">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">天元兴</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">深圳天元兴科技有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2024年12月</div></div>
+        <div class="ib-row"><div class="ib-label">总部</div><div class="ib-value">深圳</div></div>
+        <div class="ib-row"><div class="ib-label">创始人/CEO</div><div class="ib-value">旷章辉</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">核心产品</div><div class="ib-value">TX01轮式双臂机器人</div></div>
+        <div class="ib-row"><div class="ib-label">融资</div><div class="ib-value">天使轮数千万元（2026.2）</div></div>
+        <div class="ib-row"><div class="ib-label">头部客户</div><div class="ib-value">宁德时代、中铁电气化局等10+</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">赛道</div><div class="ib-value">工业具身智能</div></div>
+        <div class="ib-row"><div class="ib-label">技术路线</div><div class="ib-value">端到端闭环控制</div></div>
+        <div class="ib-row"><div class="ib-label">背景</div><div class="ib-value">前商汤科技团队</div></div>
+      </aside>
+      <p class="article-intro"><strong>天元兴</strong>，全称深圳天元兴科技有限公司，成立于2024年12月，前身为商汤科技工业机器人事业部，由原班核心团队拆分成立。公司定位为通用工业具身智能平台，采用端到端闭环控制架构，核心产品为轮式底盘人形双臂机器人TX01。创始团队此前在商汤期间已在宁德时代等头部客户批量落地超100套锂电池智能感知方案。2026年2月完成数千万元天使轮融资，投资方包括弘德投资、盛世鸿元和海愿资本。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper"><table class="wikitable infotable">
+        <tr><th>项目</th><th>内容</th></tr>
+        <tr><td>公司全称</td><td>深圳天元兴科技有限公司</td></tr>
+        <tr><td>成立时间</td><td>2024年12月</td></tr>
+        <tr><td>总部</td><td>深圳</td></tr>
+        <tr><td>上市情况</td><td>未上市</td></tr>
+        <tr><td>创始人/CEO</td><td>旷章辉</td></tr>
+        <tr><td>定位</td><td>通用工业具身智能平台</td></tr>
+        <tr><td>背景</td><td>商汤科技工业机器人事业部拆分；商汤科技X生态成员企业</td></tr>
+        <tr><td>聚焦行业</td><td>锂电、光伏、轨道交通、半导体</td></tr>
+      </table></div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>时间</th><th>事件</th></tr>
+        <tr><td>商汤时期</td><td>团队在商汤科技内部主导锂电池智能感知方案，已在宁德时代批量落地超100套</td></tr>
+        <tr><td>2024年12月</td><td>从商汤科技拆分，成立深圳天元兴科技有限公司</td></tr>
+        <tr><td>2025年</td><td>TX01完成两代样机迭代；部分客户完成项目签约；锂电/光伏企业完成POC验证</td></tr>
+        <tr><td>2026年2月</td><td>完成数千万元天使轮融资，弘德投资、盛世鸿元、海愿资本等投资</td></tr>
+        <tr><td>2026年3月</td><td>TX01进入新能源头部客户现场测试，目标当年批量出货</td></tr>
+        <tr><td>2027年（目标）</td><td>形成完整产品矩阵，支持50余种工具使用模型</td></tr>
+      </table></div>
+
+      <h3 id="founders">1.2 创始人及核心团队</h3>
+      <p>天元兴创始团队为商汤科技工业机器人事业部原班人马，在工业AI和机器人领域有深厚积累。团队呈现"大厂内部孵化+产业深耕"特点。</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+        <tr><td>创始人&CEO</td><td>旷章辉</td><td>香港大学人工智能专业博士；曾任职于微软亚洲研究院、华为诺亚方舟实验室；2015年加入商汤科技，离任前担任商汤科技工业机器人事业部负责人；主导开发的锂电池智能感知方案已在宁德时代等头部客户批量落地超100套</td></tr>
+      </table></div>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>轮次</th><th>时间</th><th>金额</th><th>投资方</th><th>资金用途</th></tr>
+        <tr><td>天使轮</td><td>2026年2月</td><td>数千万元</td><td>弘德投资、盛世鸿元、海愿资本等</td><td>端到端具身智能控制技术研发、团队扩张、工业场景规模化落地</td></tr>
+      </table></div>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>技术维度</th><th>说明</th></tr>
+        <tr><td>总体AI架构</td><td>端到端闭环控制架构，有别于传统"传感器感知→标定→规控"串行架构</td></tr>
+        <tr><td>数据方案</td><td>TengenData具身智能数据平台，持续积累工业场景操作数据</td></tr>
+        <tr><td>算法平台</td><td>TengenBrain，以VLN/VLA/VFA三层架构为核心</td></tr>
+        <tr><td>硬件平台</td><td>TengenBuddy，一体化控制的机器人硬件平台</td></tr>
+        <tr><td>核心优势</td><td>端到端方案只需适配场景数据，无需复杂现场调试，可复制性大幅提升；量产成本预计降低至少50%</td></tr>
+        <tr><td>控制技术</td><td>整机一体化控制（行业普遍采用手臂/灵巧手/底盘独立控制模式）</td></tr>
+      </table></div>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>产品</th><th>类型</th><th>关键参数</th><th>适用场景</th></tr>
+        <tr><td>TX01</td><td>轮式底盘+人形双臂机器人</td><td>竹节电缸+轮式底盘；重心始终居中；续航4-8小时；最大负载100kg；一体化控制</td><td>柔性搬运、上下料、精密装配、主动质检</td></tr>
+      </table></div>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>场景分类</th><th>具体应用</th><th>合作伙伴/客户</th></tr>
+        <tr><td>锂电制造</td><td>锂电池智能感知、柔性搬运、上下料、精密装配</td><td>宁德时代（批量落地超100套）</td></tr>
+        <tr><td>轨道交通</td><td>高铁维管场景的智能检测</td><td>中铁电气化局（京沪高铁维管公司）</td></tr>
+        <tr><td>光伏制造</td><td>光伏产线POC验证</td><td>光伏企业（已完成POC）</td></tr>
+        <tr><td>精密制造</td><td>轴承等精密零部件装配</td><td>慈兴集团</td></tr>
+        <tr><td>消费电子</td><td>电池模组产线</td><td>欣旺达（含泰国基地）</td></tr>
+      </table></div>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>时间</th><th>进展</th></tr>
+        <tr><td>商汤时期</td><td>锂电池智能感知方案在宁德时代批量落地超100套</td></tr>
+        <tr><td>2025年</td><td>TX01完成两代样机迭代；锂电/光伏企业完成POC验证；部分客户签约</td></tr>
+        <tr><td>2026年3月</td><td>TX01进入新能源头部客户现场测试，目标当年批量出货</td></tr>
+        <tr><td>出海</td><td>随宁德时代项目落地德国图林根；随欣旺达项目落地泰国基地</td></tr>
+      </table></div>
+
+      <h3 id="financials">1.8 财务数据</h3>
+      <p>公司拆分运营不足一年半，无公开财务数据。天使轮融资数千万元。量产之后，产品成本预计可降低至少50%。</p>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>天元兴是商汤科技X生态成员企业，享有商汤的AI基础设施和技术生态支持</li>
+        <li>已合作头部工业客户10余家，客户关系深厚且经长期验证</li>
+        <li>旷章辉判断海外工业具身智能领域竞争烈度低于国内，将作为差异化突围方向</li>
+        <li>2027年目标形成完整产品矩阵，支持50余种工具使用模型</li>
+        <li>一体化控制架构是核心差异化：行业普遍采用手臂/底盘/灵巧手独立控制，TX01实现整机统一控制</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="a1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>旷章辉团队在商汤时期已深耕锂电智能制造多年，主导的锂电池智能感知方案在宁德时代批量落地超100套，这一背景与天元兴选择锂电/光伏/轨道交通等工业场景高度匹配。团队不仅懂AI，更懂具体工业场景的工艺流程、客户决策链和部署环境，这是纯粹学术背景团队难以复制的优势。选择从商汤分拆而非从零创业，本质是将已验证的行业Know-how和客户关系"带出"大厂，风险更低、商业化确定性更高。</p>
+      </div>
+
+      <div class="analysis-block" id="a2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>天元兴的端到端闭环控制架构与传统工业机器人的"感知-标定-规控"串行架构形成代际差异。工业场景的核心痛点是部署成本高（需要大量现场标定和调试），端到端方案"只需适配场景数据，无需复杂现场调试"的承诺直接切中这一痛点。如果量产成本真能降低50%，TX01在价格敏感的制造业中将具备显著竞争优势。但端到端方案的可解释性和安全性在工业场景（特别是与人协作的环节）仍需验证。</p>
+      </div>
+
+      <div class="analysis-block" id="a3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>天使轮投资方以人民币基金为主（弘德投资、盛世鸿元、海愿资本），暂无产业资本直接介入。这意味着公司在战略上保持较高独立性，不会被单一产业场景绑定。但同时也意味着需要自行开拓和维护工业客户关系——好在团队在商汤时期已积累的宁德时代、中铁等客户资源弥补了这一不足。商汤科技X生态的身份也为公司提供了底层AI能力的背书。</p>
+      </div>
+
+      <div class="analysis-block" id="a4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>天元兴的演进路径非常线性：商汤内部孵化→验证产品市场匹配（锂电感知方案批量落地）→分拆独立→升级产品形态（从感知方案到端到端操作机器人TX01）→横向拓展场景（从锂电到光伏、轨交、精密制造）。这一定义清晰的演进路径反映了团队对工业场景需求递进规律的深刻理解，也避免了大多数具身智能公司"先做出来再说"的战略模糊期。</p>
+      </div>
+
+      <div class="analysis-block" id="a5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>天元兴的取舍非常务实：不做双足人形，做轮式双臂；不做通用大脑，做工业场景的端到端控制；不做全栈大模型自研，而是利用商汤生态的数据-算法-硬件三层协同。轮式底盘+人形双臂的形态选择，体现了"够用就好"的工程思维——工业场景中轮式移动已足够覆盖绝大多数需求，双足行走的额外成本在此场景中难以产生对应的价值增量。</p>
+      </div>
+
+      <div class="analysis-block" id="a6">
+        <h4>2.6 其他重要观察、分析</h4>
+        <p>天元兴是具身智能赛道中少有的"从产业中来、到产业中去"的样本。团队出身大厂AI部门而非传统机器人公司或学术界，但选择的场景却是最"古典"的工业制造。这种"AI团队做工业硬件"的跨界组合在具身智能领域可能比纯机器人团队更有优势——因为工业场景的核心瓶颈已从"运动控制精度"转向"智能泛化能力"。出海方面，随宁德时代和欣旺达的项目已有德国和泰国两个触点，如果TX01在国内验证成功，海外拓展的基础设施已初步就绪。</p>
+      </div>
+
+      <h2 id="sources">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://www.donews.com/news/detail/4/6441030.html" target="_blank">原商汤工业机器人团队拆分创立天元兴，获数千万元天使轮融资 — DoNews</a></li>
+          <li><a href="https://news.qq.com/rain/a/20260226A04EGV00" target="_blank">通用工业具身智能平台天元兴完成数千万元天使轮融资 — 腾讯新闻</a></li>
+          <li><a href="https://www.bbtnews.com.cn/2026/0226/585609.shtml" target="_blank">通用工业具身智能平台天元兴完成数千万元天使轮融资 — 北京商报</a></li>
+          <li><a href="https://finance.eastmoney.com/a/202602263655263239.html" target="_blank">通用工业具身智能平台天元兴完成数千万元天使轮融资 — 东方财富</a></li>
+          <li><a href="https://news.qq.com/rain/a/20260226A0255A00" target="_blank">硬氪独家｜前商汤工业机器人团队创业融资数千万 — 36氪/硬氪</a></li>
+          <li><a href="https://m.pedaily.cn/news/561173" target="_blank">通用工业具身智能平台天元兴完成数千万元天使轮融资 — 投资界</a></li>
+          <li><a href="https://i.gasgoo.com/news/70448030.html" target="_blank">Seeds | 原商汤工业机器人团队拆分创业获数千万元融资 — 盖世汽车</a></li>
+          <li><a href="https://m.x-techcon.com/article/110644.html" target="_blank">前商汤工业机器人团队创业融资数千万 — 新智驾</a></li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">本页面由具身智能Wiki维护，最后更新于2026年5月。内容基于公开资料整理，仅供参考。</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

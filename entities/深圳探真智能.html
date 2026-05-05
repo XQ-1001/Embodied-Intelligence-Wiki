@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>深圳探真智能 — 具身智能Wiki</title><style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style></head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> › <span>深圳探真智能</span></div>
+  <div class="wiki-header"><h1>深圳探真智能</h1><div class="subtitle">深圳市探真智能科技有限公司 · 2025年成立 · 天使轮</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#team">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#finance">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl3"><a href="#a1">2.1 团队与场景匹配度</a></li>
+        <li class="toc-lvl3"><a href="#a2">2.2 技术路线与场景适配性</a></li>
+        <li class="toc-lvl3"><a href="#a3">2.3 资本结构对战略的影响</a></li>
+        <li class="toc-lvl3"><a href="#a4">2.4 试错过程与路径调整</a></li>
+        <li class="toc-lvl3"><a href="#a5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl3"><a href="#a6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#refs">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">深圳探真智能</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">深圳市探真智能科技有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2025年11月28日</div></div>
+        <div class="ib-row"><div class="ib-label">注册地</div><div class="ib-value">深圳市宝安区</div></div>
+        <div class="ib-row"><div class="ib-label">法定代表人</div><div class="ib-value">田艺</div></div>
+        <div class="ib-section">融资数据</div>
+        <div class="ib-row"><div class="ib-label">最新轮次</div><div class="ib-value">天使轮（2026.1）</div></div>
+        <div class="ib-row"><div class="ib-label">融资金额</div><div class="ib-value">千万级人民币</div></div>
+        <div class="ib-row"><div class="ib-label">投资方</div><div class="ib-value">未公开披露</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">注册资本</div><div class="ib-value">30万元</div></div>
+        <div class="ib-row"><div class="ib-label">团队规模</div><div class="ib-value">1-49人</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">赛道</div><div class="ib-value">工业具身智能</div></div>
+        <div class="ib-row"><div class="ib-label">背景特色</div><div class="ib-value">大疆系创业团队</div></div>
+      </aside>
+
+      <p class="article-intro"><strong>深圳探真智能</strong>（深圳市探真智能科技有限公司）是一家成立于2025年11月的工业具身智能初创企业，核心团队由三位来自大疆创新（DJI）的技术人才联合创立。公司定位为"具身智能解决方案提供商"，致力于通过深度融合计算机视觉、三维空间重建与机器人控制技术，打造具备感知、认知与行动能力的工业级具身智能体。公司成立后不到40天即于2026年1月完成千万级天使轮融资，彰显了资本市场对其大疆系团队背景和技术方向的高度认可。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper"><table class="wikitable infotable">
+        <tr><th>项目</th><th>内容</th></tr>
+        <tr><td>公司全称</td><td>深圳市探真智能科技有限公司</td></tr>
+        <tr><td>成立时间</td><td>2025年11月28日</td></tr>
+        <tr><td>注册资本</td><td>30万人民币</td></tr>
+        <tr><td>法定代表人</td><td>田艺</td></tr>
+        <tr><td>注册地址</td><td>深圳市宝安区新安街道兴东社区67区留芳路6号庭威产业园2号楼101</td></tr>
+        <tr><td>公司类型</td><td>有限责任公司</td></tr>
+        <tr><td>团队规模</td><td>1-49人</td></tr>
+      </table></div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>时间</th><th>事件</th></tr>
+        <tr><td>2025年11月28日</td><td>公司于深圳宝安区注册成立</td></tr>
+        <tr><td>2026年1月5日</td><td>完成千万级天使轮融资（成立仅38天）</td></tr>
+      </table></div>
+
+      <h3 id="team">1.2 创始人及核心团队</h3>
+      <p>深圳探真智能由三位来自<strong>大疆创新（DJI）</strong>的顶尖技术人才联合创立，核心成员拥有深厚的机器人、空间计算及行业应用落地经验。</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+        <tr><td>法定代表人/联合创始人</td><td>田艺</td><td>前大疆创新技术骨干，曾作为发明人参与大疆专利CN116360406A（可移动平台的控制方法）</td></tr>
+        <tr><td>联合创始人</td><td>梁家斌</td><td>前大疆创新技术骨干，与田艺共同作为大疆专利CN116360406A发明人</td></tr>
+        <tr><td>联合创始人</td><td>张霄</td><td>前大疆创新团队成员</td></tr>
+      </table></div>
+      <p>团队覆盖核心算法、机器人系统、产品定义、商业化策略、生产与供应链的完整能力矩阵。公司自我定位为"不玩虚的，不炒概念，专注于在复杂工业环境中，把感知、决策与执行做深、做透"，强调"技术深度与商业闭环"的双重长期主义。</p>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>轮次</th><th>时间</th><th>金额</th><th>估值</th><th>投资方</th></tr>
+        <tr><td>天使轮</td><td>2026年1月5日</td><td>千万级人民币</td><td>未披露</td><td>未公开披露</td></tr>
+      </table></div>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>股东类型</th><th>主要股东</th><th>备注</th></tr>
+        <tr><td>创始人</td><td>田艺、梁家斌、张霄</td><td>三位联合创始人直接持股</td></tr>
+      </table></div>
+      <p>公司成立仅38天即完成千万级天使轮融资，融资速度很快，显示资本市场对"大疆系"团队的高度认可。但投资机构身份未公开披露，可能为个人天使或非公开基金。</p>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>技术维度</th><th>内容</th></tr>
+        <tr><td>AI技术路线</td><td>深度融合计算机视觉、三维空间重建与机器人控制技术，打造具备感知-认知-行动能力的工业具身智能体</td></tr>
+        <tr><td>数据方案</td><td>尚未公开披露具体数据方案</td></tr>
+        <tr><td>全栈/专用路线</td><td>聚焦工业场景的具身智能解决方案，结合机器人与AI技术</td></tr>
+        <tr><td>差异化技术</td><td>大疆系团队在空间计算、多传感器融合、实时控制方面的深厚积累</td></tr>
+      </table></div>
+      <p>团队的大疆背景使其在空间感知、多传感器融合、实时系统控制方面具备先天的技术优势，这与工业具身智能对精确空间感知和实时响应的核心需求高度匹配。</p>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <p>公司注册经营范围涵盖工业机器人制造与销售、特殊作业机器人制造、服务消费机器人制造与销售、智能机器人的研发、人工智能行业应用系统集成服务、智能仪器仪表制造、智能车载设备制造、智能控制系统集成、智能物料搬运装备、电机及其控制系统研发等。</p>
+      <p>截至目前（2026年5月），公司成立仅约半年，尚未有具体产品名称或型号的公开信息，产品可能仍处于研发阶段。</p>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <p>公司明确聚焦<strong>工业场景</strong>的具身智能应用，旨在解决工业场景中复杂、高危及重复性的作业难题。根据公司经营范围描述，潜在应用方向包括工业机器人制造、特殊作业（高危环境）、物料搬运、智能车载设备等。与消费级人形机器人赛道不同，探真智能走的是"从工业场景切入"的务实路线。</p>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <p>公司处于极早期阶段（成立不足半年），暂无公开的商业化数据。天使轮融资千万级为产品研发提供了初始资金支持。</p>
+
+      <h3 id="finance">1.8 财务数据</h3>
+      <p>公司为成立不足半年的早期初创企业，未公开披露财务数据。注册资本30万元，天使轮融资千万级人民币为公司提供了初始研发资金。</p>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>公司名称"探真"暗含"探索真实世界、追求技术本质"的理念</li>
+        <li>三位联合创始人在大疆期间的技术积累（特别是空间感知与实时控制）是公司最核心的资产</li>
+        <li>专利CN116360406A（可移动平台的控制方法）由田艺和梁家斌在大疆期间作为发明人申请，侧面印证了团队的技术深度</li>
+        <li>公司选址深圳宝安区庭威产业园，该区域拥有良好的硬件创业生态和供应链资源</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="a1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>大疆创新以无人机闻名，其核心技术栈集中在空间感知（视觉SLAM、双目立体视觉）、多传感器融合（IMU+视觉+GPS）、实时运动控制和嵌入式系统工程——这些能力与工业具身智能的需求高度重合。工业场景的机器人需要在复杂、动态的工厂环境中实现精确的空间定位、物体识别和自主运动规划，而这恰恰是大疆系团队在无人机产品中积累了十余年的核心能力。因此，团队选择从工业具身智能切入是高度匹配的战略决策。三位联合创始人的大疆背景也使得团队在硬件产品化、供应链管理和工程落地方面具备稀缺的产业经验。</p>
+      </div>
+
+      <div class="analysis-block" id="a2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>探真智能选择"计算机视觉+三维空间重建+机器人控制"作为核心技术组合，在工业场景中具有明确的适配性。工业机器人需要在非结构化的工厂环境中准确感知周围空间、识别工件位置和姿态，然后执行精确的抓取、搬运或装配动作——这本质上是一个"感知→认知→行动"的闭环，与大疆无人机的"环境感知→路径规划→飞行控制"闭环在技术架构上高度相似。但工业场景对精度、可靠性和安全性的要求比消费级无人机更高，团队需要在大疆经验的基础上进行工业级的适配和升级。</p>
+      </div>
+
+      <div class="analysis-block" id="a3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>目前投资方未公开披露，天使轮可能为个人天使或非公开基金投资。三位联合创始人直接持股的简洁股权结构有利于早期快速决策和执行。由于未引入产业资本（如制造企业、物流公司等），公司在场景选择上具有较高的灵活性和独立性，可以基于技术判断自由选择最有潜力的工业细分场景，而不受特定产业资本的场景绑定。不过，未来如果引入产业资本，可能会自然绑定特定的客户资源和应用场景。</p>
+      </div>
+
+      <div class="analysis-block" id="a4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>公司成立仅半年，尚未观察到明显的试错过程或路径调整。团队从大疆出来后直接切入具身智能赛道，中间没有经过其他方向的探索，路径较为直接。这在当前具身智能产业快速升温的背景下是合理的——团队利用大疆积累的核心能力快速切入一个新兴的、有明确需求缺口的赛道。但极早期的阶段也意味着未来的产品方向、技术路线和应用场景仍存在调整的可能性。</p>
+      </div>
+
+      <div class="analysis-block" id="a5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>探真智能做出了一项明确的取舍：不走人形机器人概念路线，而是聚焦工业场景的务实应用。这一选择避免了与人形机器人赛道头部玩家的直接竞争（优必选、智元、Figure等），同时充分利用了大疆系团队在空间感知和实时控制方面的核心优势。但工业具身智能也是一个竞争激烈的赛道，既面临传统工业机器人巨头（发那科、ABB、库卡）的竞争，也面临新兴AI机器人公司（如非夕Flexiv、微亿智造等）的同赛道竞争。探真智能需要在工业场景中找到一个足够聚焦且自己能建立技术壁垒的细分方向。</p>
+      </div>
+
+      <div class="analysis-block" id="a6">
+        <h4>2.6 其他重要观察</h4>
+        <p>探真智能是具身智能赛道中"大疆系"创业的典型案例之一。大疆作为全球无人机龙头，其人才溢出效应正在多个硬科技领域显现。探真智能的团队背景和融资速度（成立38天即获千万级融资）表明，在当前的具身智能投资热潮中，拥有顶级硬件公司背景的创业团队具有显著的融资优势。但团队需要警惕"大疆光环"的局限性——无人机与工业机器人虽然技术栈相似，但在产品定义、客户需求、安全认证和商业模式上存在显著差异，团队需要在工业领域建立独立的行业认知和客户关系。公司后续的产品发布和客户拓展将是验证其商业模式的关键节点。</p>
+      </div>
+
+      <h2 id="refs">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li>网易 — <a href="https://www.163.com/dy/article/KIMTMPM00519QIKK.html">深圳市探真智能科技有限公司获"天使轮"融资，金额千万级人民币</a></li>
+          <li>innohere — <a href="https://innohere.com/ir/163579/general.html">探真智能 — 公司简介</a></li>
+          <li>innohere — <a href="https://innohere.com/ir/163579/finance.html">探真智能 — 融资历史</a></li>
+          <li>猎聘 — <a href="https://www.liepin.com/company/21367505/">深圳市探真智能科技有限公司招聘</a></li>
+          <li>天眼查 — <a href="https://m.tianyancha.com/zhuanli/dbf34cedcc6bd7609e09210017a24e55">CN116360406A 可移动平台的控制方法、装置及控制系统</a></li>
+          <li>FY35 — <a href="https://www.fy35.com/company/31368474.html">深圳市探真智能科技有限公司</a></li>
+          <li>投资界 — <a href="https://vc.pedaily.cn/invest/198061.html">探真科技</a></li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">本页面最后更新于2026年5月4日 · 具身智能Wiki项目</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

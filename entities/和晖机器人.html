@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>和晖机器人 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> › <span>和晖机器人</span></div>
+  <div class="wiki-header"><h1>和晖机器人</h1><div class="subtitle">Unisunbot · 2025年成立 · 天使轮 · 驱控一体化运动控制系统</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#team">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#product">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#finance">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#analysis-1">2.1 团队背景与场景匹配度</a></li>
+        <li class="toc-lvl4"><a href="#analysis-2">2.2 技术路线与场景适配性</a></li>
+        <li class="toc-lvl4"><a href="#analysis-3">2.3 股东/资本结构对战略的影响</a></li>
+        <li class="toc-lvl4"><a href="#analysis-4">2.4 试错过程与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#analysis-5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#analysis-6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#references">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">和晖机器人</div>
+        <div class="ib-section">基本信息</div>
+        <div class="ib-row"><div class="ib-label">公司全称</div><div class="ib-value">浙江和晖机器人技术有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">英文品牌</div><div class="ib-value">Unisunbot</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2025年9月18日</div></div>
+        <div class="ib-row"><div class="ib-label">注册地</div><div class="ib-value">杭州市萧山区</div></div>
+        <div class="ib-row"><div class="ib-label">创始人</div><div class="ib-value">董辉</div></div>
+        <div class="ib-row"><div class="ib-label">注册资本</div><div class="ib-value">1102.5万元</div></div>
+        <div class="ib-section">融资数据</div>
+        <div class="ib-row"><div class="ib-label">最新轮次</div><div class="ib-value">天使轮</div></div>
+        <div class="ib-row"><div class="ib-label">融资金额</div><div class="ib-value">数千万元人民币</div></div>
+        <div class="ib-row"><div class="ib-label">主要投资方</div><div class="ib-value">银杏谷资本、锦聚投资</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">已获订单</div><div class="ib-value">超6000万元</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">行业</div><div class="ib-value">具身智能 · 运动控制</div></div>
+        <div class="ib-row"><div class="ib-label">赛道</div><div class="ib-value">驱控一体化</div></div>
+        <div class="ib-row"><div class="ib-label">阶段</div><div class="ib-value">天使轮 / 种子独角兽</div></div>
+      </aside>
+
+      <p class="article-intro"><strong>和晖机器人</strong>（Unisunbot），全称浙江和晖机器人技术有限公司，成立于2025年9月，总部位于杭州市萧山区。公司由浙江大学博士、浙江工业大学教授、展晖科技创始人董辉创立，专注于具身智能机器人运动控制系统（"小脑"及关节模组）的研发与产业化，主打产品为<strong>Unisun-M1驱控系统</strong>。公司定位为驱控一体化解决方案供应商，覆盖"大脑+小脑+伺服驱动+关节模组+应用"全栈技术，成立不到半年即获得银杏谷资本、锦聚投资等机构数千万天使轮投资，并拿下超6000万元订单。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper">
+        <table class="wikitable infotable">
+          <tr><th>项目</th><th>内容</th></tr>
+          <tr><td>公司全称</td><td>浙江和晖机器人技术有限公司</td></tr>
+          <tr><td>英文品牌</td><td>Unisunbot</td></tr>
+          <tr><td>成立时间</td><td>2025年9月18日</td></tr>
+          <tr><td>注册地</td><td>杭州市萧山区经济技术开发区机器人中心（原注册于衢州龙游，2025年12月迁至杭州）</td></tr>
+          <tr><td>法定代表人</td><td>董辉</td></tr>
+          <tr><td>注册资本</td><td>1102.5万人民币</td></tr>
+          <tr><td>上市状态</td><td>未上市</td></tr>
+          <tr><td>行业标签</td><td>具身智能 · 机器人运动控制 · 驱控一体化 · 工业自动化</td></tr>
+        </table>
+      </div>
+      <h4>发展沿革</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>时间</th><th>事件</th></tr>
+          <tr><td>2025年9月</td><td>浙江和晖机器人技术有限公司注册成立（衢州龙游）</td></tr>
+          <tr><td>2025年11月</td><td>天使轮融资首次披露，投资方为银杏谷资本、锦聚投资、拜罗伊特科技</td></tr>
+          <tr><td>2025年12月</td><td>入选「2025浙大系创新创业榜单」种子独角兽企业</td></tr>
+          <tr><td>2025年12月</td><td>注册地由衢州龙游迁至杭州萧山区</td></tr>
+          <tr><td>2026年1月23日</td><td>天使轮融资完成，金额数千万人民币</td></tr>
+          <tr><td>2026年1月31日</td><td>承办「精控赋能·共筑落地——具身机器人技术实践与生态论坛」，与星汉动力达成战略合作</td></tr>
+        </table>
+      </div>
+
+      <h3 id="team">1.2 创始人及核心团队</h3>
+      <p>和晖机器人的创始人与核心团队具有鲜明的<strong>高校学术+产业实战</strong>双重基因。创始人董辉博士（1979年生）2007年毕业于浙江大学控制科学与工程专业，现为浙江工业大学信息工程学院教授、博士生导师。在创立和晖机器人之前，董辉曾任职于华为、UT斯达康和通用电气（GE）等大型企业，积累了丰富的产业经验。他还于2017年创办了杭州展晖科技有限公司，专注于高端运动控制和工控软件核心算法的国产替代。</p>
+      <p>公司股东结构包含4家合伙企业（杭州翊晖、杭州翎晖、杭州和晖、拜罗伊特科技），显示团队激励与外部资源导入并重的设计思路。整体团队呈现以董辉个人学术声望和产业积累为核心、合伙企业为团队持股平台的典型高校教授创业架构。</p>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+          <tr><td>创始人/法人</td><td>董辉</td><td>浙江大学控制科学博士（2007），浙江工业大学教授/博导，展晖科技创始人；曾任职华为、UT斯达康、GE；2024年浙江省最具创新力青年科技型企业家；手握70余项授权发明专利，主持国家及省部级重大项目10余项，横向经费超8000万元</td></tr>
+        </table>
+      </div>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>轮次</th><th>时间</th><th>金额</th><th>投资方</th></tr>
+          <tr><td>天使轮</td><td>2025年11月（首次披露）</td><td>未披露</td><td>银杏谷资本、锦聚投资、拜罗伊特科技</td></tr>
+          <tr><td>天使轮（完成）</td><td>2026年1月23日</td><td>数千万人民币</td><td>银杏谷资本、锦聚投资</td></tr>
+        </table>
+      </div>
+      <p>公司估值尚未公开披露。股东结构为董辉个人持股加4家合伙企业（杭州翊晖、杭州翎晖、杭州和晖、拜罗伊特科技（上海）），尚未有产业资本或战略投资者大额入股。公司目前仅完成一轮融资，处于极早期阶段。</p>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>技术维度</th><th>具体内容</th></tr>
+          <tr><td>总体AI技术路线</td><td>聚焦具身智能"小脑"层——运动控制系统，覆盖"大脑+小脑+伺服驱动+关节模组+应用"全栈</td></tr>
+          <tr><td>数据方案</td><td>基于创始人20年工业自动化控制经验，积累大量运动控制算法与实际工况数据</td></tr>
+          <tr><td>全栈/专用路线</td><td>驱控一体化专用路线，从底层代码实现100%自主可控</td></tr>
+          <tr><td>自研程度</td><td>核心算法完全自研，伺服驱动与关节模组深度协同优化</td></tr>
+          <tr><td>差异化特色</td><td>高性能伺服驱动+关节模组深度融合，响应速度与力控平顺性达行业领先水平；覆盖四足、人形等多种机器人形态</td></tr>
+        </table>
+      </div>
+      <p>和晖机器人的技术根基来自创始人董辉在展晖科技积累的高端运动控制算法能力。展晖科技自2017年起便专注于工控软件核心算法的国产替代，产品已广泛应用于机器人、机械手、切割机、点胶机、模切机等智能装备领域。和晖机器人将这一技术底座延伸至具身智能机器人领域，核心策略是以"小脑"运动控制为切入点，向上对接"大脑"AI算法，向下整合伺服驱动与关节模组，形成驱控一体化的完整解决方案。</p>
+
+      <h3 id="product">1.5 产品形态</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>产品名称</th><th>定位</th><th>核心特点</th><th>适用形态</th></tr>
+          <tr><td>Unisun-M1 驱控系统</td><td>高性能具身智能机器人运动控制系统</td><td>高性能伺服驱动与关节模组深度协同优化；响应速度与力控平顺性行业领先；从底层代码100%自主可控</td><td>四足机器人、人形机器人等多种形态</td></tr>
+        </table>
+      </div>
+      <p>Unisun-M1定位为机器人的"小脑"及关节模组，为上游机器人整机厂商提供核心运动控制部件。产品主打高性价比的国产替代方案，致力于降低具身智能机器人的运动控制成本。目前尚无公开的详细参数规格披露。</p>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>场景分类</th><th>具体应用</th><th>合作方/生态伙伴</th></tr>
+          <tr><td>工业制造</td><td>智能装备运动控制、工业机器人关节驱动</td><td>申昊科技、万里扬、卧龙电驱、诺力</td></tr>
+          <tr><td>具身智能整机</td><td>四足机器人、人形机器人运动控制系统</td><td>星汉动力（战略合作）、千寻智能、五八智能</td></tr>
+          <tr><td>科研/教育</td><td>高校与科研机构机器人研发平台</td><td>浙江工业大学、中国计量大学</td></tr>
+          <tr><td>云端算力</td><td>AI算法部署与云平台对接</td><td>阿里云</td></tr>
+        </table>
+      </div>
+      <p>和晖机器人扮演产业链上游核心部件供应商角色，其驱控系统服务于各类具身智能整机厂商。2026年1月论坛汇聚了阿里云、申昊科技、卧龙电驱、绿源集团、千寻智能、诺力等近70家产业链企业，显示其在浙江省机器人产业生态中已初步建立起广泛的合作网络。</p>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <p>截至2026年1月，公司已获订单超6000万元人民币。对于一个成立不足半年的公司而言，这一数据表明其驱控系统产品已具备较强的市场需求验证。</p>
+      <p>2026年1月31日，和晖机器人作为承办单位举办「精控赋能·共筑落地——具身机器人技术实践与生态论坛」，会上与星汉动力完成战略合作签约，双方将围绕核心部件标准化、高性能关节模组与AI算法深度适配、复杂工业场景全链路工程落地等方向展开合作，目标加速规模化量产与市场交付。</p>
+
+      <h3 id="finance">1.8 财务数据</h3>
+      <p>公司成立于2025年9月，目前尚处于产品研发与早期商业验证阶段，尚未公开披露营收和利润数据。可获取的财务相关数据极为有限：注册资本1102.5万元，天使轮融资数千万人民币，已获订单超6000万元。无公开营收、净利润、毛利率或现金储备数据。</p>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>入选「2025浙大系创新创业榜单」种子独角兽企业</li>
+        <li>与吉林大学重庆研究院参股企业星汉动力达成战略合作，推动核心部件标准化与量产交付</li>
+        <li>主办方为浙江省机器人产业发展协会，和晖机器人作为主要承办单位，显示其在浙江机器人产业生态中的组织角色</li>
+        <li>创始人董辉与宇树科技王兴兴同批获评2024年浙江省最具创新力青年科技型企业家，两人均为具身智能赛道浙大系创业者</li>
+        <li>公司注册地在2025年12月从衢州龙游迁至杭州萧山，靠近浙江省机器人产业核心集聚区</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="analysis-1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>创始人董辉的学术与产业背景与驱控一体化赛道高度匹配。其浙江大学教授身份给予团队扎实的学术理论支撑，20年工业自动化控制领域的产业经验（展晖科技、华为、GE）决定了其产品方向天然偏向工业级高精度运动控制。展晖科技已有的运动控制算法积累可直接移植至具身智能机器人"小脑"系统，形成技术复用优势。团队选择从上游核心部件（驱控系统）切入而非直接做整机，与创始人"强控制、重算法"的能力长板精准对齐。此外，董辉在浙江省机器人产业发展协会中的人脉网络（如与宇树科技等企业同属浙大系生态），为其早期场景拓展提供了天然的产业合作土壤。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>和晖机器人的驱控一体化路线与当前具身智能产业链的瓶颈高度适配。具身智能整机厂商普遍面临运动控制的精度、响应速度与成本三角难题——"大脑"AI算法快速迭代，但"小脑"运动控制的技术门槛与量产成本居高不下。和晖以高性价比国产替代为切入点，聚焦伺服驱动与关节模组的深度协同优化，精准切入了产业链的薄弱环节。该路线与工业场景对运动控制的高可靠性要求天然吻合，兼顾四足和人形机器人两大主流形态也为未来场景拓展保留了灵活性。潜在风险在于，如果行业出现标准化的小脑-大脑接口协议，纯控制层供应商可能面临被AI公司向下整合的压力。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>当前股东以创始人个人持股加员工合伙企业为主，银杏谷资本和锦聚投资作为天使轮财务投资者进入。银杏谷资本在硬科技和智能制造领域有较深布局，锦聚投资则有产业资源整合能力。目前尚无产业资本（如机器人整机厂商、车企、制造企业）大额入股，这意味着公司短期内具有较高的战略独立性和场景选择自主权，不必被单一产业方绑定。但随着规模扩大，如果引入产业投资者（如上游整机厂商），可能面临客户冲突的取舍；若不引入，则可能在订单资源和大客户绑定方面落后于有产业资本加持的竞品。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>公司成立仅半年，尚未出现明显的试错或路径调整。但可观察到两个值得注意的动向：其一，公司注册地从衢州龙游迁至杭州萧山，显示出从地方城市向机器人产业核心区靠拢的战略意图——这既便于招揽人才，也利于与杭州及浙江省机器人产业集群（宇树科技、云深处等）建立更紧密的合作关系；其二，公司从天使轮引入三家投资方到最终落定两家（银杏谷、锦聚），拜罗伊特科技在最终融资公告中未被列为投资方，可能存在投资条款调整。总体而言，公司仍处于战略成型期，未来产品方向和市场定位的调整值得关注。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>和晖机器人的核心取舍是：<strong>不做整机，专做"小脑"</strong>。在具身智能产业中，这是一个"卖铲子"的定位——不直接参与整机品牌与场景应用的竞争，而是为所有整机厂商提供核心运动控制部件。这一策略的优势在于市场面宽（可服务多个整机品牌）、技术壁垒高（运动控制是硬门槛），劣势在于品牌曝光度低、长期可能被上下游挤压。类比智能手机产业链，和晖更像是做芯片或传感器的角色，而非手机品牌。在具身智能尚未出现明确的"iPhone时刻"之前，上游核心部件的市场空间和议价能力取决于整机行业的碎片化程度与标准化进程。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-6">
+        <h4>2.6 其他重要观察</h4>
+        <p>（1）浙大系创业生态是和晖机器人不可忽视的隐形资产。创始人董辉与宇树科技王兴兴同批获奖，均在浙江机器人产业生态中活跃，浙大系企业间的资源互通可能成为早期业务的加速器。（2）成立不到半年即获6000万订单，表明产品已越过"实验室样品"阶段进入商业验证，这在天使轮公司中属于较快节奏。（3）公司承办的2026年1月论坛名为"精控赋能·共筑落地"，主题词从"技术"转向"落地"，反映了公司及行业从技术验证转向规模化应用的整体基调。（4）作为浙江省机器人产业发展协会论坛的承办方，和晖在区域产业政策资源获取上具有一定先发优势，浙江省对具身智能产业的扶持力度值得持续关注。</p>
+      </div>
+
+      <h2 id="references">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://news.qq.com/rain/a/20260131A06CBK00" target="_blank">汇聚行业领军企业 共铸"智造"新质生产力和晖机器人助力具身机器人技术实践与生态论坛在杭成功举办</a> — 腾讯新闻</li>
+          <li><a href="https://finance.jrj.com.cn/2026/01/24101955255189.shtml" target="_blank">浙江和晖机器人技术有限公司获"天使轮"融资，金额数千万人民币</a> — 金融界</li>
+          <li><a href="https://m.qixin.com/company/9f252ef1-950b-11f0-a806-525400b04e3d" target="_blank">浙江和晖机器人技术有限公司</a> — 启信宝</li>
+          <li><a href="https://m.pedaily.cn/vc/company/865536.html" target="_blank">和晖机器人</a> — 投资界</li>
+          <li><a href="https://vc.pedaily.cn/company/f2844-y2025-c311-r3133" target="_blank">和晖机器人融资详情</a> — 投资圈</li>
+          <li><a href="https://stock.stockstar.com/RB2026012500008769.shtml" target="_blank">【投融资动态】和晖机器人天使轮融资，融资额数千万人民币，投资方为银杏谷资本、锦聚投资等</a> — 证券之星</li>
+          <li><a href="https://tidenews.com.cn/news.html?id=3360842" target="_blank">汇聚行业领军企业，共铸"智造"新质生产力，和晖机器人助力具身机器人技术实践与生态论坛在杭举办</a> — 潮新闻</li>
+          <li><a href="https://www.donews.com/news/detail/8/6271012.html" target="_blank">和晖机器人获天使轮融资</a> — DoNews</li>
+          <li><a href="https://www.cqrijlu.com/html/610.html" target="_blank">吉林大学重庆研究院参股企业星汉动力受邀出席具身机器人高峰论坛 与和晖机器人携手迈出量产关键一步</a> — 吉林大学重庆研究院</li>
+          <li><a href="https://www.innohere.com/ir/163137/finance.html" target="_blank">和晖机器人 - 融资历史</a> — 烯牛数据</li>
+          <li><a href="https://data.iyiou.com/company/details/8838fda7a763bc5f7fb0ee69d6e4a617/profile" target="_blank">和晖机器人</a> — 亿欧数据</li>
+          <li><a href="http://t.10jqka.com.cn/pid_589568692.shtml" target="_blank">【投融资动态】和晖机器人天使轮融资，融资额数千万人民币</a> — 同花顺</li>
+          <li><a href="http://www.qxzh.zj.cn/art/2025/2/27/art_1228965109_58933129.html" target="_blank">董辉：掀起工业自动化"国产替代"的浪潮</a> — 浙江省企业权益保护协会</li>
+          <li><a href="https://homepage.zjut.edu.cn//dh2/" target="_blank">董辉 - 浙江工业大学教师个人主页</a></li>
+          <li><a href="https://baike.baidu.com/item/%E8%91%A3%E8%BE%89/66744844" target="_blank">董辉</a> — 百度百科</li>
+          <li><a href="https://www.ikeysun.com/sys-nd/37.html" target="_blank">展晖科技有限公司法人董辉教授荣膺"2022中国自动化领域年度人物"</a></li>
+          <li><a href="http://www.nbsqywh.com/cn/pinpaid.php?gid=0&nid=898" target="_blank">董辉：掀起工业自动化"国产替代"的浪潮</a> — 宁波市企业文化研究会</li>
+          <li><a href="http://stock.stockstar.com/RB2025112600032740.shtml" target="_blank">【投融资动态】和晖机器人天使轮融资，投资方为锦聚投资、银杏谷资本等</a> — 证券之星</li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">本页面由具身智能Wiki维护，最后更新于2026年5月 · 内容仅供信息参考，不构成投资建议</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

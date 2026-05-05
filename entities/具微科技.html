@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>具微科技 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> › <span>具微科技</span></div>
+  <div class="wiki-header"><h1>具微科技</h1><div class="subtitle">Micbot · 成立于2025年 · 特种工业轮足四足机器人 · 中国市占率45% · 在手订单超5亿元</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#founders">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financials">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#analysis-1">2.1 团队背景与场景选择匹配度</a></li>
+        <li class="toc-lvl4"><a href="#analysis-2">2.2 技术路线与场景适配性</a></li>
+        <li class="toc-lvl4"><a href="#analysis-3">2.3 股东/资本结构对战略影响</a></li>
+        <li class="toc-lvl4"><a href="#analysis-4">2.4 试错过程与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#analysis-5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#analysis-6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#references">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">具微科技</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">杭州具微科技有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">英文名</div><div class="ib-value">Micbot</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2025年2月14日</div></div>
+        <div class="ib-row"><div class="ib-label">注册地</div><div class="ib-value">浙江省杭州市钱塘区</div></div>
+        <div class="ib-row"><div class="ib-label">创始人&CEO</div><div class="ib-value">王子煊</div></div>
+        <div class="ib-row"><div class="ib-label">首席科学家</div><div class="ib-value">李秦川（浙江理工大学）</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">2025年订单</div><div class="ib-value">1.1亿元</div></div>
+        <div class="ib-row"><div class="ib-label">在手订单</div><div class="ib-value">超5亿元</div></div>
+        <div class="ib-row"><div class="ib-label">市场占有率</div><div class="ib-value">45%（特种工业四足）</div></div>
+        <div class="ib-row"><div class="ib-label">员工人数</div><div class="ib-value">未公开（研发占比>70%）</div></div>
+        <div class="ib-section">融资</div>
+        <div class="ib-row"><div class="ib-label">累计融资</div><div class="ib-value">数亿元（含超亿美元单轮）</div></div>
+        <div class="ib-row"><div class="ib-label">最新轮次</div><div class="ib-value">A+++轮（2026.04）</div></div>
+        <div class="ib-row"><div class="ib-label">估值</div><div class="ib-value">未公开</div></div>
+        <div class="ib-section">分类</div>
+        <div class="ib-row"><div class="ib-label">行业</div><div class="ib-value">具身智能 · 特种机器人</div></div>
+        <div class="ib-row"><div class="ib-label">产品形态</div><div class="ib-value">轮足四足机器人</div></div>
+        <div class="ib-row"><div class="ib-label">技术路线</div><div class="ib-value">轮足复合 · 全栈自研</div></div>
+        <div class="ib-section">官方链接</div>
+        <div class="ib-row"><div class="ib-label">官网</div><div class="ib-value">未公开</div></div>
+      </aside>
+
+      <p class="article-intro">具微科技（杭州具微科技有限公司，英文名Micbot）是一家专注于特种工业轮足四足机器人研发与商业化的具身智能创业公司，2025年2月成立于浙江省杭州市钱塘区。公司在成立一年内即实现从0到订单突破5亿元的爆发式增长，2026年初两个月内完成4轮累计数亿元融资。具微科技以"四防"（防磁、防爆、防水、防冻）为核心差异化，聚焦电解铝、石油化工、消防应急等极端工业场景，在中国特种工业四足机器人细分市场占有率达45%，位列第一。与宇树科技、云深处、五八智能并称为"杭州四小狗"。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 基本信息</h3>
+      <div class="table-wrapper">
+        <table class="wikitable infotable">
+          <tr><th>项目</th><th>内容</th></tr>
+          <tr><td>公司全称</td><td>杭州具微科技有限公司</td></tr>
+          <tr><td>英文名称</td><td>Micbot</td></tr>
+          <tr><td>成立时间</td><td>2025年2月14日</td></tr>
+          <tr><td>注册地</td><td>浙江省杭州市钱塘区机器人谷</td></tr>
+          <tr><td>法定代表人</td><td>王子煊</td></tr>
+          <tr><td>上市状态</td><td>未上市</td></tr>
+          <tr><td>所属赛道</td><td>具身智能 · 特种工业机器人 · 轮足四足机器人</td></tr>
+          <tr><td>行业地位</td><td>"杭州四小狗"之一；中国特种工业四足机器人市占率第一（45%）</td></tr>
+        </table>
+      </div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>时间</th><th>事件</th></tr>
+          <tr><td>2025年2月</td><td>杭州具微科技有限公司正式成立，总部位于钱塘区</td></tr>
+          <tr><td>2025年12月</td><td>与浙江理工大学机械工程学院共建"浙理-具微智能机器人研究院"</td></tr>
+          <tr><td>2025年全年</td><td>完成订单达1.1亿元；产品完成1000高斯强磁环境测试（行业首家）</td></tr>
+          <tr><td>2026年1月</td><td>完成近亿元A轮融资，正强股份领投；李秦川教授受聘首席科学家</td></tr>
+          <tr><td>2026年2月</td><td>连续完成A+轮（建元天华）和A++轮（滨州国投），均为超亿美元级别</td></tr>
+          <tr><td>2026年3月</td><td>获国内首张具身智能机器人复合防爆认证（Ex db eb IIB T4 Gb）</td></tr>
+          <tr><td>2026年4月</td><td>完成A+++轮数亿元融资（滨州国投、魏桥集团、滨化股份联合领投）；钱塘机器人谷开园，具微科技作为链主入驻</td></tr>
+        </table>
+      </div>
+
+      <h3 id="founders">1.2 创始人及核心团队</h3>
+      <p>具微科技由90后连续创业者王子煊创立，核心团队来自斯坦福大学、浙江大学、浙江理工大学等顶尖高校，研发人员占比超70%。公司首席科学家为浙江理工大学机械工程学院院长李秦川教授——国家级领军人才、国务院政府特殊津贴专家、曾任IEEE Transactions on Robotics副编辑。团队整体呈现"产业经验+学术权威"混合型人才结构，专业覆盖机器人结构设计、运动控制、AI算法、高端制造和机电一体化。</p>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+          <tr><td>创始人&CEO</td><td>王子煊</td><td>温州90后连续创业者，温州大学本科、经济学硕士，持有国家法律职业资格。曾任职世界500强集团，创办顺遂国际任创始人兼总裁。曾任核聚资本董事合伙人，主导投资零跑汽车、欣旺达等知名项目。2021年牵头创立国内头部钠电池企业。2026年获评杭州"未来产业领军人才"</td></tr>
+          <tr><td>首席科学家</td><td>李秦川</td><td>浙江理工大学机械工程学院院长、国家级领军人才、国务院政府特殊津贴专家、全国先进工作者。曾任IEEE Transactions on Robotics副编辑，主持国家自然科学基金杰出青年项目等十余项国家级科研项目。研究方向：机器人机构学、机器人化制造装备、足式/人形机器人</td></tr>
+          <tr><td>CMO</td><td>黄子炎</td><td>负责市场营销与品牌建设（公开信息有限）</td></tr>
+          <tr><td>研发团队</td><td>—</td><td>斯坦福大学、浙江大学、浙江理工大学等高校背景，研发人员占比超70%</td></tr>
+        </table>
+      </div>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <p>具微科技在2026年开年约两个月内完成4轮密集融资，创下具身智能行业30天内连续完成3轮融资的纪录。投资方覆盖上市公司产业资本、国有资本与市场化机构，形成"技术自研+供应链绑定+场景闭环落地"的三位一体资本结构。</p>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>轮次</th><th>时间</th><th>金额</th><th>投资方</th><th>战略协同</th></tr>
+          <tr><td>A轮</td><td>2026年1月</td><td>近亿元</td><td>正强股份（领投）、壹连科技、豪恩汽电、鲁信创投</td><td>深度绑定关节模组、电连接、智能感知等上游供应链</td></tr>
+          <tr><td>A+轮</td><td>2026年2月</td><td>超亿美元</td><td>建元天华</td><td>行业资本加码</td></tr>
+          <tr><td>A++轮</td><td>2026年2月</td><td>超亿美元</td><td>滨州国投</td><td>国有资本战略注资，对接山东工业场景</td></tr>
+          <tr><td>A+++轮</td><td>2026年4月</td><td>数亿元</td><td>滨州国投、魏桥集团、滨化股份（联合领投）、和达控股、德诺资本（跟投）</td><td>产业场景协同：魏桥（电解铝）、滨化（化工防爆）</td></tr>
+        </table>
+      </div>
+      <p>累计融资总额达数亿元，含超亿美元级单轮。目前未上市，估值未公开披露。</p>
+      <div class="callout"><div class="callout-title">资本结构特征</div>投资方以产业资本和国有资本为主，四家上市公司（正强股份、壹连科技、豪恩汽电等）联合投资被认为是围绕四足机器人产业化落地的"生态型"布局。滨州国投连续多轮领投，魏桥集团和滨化股份作为产业方直接入股，形成了罕见的"投资即绑定场景"模式。</div>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <p>具微科技采取全栈正向自研路线，涵盖从底层电机驱动到上层感知决策的完整技术栈。核心技术特色包括全球首创的轮足复合运动控制、行业首家自研能量回收电池系统，以及"感规控驱"一体化系统。</p>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>技术维度</th><th>路线选择</th><th>说明</th></tr>
+          <tr><td>AI架构</td><td>"感规控驱"一体化</td><td>底层FOC控制→上层运动控制→感知决策全链路打通；自研NeuroFuse多模态感知网络+CogniDecide决策引擎</td></tr>
+          <tr><td>运动形态</td><td>轮足复合（全球首创）</td><td>融合轮式高效巡航与足式全地形通过性，"宽体+短腿"构型，兼顾效率与全地形能力</td></tr>
+          <tr><td>关节电机</td><td>自研DynaForce劲擎关节模组</td><td>16个关节电机，最大扭矩450N·m，与正强股份联合研发自产</td></tr>
+          <tr><td>能量系统</td><td>自研能量回收电池</td><td>借鉴汽车行业动能回收+液冷方案，热插拔3.2kWh三元锂电池，续航达行业3-6倍</td></tr>
+          <tr><td>感知系统</td><td>多传感器融合</td><td>96线激光雷达（可扩展至3个）+深度相机+超声波雷达+IMU；P1-ExR增加热成像仪+四合一气体传感器</td></tr>
+          <tr><td>算法特色</td><td>强化学习+无图导航</td><td>自主跟随、越障、三维空间无图自主导航；研发中：群体智能多机器人协同</td></tr>
+          <tr><td>材料结构</td><td>航空级碳纤维复合骨骼</td><td>航空级碳纤维+高强度铝合金关节，轻量化与强度平衡</td></tr>
+          <tr><td>全栈程度</td><td>全栈自研（硬件+算法）</td><td>从电机、电池、骨骼结构到感知决策算法全部自研，不依赖外部方案</td></tr>
+        </table>
+      </div>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>型号</th><th>定位</th><th>重量</th><th>负载</th><th>续航</th><th>温度范围</th><th>核心特色</th></tr>
+          <tr><td>MOVENEW P1</td><td>行业级核心产品</td><td>77kg</td><td>动态200kg / 静态400kg</td><td>空载12h / 满载8h</td><td>-40°C~85°C</td><td>IP67防护、1000Gs防磁、3m/s速度、45°爬坡</td></tr>
+          <tr><td>MOVENEW P1-ExR</td><td>防爆版（P1衍生）</td><td>同P1</td><td>同P1</td><td>12h</td><td>同P1</td><td>行业首张Ex db eb IIB T4 Gb防爆认证；配备热成像仪+四合一气体传感器；3000小时无故障运行</td></tr>
+          <tr><td>MOVENEW P2</td><td>行业级增强越障</td><td>同P1</td><td>同P1</td><td>同P1</td><td>同P1</td><td>可爬25cm台阶，最大攀爬800mm，防爆认证</td></tr>
+          <tr><td>MOVENEW T1</td><td>旗舰级智能体</td><td>35kg</td><td>100kg</td><td>12h</td><td>—</td><td>本地181 TOPS算力；视觉+激光+超声三重感知；NeuroFuse+CogniDecide系统</td></tr>
+        </table>
+      </div>
+      <p>所有行业级产品均支持模块化快换上装（巡检/检测/应急处置/机械臂），一机多用，满足"四防"极端场景需求。</p>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>场景领域</th><th>典型环境</th><th>核心需求</th><th>代表合作方</th></tr>
+          <tr><td>电解铝/冶金</td><td>强磁场（1000Gs）、高温车间</td><td>防磁抗干扰巡检、设备状态监测</td><td>魏桥集团（全球500强）</td></tr>
+          <tr><td>石油石化/化工</td><td>易燃易爆气体环境（1区/2区）</td><td>防爆巡检、气体泄漏检测、罐区监控</td><td>滨化股份、滨州化工</td></tr>
+          <tr><td>消防应急</td><td>火场、坍塌建筑</td><td>重型物资运输、火场侦察、有毒气体探测</td><td>各地消防/应急管理部门</td></tr>
+          <tr><td>公安安防</td><td>厂区/园区巡逻</td><td>自主巡逻、异常识别告警</td><td>公安/安防系统</td></tr>
+          <tr><td>煤炭/矿井</td><td>井下瓦斯、高粉尘</td><td>防爆巡检、安全监测</td><td>煤炭企业</td></tr>
+        </table>
+      </div>
+      <p>订单分布：约1/3来自重工业场景，1/3来自政府项目（公安、应急、消防），1/3来自海外市场。</p>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <p>具微科技在成立首年即实现爆发式商业化突破。2025年全年完成订单1.1亿元，截至2026年4月在手订单突破5亿元。2026年预计出货量达上千台，预计营收数亿元。产品已覆盖近千个行业应用场景，客户以大型国央企为主，采购逻辑偏工业装备导向。市场占有率在中国特种工业四足机器人细分赛道达45%，位列第一。商业模式为提供本地部署+上装适配+算法平台一体化的全栈式特种作业解决方案。</p>
+
+      <h3 id="financials">1.8 财务数据</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>指标</th><th>2025年</th><th>2026年（预期）</th></tr>
+          <tr><td>完成订单</td><td>1.1亿元</td><td>—</td></tr>
+          <tr><td>在手订单</td><td>—</td><td>超5亿元</td></tr>
+          <tr><td>预计营收</td><td>—</td><td>数亿元</td></tr>
+          <tr><td>预计出货</td><td>—</td><td>上千台</td></tr>
+          <tr><td>市场占有率</td><td>—</td><td>45%（特种工业四足）</td></tr>
+        </table>
+      </div>
+      <p>公司尚未上市，未公开披露完整财务报表。账面资金储备方面，考虑到2026年密集完成4轮大额融资（含超亿美元单轮），现金储备应较为充裕，足以支撑研发投入与产能扩张。</p>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>具微科技以"链主企业"身份入驻钱塘（新）区机器人谷（建筑面积10万㎡），上下游企业如具强科技（一体化关节模组）、XRET（智能电池）等已集聚落地</li>
+        <li>创始人王子煊提出"三个非共识"经营理念：移动≠足（轮足融合效率优先）、操作≠手（电子信号控工具非仿生五指）、交互对象≠人（机器人围绕任务作业）</li>
+        <li>公司提出具身智能三阶段论：要素创新（已完成）→供应链整合+工程化+场景落地（进行中）→商业模式创新（推进中）</li>
+        <li>2027年底目标：无故障连续工作时间提升至1万小时以上（工业级标准）</li>
+        <li>计划向第三方硬件开发者开放"操作系统/应用商城"，推动生态扩展</li>
+        <li>长期战略：从特种场景向日常生活服务场景迁移</li>
+        <li>产品已获国内首张具身智能机器人复合防爆认证，年内计划完成IECEx、ATEX、CNEX全系列国际防爆认证</li>
+        <li>2026年世界机器人大会参展企业</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="analysis-1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>王子煊的投资背景（零跑汽车、欣旺达、钠电池创业）使其对"技术与产业链结合"有深刻理解，连续创业经验有助于在资本与场景间快速搭建通路。首席科学家李秦川在机器人机构学领域的学术权威地位为四足机器人骨骼构型设计提供了扎实的理论支撑。然而，团队核心缺乏传统工业领域（如石油化工、冶金）的行业老兵，这在一定程度上影响了对极端工业场景需求深度的把握。不过，通过引入魏桥集团、滨化股份等产业资本，具微科技巧妙地将场景know-how"外部化"——投资方即需求方，在相当程度上弥补了团队行业经验的短板。整体来看，团队以资本运作能力和学术资源弥补了工业场景经验的不足，形成了独特的"投资+学术"驱动型的场景切入模式。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>具微科技选择的"轮足复合"而非纯足式路线，是其场景适配性的核心智慧。在电解铝、石油化工等工业场景中，大部分巡检区域为平坦的厂区道路，纯足式方案存在效率低、能耗高的天然劣势；而纯轮式方案则在台阶、管道等障碍面前失效。轮足融合实现了"公路高速巡航+复杂地形攀爬"的无缝切换，是最贴合工业场景的选择。能量回收系统（借鉴汽车动能回收技术）将续航推至12小时（行业平均2-4小时），解决了工业场景"最后一公里"的巡检连续性问题。从技术路线与场景的匹配度看，这是一条每项技术决策都能在场景中找到直接"为什么要这样做"的答案的路径，适配度极高。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>具微科技的股东结构呈现出罕见的"投资即绑定场景"特征：正强股份（关节模组供应商）→供应链锁定；魏桥集团（全球最大电解铝企业之一）→防磁场景直接落地；滨化股份→化工防爆场景需求方；滨州国投→国有资本背书+政府项目资源。这种模式下，具微科技的战略空间受到投资方场景的天然约束——在享受魏桥电解铝场景的同时，也意味着短期内不太可能切入竞争对手的同类场景。但积极面是，这一模式极大降低了商业化不确定性和客户教育成本——不需要"找场景"，场景已经跟着资本一起进来了。这一模式对于特种工业这一高壁垒、高信任门槛的赛道尤其有效，但也可能在远期面临"场景集中度风险"和"大客户依赖"的挑战。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>从公开信息看，具微科技成立仅一年有余，尚未经历大规模的战略转向或产品线调整。但其产品迭代速度极快：从P1（通用型）到P1-ExR（防爆版）再到P2（增强越障）和T1（旗舰智能体），在不到一年内完成了从基础到细分到旗舰的产品矩阵构建。特别值得注意的是，王子煊早期提出的"三个非共识"理念——特别是"操作≠手"（不模仿人类手指，用电子信号控制工具）——在最早期就明确了不做通用人形机器人、专注特种工业场景的战略定力。这种"一出生就知道自己不该做什么"的战略清晰度，在具身智能这一充满诱惑的赛道中本身就是一种稀缺能力。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>具微科技的核心取舍是明确的"iPod路线"而非"iPhone路线"——不做通用人形机器人，不做消费级市场，专注做好一件事：让四足机器人在极端工业环境中可靠运行。与宇树科技（消费级+行业级双线布局，纯足式）和云深处（电力巡检，足式）的差异化在于：具微选择了轮足融合且聚焦"防磁防爆"这一最冷僻但壁垒最高的细分。这一取舍的优势在于差异化极强、竞争相对空白（特种工业四足市占率45%），劣势在于市场天花板受限——极端工业场景总量有限。但从商业化角度看，具微在成立仅一年即实现超5亿元在手订单，说明其选择的细分市场深度远超表面数字。其从特种场景向日常生活场景迁移的长期规划，也暗示了"先啃硬骨头建立技术壁垒，再降维切入更大市场"的路径设计。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-6">
+        <h4>2.6 其他重要观察</h4>
+        <p>具微科技的崛起与杭州钱塘区"机器人谷"的产业政策高度同频，区政府提供的场地、人才和产业政策支持是公司快速成长的重要外部条件，这也意味着公司的发展在一定程度上依赖于地方政策连续性。从融资节奏看，2026年初四轮密集融资可能预示着资金消耗较快——四足机器人的硬件研发和场景定制化部署是重资产模式。另外，王子煊作为温州背景的90后创业者，其此前在资本市场的积累（核聚资本、零跑汽车投资经验）为公司在资本端的运作提供了远超同龄创业者的优势。一个值得关注的风险点是：公司目前的产品主要依赖大型国央企客户，客户集中度可能较高，且国央企采购周期长、决策链条复杂，可能影响营收的可预测性。此外，防爆认证虽已获国内首证，但IECEx/ATEX等国际认证尚未完成，海外市场的拓展进度仍需观察。</p>
+      </div>
+
+      <h2 id="references">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://36kr.com/p/3777491215913736">36氪：具微科技两个月狂揽4轮数亿元融资，产业资本"天团"强势入局</a></li>
+          <li><a href="https://m.jiemian.com/article/13931101.html">界面新闻：具微科技完成近亿元A轮融资，四家上市公司联手构建生态场景闭环</a></li>
+          <li><a href="https://www.iyiou.com/news/202602261122725">亿欧：具微科技完成超亿美金A++轮融资，加速特种工业四足机器人落地应用</a></li>
+          <li><a href="https://m.lieyunpro.com/archives/500523">猎云网：月内融3轮，具微科技又完成超亿美元A++轮融资</a></li>
+          <li><a href="https://news.pedaily.cn/202602/561213.shtml">投资界：一个月连融三轮，具微科技完成超亿美元A++轮融资</a></li>
+          <li><a href="https://hznews.hangzhou.com.cn/chengshi/content/2026-03/01/content_9184297.htm">杭州日报："杭州第四狗"专往"要命"的地方跑</a></li>
+          <li><a href="https://www.zhidx.com/p/552232.html">智东西：温州90后创办的杭州四足机器人创企，四个月连获四轮数亿元融资</a></li>
+          <li><a href="https://w.geekpark.net/news/359525">极客公园：具微科技完成近亿元A轮融资，四家上市公司联手构建生态场景闭环</a></li>
+          <li><a href="https://36kr.com/newsflashes/3656093613187461">36氪：具微科技与浙江理工大学达成战略合作，李秦川教授受聘首席科学家</a></li>
+          <li><a href="http://www.investorscn.com/2026/01/30/126849/">投资者网：获四大上市公司联合投资，具微科技拿下5亿订单</a></li>
+          <li><a href="https://apiv4.cst123.cn/cst/news/shareDetail?id=1229172693111144448">杭州钱塘：具身智能产业布局再落一子，钱塘（新）区机器人谷正式开园</a></li>
+          <li><a href="https://difang.gmw.cn/zj/2026-04/17/content_38715800.htm">光明网：浙江杭州钱塘（新）区机器人谷开园</a></li>
+          <li><a href="https://hznews.hangzhou.com.cn/jingji/content/2026-04/14/content_9205974_0.htm">杭州日报：冲向"生命禁区"的杭州"机器狗"</a></li>
+          <li><a href="https://www.hangzhou.gov.cn/col/col812264/art/2026/art_f446b7e858e0400fb02c03c7b9ac2f64.html">杭州市政府：一只钱塘"机器狗"的差异化突围</a></li>
+          <li><a href="http://wzs.org.cn/sjzs/news?id=23951">世界浙商网：防磁、防爆、防水、防冻，浙产机器狗跑向"生命禁区"</a></li>
+          <li><a href="https://zjnews.zjol.com.cn/yc/qmt/202604/t20260414_31604645.shtml">浙江在线：专攻高危"禁区"，具微机器狗啃下特种工业"硬骨头"</a></li>
+          <li><a href="http://www.ca800.com:8002/news/d_1o7fiqpvqr8g1.html">中国工控网：行业首证破局！具微MOVENEW-P1-ExR防爆机器狗直击高危巡检痛点</a></li>
+          <li><a href="https://www.zhidx.com/p/536619.html">智东西：温州90后造四足机器人，融资超亿美金</a></li>
+          <li><a href="https://www.worldrobotconference.com/expo/company/506.html">世界机器人大会：杭州具微科技有限公司展商信息</a></li>
+          <li><a href="https://app.xinhuanet.com/news/article.html?articleId=dc915684d3c72bbc64cdcab7754b1644">新华网：链博会筹备探访杭企，具微科技深耕工业特种四足机器人赛道</a></li>
+          <li><a href="http://www.robotsj.cn/specialrobot/1665.html">机器人世界：具微科技MOVENEW P1行业级机器狗产品参数</a></li>
+          <li><a href="https://www.donews.com/news/detail/8/6442757.html">DoNews：具微科技完成新一轮融资，聚焦特种四足机器人研发</a></li>
+          <li><a href="https://www.iyiou.com/news/202601231120485">亿欧："杭州四小狗"新锐企业具微科技完成近亿元A轮融资</a></li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">本页面数据截至2026年5月，来源为公开报道与公司披露信息。具身智能Wiki · 自动分发系统生成</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>具身科技 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> <span class="breadcrumb-sep">›</span> <span>具身科技</span></div>
+  <div class="wiki-header">
+    <h1>具身科技</h1>
+    <div class="subtitle">四川具身人形机器人科技有限公司 · EIR · 成立2024年 · 成都 · 天使轮 · 估值数亿元</div>
+  </div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 公司基本信息</a></li>
+        <li class="toc-lvl3"><a href="#team">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financial">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#analysis-1">2.1 团队背景与场景选择匹配度</a></li>
+        <li class="toc-lvl4"><a href="#analysis-2">2.2 技术路线与场景适配性</a></li>
+        <li class="toc-lvl4"><a href="#analysis-3">2.3 股东/资本结构对战略的影响</a></li>
+        <li class="toc-lvl4"><a href="#analysis-4">2.4 试错过程与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#analysis-5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#analysis-6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#references">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">具身科技</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">四川具身人形机器人科技有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">英文简称</div><div class="ib-value">EIR</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2024年9月9日</div></div>
+        <div class="ib-row"><div class="ib-label">注册地</div><div class="ib-value">成都高新区</div></div>
+        <div class="ib-row"><div class="ib-label">法定代表人</div><div class="ib-value">冯振宇</div></div>
+        <div class="ib-row"><div class="ib-label">注册资本</div><div class="ib-value">2224.29万元</div></div>
+        <div class="ib-row"><div class="ib-label">团队规模</div><div class="ib-value">约60人（2025），计划160人（2026）</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">估值</div><div class="ib-value">数亿元（天使轮）</div></div>
+        <div class="ib-row"><div class="ib-label">2026营收目标</div><div class="ib-value">突破亿元</div></div>
+        <div class="ib-row"><div class="ib-label">核心产品</div><div class="ib-value">天行者1号/2号、爱湫</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">赛道</div><div class="ib-value">人形机器人</div></div>
+        <div class="ib-row"><div class="ib-label">技术路线</div><div class="ib-value">ELA（情感-语言-动作）</div></div>
+        <div class="ib-row"><div class="ib-label">地区</div><div class="ib-value">中西部/成都</div></div>
+        <div class="ib-section">官网</div>
+        <div class="ib-row"><div class="ib-label">官网</div><div class="ib-value">信息未公开</div></div>
+      </aside>
+
+      <p class="article-intro"><strong>具身科技</strong>（全称四川具身人形机器人科技有限公司，英文简称EIR），是一家位于成都高新区的人形机器人研发与制造企业。公司由电子科技大学博士后冯振宇于2024年9月创立，依托电子科技大学机器人研究中心的科研积累，定位为四川本土标志性人形机器人"主机厂"。公司以自研ELA（情感-语言-动作）模型为核心技术路线，主攻人形机器人全身运动控制（"小脑"）与情感交互能力，推出天行者系列工业/通用人形机器人及爱湫情感交互机器人，是中西部地区具身智能领域快速崛起的代表企业。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper">
+        <table class="wikitable infotable">
+          <tr><th>项目</th><th>内容</th></tr>
+          <tr><td>公司全称</td><td>四川具身人形机器人科技有限公司</td></tr>
+          <tr><td>英文名称</td><td>Sichuan Embodied Humanoid Robot Technology Co., Ltd.（简称EIR）</td></tr>
+          <tr><td>成立时间</td><td>2024年9月9日</td></tr>
+          <tr><td>注册地</td><td>四川省成都高新区天府五街200号"诸葛空间"人工智能产业园区</td></tr>
+          <tr><td>法定代表人</td><td>冯振宇</td></tr>
+          <tr><td>注册资本</td><td>2224.2909万元人民币</td></tr>
+          <tr><td>上市状态</td><td>未上市</td></tr>
+          <tr><td>企业类型</td><td>有限责任公司</td></tr>
+        </table>
+      </div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>时间</th><th>事件</th></tr>
+          <tr><td>2024年9月</td><td>公司正式注册成立，落地成都高新区</td></tr>
+          <tr><td>2024年12月</td><td>发布四川首台商用化人形机器人"天行者1号"，从图纸到直立行走仅用69天，创中西部商用化人形机器人最快发布纪录，核心零部件本地化率超90%</td></tr>
+          <tr><td>2025年5月</td><td>完成数千万元天使轮融资，策源资本与沛坤基金联合领投；同期获成都科创投集团旗下未来产业天使基金产业投资</td></tr>
+          <tr><td>2025年5月</td><td>与天府绛溪实验室共建"交互人形机器人前沿研究中心"，启动脑机接口融合研究</td></tr>
+          <tr><td>2025年8月</td><td>完成天使+轮融资，引入川创投（绵阳市聚兴创新股权投资基金）</td></tr>
+          <tr><td>2025年9月</td><td>发布"天行者2号"全尺寸通用人形机器人，55个自由度，三档定价（15.8万/25.8万/70万+），上线京东平台，接入京东JoyInside大模型</td></tr>
+          <tr><td>2025年12月</td><td>全球首款情感交互人形机器人"爱湫（AIQ）"亮相，搭载自研情感认知系统</td></tr>
+          <tr><td>2026年1月</td><td>"爱湫"亮相半月内累计接到国内外订单咨询近千次；CEO公布2026年营收目标突破亿元</td></tr>
+        </table>
+      </div>
+
+      <h3 id="team">1.2 创始人及核心团队</h3>
+      <p>具身科技是电子科技大学机器人研究中心嫡系创业团队，核心成员多为电子科技大学校友。团队由院士领衔的30余位国家级专家和100余名硕博研发骨干组成。截至2025年中，公司团队规模约60人，CEO冯振宇规划2026年扩增至约160人。团队人才结构属于典型的<strong>学术派创业</strong>特征——以高校实验室前沿研究为底座，强调从核心算法到精密制造的全链条自主研发能力。</p>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+          <tr><td>创始人/CEO/CTO</td><td>冯振宇</td><td>"90后"，安徽籍，电子科技大学博士后，机械设计制造及其自动化专业背景。2010年考入电子科技大学，在成都求学工作超15年。研究足迹覆盖轮式机器人、水下机器人、人形机器人等多领域。因童年观看电影《终结者》对机器人产生兴趣，最终选择人形机器人作为创业方向。</td></tr>
+          <tr><td>首席科学家（领衔）</td><td>院士（姓名未公开）</td><td>领衔公司的前沿技术研发方向，与电子科技大学深度绑定。</td></tr>
+          <tr><td>核心研发团队</td><td>电子科技大学机器人研究中心</td><td>40余名硕博研发骨干，专注于机器人全身运动控制、多模态感知融合等国际前沿技术方向。公司在运动控制领域拥有深厚学术积累。</td></tr>
+        </table>
+      </div>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+
+      <h4>融资历史</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>轮次</th><th>时间</th><th>金额</th><th>估值</th><th>投资方</th></tr>
+          <tr><td>天使轮</td><td>2025年5月</td><td>数千万元</td><td>数亿元</td><td>策源资本（领投）、沛坤基金（联合领投）</td></tr>
+          <tr><td>产业投资</td><td>2025年5月</td><td>未披露</td><td>—</td><td>成都科创投集团旗下未来产业天使基金</td></tr>
+          <tr><td>天使+轮</td><td>2025年8月</td><td>未披露</td><td>数亿元</td><td>川创投（绵阳市聚兴创新股权投资基金）</td></tr>
+        </table>
+      </div>
+
+      <h4>股东结构（截至2025年8月）</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>股东名称</th><th>出资额（万元）</th><th>性质</th></tr>
+          <tr><td>成都心智涌现科技合伙企业（有限合伙）</td><td>800</td><td>创始团队持股平台</td></tr>
+          <tr><td>成都钟期科技合伙企业（有限合伙）</td><td>700</td><td>创始团队持股平台</td></tr>
+          <tr><td>四川省机械研究设计院（集团）有限公司</td><td>300</td><td>产业战略股东</td></tr>
+          <tr><td>成都川哈工机器人及智能装备产业技术研究院有限公司</td><td>200</td><td>产业战略股东</td></tr>
+          <tr><td>成都策源广益电子信息股权投资基金合伙企业</td><td>73.43</td><td>策源资本</td></tr>
+          <tr><td>成都策源广益数字经济股权投资基金合伙企业</td><td>73.43</td><td>策源资本</td></tr>
+          <tr><td>成都沛坤叁号股权投资合伙企业</td><td>44.78</td><td>沛坤基金</td></tr>
+          <tr><td>绵阳市聚兴创新股权投资基金合伙企业</td><td>29.85</td><td>川创投</td></tr>
+        </table>
+      </div>
+      <p>公司创始团队通过两个持股平台合计持股约67%，保持对公司的控制权。产业股东四川省机械研究设计院与成都川哈工研究院为公司提供了制造工艺与产业资源支撑。公司目前未上市，暂无公开上市计划披露。</p>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>技术维度</th><th>具体路线</th></tr>
+          <tr><td>总体AI架构</td><td>ELA模型（Emotion-Language-Action，情感-语言-动作），行业首创将情感认知纳入具身智能核心架构</td></tr>
+          <tr><td>运动控制（小脑）</td><td>自研高鲁棒性全身运控算法与高紧凑一体化仿生关节模组，成本较进口产品大幅降低；核心零部件本地化率超90%</td></tr>
+          <tr><td>情感交互</td><td>自研情感认知系统，支持微表情识别、语境分析和触觉反馈，可识别≥15种情感，准确率≥85%；"爱湫"搭载59个面部自由度实现类人表情</td></tr>
+          <tr><td>感知系统</td><td>多模态感知融合（激光雷达+3D视觉），天行者2号具备环境感知与物体识别能力</td></tr>
+          <tr><td>数据方案</td><td>自建训练场与数据采集平台，参与"蜂巢数据共创"等数据生态；同步建设四川省人形机器人训练场</td></tr>
+          <tr><td>全栈/专用</td><td>全链条自研——覆盖核心算法、控制系统、部件研发到精密制造；定位为"主机厂"模式，兼顾本体与大脑</td></tr>
+          <tr><td>特色差异化</td><td>脑机接口融合（与天府绛溪实验室共建研究中心）；ELA路线与行业主流VLA路线形成差异化竞争</td></tr>
+        </table>
+      </div>
+      <p>具身科技选择了一条与行业主流（VLA即视觉-语言-动作）有所差异的技术路线——ELA（情感-语言-动作），将情感交互作为核心技术维度而非附加功能。公司CEO冯振宇曾公开表示，公司核心壁垒在"小脑"（运动控制）技术。在数据层面，公司依赖自建数据采集工厂和训练场获取真实物理交互数据，这也是其当前已产生实际订单的业务板块。</p>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>产品</th><th>分类</th><th>发布时间</th><th>关键参数</th><th>定价</th><th>主要适用场景</th></tr>
+          <tr><td>天行者1号</td><td>工业级人形机器人</td><td>2024年12月</td><td>身高165cm，重约50kg，续航1.5小时；核心零部件本地化率超90%；69天完成从图纸到直立行走</td><td>未公开</td><td>科研教学、数据采集、早期工业验证</td></tr>
+          <tr><td>天行者2号</td><td>全尺寸通用人形机器人</td><td>2025年9月</td><td>身高165cm，重55kg，55自由度，负载15kg，续航2小时；搭载多模态感知系统；接入京东JoyInside大模型</td><td>15.8万（半身数采版）/ 25.8万（全尺寸全身版）/ 70万+（高端研发版）</td><td>智能制造、科研教学、康养服务、数据采集</td></tr>
+          <tr><td>爱湫（AIQ/EMO1）</td><td>情感交互人形机器人</td><td>2025年12月</td><td>59个面部自由度，3D超短焦投影技术；可识别≥15种情感，准确率≥85%；灵感源自西南特有物种"汶川龙蜥"</td><td>未公开</td><td>文旅商演、银发经济、家庭陪伴、展会</td></tr>
+          <tr><td>灵瞳</td><td>四足机器狗</td><td>未公开</td><td>全地形特种作业</td><td>未公开</td><td>安防巡检、科研教学</td></tr>
+        </table>
+      </div>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>场景分类</th><th>具体场景</th><th>当前状态</th><th>合作方/客户</th></tr>
+          <tr><td>工业制造</td><td>化工厂巡检与操作、3C制造产线辅助</td><td>合作验证阶段（尚未正式部署）</td><td>成都本地化工厂、头部3C制造企业（应其需求开发）</td></tr>
+          <tr><td>数据服务</td><td>机器人数据采集、训练场运营</td><td>已产生实际订单</td><td>科研机构、数据采集工厂</td></tr>
+          <tr><td>科研教育</td><td>高校与科研院所机器人研究平台</td><td>主力客户群</td><td>电子科技大学、四川大学等</td></tr>
+          <tr><td>文旅商业</td><td>展会演出、文旅导览、商业互动</td><td>"爱湫"订单咨询活跃</td><td>国内外文旅、展会客户（半月近千次咨询）</td></tr>
+          <tr><td>家庭服务</td><td>银发经济、家庭陪伴</td><td>早期培育阶段</td><td>规划中</td></tr>
+          <tr><td>安防巡检</td><td>AI机器人智慧巡检</td><td>生态孵化中</td><td>中国电信（战略合作）</td></tr>
+        </table>
+      </div>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <p>具身科技目前处于<strong>从技术验证向商业化落地的关键转折期</strong>，商业化进展按产品线分化明显：</p>
+      <ul>
+        <li><strong>数据采集与训练场</strong>：已从数据采集工厂和训练场获得实际订单，是天行者系列当前最成熟的营收来源。这与人形机器人行业"数据匮乏"的核心痛点高度匹配——真实物理场景数据是训练机器人"大脑"的关键资源。</li>
+        <li><strong>天行者2号零售</strong>：三档定价上线京东平台，面向科研机构与开发者群体，订单量持续增加。</li>
+        <li><strong>"爱湫"情感机器人</strong>：2025年12月底亮相后，半月内累计收到国内外订单咨询近千次，文旅场景需求旺盛。公司正推进调试与交付。</li>
+        <li><strong>工业进厂</strong>：化工厂和3C制造目前处于合作验证阶段，尚未正式部署。CEO冯振宇判断人形机器人"技术刚及格（60分），还达不到85分"，真正进厂干活需3-5年。</li>
+        <li><strong>2026年营收目标</strong>：CEO明确提出全年营收突破亿元大关。</li>
+        <li><strong>远期目标</strong>：2027年实现1万台产品批量化生产。</li>
+      </ul>
+
+      <h3 id="financial">1.8 财务数据</h3>
+      <p>具身科技成立于2024年9月，尚无公开的完整年度财务数据。以下为可获取的财务相关信息：</p>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>指标</th><th>2024年</th><th>2025年</th><th>2026年（目标）</th></tr>
+          <tr><td>营收</td><td>未披露（成立仅3月余）</td><td>未公开披露</td><td>目标突破亿元</td></tr>
+          <tr><td>净利润</td><td>—</td><td>—</td><td>—</td></tr>
+          <tr><td>融资总额</td><td>—</td><td>数千万元（天使轮+）</td><td>—</td></tr>
+          <tr><td>估值</td><td>—</td><td>数亿元</td><td>—</td></tr>
+          <tr><td>注册资本</td><td>2224.29万元</td><td>2224.29万元</td><td>—</td></tr>
+          <tr><td>团队规模</td><td>初创</td><td>约60人</td><td>计划扩至160人</td></tr>
+        </table>
+      </div>
+      <p>公司财务数据极为有限，主要因其成立时间短（不足两年）且未上市，暂无公开财报披露义务。融资规模在成都地区人形机器人创业公司中处于领先水平，估值达到数亿元量级。</p>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>具身科技定位为"四川本土标志性人形机器人主机厂"，是中西部地区最具代表性的人形机器人企业之一。</li>
+        <li>公司以季度为单位快速迭代新品（约一个季度一款），追求极致的研发效率。CEO冯振宇强调"对中西部企业而言，效率是最重要的生命力"。</li>
+        <li>"爱湫"机器人的命名灵感源自西南特有物种"汶川龙蜥"，设计上融入成都城市文化基因。</li>
+        <li>与天府绛溪实验室共建"交互人形机器人前沿研究中心"，是国内较早启动脑机接口与人形机器人融合研究的企业。</li>
+        <li>已建成四川省人形机器人训练场，参与物理AI数据网络建设。</li>
+        <li>公司参加了第八届中国国际进口博览会（2025年11月），"成都造"机器人亮相国际舞台。</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="analysis-1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>具身科技创始团队根植于电子科技大学机器人研究中心，在全身运动控制、多模态感知融合方面有深厚学术积累——这与其将"小脑"（运动控制）作为核心壁垒的定位高度匹配。CEO冯振宇博士后期间研究覆盖轮式、水下、人形多形态机器人，具备系统工程思维。然而，团队选择了一条与传统工业机器人团队不同的差异化路径——将<strong>情感交互</strong>作为核心场景之一（"爱湫"产品线），这一方向更依赖心理学、交互设计、NLP等跨学科技能，电子科大纯工科团队在这些维度的积累相对有限。团队背景与"工业进厂"场景匹配度最高（运动控制优势），与"情感交互"场景存在一定跨界挑战，需要引入跨学科人才补强。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>具身科技选择ELA（情感-语言-动作）而非行业主流的VLA（视觉-语言-动作）路线，本质上是通过"情感"维度实现差异化竞争。这一路线在人形机器人行业属于<strong>非共识选择</strong>——主流玩家（智元、宇树、银河通用等）更聚焦作业智能（操作精度、任务完成率），而具身科技试图通过情感交互能力开辟差异化市场。适配性分析：ELA路线与"爱湫"面向的文旅/银发经济/家庭陪伴场景匹配度高，但与"进厂干活"的工业场景存在明显错配——工厂环境对情感交互需求极低。公司CEO也承认天行者"距离真正能干活还差火候"，说明其技术路线与工业落地场景之间仍有较大鸿沟。情感+工业的双线并行可能造成研发资源分散，需要明确优先级。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>具身科技当前股东结构呈现<strong>"创始团队主导+地方国资护航+产业资本支撑"</strong>的特点。创始团队通过两个持股平台合计持股约67%，保持较强的战略自主权。策源资本（成都高新区国资）和川创投（绵阳国资）的进入为公司绑定了成都本地政策资源与应用场景。四川省机械研究设计院和成都川哈工研究院作为产业股东，提供了精密制造与工装工艺支撑。值得注意的是，公司目前<strong>缺少产业端战略投资者</strong>（如车企、3C制造企业、物流企业等），这意味着场景资源尚未被资本绑定——好处是场景选择空间更灵活，风险是工业落地验证缺少"自己人"场景兜底。国资主导的股东结构也可能影响公司在定价策略、商业节奏上的激进程度。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>具身科技虽然成立仅一年多，但其快速的产品迭代节奏中已显现路径调整的影子。公司最初以天行者1号（工业人形机器人）切入市场，69天极速发布显示了极强的工程执行力。随后天行者2号升级为通用全尺寸平台，并迅速上线京东试水零售渠道——这标志着公司从<strong>"纯工业B端"向"B端+C端双线"的路径延伸</strong>。到2025年底推出"爱湫"情感机器人，场景进一步向文旅和家庭服务拓展。从"工业进厂"到"数据采集工厂"再到"情感交互"，公司实际上在根据市场需求灵活调整重心——数据采集业务已产生实际订单，情感机器人咨询量超预期，而工业进厂仍处于验证阶段。这种敏捷试错策略体现了创业公司对PMF的主动探索，但频繁的场景切换也可能稀释技术纵深。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>具身科技在中西部具身智能格局中做出了几个明确的取舍：第一，<strong>不走iPhone式的全场景通用平台路线，而是走"专用务实"路线</strong>——以运动控制为基座，以情感交互为差异化标签，类似于在机器人赛道做一个"细分品类冠军"而非全能选手。第二，定位为"主机厂"而非纯大脑模型公司，选择软硬一体全栈自研，这在中西部企业中较为罕见。第三，将"四川造"本土标签作为品牌策略核心——利用成都的制造业基础（核心零部件本地化率超90%）、高校人才资源（电子科大）和地方政策支持建立护城河。在行业头部（智元、宇树、银河通用等）已占据大量资本和场景资源的背景下，具身科技的差异化情感路线+中西部本土深耕策略是一项合理取舍，但市场规模天花板需要持续验证。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-6">
+        <h4>2.6 其他重要观察</h4>
+        <p>具身科技有三个值得关注的潜在变量。其一，<strong>脑机接口融合</strong>——与天府绛溪实验室共建的前沿研究中心若取得突破，可能为情感交互机器人提供全新的交互范式，形成真正的技术壁垒。其二，<strong>京东生态的深度绑定</strong>——天行者2号不仅是西南首个上线京东的人形机器人，还接入了京东JoyInside大模型，如果后续京东持续注入零售场景和供应链资源，可能成为其C端破局的关键变量。其三，<strong>中西部政策红利</strong>——成都正大力发展人工智能与机器人产业，银河通用等头部企业已落子成都，具身科技作为本土代表可能持续受益于地方产业基金和政策倾斜。但核心风险同样明确：公司资金体量远小于头部玩家（数千万元 vs 数十亿元级），在人才争夺、供应链议价、场景抢占上承受显著压力，需要以更高效的资本效率跑出差异化路径。</p>
+      </div>
+
+      <h2 id="references">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://www.stcn.com/article/detail/1849436.html">中西部人形机器人融资速度刷新 具身科技完成数千万元天使轮融资 — 证券时报（2025-05）</a></li>
+          <li><a href="https://cd.nbd.com.cn/articles/2025-05-27/3890147.html">四川首款情感机器人即将面世！具身科技完成数千万元天使轮融资 — 每日经济新闻（2025-05-27）</a></li>
+          <li><a href="https://www.cs.com.cn/ssgs/gsxw/202602/t20260211_6537604.html">具身科技CEO冯振宇：加速跑 助人形机器人早日"进厂" — 中国证券报（2026-02-11）</a></li>
+          <li><a href="https://www.jrtzb.com.cn/24hours/202505/83052898.html">四川具身人形机器人科技有限公司获数千万元天使轮融资 — 金融投资报（2025-05）</a></li>
+          <li><a href="http://sc.people.com.cn/n2/2025/0526/c345167-41239644.html">四川首款情感机器人即将面世 — 人民网四川频道（2025-05-26）</a></li>
+          <li><a href="https://www.cditv.cn/show/4813-2371608.html">"90后"创业者冯振宇：让"四川造"人形机器人闻名全球 — 成都广播电视台</a></li>
+          <li><a href="https://cbgc.scol.com.cn/news/7083112">从"电影梦"到"四川造"！"90后"创业博士领航"四川造"机器人逐鹿全球 — 川观新闻</a></li>
+          <li><a href="https://baike.baidu.com/item/%E5%86%AF%E6%8C%AF%E5%AE%87/65129946">冯振宇 — 百度百科</a></li>
+          <li><a href="https://www.thepaper.cn/newsDetail_forward_30879323">四川首款，"懂感情"的机器人正在向你走来 — 澎湃新闻（2025）</a></li>
+          <li><a href="https://www.stdaily.com/web/gdxw/2025-09/25/content_407470.html">"成都造"人形机器人"天行者2号"正式亮相 — 科技日报（2025-09-25）</a></li>
+          <li><a href="http://sc.people.com.cn/n2/2025/0925/c345167-41363739.html">"天行者2号"来了！ — 人民网四川频道（2025-09-25）</a></li>
+          <li><a href="https://epaper.scdaily.cn/shtml/scrb/20250107/321018.shtml">首台商用人形机器人预计3月起进行部分量产 — 四川日报（2025-01-07）</a></li>
+          <li><a href="https://m.nbd.com.cn/articles/2026-01-30/4243723.html">订单增长！成都机器人，年底"打工"忙 — 每日经济新闻（2026-01-30）</a></li>
+          <li><a href="https://finance.sina.cn/stock/jdts/2026-01-14/detail-inhhhaht8428130.d.html">全球首款情感交互人形机器人"爱湫"新进展：会舞蹈，半月订单咨询近千次 — 新浪财经（2026-01-14）</a></li>
+          <li><a href="https://www.sohu.com/a/983842723_777213">一年两代三款机器人！西南首个→全球首个 — 搜狐（2026-01）</a></li>
+          <li><a href="http://m.zqrb.cn/tmt/tmthangye/2025-09-25/A1758782006398.html">成都华微携手具身科技 共启四川具身智能产业新篇章 — 证券日报（2025-09-25）</a></li>
+          <li><a href="https://www.orinnocapital.com/news/682.html">已投企业具身科技"天行者2号"，正式上线！ — 成都高新策源资本官网（2025-09-24）</a></li>
+          <li><a href="https://www.x-techcon.com/article/56688.html">西南地区首台全尺寸人形机器人，被送上京东货架 — 先进技术观察</a></li>
+          <li><a href="https://www.chengdu.gov.cn/cdsrmzf/c169603/2026-01/05/content_e9c7c1cd762141e584ce1a65696453a3.shtml">成都新兴产业加速成势 人工智能实现全链覆盖 — 成都市人民政府（2026-01-05）</a></li>
+          <li><a href="https://m.tianyancha.com/schange/7118156633-fe74">四川具身人形机器人科技有限公司变更记录 — 天眼查</a></li>
+          <li><a href="https://www.eet-china.com/mp/a453822.html">机器人"进厂打工"离我们还有多远？ — 电子工程专辑（2026）</a></li>
+          <li><a href="https://epaper.scdaily.cn/shtml/scrb/20251125/1063182.html">创办公司闯出名堂 让"四川造"人形机器人闻名全球 — 四川日报（2025-11-25）</a></li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">本页面最后更新于2026年5月4日 · 信息来源截至各参考链接标注日期 · 具身智能Wiki</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body>
+</html>

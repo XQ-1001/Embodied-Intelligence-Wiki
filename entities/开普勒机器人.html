@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>开普勒机器人 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style></head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> <span class="breadcrumb-sep">›</span> <span>开普勒机器人</span></div>
+  <div class="wiki-header"><h1>开普勒机器人</h1><div class="subtitle">Kepler Robotics · 成立于2023年 · 工业级蓝领人形机器人 · 已完成7轮融资 · K2大黄蜂量产交付</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#team">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financial">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#others">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#analysis-1">2.1 团队背景与场景匹配度</a></li>
+        <li class="toc-lvl4"><a href="#analysis-2">2.2 技术路线与场景适配性</a></li>
+        <li class="toc-lvl4"><a href="#analysis-3">2.3 股东/资本对战略的影响</a></li>
+        <li class="toc-lvl4"><a href="#analysis-4">2.4 试错过程与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#analysis-5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#analysis-6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#refs">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">开普勒机器人</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">上海开普勒机器人有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">英文</div><div class="ib-value">Kepler Robotics (KEPLER)</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2023年8月</div></div>
+        <div class="ib-row"><div class="ib-label">注册地</div><div class="ib-value">上海浦东张江</div></div>
+        <div class="ib-row"><div class="ib-label">法定代表人</div><div class="ib-value">杨华</div></div>
+        <div class="ib-row"><div class="ib-label">CEO</div><div class="ib-value">胡德波</div></div>
+        <div class="ib-row"><div class="ib-label">注册资本</div><div class="ib-value">约387万元</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">核心定位</div><div class="ib-value">工业级蓝领人形机器人</div></div>
+        <div class="ib-row"><div class="ib-label">研发占比</div><div class="ib-value">超70%</div></div>
+        <div class="ib-row"><div class="ib-label">核心产品</div><div class="ib-value">先行者K2大黄蜂</div></div>
+        <div class="ib-row"><div class="ib-label">售价</div><div class="ib-value">¥24.8万起 ($3万基础版)</div></div>
+        <div class="ib-row"><div class="ib-label">融资轮次</div><div class="ib-value">7轮（天使至A++）</div></div>
+        <div class="ib-row"><div class="ib-label">最新融资</div><div class="ib-value">2026.4 A++轮亿元级</div></div>
+        <div class="ib-section">官网</div>
+        <div class="ib-row"><div class="ib-label">官网</div><div class="ib-value">keplerbot.com（企业信息平台可查）</div></div>
+      </aside>
+      <p class="article-intro"><strong>开普勒机器人</strong>（Kepler Robotics，品牌名KEPLER）是一家专注于工业级通用人形机器人研发、生产及应用生态的高科技创新企业，成立于2023年，总部位于上海浦东张江。公司由小米生态链企业纯米科技创始人杨华联合全球化老兵胡德波共同创立，核心团队来自华为、小米、特斯拉、波士顿动力等企业。开普勒以"蓝领人形机器人"为差异化定位，主打工业场景落地，核心产品先行者K2"大黄蜂"已于2025年9月启动量产交付，成为全球首款商业可售混动架构人形机器人。截至2026年4月，公司已完成7轮融资，累计引入十余家上市公司产业股东，构建了从供应链到应用场景的垂直整合生态。</p>
+      <h2 id="facts">1 事实层</h2>
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper"><table class="wikitable infotable">
+        <tr><th>项目</th><th>内容</th></tr>
+        <tr><td>公司全称</td><td>上海开普勒机器人有限公司</td></tr>
+        <tr><td>英文名称</td><td>Shanghai Kepler Robotics Co., Ltd. / KEPLER</td></tr>
+        <tr><td>成立时间</td><td>2023年8月15日</td></tr>
+        <tr><td>注册地址</td><td>中国（上海）自由贸易试验区</td></tr>
+        <tr><td>总部</td><td>上海浦东张江</td></tr>
+        <tr><td>法定代表人</td><td>杨华</td></tr>
+        <tr><td>注册资本</td><td>约387万元人民币</td></tr>
+        <tr><td>核心定位</td><td>工业级蓝领人形机器人全栈研发</td></tr>
+        <tr><td>研发人员占比</td><td>超70%</td></tr>
+        <tr><td>专利情况</td><td>已申请国内外专利67项，获授权10余项（截至2025年）</td></tr>
+        <tr><td>官网</td><td>企业信息平台可查</td></tr>
+      </table></div>
+      <h4>发展沿革</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>时间</th><th>事件</th></tr>
+        <tr><td>2021年</td><td>创始人杨华进入机器人研发领域，启动前期技术探索</td></tr>
+        <tr><td>2023年8月</td><td>上海开普勒机器人有限公司正式注册成立</td></tr>
+        <tr><td>2023年11月</td><td>发布首款人形机器人先行者K1（概念验证阶段）</td></tr>
+        <tr><td>2024年4月</td><td>完成天使轮融资（北洋海棠基金、尚势资本）</td></tr>
+        <tr><td>2024年10月</td><td>迭代发布先行者K2"大黄蜂"，超80%核心零部件自研</td></tr>
+        <tr><td>2025年4月</td><td>完成Pre-A轮融资，引入张科垚坤基金、伟创电气、柯力传感</td></tr>
+        <tr><td>2025年5月</td><td>Pre-A+轮；携K2亮相IEEE ICRA 2025（亚特兰大）</td></tr>
+        <tr><td>2025年6月</td><td>A1轮融资，引入涛涛车业、福然德、兆丰股份等5家上市公司；与上汽通用达成工业场景战略合作</td></tr>
+        <tr><td>2025年7月</td><td>WAIC 2025完成全球首例双足人形机器人8小时不间断续航直播</td></tr>
+        <tr><td>2025年9月</td><td>K2大黄蜂正式量产交付，成为全球首款商业可售混动架构人形机器人；与露笑科技签约启动家庭AI具身机器人项目</td></tr>
+        <tr><td>2026年2月</td><td>A2轮融资，杭州柯林（688611）亿元级战略投资，持股约10%</td></tr>
+        <tr><td>2026年4月</td><td>A++轮亿元级融资，赛富投资基金领投，诺力股份、民爆光电跟投；发布国内首个VTLA力触觉全栈数采方案</td></tr>
+      </table></div>
+      <h3 id="team">1.2 创始人及核心团队</h3>
+      <p>开普勒机器人的核心团队呈现典型的"产业老兵+连续创业者"组合特征。创始人杨华拥有20年消费电子及智能硬件产业经验，联合创始人兼CEO胡德波具备20余年全球化市场运营背景，核心团队成员来自华为、小米、特斯拉、波士顿动力、摩托罗拉等知名企业，覆盖AI算法、机械设计、电子控制、传感器技术和供应链管理等领域。公司整体呈现产业派人才结构，研发人员占比超过70%。</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+        <tr><td>创始人</td><td>杨华</td><td>1976年生，内蒙古大学本科毕业。曾任天津摩托罗拉产品工程师及部门经理，上海索博智能电子总经理。2014年创立小米生态链企业纯米科技，成功打造米家IH电饭煲等爆款产品，在消费电子供应链管理和规模化制造方面积累了深厚经验。2021年进入机器人研发领域，2023年正式创立开普勒机器人。</td></tr>
+        <tr><td>联合创始人兼CEO</td><td>胡德波</td><td>70后，瑞典皇家理工学院硕士（高性能计算与机器学习方向）。曾在中兴通讯、华为担任海外高管，拥有20多年全球化市场、销售及运营经验。曾任臻迪机器人欧洲公司CEO，兼具机器人行业经验与国际化视野。</td></tr>
+        <tr><td>CTO</td><td>席奥</td><td>负责公司整体技术路线规划，主导K2大黄蜂的工程化落地及VTLA全感知模型研发。在2026年4月证券时报专访中详细阐述了公司从"硬件可用"到"智能好用"的技术跨越路径。</td></tr>
+      </table></div>
+      <h3 id="funding">1.3 融资与股东</h3>
+      <p>开普勒机器人自2024年4月完成天使轮以来，累计完成7轮融资，呈现"高频次、产业资本主导"的特征。最新一轮为2026年4月的A++轮亿元级融资，由赛富投资基金领投，诺力股份（603611）、民爆光电（301362）跟投。公司前十五大股东中已有七家上市公司，覆盖伺服系统、传感器、精密零部件、数控机床、智能物流、LED制造及北美渠道等关键环节。</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>轮次</th><th>时间</th><th>金额</th><th>投资方</th></tr>
+        <tr><td>天使轮</td><td>2024年4月</td><td>未披露</td><td>北洋海棠基金、尚势资本</td></tr>
+        <tr><td>Pre-A轮</td><td>2025年4月</td><td>未披露</td><td>张科垚坤基金（领投）、伟创电气（688698）、柯力传感（603662）</td></tr>
+        <tr><td>Pre-A+轮</td><td>2025年5月</td><td>未披露</td><td>上海济君投（浦东创投+张江科投）</td></tr>
+        <tr><td>A1轮</td><td>2025年6月</td><td>未披露</td><td>涛涛车业、福然德、兆丰股份、汉威科技、乔锋智能等</td></tr>
+        <tr><td>A2轮</td><td>2026年2月</td><td>约1亿元</td><td>杭州柯林（688611），持股约10%</td></tr>
+        <tr><td>A++轮</td><td>2026年4月</td><td>亿元级</td><td>赛富投资基金（领投）、诺力股份（603611）、民爆光电（301362）</td></tr>
+      </table></div>
+      <h4>股东结构特征</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>股东类别</th><th>代表机构</th><th>战略价值</th></tr>
+        <tr><td>伺服/驱动供应链</td><td>伟创电气（688698）</td><td>伺服系统、空心杯电机、无框电机供应</td></tr>
+        <tr><td>传感器供应链</td><td>柯力传感（603662）、汉威科技</td><td>机器人传感器、具身智能传感器</td></tr>
+        <tr><td>精密零部件</td><td>兆丰股份、乔锋智能</td><td>精密轴承、数控机床加工能力</td></tr>
+        <tr><td>物流应用场景</td><td>诺力股份（603611）</td><td>智能物流装备、仓储场景落地</td></tr>
+        <tr><td>汽车供应链</td><td>福然德、涛涛车业</td><td>汽车行业供应链资源、北美550+经销商渠道</td></tr>
+        <tr><td>电力/工业客户</td><td>杭州柯林（688611）</td><td>电网、新能源及工业领域客户资源</td></tr>
+        <tr><td>国资/机构</td><td>张科垚坤基金、浦东创投、张江科投、赛富投资基金</td><td>政府产业引导、财务投资</td></tr>
+      </table></div>
+      <h3 id="tech">1.4 技术路线</h3>
+      <p>开普勒采取"硬件先行、数据驱动"的双轮技术战略。在硬件层，公司自研行星滚柱丝杠执行器和灵巧手，核心部件自研比例超过80%。在软件层，公司采用分层模型架构——"大脑"与国内多家推理逻辑大模型厂商合作，"小脑"自研精准感知模型（听觉、触觉、力觉、位置感知），并推进模仿学习、强化学习和Sim-to-Real训练。2026年4月发布的VTLA（视觉—触觉—语言—动作）全感知模型是公司技术升级的关键里程碑，标志着从纯硬件公司向"工业具身智能数据服务商"的战略转型。</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>技术维度</th><th>方案</th><th>说明</th></tr>
+        <tr><td>总体AI架构</td><td>分层模型（大脑+小脑）</td><td>大脑合作外部大模型厂商；小脑自研精准感知模型</td></tr>
+        <tr><td>感知模型</td><td>VTLA全感知模型（2026.4发布）</td><td>国内首个原生适配VTLA的力触觉全栈数采方案，任务成功率提升至86%</td></tr>
+        <tr><td>执行器方案</td><td>自研行星滚柱丝杠+旋转执行器混动</td><td>类似特斯拉Optimus架构，单台K2使用14根丝杠，该部件占整机成本约20%</td></tr>
+        <tr><td>灵巧手</td><td>自研"巧手大师"</td><td>单手11自由度，单指25力触点，六维力传感手腕，模块化快换</td></tr>
+        <tr><td>训练方法</td><td>模仿学习+强化学习+Sim-to-Real</td><td>分层训练，工业场景连续1000次装配成功率98%</td></tr>
+        <tr><td>全栈/专用路线</td><td>硬件全栈自研+软件分层合作</td><td>核心硬件80%+自研，软件层面大模型引入外部合作</td></tr>
+        <tr><td>差异化特色</td><td>8小时超长续航、直膝行走、混动架构</td><td>81.3%能效利用率，充电1小时连干8小时</td></tr>
+      </table></div>
+      <h3 id="products">1.5 产品形态</h3>
+      <p>开普勒目前拥有两款人形机器人产品：先行者K1（概念验证）和先行者K2"大黄蜂"（量产交付）。K2是公司核心商业化产品，提供双足基础版、双足开发版和轮式开发版三种型号。公司正与露笑科技等合作方推进新一代家庭AI具身机器人研发，目标三年百万台销量。</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>产品</th><th>发布时间</th><th>状态</th><th>主要参数</th><th>适用场景</th></tr>
+        <tr><td>先行者K1</td><td>2023年11月</td><td>概念验证</td><td>首款人形机器人，技术验证平台</td><td>技术研发验证</td></tr>
+        <tr><td>先行者K2"大黄蜂"</td><td>2024年10月发布；2025年9月量产</td><td>量产交付</td><td>身高175cm，体重75-83kg，52自由度，双臂负载30kg，100TOPS算力，2.33KWh电池，续航8小时</td><td>汽车制造、物流搬运、高空焊接、巡检</td></tr>
+        <tr><td>家庭AI具身机器人（规划中）</td><td>预计2026+</td><td>研发中</td><td>VLA自主移动+Agent视觉语言交互，目标三年百万台销量</td><td>家庭服务、美欧消费市场</td></tr>
+      </table></div>
+      <h4>K2大黄蜂核心参数</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>参数项</th><th>数值</th></tr>
+        <tr><td>身高</td><td>175cm（适配工厂工位产线国际标准）</td></tr>
+        <tr><td>体重</td><td>75-83kg</td></tr>
+        <tr><td>全身自由度</td><td>52个</td></tr>
+        <tr><td>灵巧手</td><td>单手11自由度（主动+被动），单指25力触点，六维力手腕</td></tr>
+        <tr><td>传感器</td><td>全身80+传感器，4颗红外双目3D摄像头</td></tr>
+        <tr><td>算力</td><td>100 TOPS</td></tr>
+        <tr><td>电池</td><td>2.33KWh，充电1小时连续工作8小时</td></tr>
+        <tr><td>双臂负载</td><td>最大30kg（单臂15kg）</td></tr>
+        <tr><td>能效利用率</td><td>81.3%</td></tr>
+        <tr><td>行走方式</td><td>类人直膝行走</td></tr>
+        <tr><td>定位精度</td><td>0.01度，毫米级精细操作</td></tr>
+        <tr><td>售价</td><td>¥24.8万起（基础版量采约$3万）</td></tr>
+        <tr><td>可选型号</td><td>双足基础版、双足开发版、轮式开发版</td></tr>
+      </table></div>
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>场景分类</th><th>应用内容</th><th>合作方/落地案例</th></tr>
+        <tr><td>汽车制造</td><td>车缝检测、冲压上料、大型金属部件搬运、零部件上下料、物流搬运、自主巡检</td><td>上汽通用物流工厂</td></tr>
+        <tr><td>高空作业</td><td>全球首例人机协作高空焊接</td><td>—</td></tr>
+        <tr><td>精密制造</td><td>零部件生产装配</td><td>兆丰股份零部件生产车间</td></tr>
+        <tr><td>消费电子制造</td><td>工厂产线操作、整体作业成功率约98%</td><td>纯米科技工厂（春节连续作业验证）</td></tr>
+        <tr><td>智能物流</td><td>物流搬运、智能分拣</td><td>福兰德、诺力股份</td></tr>
+        <tr><td>智能制造</td><td>数控加工、产线协同</td><td>伟创电气、柯力传感、乔锋智能</td></tr>
+        <tr><td>家庭消费（规划）</td><td>家庭AI具身服务、VLA自主移动、Agent视觉语言交互</td><td>露笑科技、宁波君屋、头部跨境电商（北美/欧洲渠道）</td></tr>
+        <tr><td>国际展示</td><td>行业展会技术展示</td><td>IEEE ICRA 2025（亚特兰大）、WAIC 2025（上海）、GITEX GLOBAL 2024（迪拜）</td></tr>
+      </table></div>
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <p>开普勒机器人已于2025年9月正式启动K2大黄蜂的量产交付，成为全球首款商业可售混动架构人形机器人。据公开信息，公司已达成框架协议下的明确意向订单数千台，交易金额高达数亿元。K2基础版量采售价约3万美元（¥24.8万元起），公司测算客户投资回收期约1.5-1.8年。在2026年春节期间的纯米科技工厂实测中，K2整体作业成功率约98%，汽车工厂连续1000次装配操作成功率达98%，产线产能提升30%。2026年公司重点推动从"硬件可用"到"智能好用"的跨越，加速小批量商用落地。</p>
+      <div class="callout"><div class="callout-title">量产里程碑</div>2025年9月K2大黄蜂正式量产交付，已跑通"场景驱动—数据积累—快速迭代—规模交付"的正向闭环。公司与露笑科技、宁波君屋及头部跨境电商签署三方协议，目标2026-2028年在美欧市场累计销售家庭具身AI服务机器人不少于100万台。</div>
+      <h3 id="financial">1.8 财务数据</h3>
+      <p>开普勒机器人为非上市初创企业，未公开披露详细财务报表。以下为基于公开融资信息的汇总：</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>指标</th><th>详情</th></tr>
+        <tr><td>累计融资</td><td>7轮，累计数亿元人民币（含2026年4月A++轮亿元级）</td></tr>
+        <tr><td>最新估值</td><td>未公开披露。参考同赛道公司（智元机器人、傅利叶智能等估值数十亿至上百亿），市场推测估值在10-30亿元区间</td></tr>
+        <tr><td>2025-2026订单</td><td>框架协议下意向订单数千台，交易金额数亿元</td></tr>
+        <tr><td>产品价格</td><td>K2大黄蜂基础版¥24.8万起（量采约$3万）</td></tr>
+        <tr><td>客户投资回收期</td><td>约1.5-1.8年（公司测算）</td></tr>
+        <tr><td>注册资本</td><td>约387万元</td></tr>
+        <tr><td>PitchBook状态</td><td>列为"Generating Revenue"阶段</td></tr>
+      </table></div>
+      <h3 id="others">1.9 其他信息</h3>
+      <ul>
+        <li>开普勒采取独特的"产业资本+供应链股东"融资策略，前十五大股东中有七家上市公司，覆盖伺服系统、传感器、精密零部件、物流、北美渠道等关键环节，形成从供应链到应用场景的垂直整合。</li>
+        <li>公司核心差异化标签为"蓝领人形机器人"——专注工业级、高强度、高负载场景，对标特斯拉Optimus的技术路线（行星滚柱丝杠混动架构），但价格远低于行业百万级原型机。</li>
+        <li>全球首例人机协作高空焊接作业由K2大黄蜂完成，标志着人形机器人进入高危特种作业领域的里程碑。</li>
+        <li>公司已完成国内首个原生适配VTLA全感知模型的力触觉全栈数采方案，面向行业开放数据采集能力，战略定位从纯硬件公司向"工业具身智能数据服务商"转型。</li>
+        <li>露笑科技（002617）三方合作中约定未来可能"通过合资形式建立独立品牌"，可能涉及品牌或业务的独立运营。</li>
+        <li>公司预测人形机器人大规模部署仍需3-5年，当前处于从"硬件可用"到"智能好用"的跨越期。</li>
+      </ul>
+      <h2 id="analysis">2 分析层</h2>
+      <div class="analysis-block" id="analysis-1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>开普勒的创始团队呈现典型的"消费电子制造+全球化运营"二元结构。杨华在纯米科技成功打造小米生态链爆款的经历，使其对供应链管理、规模化制造和成本控制有深刻理解——这直接反映在K2大黄蜂的定价策略（¥24.8万起，量采$3万）和80%+核心部件自研自产的决策上。胡德波的华为/中兴海外高管背景及瑞典皇家理工学院机器学习方向的学术训练，则为公司带来了全球化市场视野和技术判断力。团队整体属于产业派而非纯学术派，这解释了开普勒为何选择工业蓝领场景而非通用服务或科研演示场景——他们更擅长解决"造出来、卖出去、用得稳"的工程化问题，而非追求技术参数的领先。团队在消费电子领域积累的快速迭代和成本控制能力，正被系统性地迁移至机器人产业。</p>
+      </div>
+      <div class="analysis-block" id="analysis-2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>开普勒选择行星滚柱丝杠+旋转执行器的串并联混动架构，与特斯拉Optimus属于同一技术路线。这一选择高度适配其目标工业场景：滚柱丝杠相比传统滚珠丝杠承载能力更高、刚性更强，能满足30kg大负载搬运和8小时连续作业的工业需求；混动架构的动态省电特性（静态基本不耗电）是达成8小时续航的关键。在AI层面，开普勒的VTLA全感知模型引入力触觉数据后，任务成功率从纯视觉的50-60%提升至近86%，工业装配失败率从33%降至20%以下，验证了"视觉+力触觉"融合路线对精密工业操作的适配性。分层模型架构（大脑外部合作、小脑自研）则是资源有限条件下务实的工程决策——避免在大模型军备竞赛中消耗过多资源，集中力量攻克与物理世界交互最紧密的感知与控制层。</p>
+      </div>
+      <div class="analysis-block" id="analysis-3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>开普勒的股东结构是具身智能赛道中产业资本绑定最深的企业之一。七家上市公司股东分别对应伺服系统（伟创电气）、传感器（柯力传感、汉威科技）、精密零部件（兆丰股份、乔锋智能）、汽车供应链（福然德、涛涛车业）、智能物流（诺力股份）、电网工业（杭州柯林）等关键环节。这种"供应链即股东"的结构具有双重效应：一方面，它自然绑定应用场景和采购渠道——如上汽通用（通过福然德汽车供应链关系）、工业物流（通过诺力股份）——降低了冷启动成本；另一方面，过多产业资本可能限制公司场景选择的灵活性，使公司倾向于优先服务股东行业场景。杭州柯林持股约10%后，公司战略中明确增加了电网、新能源等工业场景方向。赛富投资基金的领投则为公司补充了财务投资者的独立视角，有助于平衡产业资本的主导倾向。</p>
+      </div>
+      <div class="analysis-block" id="analysis-4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>开普勒的技术和商业路径经历了三个明显阶段。第一阶段（2021-2023）：杨华以个人身份进入机器人研发，2023年11月推出K1概念验证机——这一阶段主要是技术探索和团队搭建。第二阶段（2024-2025年中）：公司明确"蓝领人形机器人"定位，发布K2大黄蜂，并在Pre-A至A1轮密集引入产业资本——这是"硬件先行"的规模化准备期。第三阶段（2025年9月至今）：K2启动量产交付后，公司战略明显从纯硬件公司向"工业具身智能数据服务商"转型——2026年4月发布VTLA全感知模型，宣布开放力触觉数采能力给行业。这一转型的逻辑在于：人形机器人的竞争正从"谁能造出来"转向"谁能造得好用"，而"好用"的核心壁垒在于真实工业场景的数据积累。开普勒通过先卖硬件获取场景入口，再通过数据服务构建生态壁垒，形成了与纯软件AI公司和纯硬件制造商都不同的竞争路径。</p>
+      </div>
+      <div class="analysis-block" id="analysis-5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>开普勒在竞争激烈的人形机器人赛道中做了清晰的取舍。首先是场景取舍：走"工业垂类纵向泛化"的iPod式务实路线，而非"全场景通用"的iPhone式平台路线——聚焦汽车制造、物流搬运、高空作业等可明确ROI的工业场景。其次是技术取舍：硬件全栈自研（执行器、灵巧手、驱动系统80%+自研），但AI大脑选择外部合作而非自研大模型——集中资源构建硬件壁垒和物理交互层能力。第三是商业模式取舍：先以亲民定价（¥24.8万起）快速占领工业场景入口，再通过数据服务（VTLA数采方案）构建长期壁垒，而非追求高毛利的硬件销售。与特斯拉Optimus相比，开普勒的差异化在于对国内制造业场景的更深度理解和产业资本绑定的场景获取能力；与智元机器人等国内同行相比，开普勒的差异化在于更聚焦工业蓝领而非通用服务。</p>
+      </div>
+      <div class="analysis-block" id="analysis-6">
+        <h4>2.6 其他重要观察</h4>
+        <p>开普勒最值得关注的战略动作是2025年9月与露笑科技及头部跨境电商签署的家庭具身AI机器人三方合作协议，目标2026-2028年在美欧市场累计销售100万台。这一动作标志着公司从纯工业B2B向消费B2C的首次跨界，风险与机会并存。机会在于：借助跨境电商成熟的北美/欧洲渠道，可快速触达海外消费者，且家庭场景的数据积累将为通用AI能力提供新的训练来源。风险在于：工业级人形机器人（75-83kg、52自由度）直接迁移至家庭场景的技术降维和成本压缩挑战巨大；工业场景对可靠性、负载、续航的要求与家庭场景对安全性、交互自然度、价格的要求差异显著。这一跨界能否成功，取决于公司能否在维持工业主航道的技术优势的同时，有效管理消费级产品的研发资源和市场风险。此外，合作协议中约定未来可能通过合资形式建立独立品牌，暗示公司可能在家庭机器人业务上采取独立运作的架构，以避免对工业主业造成干扰。</p>
+      </div>
+      <h2 id="refs">3 参考资料</h2>
+      <div class="references"><ol>
+        <li><a href="https://finance.eastmoney.com/a/202604083698474439.html">两家A股上市公司战略入股 开普勒机器人完成亿元级A++轮融资 — 东方财富</a></li>
+        <li><a href="https://media.qimingpian.cn/2025/04/24/1d2a4280cbeec8dbe95d7874ad315c0c.html">上海开普勒机器人完成Pre-A轮融资，多家产业资本参投 — 企名片</a></li>
+        <li><a href="https://www.donews.com/news/detail/4/6151043.html">开普勒人形机器人K2大黄蜂启动量产交付 — DoNews</a></li>
+        <li><a href="https://www.sh.chinanews.com.cn/kjjy/2025-08-02/138713.shtml">开普勒大黄蜂挑战8小时直播圆满收官 — 中新社上海</a></li>
+        <li><a href="https://www.iotworld.com.cn/html/News/202509/e43da23ae512cdc6.shtml">全球首款商业可售混动架构人形机器人量产 — 物联网世界</a></li>
+        <li><a href="https://www.bjnews.com.cn/detail/1748510997129964.html">开普勒人形机器人在海外国际会议中展中国智造风采 — 新京报</a></li>
+        <li><a href="https://m.jiemian.com/article/13753548.html">又一家上海公司开始交付人形机器人，但成批进厂尚需时日 — 界面新闻</a></li>
+        <li><a href="https://pitchbook.com/profiles/company/596725-93">Keplerbot 2026 Company Profile: Valuation, Funding & Investors — PitchBook</a></li>
+        <li><a href="https://finance.sina.com.cn/jjxw/2026-04-09/doc-inhtwtez5836449.shtml">开普勒机器人完成亿元级 A++ 轮融资 — 新浪财经</a></li>
+        <li><a href="https://stcn.com/article/detail/3734325.html">两家A股上市公司战略入股，开普勒机器人完成亿元级A++轮融资 — 证券时报</a></li>
+        <li><a href="http://www.investorscn.com/2026/04/09/128821/">亿元A++轮落地，开普勒推出国内首个力触VTLA数采方案 — 投资者网</a></li>
+        <li><a href="https://stcn.com/article/detail/3723575.html">开普勒机器人：持续优化负载和续航能力 推动VLA模型与工业世界模型融合 — 证券时报</a></li>
+        <li><a href="https://www.leaderobot.com/news/5605">重磅！人形机器人研发商「开普勒」一月内完成两轮融资 — 立德共创</a></li>
+        <li><a href="https://news.pedaily.cn/202506/551640.shtml">开普勒机器人完成Pre A+轮融资 — 投资界</a></li>
+        <li><a href="https://news.pedaily.cn/202504/548809.shtml">上海开普勒机器人完成Pre-A轮融资，多家产业资本参投 — 投资界</a></li>
+        <li><a href="https://www.163.com/dy/article/KQ3ADI9T05119596.html">上海一家机器人公司获得近亿元融资，赛富投资基金领投 — 网易</a></li>
+        <li><a href="https://www.iyiou.com/news/202602061121641">开普勒获杭州柯林亿元战略投资，加速工业级具身智能规模化落地 — 亿欧</a></li>
+        <li><a href="https://app.dahecube.com/nweb/pc/article.html?artid=247630">露笑科技布局家庭具身AI机器人，携手技术方与渠道巨头共拓欧美市场 — 大河财立方</a></li>
+        <li><a href="https://api3.cls.cn/share/article/2146564">露笑科技：控股子公司拟推出家庭具身AI服务机器人 — 财联社</a></li>
+        <li><a href="https://mp.ofweek.com/ai/a556714727547">一文看懂｜开普勒机器人：工业级人形机器人的探索者 — OFweek</a></li>
+        <li><a href="https://m.rccaijing.com/news-7324687326767674663.html">"70后"全球化老兵入局人形机器人，开普勒完成Pre-A轮融资 — 锐创财经</a></li>
+        <li><a href="http://xzlrobot.com/c14601.html">硬核！开普勒K2"大黄蜂"落地上汽通用 — 协作机器人网</a></li>
+      </ol></div>
+    </article>
+  </div>
+  <div class="page-footer">本页面由具身智能Wiki项目自动生成 · 数据截至2026年5月 · 内容仅供参考，不构成投资建议</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>
