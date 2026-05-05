@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>VLAI未来动力 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> › <span>VLAI未来动力</span></div>
+  <div class="wiki-header"><h1>VLAI未来动力</h1><div class="subtitle">VLAI Robotics · 广州未来动力有限公司 · 2024年成立 · 港科大系 · 具身智能核心零部件 · 奇绩创坛投资</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#team">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financials">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#a1">2.1 团队背景与场景选择匹配度</a></li>
+        <li class="toc-lvl4"><a href="#a2">2.2 技术路线与场景适配性</a></li>
+        <li class="toc-lvl4"><a href="#a3">2.3 股东/资本结构对战略的影响</a></li>
+        <li class="toc-lvl4"><a href="#a4">2.4 试错过程与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#a5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#a6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#references">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">VLAI未来动力</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">广州未来动力有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">英文品牌</div><div class="ib-value">VLAI Robotics</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2024年4月10日</div></div>
+        <div class="ib-row"><div class="ib-label">总部</div><div class="ib-value">广州南沙 / 深圳南山</div></div>
+        <div class="ib-row"><div class="ib-label">注册资本</div><div class="ib-value">100万人民币</div></div>
+        <div class="ib-row"><div class="ib-label">法定代表人</div><div class="ib-value">张茂峰</div></div>
+        <div class="ib-section">融资数据</div>
+        <div class="ib-row"><div class="ib-label">天使轮</div><div class="ib-value">数百万元（2025年1月）</div></div>
+        <div class="ib-row"><div class="ib-label">投资方</div><div class="ib-value">奇绩创坛（独家）</div></div>
+        <div class="ib-section">产品定价</div>
+        <div class="ib-row"><div class="ib-label">B3关节电机</div><div class="ib-value">¥699</div></div>
+        <div class="ib-row"><div class="ib-label">B4关节电机</div><div class="ib-value">¥999</div></div>
+        <div class="ib-row"><div class="ib-label">X双臂机器人</div><div class="ib-value">¥19,800起</div></div>
+        <div class="ib-row"><div class="ib-label">L1移动双臂</div><div class="ib-value">¥28,800起</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">赛道</div><div class="ib-value"><span class="tag">关节电机</span><span class="tag">双臂机器人</span><span class="tag">VLA大模型</span><span class="tag">具身智能</span></div></div>
+      <div class="ib-row"><div class="ib-label">官网</div><div class="ib-value"><a href="https://www.163.com/dy/article/JMJ0UA1605118DFD.html" target="_blank">www.163.com/dy/article/JMJ0UA1605118DFD.html</a></div></div>
+      </aside>
+
+      <p class="article-intro"><b>VLAI未来动力</b>（VLAI Robotics，广州未来动力有限公司），是一家2024年4月成立的具身智能软硬件技术提供商，总部位于广州南沙，在深圳设有分公司。公司由香港科技大学（广州）团队创立，核心成员兼具清华、CMU、苏黎世联邦理工等学术背景和字节跳动、百度、大疆、比亚迪等产业经验。公司以自研一体化关节电机为切入点，逐步向上构建双臂机器人整机和VLAI机器人大模型（Vision-Language-Action），形成了「核心零部件+整机+AI大脑」的三层产品体系。2025年1月获奇绩创坛数百万天使轮独家投资，2026年4月发布L1轮式移动双臂机器人，定价2.88万元起。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper"><table class="wikitable infotable">
+        <tr><th>项目</th><th>内容</th></tr>
+        <tr><td>公司全称</td><td>广州未来动力有限公司</td></tr>
+        <tr><td>深圳实体</td><td>深圳未来动力有限公司（2025年5月成立）</td></tr>
+        <tr><td>英文品牌</td><td>VLAI Robotics / VLAI Future Power</td></tr>
+        <tr><td>成立时间</td><td>2024年4月10日</td></tr>
+        <tr><td>注册资本</td><td>100万人民币</td></tr>
+        <tr><td>法定代表人</td><td>张茂峰（实控人，持股99.9999%）</td></tr>
+        <tr><td>注册地</td><td>广州市南沙区 / 深圳市南山区西丽万科云城</td></tr>
+        <tr><td>上市状态</td><td>未上市</td></tr>
+        <tr><td>定位</td><td>具身智能核心零部件供应商 + 软硬件技术提供商</td></tr>
+      </table></div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>时间</th><th>事件</th></tr>
+        <tr><td>2024年4月</td><td>广州未来动力有限公司成立</td></tr>
+        <tr><td>2025年1月</td><td>完成天使轮数百万元融资，奇绩创坛独家投资；一体化关节电机进入量产；发布B3/B4新一代关节电机</td></tr>
+        <tr><td>2025年5月</td><td>深圳未来动力有限公司注册成立</td></tr>
+        <tr><td>2025年10月</td><td>联合OpenArm团队亮相IROS 2025（杭州），仿人机械臂正式开售，定价3.99万元起，首批限300台</td></tr>
+        <tr><td>2026年4月</td><td>发布L1轮式可升降双臂机器人，定价2.88万元起，定位「移动操作新物种」</td></tr>
+      </table></div>
+
+      <h3 id="team">1.2 创始人及核心团队</h3>
+      <p>VLAI未来动力由法定代表人张茂峰创立并实际控制。核心团队以香港科技大学（广州）毕业生为主体，成员来自清华、CMU、苏黎世联邦理工学院、南方科技大学、香港理工大学等顶尖高校，以及字节跳动、百度、大疆（DJI）、比亚迪等头部科技企业。团队以98后年轻成员为主，具备从算法研发到整机系统集成的全栈能力。公司整体呈现学术+产业混合型人才结构，兼具前沿研究能力和工程化落地经验。</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>维度</th><th>说明</th></tr>
+        <tr><td>学术背景</td><td>港科大（广州）为主体，清华、CMU、ETH Zurich、南科大、港理工</td></tr>
+        <tr><td>产业背景</td><td>字节跳动、百度、大疆、比亚迪等</td></tr>
+        <tr><td>团队特点</td><td>多为98后，全栈能力（算法→整机），年轻化</td></tr>
+        <tr><td>创始人</td><td>张茂峰（法定代表人/实控人，持股99.9999%）</td></tr>
+      </table></div>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>轮次</th><th>时间</th><th>金额</th><th>投资方</th><th>用途</th></tr>
+        <tr><td>天使轮</td><td>2025年1月</td><td>数百万元人民币</td><td>奇绩创坛（MiraclePlus，前YC中国）独家</td><td>关节电机研发、关节矩阵拓展、硬件迭代、量产交付、小智1号人形机器人研发</td></tr>
+      </table></div>
+      <p>奇绩创坛是唯一机构投资方。创始人张茂峰持股约99.9999%，拥有绝对控制权。公司估值未公开，考虑到天使轮融资金额为数百万元级别，推测估值在数千万人民币量级。公司未上市。</p>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>技术层</th><th>内容</th></tr>
+        <tr><td>核心零部件</td><td>自研一体化关节电机（电机+行星减速器+驱动器三合一设计），双编码器，模块化扩展，多重保护机制</td></tr>
+        <tr><td>运动控制</td><td>强化学习（RL）运动控制算法</td></tr>
+        <tr><td>AI大脑</td><td>自研VLAI机器人大模型（VLA — Vision-Language-Action），实现视觉-语言-动作端到端控制</td></tr>
+        <tr><td>软件平台</td><td>全新机器人操控平台，支持一键控制/连接/监控/遥操作/数据采集，Agent智能操控，自然语言交互</td></tr>
+        <tr><td>开放生态</td><td>预留全套开发接口，支持底层全流程二次开发</td></tr>
+      </table></div>
+      <p>VLAI未来动力的技术路线清晰：从底层核心零部件（一体化关节电机）出发，向运控算法（RL）和AI大脑（VLA大模型）逐层上探，最终通过整机产品（双臂机器人/人形机器人）完成技术闭环。关节电机采用电机+减速器+驱动器三合一方案，核心卖点是高扭矩密度和极致性价比。VLAI大模型是实现自然语言交互和端到端操控的关键差异点。</p>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <h4>关节电机系列</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>型号</th><th>峰值扭矩</th><th>扭矩密度</th><th>重量</th><th>售价</th><th>状态</th></tr>
+        <tr><td>VLAI-8018</td><td>36 Nm</td><td>—</td><td>600g</td><td>未披露</td><td>已发布</td></tr>
+        <tr><td>B3</td><td>36 Nm</td><td>65 Nm/Kg</td><td>—</td><td>¥699</td><td>量产中</td></tr>
+        <tr><td>B4</td><td>120 Nm</td><td>85 Nm/Kg</td><td>—</td><td>¥999</td><td>量产中</td></tr>
+      </table></div>
+
+      <h4>整机产品</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>产品</th><th>关键参数</th><th>售价</th><th>发布时间</th></tr>
+        <tr><td>X系列双臂机器人</td><td>双臂协作，面向科研教育</td><td>¥19,800起</td><td>2025年</td></tr>
+        <tr><td>仿人机械臂（OpenArm合作）</td><td>7+1 DOF，单臂负载6kg，双臂16 DOF</td><td>¥39,900起（含夹爪）</td><td>2025年10月（IROS）</td></tr>
+        <tr><td>L1轮式移动双臂机器人</td><td>全自动升降70-160cm，单臂8DOF/6kg负载，底盘100kg，双轮差速，Agent智能操控</td><td>¥28,800起</td><td>2026年4月</td></tr>
+        <tr><td>小智1号人形机器人</td><td>研发中，细节未公开</td><td>未披露</td><td>未发布</td></tr>
+      </table></div>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>阶段</th><th>目标场景</th><th>说明</th></tr>
+        <tr><td>第一步（当前）</td><td>科研教育</td><td>面向高校和科研机构的机器人开发平台，L1/X系列主打</td></tr>
+        <tr><td>第二步（规划中）</td><td>工业应用</td><td>通过VLAI大模型赋能，进入工厂、物流等工业场景</td></tr>
+        <tr><td>第三步（远期）</td><td>家庭/商用/农业</td><td>渗透酒店、办公、家庭服务、农业采摘等场景</td></tr>
+      </table></div>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <p>一体化关节电机B3/B4系列已进入量产阶段，以极致低价（¥699/¥999）切入市场，推动量产订单交付。仿人机械臂首批限购300台（3.99万元起）。L1轮式移动双臂机器人2026年4月发布，定价2.88万元起，以「产品级价格、科研级性能」为卖点。公司目前处于从核心零部件供应商向整机方案提供商升级的关键阶段，营收规模未公开，但产品定价策略显示出以量取胜、快速占领市场的意图。</p>
+
+      <h3 id="financials">1.8 财务数据</h3>
+      <p>公司未公开营收、利润等财务数据。作为2024年成立的极早期创业公司，预计尚未实现规模化营收。天使轮融资数百万元，注册资本100万元，资金储备规模较小。估值未公开，推测在数千万人民币量级。公司目前主要通过关节电机销售和整机预订获取早期现金流。</p>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>公司名称「VLAI」取自Vision-Language-Action（视觉-语言-动作），体现了其以VLA大模型为核心的AI技术路线。</li>
+        <li>关节电机B3/B4的定价（¥699/¥999）在行业内具有极强的价格竞争力，远低于同类产品，可能对关节电机市场格局产生冲击。</li>
+        <li>L1轮式移动双臂机器人被定位为「移动操作新物种」，将移动底盘与可升降双臂融合，定价2.88万元在整机市场中极具竞争力。</li>
+        <li>与日本OpenArm团队的合作使其获得了双臂机器人设计的技术输入，IROS 2025的亮相提升了国际学术能见度。</li>
+        <li>创始人张茂峰持股99.9999%的绝对控股结构，在早期创业中较为罕见，可能影响后续融资时的股权稀释灵活性。</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="a1">
+        <h4>2.1 团队背景与场景选择匹配度</h4>
+        <p>VLAI团队以港科大（广州）为核心，港科大在机器人领域有深厚积累（大疆创始人汪滔即出自港科大），团队成员兼具清华、CMU等顶尖学术背景和大疆、比亚迪等硬件产业经验。选择从「核心零部件（关节电机）」切入具身智能赛道，与团队在机电一体化、硬件工程化方面的能力高度匹配。大疆背景的团队成员在「极致性价比+量产能力」方面有天然优势，这解释了B3/B4关节电机定价¥699/¥999的底气。从零部件向整机+AI大脑的延伸路径，也符合团队「硬件基因→系统集成→软件赋能」的能力拓展逻辑。</p>
+      </div>
+
+      <div class="analysis-block" id="a2">
+        <h4>2.2 技术路线与场景适配性</h4>
+        <p>VLAI的技术路线具有鲜明的层次感：底层自研关节电机（硬件壁垒）→ 中层RL运控算法 → 上层VLAI大模型（AI壁垒）。首先聚焦科研教育场景的策略是务实的：科研用户对价格敏感、对开放性要求高、容忍一定的工程不完善，适合早期产品打磨和迭代。RL运控算法与VLA大模型的结合，理论上可以实现从「理解指令」到「执行动作」的端到端闭环，但在当前阶段，VLA大模型的实际性能和在工业场景的可靠性有待验证。科研教育→工业→家庭的渐进式场景拓展路径合理，但每步跨越都面临显著的技术和商业挑战。</p>
+      </div>
+
+      <div class="analysis-block" id="a3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>奇绩创坛（前YC中国）是唯一机构投资方，陆奇创办的奇绩以「早期+深度孵化」著称，对初创公司的支持不仅限于资金，更包括产品定义、市场策略和后续融资对接。这一股东背景有利于VLAI在产品化和融资节奏上获得专业指导。创始人张茂峰持股99.9999%的绝对控股给予其极大的战略自由度，但若后续需要大额融资，过高的创始人持股比例可能成为与投资人谈判的障碍。天使轮数百万元的融资规模较小，在具身智能这一烧钱赛道中，资金储备可能不足以支撑L1量产和人形机器人研发的双线推进。</p>
+      </div>
+
+      <div class="analysis-block" id="a4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>VLAI成立仅两年，路径相对线性：关节电机（2024-2025）→ 双臂机器人X系列（2025）→ 仿人机械臂（2025.10）→ L1轮式移动双臂（2026.4）→ 小智1号人形机器人（研发中）。定价策略有明显的调整：仿人机械臂3.99万元→L1移动双臂2.88万元，价格反而下探，体现了「极致性价比」策略的强化。从纯零部件到整机的跨越是一次重要的路径升级，反映了公司对「仅做零部件天花板有限」的认知。目前尚无明显的失败试错记录，这可能意味着公司仍处于快速试错的早期阶段，也可能反映了团队在产品定义方面的精准度。</p>
+      </div>
+
+      <div class="analysis-block" id="a5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>VLAI的竞争定位清晰且差异化：做具身智能的「卖铲人」——以高性价比核心零部件（关节电机）切入市场，同时向上延伸整机和AI大脑。在关节电机领域，¥699/¥999的定价直接对标并碾压了市场上的中高端关节电机，这一激进的价格策略可能引爆行业价格战。在整机领域，L1以2.88万元的定价和「移动+可升降双臂」的差异化构型，与宇树、傅利叶等公司的整机形成了错位竞争——VLAI做的是轻量级、高性价比的科研/开发平台，而非对标工业级人形机器人。核心取舍：做平台/工具而非终端应用，做「基础设施层」而非「应用层」，这与大疆早期做飞行控制系统的路径有相似之处。</p>
+      </div>
+
+      <div class="analysis-block" id="a6">
+        <h4>2.6 其他重要观察</h4>
+        <p>VLAI未来动力是Tier 3中信息最丰富、路径最清晰的公司之一。其以大疆系基因为底色的「极致性价比+全栈能力」策略，在具身智能赛道形成了独特定位。从关节电机¥699到L1整机¥28,800的定价曲线，显示公司对成本控制和规模化有清晰的思路。但挑战同样显著：天使轮融资规模有限、人形机器人尚未发布、VLA大模型实际能力待验证、行业竞争日益激烈。如果公司能在Pre-A轮/A轮获得充足资金，凭借当前的定价优势和产品节奏，有望在科研级双臂机器人市场建立领先地位，并向工业场景延伸。值得持续关注其VLA大模型的迭代进展和人形机器人的发布时点。</p>
+      </div>
+
+      <h2 id="references">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://www.163.com/dy/article/JMJ0UA1605118DFD.html">VLAI未来动力获数百万天使轮融资，自研一体化关节电机已进入量产 — 硬氪/网易</a></li>
+          <li><a href="https://startup.aliyun.com/info/1091880.html">VLAI未来动力获数百万天使轮融资，奇绩创坛投资 — 阿里云创业</a></li>
+          <li><a href="https://baijiahao.baidu.com/s?id=1822020019765012494">专注具身智能核心零部件，VLAI未来动力完成天使轮融资 — 百度百家</a></li>
+          <li><a href="https://lieyunpro.com/archives/496038">专注具身智能核心零部件，VLAI未来动力完成天使轮融资 — 猎云网</a></li>
+          <li><a href="https://www.leaderobot.com/news/6539">VLAI Robotics与OpenArm团队亮相IROS2025 — Leaderobot</a></li>
+          <li><a href="https://baijiahao.baidu.com/s?id=1861248861704190771">2.88万起！未来动力L1轮式移动双臂机器人重磅发布 — 百度百家</a></li>
+          <li><a href="https://vc.pedaily.cn/company/713951.html">VLAI未来动力 — 投资界</a></li>
+          <li><a href="https://innohere.com/ir/158082/holder.html">VLAI未来动力股东信息 — InnoHere</a></li>
+          <li><a href="https://rccaijing.com/news-7288100930787669448.html">VLAI未来动力获数百万天使轮融资，奇绩创坛投资 — 锐创财经</a></li>
+          <li><a href="https://www.sohu.com/a/852548304_100106801">VLAI未来动力完成天使轮融资，加速关节电机研发与量产 — 搜狐</a></li>
+          <li><a href="http://www.bowangcaijing.cn/news/1383847.html">VLAI未来动力完成天使轮融资 — 博望财经</a></li>
+          <li><a href="http://www.ikanchai.com/article/20250123/614952.shtml">VLAI未来动力完成天使轮融资 — 砍柴网</a></li>
+          <li><a href="https://eu.36kr.com/zh/p/3133910873463301">VLAI未来动力 — 36氪</a></li>
+          <li><a href="http://www.chinazjph.com/BusinessPlan/tourongzixun/10417.html">VLAI未来动力完成数百万元天使轮 — 中国资本策划网</a></li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">此页面最后编辑于2026年5月4日 · 数据来源截至2026年4月公开信息 · <a href="../index.html">具身智能Wiki</a></div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>
