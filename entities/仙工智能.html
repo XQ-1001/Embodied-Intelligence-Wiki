@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>仙工智能 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> <span class="breadcrumb-sep">›</span> <span>仙工智能</span></div>
+
+  <div class="wiki-header">
+    <h1>仙工智能</h1>
+    <div class="subtitle">SEER Robotics · 成立 2020年4月 · 港股递表中 · C 轮估值 32.7 亿元 · 全球控制器销量第一</div>
+  </div>
+
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 公司基本信息</a></li>
+        <li class="toc-lvl3"><a href="#team">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#product">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financials">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#analysis-1">2.1 团队背景与场景选择</a></li>
+        <li class="toc-lvl4"><a href="#analysis-2">2.2 技术路线与场景适配</a></li>
+        <li class="toc-lvl4"><a href="#analysis-3">2.3 股东结构对战略影响</a></li>
+        <li class="toc-lvl4"><a href="#analysis-4">2.4 试错过程与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#analysis-5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#analysis-6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#references">3 参考资料</a></li>
+      </ul>
+    </nav>
+
+    <article class="wiki-article">
+
+      <aside class="infobox">
+        <div class="infobox-title">仙工智能</div>
+        <div class="ib-row"><div class="ib-label">公司全称</div><div class="ib-value">上海仙工智能科技股份有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">英文名称</div><div class="ib-value">SEER Robotics</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2020 年 4 月</div></div>
+        <div class="ib-row"><div class="ib-label">总部</div><div class="ib-value">上海浦东张江国创中心</div></div>
+        <div class="ib-row"><div class="ib-label">创始人/CEO</div><div class="ib-value">赵越</div></div>
+        <div class="ib-row"><div class="ib-label">上市状态</div><div class="ib-value">港股递表中（18C 特专科技）</div></div>
+        <div class="ib-section">财务数据（2024）</div>
+        <div class="ib-row"><div class="ib-label">营收</div><div class="ib-value">3.39 亿元</div></div>
+        <div class="ib-row"><div class="ib-label">毛利率</div><div class="ib-value">45.9%</div></div>
+        <div class="ib-row"><div class="ib-label">净利润</div><div class="ib-value">亏损 4,231 万元</div></div>
+        <div class="ib-section">估值/市值</div>
+        <div class="ib-row"><div class="ib-label">最新估值</div><div class="ib-value">32.7 亿元（C 轮，2025.04）</div></div>
+        <div class="ib-row"><div class="ib-label">累计融资</div><div class="ib-value">约 2.83 亿元</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">控制器市占率</div><div class="ib-value">全球 23.6% / 中国 37.5%（2024，双第一）</div></div>
+        <div class="ib-row"><div class="ib-label">累计客户</div><div class="ib-value">1,500+ 家</div></div>
+        <div class="ib-row"><div class="ib-label">覆盖国家</div><div class="ib-value">35+</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">行业</div><div class="ib-value"><span class="tag">机器人</span><span class="tag">控制器</span><span class="tag">具身智能</span></div></div>
+        <div class="ib-row"><div class="ib-label">路线</div><div class="ib-value"><span class="tag tag-info">控制器+本体+软件</span><span class="tag tag-info">开放平台</span></div></div>
+        <div class="ib-section">官网</div>
+        <div class="ib-row"><div class="ib-label">官网</div><div class="ib-value"><a href="https://www.seer-robotics.ai" target="_blank">seer-robotics.ai</a></div></div>
+      </aside>
+
+      <p class="article-intro">
+        <strong>仙工智能</strong>（SEER Robotics）是一家总部位于上海浦东的智能机器人公司，由浙江大学校友、前 RoboCup 世界冠军赵越于 2020 年 4 月创立。公司定位「以控制系统为核心的平台型智能机器人公司」，核心产品为 SRC 系列机器人控制器，2023-2024 年连续两年蝉联全球机器人控制器销量第一（2024 年全球市占率 23.6%，中国 37.5%）。2024 年进军具身智能领域，推出全球首款一体化具身智能控制器 SRC-5000 及轮式人形机器人 MARS-01。公司 2024 年营收 3.39 亿元（三年 CAGR 35.7%），2025 年 11 月第二次向港交所递交 18C 特专科技上市申请，C 轮投后估值 32.7 亿元。
+      </p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+
+      <div class="table-wrapper">
+        <table class="wikitable infotable">
+          <tr><th>项目</th><th>内容</th></tr>
+          <tr><td>公司全称</td><td>上海仙工智能科技股份有限公司</td></tr>
+          <tr><td>英文名称</td><td>Shanghai Seer Intelligent Technology Corporation（品牌名 SEER Robotics）</td></tr>
+          <tr><td>成立时间</td><td>2020 年 4 月</td></tr>
+          <tr><td>注册地</td><td>中国上海</td></tr>
+          <tr><td>总部</td><td>上海浦东新区张江国创中心（2026 年 4 月迁入）</td></tr>
+          <tr><td>分支机构</td><td>德国子公司、香港、无锡、深圳、成都</td></tr>
+          <tr><td>上市状态</td><td>港股递表中（18C 特专科技通道，中金独家保荐）</td></tr>
+          <tr><td>官网</td><td><a href="https://www.seer-robotics.ai" target="_blank">www.seer-robotics.ai</a></td></tr>
+        </table>
+      </div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>时间</th><th>事件</th></tr>
+          <tr><td>2015 年 10 月</td><td>赵越创办前身公司「仙知机器人」，核心团队来自 RoboCup 世界冠军队</td></tr>
+          <tr><td>2020 年 4 月</td><td>上海仙工智能科技股份有限公司正式注册成立</td></tr>
+          <tr><td>2020 年底</td><td>完成 A 轮融资，估值 3 亿元，推出 SRC-2000 通用版 AMR 控制器</td></tr>
+          <tr><td>2021 年 3 月</td><td>A+ 轮融资 3,600 万元，估值 6 亿元，IDG 资本入局</td></tr>
+          <tr><td>2021 年</td><td>推出 SRC-3000FS 内置功能安全控制器</td></tr>
+          <tr><td>2022 年初</td><td>B 轮融资超 1 亿元，估值 24 亿元，赛富基金领投</td></tr>
+          <tr><td>2023 年</td><td>推出 SRC-880 入门级控制器；全球控制器销量首夺第一</td></tr>
+          <tr><td>2024 年 9 月</td><td>推出全球首款一体化具身智能控制器 SRC-5000，标志进军具身智能</td></tr>
+          <tr><td>2025 年 4 月</td><td>C 轮融资 7,000 万元，估值 32.7 亿元；首届具身智能机器人运动会参展</td></tr>
+          <tr><td>2025 年 5 月</td><td>首次向港交所递交 18C 上市申请</td></tr>
+          <tr><td>2025 年 7 月</td><td>WAIC 2025 世界人工智能大会首秀，展示轮式人形 MARS-01</td></tr>
+          <tr><td>2025 年 10 月</td><td>轮式人形机器人实现「小批量交付」</td></tr>
+          <tr><td>2025 年 11 月</td><td>第二次向港交所递表；与韩国农心工程签署战略合作</td></tr>
+          <tr><td>2025 年 12 月</td><td>具身机器人首次海外亮相</td></tr>
+          <tr><td>2026 年 3 月</td><td>连续第四次亮相德国 LogiMAT 展，首展四足机器狗 D1 PRO</td></tr>
+          <tr><td>2026 年 4 月</td><td>总部迁入浦东张江国创中心；亮相北美 MODEX 2026；获「上海市创新型企业总部」认定</td></tr>
+        </table>
+      </div>
+
+      <h3 id="team">1.2 创始人及核心团队</h3>
+
+      <p>仙工智能由赵越领衔，核心团队多来自浙江大学智能控制研究所及 RoboCup 机器人足球世界冠军队。赵越本人拥有独特的「弃医从工」经历——从浙大八年制医学班退学后重新考入控制科学方向攻读硕士，两次带队夺得 RoboCup 小型足球机器人世界冠军。团队结构呈现「浙大系学术基因 + 产业实战经验」的混合特征。</p>
+
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+          <tr>
+            <td>创始人/董事长/CEO</td>
+            <td>赵越</td>
+            <td>1989 年生，浙江大学控制科学与工程硕士。2013、2014 年 RoboCup 小型足球机器人世界冠军（队长）。2015 年创办仙知机器人，2020 年创办仙工智能。持有 36 项发明专利。2022 年入选《财富》中国 40 位 40 岁以下商界精英。直接持股 17.05%，通过一致行动人控制 52.89% 投票权。</td>
+          </tr>
+          <tr>
+            <td>战略市场负责人/执行董事</td>
+            <td>丁霞</td>
+            <td>赵越妻子，前科沃斯投资总监、X-MAN 加速器总经理。在产业资本和科技创业生态方面有丰富资源。</td>
+          </tr>
+          <tr>
+            <td>联合创始人/产品研发负责人</td>
+            <td>叶杨笙</td>
+            <td>赵越表弟（姻亲），浙大控制科学与工程硕士。负责产品研发体系。</td>
+          </tr>
+          <tr>
+            <td>联合创始人</td>
+            <td>王群</td>
+            <td>浙大校友，与赵越同为 RoboCup 冠军队核心成员。</td>
+          </tr>
+        </table>
+      </div>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+
+      <p>仙工智能成立五年间完成四轮融资，累计约 2.83 亿元，估值从 3 亿元增长至 32.7 亿元，涨超 10 倍。投资方涵盖产业资本（科沃斯、隐山资本/普洛斯）和顶级财务投资者（IDG 资本、赛富基金），形成「产业+财务」双重资本结构。2025 年两次向港交所递表，冲刺 18C 特专科技 IPO。</p>
+
+      <h4>融资历史</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>轮次</th><th>时间</th><th>金额</th><th>估值</th><th>主要投资方</th></tr>
+          <tr><td>A 轮</td><td>2020 年底</td><td>未披露</td><td>3 亿元</td><td>科沃斯、隐山资本（普洛斯）、华创资本、惠银</td></tr>
+          <tr><td>A+ 轮</td><td>2021 年 3 月</td><td>3,600 万元</td><td>6 亿元</td><td>IDG 资本（天津德辉）</td></tr>
+          <tr><td>B 轮</td><td>2022 年初</td><td>超 1 亿元</td><td>24 亿元</td><td>赛富基金（8,000 万领投）、IDG 资本、浩澜资本</td></tr>
+          <tr><td>C 轮</td><td>2025 年 4 月</td><td>7,000 万元</td><td>32.7 亿元</td><td>洪泰投资、赛富基金</td></tr>
+        </table>
+      </div>
+
+      <h4>IPO 前主要股东结构</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>股东</th><th>持股比例</th><th>类型</th></tr>
+          <tr><td>赵越（创始人/控股）</td><td>17.05%（通过一致行动人控制 52.89% 投票权）</td><td>创始人</td></tr>
+          <tr><td>隐山资本（普洛斯旗下）</td><td>14.25%</td><td>产业资本（物流地产）</td></tr>
+          <tr><td>华创资本</td><td>9.65%</td><td>财务投资者</td></tr>
+          <tr><td>科沃斯</td><td>6.45%</td><td>产业资本（服务机器人龙头）</td></tr>
+          <tr><td>IDG 资本</td><td>5.35%</td><td>顶级 VC</td></tr>
+          <tr><td>赛富基金</td><td>4.26%</td><td>财务投资者</td></tr>
+        </table>
+      </div>
+
+      <h3 id="tech">1.4 技术路线</h3>
+
+      <p>仙工智能的技术路线以「控制器为锚、软件为链、本体为延伸」，构建从底层控制到上层 AI 的全栈能力。在传统工业 AMR 领域，其以 3D SLAM 导航（精度 ±2mm）和 NFL 自然特征定位（免部署方案）建立了技术壁垒。2024 年进军具身智能后，路线升级为「多芯片异构架构 + 全身控制 + VLA 模型」，核心控制周期从数十 ms 压缩至 1ms，实现了从工业移动控制向人形机器人全身运动控制的技术跨越。</p>
+
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>维度</th><th>内容</th></tr>
+          <tr><td>总体 AI 架构</td><td>多芯片异构系统：AI 核（20-156 TOPS GPU 可配置）+ 实时核 + 通用核。SRC-5000 系列搭载最高 156 TOPS 算力，支持自然语言指令解析和少样本学习</td></tr>
+          <tr><td>导航技术</td><td>3D SLAM 导航（精度 ±2mm）+ NFL 自然特征定位（免二维码部署）+ VSLAM 与激光 SLAM 融合；适配 ≥32 轴电机控制</td></tr>
+          <tr><td>运动控制</td><td>全身控制（Whole-body Control）— 手-眼-脚协同；1ms 控制周期（行业通常数十 ms）；工业 EtherCAT 总线 + Wi-Fi 6</td></tr>
+          <tr><td>具身智能</td><td>VLA 模型（视觉-语言-动作）— 自然语言指令 → 任务拆解 → 全身运动规划 → 实时控制；支持四足机器狗强化学习抗扰算法</td></tr>
+          <tr><td>软件生态</td><td>星云平台（Nebula，1000+ 款型选配）+ MWMS/M4 仓储管理 + RDS 调度系统 + Roboshop 部署工具 + Meta-Visualization 数字孪生</td></tr>
+          <tr><td>全栈/专用路线</td><td>全栈开放平台路线：自研控制器（核心）+ 自研软件 + 合作伙伴本体，不做封闭全栈，以开放生态降低产业门槛</td></tr>
+        </table>
+      </div>
+
+      <h3 id="product">1.5 产品形态</h3>
+
+      <p>仙工智能以控制器为核心产品，并基于控制器集成整机形成多层次产品矩阵。2024 年进军具身智能后新增轮式人形及四足机器狗品类。</p>
+
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>产品分类</th><th>子类/型号</th><th>说明</th><th>主要参数</th><th>发布时间</th></tr>
+          <tr><td rowspan="5">控制器</td><td>SRC-2000</td><td>通用版 AMR 控制器</td><td>标准化接口，适配多品牌硬件</td><td>2020</td></tr>
+          <tr><td>SRC-3000FS</td><td>内置功能安全控制器</td><td>满足工业安全等级要求</td><td>2021</td></tr>
+          <tr><td>SRC-880</td><td>入门级控制器</td><td>低成本方案</td><td>2023</td></tr>
+          <tr><td>SRC-5000</td><td>一体化具身智能控制器（全球首款），全身控制+手眼协调+VLA</td><td>AI 算力最高 156 TOPS，1ms 控制周期，≥32 轴，3D 激光+多相机 VSLAM</td><td>2024.09</td></tr>
+          <tr><td>SRC-1000</td><td>四足/六足机器狗专用控制器，3D 自主导航</td><td>强化学习抗扰算法</td><td>2025</td></tr>
+          <tr><td>轮式人形</td><td>MARS-01</td><td>轮式人形机器人</td><td>40+ 自由度，7 自由度机械臂 ×2，6kg 单臂负载，1720mm 高，700mm 升降行程</td><td>2025</td></tr>
+          <tr><td>四足机器狗</td><td>Puppy / D1 PRO</td><td>搭载 SRC-1000 控制器，强化学习驱动</td><td>支持全地形自适应</td><td>2025</td></tr>
+          <tr><td>AMR/AGV</td><td>智能叉车、顶升、料箱、清洁等系列</td><td>集成 SRC 控制器的标准化整机</td><td>覆盖搬运、堆高、窄巷道等</td><td>持续迭代</td></tr>
+        </table>
+      </div>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+
+      <p>仙工智能通过「控制器赋能 + 整机方案」覆盖 20 余个行业，2025 年具身智能产品线新增工业上下料、拣选、箱体搬运三大场景。</p>
+
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>场景大类</th><th>细分场景</th><th>代表客户/合作</th><th>说明</th></tr>
+          <tr><td rowspan="5">工业制造</td><td>3C 电子物料搬运</td><td>多家中大型 3C 制造商</td><td>高精度（±2mm）SLAM 导航优势明显</td></tr>
+          <tr><td>汽车零部件产线物流</td><td>一汽、上汽等供应链</td><td>AMR/叉车系列</td></tr>
+          <tr><td>新能源（锂电/光伏）</td><td>多家头部厂商</td><td>洁净车间环境适配</td></tr>
+          <tr><td>半导体晶圆搬运</td><td>多家半导体客户</td><td>高洁净度+高稳定性</td></tr>
+          <tr><td>工程机械/生物医药</td><td>多客户</td><td>覆盖 20+ 行业</td></tr>
+          <tr><td>仓储物流</td><td>智能仓储出入库、窄巷道存储</td><td>隐山资本（普洛斯）生态</td><td>MWMS/M4 + RDS 调度系统</td></tr>
+          <tr><td>具身智能（新）</td><td>箱体搬运、上下料、分拣</td><td>初期小批量交付中</td><td>MARS-01 轮式人形，三大工业场景试点</td></tr>
+          <tr><td>海外标杆</td><td>药厂物流（波兰）、家电制造（瑞典）</td><td>Polpharma、Electrolux</td><td>突破极限间隙 1cm 叉取</td></tr>
+        </table>
+      </div>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+
+      <p>仙工智能在全球工业智能机器人收入排名第 8（2024，市占率 1.1%），中国市场第 5（市占率 2.7%）。控制器方面以绝对优势位居全球及中国双第一。2025 年轮式人形机器人已实现小批量交付，海外市场（欧洲、北美、韩国）多渠道布局推进中。</p>
+
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>指标</th><th>数据</th><th>时间节点</th></tr>
+          <tr><td>全球工业智能机器人收入排名</td><td>第 8 名（市占率 1.1%）</td><td>2024 年</td></tr>
+          <tr><td>中国市场收入排名</td><td>第 5 名（市占率 2.7%）</td><td>2024 年</td></tr>
+          <tr><td>全球控制器销量排名</td><td>第 1 名（23.6%）</td><td>2024 年</td></tr>
+          <tr><td>中国控制器销量排名</td><td>第 1 名（37.5%）</td><td>2024 年</td></tr>
+          <tr><td>累计控制器销量</td><td>8,293 个（2022-2024 合计单独出售）</td><td>三年累计</td></tr>
+          <tr><td>累计整机销量</td><td>4,561 台（2022-2024 合计）</td><td>三年累计</td></tr>
+          <tr><td>累计客户数</td><td>1,500+ 家集成商与终端客户</td><td>截至 2025</td></tr>
+          <tr><td>轮式人形交付</td><td>小批量交付（2025.10）</td><td>2025 年</td></tr>
+          <tr><td>覆盖国家</td><td>35+</td><td>截至 2026</td></tr>
+        </table>
+      </div>
+
+      <h3 id="financials">1.8 财务数据</h3>
+
+      <p>仙工智能营收三年 CAGR 达 35.7%，但持续亏损且现金紧张——2024 年底账面现金仅约 9,286 万元，82.69% 融资款已消耗。毛利率从 2023 年的 49.2% 下滑至 2025 上半年的约 42.5%，主因为低毛利的整机业务占比持续扩大。</p>
+
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>指标</th><th>2022</th><th>2023</th><th>2024</th><th>2025 H1</th></tr>
+          <tr><td>营收（亿元）</td><td>1.84</td><td>2.50</td><td>3.39</td><td>1.58</td></tr>
+          <tr><td>营收增速</td><td>—</td><td>+35%</td><td>+36%</td><td>+34.4%</td></tr>
+          <tr><td>毛利率</td><td>46.8%</td><td>49.2%</td><td>45.9%</td><td>约 42.5%</td></tr>
+          <tr><td>净亏损（万元）</td><td>-3,226</td><td>-4,770</td><td>-4,231</td><td>-5,100</td></tr>
+          <tr><td>研发费用（万元）</td><td>3,932</td><td>6,375</td><td>7,131</td><td>—</td></tr>
+          <tr><td>研发占比</td><td>21.3%</td><td>25.6%</td><td>21.0%</td><td>—</td></tr>
+          <tr><td>账面现金（万元）</td><td>—</td><td>—</td><td>约 9,286</td><td>—</td></tr>
+        </table>
+      </div>
+
+      <div class="callout">
+        <div class="callout-title">营收结构（2024 年）</div>
+        <p>机器人整机（集成 SRC 控制器）占 69.5%，控制器单售占 16.9%，配件及软件约 13.6%。整机占比持续上升拖累综合毛利率，但也意味着更深的客户绑定和更大的单客户价值。</p>
+      </div>
+
+      <h3 id="other">1.9 其他信息</h3>
+
+      <ul>
+        <li>公司名称「SEER」意为「先知」（Seer），体现「以智能控制系统预见并解决机器人应用难题」的使命。</li>
+        <li>赵越的「弃医从工」经历是公司最独特的创始人叙事——从浙大八年制医学班退学，「做机器人比当外科医生更让我热血沸腾」。</li>
+        <li>公司前身「仙知机器人」已于 2024 年 12 月被仙工智能以 240 万元收购，用于消除潜在竞争和品牌统一。</li>
+        <li>IPO 选用港交所 18C 特专科技通道（适用于未盈利的高增长科技企业），2025 年 5 月首次递表失效后，同年 11 月二次递表。</li>
+        <li>星云平台累计沉淀超 1,000 种机器人款型，适配 300+ 种零部件，覆盖 2,100+ 款不同形态机器人应用。</li>
+        <li>产品全线通过 CE 认证，北美专用机型获 UL 认证及 TÜV 莱茵安全合规认证。</li>
+        <li>2026 年 1 月赵越入选「2025 年度机器人行业十大杰出人物」，同年 4 月公司获上海市政府「上海市创新型企业总部」授牌。</li>
+        <li>赵越妻子丁霞担任战略市场负责人/执行董事，表弟叶杨笙担任产品研发负责人，公司带有典型的家族式创企特征。</li>
+      </ul>
+
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="analysis-1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>赵越团队的核心基因是「移动机器人控制」——RoboCup 足球机器人要求高速、实时、多机协同的自主决策，这与工业 AMR 的导航调度需求高度吻合。团队在 SLAM 导航和控制器的深厚积累，使其在工业物流场景（3C 电子、汽车零部件、半导体等）具有天然技术优势。然而，2024 年进军具身智能（人形机器人全身控制+VLA 模型）意味着场景从「平面移动」跨越到「立体操作」，团队需要补足机械臂控制、灵巧操作、多模态感知等方面的能力。赵越妻子丁霞（前科沃斯投资总监）的产业背景为公司提供了消费/服务机器人视角，但具身智能的产业落地仍需更多验证。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>仙工智能的「控制器+本体+软件」全栈开放路线在工业 AMR 场景已被验证成功——2023-2024 连续两年控制器销量全球第一证明了市场认可。但具身智能场景对控制器的要求远高于 AMR：从二维平面导航升级为三维全身运动控制（40+ 自由度、多传感器融合、实时 VLA 推理），SRC-5000 虽在硬件参数上（156 TOPS、1ms 控制周期）具备竞争力，但软件生态（VLA 模型的泛化能力、多任务技能库）仍处早期。当前选择的三大具身场景（箱体搬运、上下料、拣选）属于工业场景中复杂度中等、容错率较高的任务，与当前技术成熟度匹配良好，避免了过度承诺。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>隐山资本（普洛斯旗下物流地产基金）作为第一大外部股东（14.25%），自然为仙工智能导入了仓储物流场景资源——普洛斯在中国管理着超过 4,000 万平米的物流园区，是天然的 AMR 部署场景。科沃斯（6.45%）的服务机器人基因则可能在消费/商用场景提供协同。IDG 和赛富等顶级 VC 的入局带来了资本市场的品牌背书和 IPO 通道资源。但需注意：隐山资本的物流地产基因可能使公司天然偏向仓储物流场景，而在具身智能所瞄准的「工业操作」场景缺乏直接的产业资源导入。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>仙工智能经历了两次显著的路径升级。第一次是 2020 年从「仙知机器人」（早期创业，产品较窄）升级为「仙工智能」——由单一移动机器人整机厂转型为以控制器为核心的开放平台，这一定位调整是公司后来成为全球控制器销冠的关键决策。第二次是 2024 年从「工业 AMR 控制器」跃迁至「具身智能控制器」——发布 SRC-5000 和轮式人形 MARS-01，标志着从「移动」到「操作」的能力延伸。这两次调整都沿袭了同一个逻辑：以控制器为核心，向上兼容更多形态和场景，而非盲目进入硬件红海。2024 年以 240 万元收购前身公司仙知机器人，则是消除历史包袱和品牌统一的有序收尾。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>仙工智能的核心取舍是：做「开放平台的卖铲人」而非「封闭全栈的机器人厂」。这一取舍使其避免了与宇树、智元等本体厂商在硬件价格上的直接竞争，而将竞争焦点集中在控制器和软件平台层面。但风险在于：随着 AMR 行业成熟，头部本体厂商可能自研控制器（类比特斯拉自研 FSD 芯片），削弱仙工智能的控制器市场份额。具身智能时代，这一风险可能被放大——人形机器人厂商（如智元、宇树）同样可能自研全身控制器。仙工智能的应对策略是：以控制器为核心整合更多本体品牌，通过开放生态的「网络效应」对抗单点自研的替代威胁。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis-6">
+        <h4>2.6 其他重要观察</h4>
+        <p>第一，仙工智能三年营收 CAGR 35.7% 在 AMR 行业中属中上水平，但在持续亏损（三年累计 -1.23 亿）和账面现金仅 9,286 万的背景下，IPO 几乎成为必选项——若 IPO 受阻，现金流可能难以支撑到盈利拐点。第二，整机业务占比从 2022 年的约 50% 升至 2024 年的 69.5%，表面上是规模扩张，实质上是「从卖铲子到卖整套工具」的升级，但也拉低了综合毛利率。第三，赵越家族的深度卷入（妻子负责战略市场、表弟负责产品研发）在早期有助于凝聚力和决策效率，但随着公司向 IPO 和全球化迈进，治理结构可能需要更职业化的升级。第四，北美和欧洲的双线出海战略（2026 年密集参展和认证）显示出从中国市场的控制器之王走向全球智能机器人基础设施的野心。</p>
+      </div>
+
+
+      <h2 id="references">3 参考资料</h2>
+
+      <div class="references">
+        <ol>
+          <li><a href="https://finance.eastmoney.com/a/202505293417325971.html" target="_blank">东方财富 — 3年卖了8000+个工业机器人"大脑" 弃医从工的"浙大极客"闯关港股</a></li>
+          <li><a href="https://www.chinaventure.com.cn/news/80-20250530-386525.html" target="_blank">投中网 — 「机器人大脑」的全球销冠，抢跑 IPO</a></li>
+          <li><a href="https://www.36kr.com/p/3312181051432713" target="_blank">36氪 — 科沃斯 IDG 押注，浙大校友创业 5 年赴港 IPO</a></li>
+          <li><a href="https://www.jiemian.com/article/12961876.html" target="_blank">界面新闻 — 5年估值 32.7 亿，仙工智能「流血」冲港股</a></li>
+          <li><a href="https://www.donews.com/article/detail/5145/86563.html" target="_blank">DoNews — 5年估值 32.7 亿！赵越「弃医」转向机器人，仙工智能「流血」冲港股</a></li>
+          <li><a href="http://stock.caijing.com.cn/20251128/5128041.shtml" target="_blank">财经网 — 科沃斯、IDG 参投，「机器人大脑」公司仙工智能再冲港股</a></li>
+          <li><a href="https://www.stcn.com/article/detail/1874079.html" target="_blank">证券时报 — 打造智能机器人开放平台 让更多企业低门槛拥抱智能未来</a></li>
+          <li><a href="https://seer-robotics.ai/zh/media/256" target="_blank">仙工智能官网 — 亮相 EIR 2025 具身智能峰会，具身新品成焦点</a></li>
+          <li><a href="https://seer-robotics.ai/zh/media/310" target="_blank">仙工智能官网 — 亮相 MODEX 2026，开放平台深度扎根北美</a></li>
+          <li><a href="https://seer-robotics.ai/zh/media/311" target="_blank">仙工智能官网 — 智领欧洲，底座先行，四度闪耀德国 LogiMAT</a></li>
+          <li><a href="https://seer-robotics.ai/zh/media/309" target="_blank">仙工智能官网 — 扎根浦东，生态进化：迈向平台型智能机器人公司新征程</a></li>
+          <li><a href="https://seer-robotics.ai/zh/media/291" target="_blank">仙工智能官网 — 具身机器人海外首秀！星云平台重新定义机器人获取新范式</a></li>
+          <li><a href="https://seer-robotics.ai/zh/media/240" target="_blank">仙工智能官网 — 首届具身智能机器人运动会，「机器人大脑」核心赋能</a></li>
+          <li><a href="https://seer-robotics.ai/zh/media/236" target="_blank">仙工智能官网 — 荣膺「人形机器人最强大脑」，以 AGI 技术加速产业发展</a></li>
+          <li><a href="https://www.itheat.com/view/55384.html" target="_blank">IT 热评 — 仙工智能 WAIC 首秀亮相，轮式人形与四足机器狗黑科技硬核圈粉</a></li>
+          <li><a href="https://www.sohu.com/a/887552651_562020" target="_blank">搜狐 — 具身机器人 iPhone 时刻到来？仙工智能在慕尼黑上海电子展给出答案</a></li>
+          <li><a href="https://www.eet-china.com/mp/a408772.html" target="_blank">电子工程专辑 — 弃医从工的「浙大极客」启动 IPO</a></li>
+          <li><a href="https://baike.baidu.com/item/%E8%B5%B5%E8%B6%8A/64862396" target="_blank">百度百科 — 赵越</a></li>
+          <li><a href="https://news.e-works.net.cn/category802/news129138.htm" target="_blank">e-works — 仙工智能与韩国农心工程签署战略合作</a></li>
+          <li><a href="https://www.worldrobotconference.com/expo/case/42.html" target="_blank">世界机器人大会 — 突破极限间隙 1cm！仙工智能助力 Electrolux 瑞典工厂</a></li>
+          <li><a href="https://cn.seer-group.com/blog/seer-robotics-promag-polpharma-efficiency" target="_blank">仙工智能 — 携手 PROMAG，助力波兰制药巨头 Polpharma 厂内效率飞跃</a></li>
+          <li><a href="https://www.donews.com/news/detail/4/6401377.html" target="_blank">DoNews — 仙工智能董事长赵越入选「2025 年度机器人行业十大杰出人物」</a></li>
+          <li><a href="https://epaper.tkww.hk/a/202506/30/AM6861a018e4b0e169b135b783.html" target="_blank">大公报 — 仙工智能拟港 IPO 估值 32 亿</a></li>
+          <li><a href="https://www.cechina.cn/Company/215601_136584/ProductDetail.aspx" target="_blank">控制工程网 — 仙工智能一体化具身智能控制器 SRC-5000</a></li>
+          <li><a href="https://finance.eastmoney.com/a/202506063423251794.html" target="_blank">东方财富 — 高管访谈：仙工智能 CEO 赵越打造智能机器人开放平台</a></li>
+        </ol>
+      </div>
+
+    </article>
+  </div>
+
+  <div class="page-footer">
+    本页面最后更新于 2026 年 5 月 5 日 · 具身智能 Wiki · 内容基于公开信息整理，仅供参考
+  </div>
+</div>
+
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body>
+</html>
