@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>海柔创新 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style></head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> <span class="breadcrumb-sep">›</span> <span>海柔创新</span></div>
+  <div class="wiki-header"><h1>海柔创新</h1><div class="subtitle">HAI ROBOTICS · 2016年成立 · 全球箱式仓储机器人（ACR）龙头 · 深圳</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#team">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#product">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenario">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financial">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#a1">2.1 团队与场景匹配度</a></li>
+        <li class="toc-lvl4"><a href="#a2">2.2 技术路线适配性</a></li>
+        <li class="toc-lvl4"><a href="#a3">2.3 股东对战略的影响</a></li>
+        <li class="toc-lvl4"><a href="#a4">2.4 试错与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#a5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#a6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#refs">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">海柔创新</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">深圳市海柔创新智能科技集团股份有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">英文名</div><div class="ib-value">HAI ROBOTICS Co., Ltd.</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2016年12月</div></div>
+        <div class="ib-row"><div class="ib-label">注册地</div><div class="ib-value">深圳宝安</div></div>
+        <div class="ib-row"><div class="ib-label">上市</div><div class="ib-value">港股递表中（高盛、中信证券保荐）</div></div>
+        <div class="ib-row"><div class="ib-label">创始人 & CEO</div><div class="ib-value">陈宇奇（香港理工/ETH Zurich）</div></div>
+        <div class="ib-row"><div class="ib-label">CTO</div><div class="ib-value">徐圣东（浙大/ETH Zurich）</div></div>
+        <div class="ib-row"><div class="ib-label">官网</div><div class="ib-value"><a href="https://www.hairobotics.com" target="_blank">hairobotics.com</a></div></div>
+        <div class="ib-section">财务数据</div>
+        <div class="ib-row"><div class="ib-label">2024年营收</div><div class="ib-value">13.60亿元（+68.5%）</div></div>
+        <div class="ib-row"><div class="ib-label">毛利率（2024）</div><div class="ib-value">26.3%</div></div>
+        <div class="ib-row"><div class="ib-label">2025前3季营收</div><div class="ib-value">12.63亿元（+35.6%）</div></div>
+        <div class="ib-row"><div class="ib-label">2025前3季毛利</div><div class="ib-value">28.9%</div></div>
+        <div class="ib-row"><div class="ib-label">累计亏损</div><div class="ib-value">约28.53亿元（2023-2025前3季）</div></div>
+        <div class="ib-row"><div class="ib-label">海外收入占比</div><div class="ib-value">39.6%（2025前3季）</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">全球市占率</div><div class="ib-value">31.4%（ACR市场第一）</div></div>
+        <div class="ib-row"><div class="ib-label">累计交付</div><div class="ib-value">30,000+台ACR机器人</div></div>
+        <div class="ib-row"><div class="ib-label">累计项目</div><div class="ib-value">1,700+个</div></div>
+        <div class="ib-row"><div class="ib-label">覆盖国家</div><div class="ib-value">40+个</div></div>
+        <div class="ib-row"><div class="ib-label">终端客户</div><div class="ib-value">800+家（含近70家世界500强）</div></div>
+        <div class="ib-row"><div class="ib-label">企业类型</div><div class="ib-value">箱式仓储机器人（ACR）龙头</div></div>
+      </aside>
+
+      <p class="article-intro"><strong>海柔创新（HAI ROBOTICS）</strong>，全称深圳市海柔创新智能科技集团股份有限公司，是一家成立于2016年的全球箱式仓储机器人（ACR，Autonomous Case-Handling Robot）领军企业，总部位于深圳宝安。公司由陈宇奇（香港理工/苏黎世联邦理工学院毕业）、徐圣东、房冰三位「88后」技术学霸联合创办，是箱式仓储机器人这一品类的全球开创者和市场第一。按2024年收入及出货量计，海柔创新全球ACR市场份额超30%，领先第二名5个百分点。2026年2月13日，公司正式向港交所递交招股书，由高盛和中信证券联席保荐，冲刺「港股ACR第一股」。海柔创新累计融资超41亿元，股东阵容涵盖五源资本、红杉中国、今日资本、IDG资本、源码资本、泛大西洋资本等顶级机构。截至2025年9月末，公司累计部署超30,000台ACR机器人、落地超1,700个项目，服务全球800多家客户。</p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper">
+      <table class="wikitable infotable">
+        <tr><th>项目</th><th>内容</th></tr>
+        <tr><td>公司全称</td><td>深圳市海柔创新智能科技集团股份有限公司</td></tr>
+        <tr><td>英文名称</td><td>HAI ROBOTICS Co., Ltd.</td></tr>
+        <tr><td>成立日期</td><td>2016年12月21日</td></tr>
+        <tr><td>注册地</td><td>广东省深圳市宝安区</td></tr>
+        <tr><td>上市状态</td><td>2026年2月13日递表港交所主板，尚未挂牌</td></tr>
+        <tr><td>联席保荐人</td><td>高盛（亚洲）、中信证券（香港）</td></tr>
+        <tr><td>生产设施</td><td>中国、马来西亚两大智造中心</td></tr>
+        <tr><td>研发团队</td><td>516名研发人员（占总员工35.7%）</td></tr>
+        <tr><td>专利申请</td><td>约2,394项（ACR赛道专利拥有量第一）</td></tr>
+        <tr><td>官网</td><td>hairobotics.com</td></tr>
+      </table>
+      </div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>时间</th><th>关键事件</th></tr>
+        <tr><td>2015年</td><td>陈宇奇团队调研30多家仓库，受CeMAT展启发，首创「货箱到人」技术路线</td></tr>
+        <tr><td>2016年12月</td><td>海柔创新在深圳正式成立，获香港理工大学种子基金</td></tr>
+        <tr><td>2017年</td><td>获XBOT PARK基金（李泽湘等）天使投资；推出全球首款箱式仓储机器人系统「库宝」HaiPick System</td></tr>
+        <tr><td>2018年</td><td>A轮融资，源码资本重仓进入；启动商业化部署</td></tr>
+        <tr><td>2021年</td><td>B+轮至D轮一年内完成三轮融资，超2亿美元；年营收破亿</td></tr>
+        <tr><td>2022年</td><td>完成D+轮1.7亿美元融资，估值约20亿美元</td></tr>
+        <tr><td>2024年</td><td>年营收13.60亿元（+68.5%），全球ACR市占率31.4%第一；推出闪攀系统HaiPick Climb</td></tr>
+        <tr><td>2025年</td><td>完成E轮至E+++轮及Pre-IPO系列融资，累计融资超41亿元</td></tr>
+        <tr><td>2025年</td><td>闪攀系统获美国PACK EXPO技术卓越奖等多项目际奖项</td></tr>
+        <tr><td>2026年2月13日</td><td>正式向港交所递交招股书，冲刺「港股ACR第一股」</td></tr>
+      </table>
+      </div>
+
+      <h3 id="team">1.2 创始人及核心团队</h3>
+      <p>海柔创新的创始团队以香港理工大学和ETH Zurich（苏黎世联邦理工学院）的机器人学背景为核心，呈现出「机器人硬件+系统工程」的学科交叉特征。创始人陈宇奇此前创立的光通信公司Plugtech曾服务NASA和贝尔实验室，体现了从精密光电子到仓储机器人的跨领域工程能力。</p>
+
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>角色</th><th>姓名</th><th>背景 / 履历</th></tr>
+        <tr><td>创始人 & CEO & 董事会主席</td><td>陈宇奇</td><td>1988/1989年出生，安徽芜湖人。香港理工大学电子系本科（一等荣誉）→ 苏黎世联邦理工学院（ETH Zurich）机器人专业硕士。2014年在香港创立Plugtech（精密光通信偏压控制器），产品获NASA、贝尔实验室、华为采用。2016年创立海柔创新。直接持股7.92%（享有63.23%投票权，同股不同权架构）。2021年入选《财富中国》「40位40岁以下商界精英」。</td></tr>
+        <tr><td>联合创始人 & COO</td><td>房冰</td><td>香港理工大学电子系2014届毕业生，与陈宇奇在本科期间结缘。负责公司运营管理。</td></tr>
+        <tr><td>联合创始人 & CTO</td><td>徐圣东</td><td>浙江大学机械系本科 → 苏黎世联邦理工学院（ETH Zurich）机器人硕士，与陈宇奇同为ETH校友。负责产品研发和机器人本体设计。</td></tr>
+        <tr><td>首席顾问</td><td>李泽湘</td><td>香港科技大学教授、大疆创新创始股东、XBOT PARK基金联合创始人。海柔创新天使投资人兼首席顾问。</td></tr>
+      </table>
+      </div>
+      <p>团队整体呈现「学术背景深厚+连续创业基因」的混合型特征。创始人此前成功创业经历（Plugtech）证明其工程产品化能力，李泽湘作为「大疆教父」的产业资源网络为公司的早期发展提供了重要背书。公司三大创始人合计持股约22.62%，掌控约69.10%投票权。</p>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <p>海柔创新成立至今共完成15轮融资（含Pre-IPO系列），累计融资约41.33亿元人民币。</p>
+
+      <h4>关键融资节点</h4>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>时间</th><th>轮次</th><th>对价/估值</th><th>核心投资方</th></tr>
+        <tr><td>2016年</td><td>种子轮</td><td>种子基金</td><td>香港理工大学创业基金</td></tr>
+        <tr><td>2017年1月</td><td>天使轮</td><td>0.19元/股</td><td>XBOT PARK基金（李泽湘、高秉强、甘洁）</td></tr>
+        <tr><td>2017年</td><td>Pre-A轮</td><td>估值不足1亿元</td><td>初心资本、华登国际</td></tr>
+        <tr><td>2018年</td><td>A轮</td><td>—</td><td>源码资本（重仓并连续加注至C轮）</td></tr>
+        <tr><td>2021年</td><td>B+轮至D轮</td><td>三轮合计超2亿美元</td><td>五源资本、红杉中国、今日资本、IDG资本等</td></tr>
+        <tr><td>2022年</td><td>D+轮</td><td>约20亿美元（~130亿元）</td><td>卡塔尔投资局等，融资1.7亿美元</td></tr>
+        <tr><td>2025年11月</td><td>Pre-IPO轮</td><td>17.91元/股</td><td>方源资本、高成资本等</td></tr>
+        <tr><td>2026年2月</td><td>Pre-IPO++轮</td><td>21.13元/股，估值约109亿元</td><td>多机构跟投</td></tr>
+      </table>
+      </div>
+
+      <h4>递表前主要股东</h4>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>股东</th><th>持股比例</th><th>类型</th></tr>
+        <tr><td>五源资本</td><td>14.53%</td><td>一线VC，第一大外部股东</td></tr>
+        <tr><td>泛大西洋资本（General Atlantic）</td><td>12.06%</td><td>全球顶级成长型PE</td></tr>
+        <tr><td>源码资本</td><td>10.85%</td><td>一线VC，A轮即进入</td></tr>
+        <tr><td>今日资本</td><td>10.79%</td><td>一线VC（徐新掌舵）</td></tr>
+        <tr><td>IDG资本</td><td>5.78%</td><td>全球VC</td></tr>
+        <tr><td>红杉中国</td><td>4.56%</td><td>全球VC</td></tr>
+        <tr><td>美团（角度资本）</td><td>4.29%</td><td>产业资本</td></tr>
+        <tr><td>创始人陈宇奇</td><td>7.92%（63.23%投票权）</td><td>创始人/实控人</td></tr>
+        <tr><td>创始团队合计</td><td>22.62%（69.10%投票权）</td><td>同股不同权架构</td></tr>
+      </table>
+      </div>
+      <p>公司递表前出现罕见大规模股东减持——同方以衡、励快骏等早期机构清仓离场。创始股东松山湖机器人研究院（李泽湘旗下XBOT PARK基金）持股从10%稀释至0.22%。公司采用同股不同权（WVR）架构赴港上市。</p>
+
+      <div class="callout"><div class="callout-title">对赌压力</div><p>若IPO失败（撤回/被拒/递表18个月未上市），赎回权将恢复。截至2026年1月，赎回负债已达50.74亿元，占公司总负债60%以上。这是公司急迫赴港上市的核心驱动力之一——此前的D+轮融资附有对赌协议，估值走高导致优先股账面负债快速膨胀。</p></div>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>技术维度</th><th>路线选择</th><th>说明</th></tr>
+        <tr><td>核心品类定义</td><td>箱式仓储机器人（ACR）</td><td>全球首创「货箱到人」模式，区别于Kiva式「货架到人」。机器人直接存取料箱而非整个货架，存储密度和拣选效率显著提升。</td></tr>
+        <tr><td>导航/定位</td><td>多传感器融合SLAM</td><td>激光雷达+视觉+IMU多模态融合定位，支持动态环境适应与自动避障。</td></tr>
+        <tr><td>攀爬技术（闪攀）</td><td>单侧导轨爬升</td><td>首创单侧爬升三维行走设计：机器人通过爬升臂与单边货架导轨接驳，同时实现地面自由行走（最高4m/s）和垂直攀升（最高1m/s）。</td></tr>
+        <tr><td>软件平台</td><td>HaiQ智慧仓储管理平台</td><td>集成「边还边取」「热度调箱」「三维避让」等算法，支持多机器人协同调度和全流程数字化管理。</td></tr>
+        <tr><td>机器人本体</td><td>全自研</td><td>机器人本体、底层定位算法、控制系统、调度系统、WMS系统全栈自研。</td></tr>
+        <tr><td>模块化设计</td><td>可拆装标准集装箱运输</td><td>机器人本体可拆装，核心组件可组合，可通过标准集装箱海运。客户端部署最快30天。</td></tr>
+        <tr><td>专利壁垒</td><td>2,394项专利申请</td><td>ACR赛道专利拥有量全球第一。</td></tr>
+      </table>
+      </div>
+
+      <h3 id="product">1.5 产品形态</h3>
+
+      <h4>HaiPick系列（箱式仓储ACR，核心产品线）</h4>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>产品系列</th><th>核心方案</th><th>能力</th><th>典型指标</th></tr>
+        <tr><td>HaiPick System 1/2/3</td><td>多层料箱拣选</td><td>覆盖不同仓库高度和吞吐量需求，最高取货高度12米</td><td>准确率99.99%</td></tr>
+        <tr><td>HaiPick A42系列</td><td>拆零拣选</td><td>面向电商、3PL、鞋服行业</td><td>部署超10,000台</td></tr>
+        <tr><td>双深位A42D</td><td>高密度存储</td><td>适配深位货架，提高存储密度</td><td>存储密度提升50%+</td></tr>
+        <tr><td>纸箱拣选A42N</td><td>不规则货物处理</td><td>可处理纸箱、软包等不规则货物</td><td>拓展适用品类</td></tr>
+        <tr><td>冷链ACR</td><td>低温环境</td><td>适配-25°C冷库环境</td><td>覆盖冷链全场景</td></tr>
+      </table>
+      </div>
+
+      <h4>HaiPick Climb 闪攀系统（2025年重磅新品）</h4>
+      <p>2025年发布，全球首款可大规模商用的单侧导轨攀爬ACR解决方案。</p>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>参数项</th><th>规格</th></tr>
+        <tr><td>设备自重</td><td>仅75公斤</td></tr>
+        <tr><td>水平速度</td><td>4米/秒</td></tr>
+        <tr><td>垂直攀爬速度</td><td>1米/秒</td></tr>
+        <tr><td>最大作业高度</td><td>货架最高12-15米</td></tr>
+        <tr><td>货架最小间距</td><td>可缩窄至0.85米</td></tr>
+        <tr><td>存储密度</td><td>每平方米最高30箱</td></tr>
+        <tr><td>区域吞吐量</td><td>1000㎡区域内每小时处理4,000+个料箱</td></tr>
+        <tr><td>空间利用率</td><td>可达96%以上</td></tr>
+        <tr><td>部署周期</td><td>最快30天</td></tr>
+        <tr><td>操作培训</td><td>员工最快30分钟培训即可上手</td></tr>
+      </table>
+      </div>
+
+      <h4>软件平台</h4>
+      <ul>
+        <li><strong>HaiQ智慧仓储管理平台</strong>：统一的软件管理平台，已全球落地1,800多个项目。</li>
+        <li><strong>3C电子产仓一体化解决方案</strong>：以HaiPick A3S智能托举式机器人为核心，覆盖原材料仓储→线边补货→工位级上料→半成品回流全流程。</li>
+      </ul>
+
+      <h3 id="scenario">1.6 应用场景</h3>
+
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>场景分类</th><th>子场景</th><th>成熟度</th><th>代表客户</th><th>说明</th></tr>
+        <tr><td rowspan="5">仓储物流</td><td>电商零售仓储</td><td>高度成熟（核心场景）</td><td>客户F（全球领先电商服装公司）、安踏、波司登</td><td>ACR箱式拣选，为海柔最核心场景</td></tr>
+        <tr><td>3PL第三方物流</td><td>高度成熟</td><td>顺丰供应链、百世物流</td><td>覆盖B2B/B2C多品类物流</td></tr>
+        <tr><td>鞋服时尚</td><td>成熟</td><td>李宁、全球十大服装时尚公司中7家</td><td>闪攀系统已在李宁嘉定仓部署，效率提升70-80%</td></tr>
+        <tr><td>冷链物流</td><td>成熟</td><td>行业头部客户</td><td>冷链ACR方案覆盖-25°C环境</td></tr>
+        <tr><td>跨境电商</td><td>成熟</td><td>波兰电商履约中心</td><td>部署65台闪攀机器人</td></tr>
+        <tr><td rowspan="3">工业制造</td><td>3C电子</td><td>拓展中</td><td>行业头部客户</td><td>产仓一体化解决方案</td></tr>
+        <tr><td>医药</td><td>拓展中</td><td>国药集团等</td><td>药品仓储拣选</td></tr>
+        <tr><td>食品饮料</td><td>拓展中</td><td>行业客户</td><td>覆盖全球食品饮料巨头</td></tr>
+        <tr><td>海外市场</td><td>多国多行业</td><td>快速扩张</td><td>Pop.capacity（美国）、GreyOrange、Zion SG、otobro（台湾）</td><td>与全球前十大系统集成商中六家建立合作</td></tr>
+      </table>
+      </div>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+
+      <h4>核心经营指标</h4>
+      <ul>
+        <li>累计向全球<strong>40+个国家和地区</strong>交付<strong>30,000+台ACR机器人</strong></li>
+        <li>累计部署项目超<strong>1,700个</strong>，服务<strong>800+家终端客户</strong></li>
+        <li>服务<strong>近70家</strong>世界500强企业</li>
+        <li>全球十大服装时尚公司中<strong>7家</strong>、全球十大3PL中<strong>6家</strong>为客户</li>
+        <li>客户复购率从2023年的<strong>68%</strong>提升至2024年的<strong>80%</strong></li>
+        <li>在美国、荷兰、新加坡布局备件仓</li>
+        <li>与全球前十大系统集成商中的<strong>六家</strong>建立合作</li>
+      </ul>
+
+      <h4>海外扩张亮点</h4>
+      <ul>
+        <li>海外收入占比从2023年的<strong>24.2%</strong>升至2025年前三季度的<strong>39.6%</strong></li>
+        <li>2025年前三季度海外订单量已占总订单量<strong>50%以上</strong></li>
+        <li>海外毛利率<strong>43.9%</strong>，约为中国大陆市场（20.0%）的2倍以上</li>
+        <li>在马来西亚建立智造中心</li>
+        <li>与GreyOrange合作2年内落地10+项目</li>
+        <li>与Pop.capacity（美国）共建「无障碍」供应链</li>
+        <li>战略合作普洛斯（GLP）推进「空间×生态」智慧物流新模式</li>
+      </ul>
+
+      <h3 id="financial">1.8 财务数据</h3>
+      <p>海柔创新为港股递表公司，以下数据来自招股书申报材料。</p>
+
+      <h4>近三年财务对比</h4>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>指标（人民币）</th><th>2023年</th><th>2024年</th><th>2025年前三季度</th></tr>
+        <tr><td>营业收入</td><td>8.07亿</td><td>13.60亿</td><td>12.63亿</td></tr>
+        <tr><td>同比增速</td><td>—</td><td>+68.5%</td><td>+35.6%</td></tr>
+        <tr><td>毛利</td><td>1.29亿</td><td>3.57亿</td><td>3.65亿</td></tr>
+        <tr><td>毛利率</td><td>16.0%</td><td>26.3%</td><td>28.9%</td></tr>
+        <tr><td>净亏损</td><td>-10.09亿</td><td>-12.56亿</td><td>-5.89亿</td></tr>
+        <tr><td>研发支出</td><td>3.09亿</td><td>3.34亿</td><td>2.58亿</td></tr>
+        <tr><td>研发费用率</td><td>38.3%</td><td>24.5%</td><td>20.4%</td></tr>
+        <tr><td>销售及市场开支</td><td>4.24亿</td><td>4.89亿</td><td>3.86亿</td></tr>
+        <tr><td>销售费用率</td><td>52.5%</td><td>35.9%</td><td>30.6%</td></tr>
+        <tr><td>经营活动现金流</td><td>-4.82亿</td><td>-1.96亿</td><td>-2.86亿</td></tr>
+      </table>
+      </div>
+
+      <h4>资产负债表关键指标（截至2025年9月30日）</h4>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>指标</th><th>数据</th></tr>
+        <tr><td>负债净额</td><td>38.79亿元（资不抵债）</td></tr>
+        <tr><td>赎回负债</td><td>39.61亿元（如IPO失败将增至50.74亿元）</td></tr>
+        <tr><td>账面现金及等价物</td><td>低于8亿元</td></tr>
+        <tr><td>资产负债率</td><td>2.4倍</td></tr>
+        <tr><td>现金转换周期</td><td>-103天（先收钱后付款模式）</td></tr>
+      </table>
+      </div>
+
+      <div class="callout"><div class="callout-title">财务结构深度分析</div><p>海柔创新呈现典型的「高速增长但增收不增利」特征。毛利率三年内从16%翻至28.9%（境外已达43.9%），研发费用率和销售费用率持续下降，规模效应逐步显现。但累计亏损超28亿，资不抵债（负债净额38.79亿），经营现金流持续为负。公司采用「先收款后交货」模式（现金转换周期-103天）。</p></div>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>创始人陈宇奇在创立海柔前有过一次成功创业——Plugtech（香港普格精密），光通信偏压控制器产品做到全球最小且性能领先，客户包括NASA和贝尔实验室。</li>
+        <li>李泽湘（大疆创新创始股东）在早期扮演关键角色——不仅通过XBOT PARK基金投资天使轮，还担任首席顾问。李泽湘系已投出固高科技、云鲸智能、海柔创新三个独角兽。</li>
+        <li>公司创业种子资金来自香港理工大学跨境创业种子基金，体现高校科研成果转化的成功模式。</li>
+        <li>今日资本创始人徐新称陈宇奇是「一个'一根筋'、死磕到底的人」。</li>
+        <li>公司采用同股不同权（WVR）架构赴港上市——陈宇奇仅持7.92%股份但享有63.23%投票权。</li>
+        <li>据灼识咨询预测，全球ACR市场规模将以65.7%的年复合增长率增长至2030年的910亿元。</li>
+        <li>第一大客户「客户F」收入占比从2024年的12.7%飙升至2025年前三季度的30.4%，构成客户集中度风险。</li>
+        <li>闪攀系统HaiPick Climb在2025年连获美国PACK EXPO技术卓越奖、英国UKMHA Archies Award「自动化卓越奖」、波兰Modernlog展MTP金奖。</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="a1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>海柔创新的创始配置非常独特——这是一个「跨领域连续创业者+机器人科班」的组合。陈宇奇在创立海柔之前已成功运营过一家服务NASA和贝尔实验室的精密光通信公司，这种「从0到1」的工程产品化经验在仓储机器人创业者中极为罕见。其ETH Zurich机器人学硕士背景与仓储机器人场景高度匹配——仓储场景本质上是结构化环境中的自主导航+精准操作问题，这正是机器人学术研究的经典问题域。李泽湘作为首席顾问，带来了大疆从0到千亿的工程-商业方法论。</p>
+      </div>
+
+      <div class="analysis-block" id="a2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>海柔技术路线的核心洞察是：在仓储场景中，「精准存取料箱」比「搬运整个货架」更高效。Kiva式「货架到人」模式需要搬运整个货架——存储密度低、无效搬运多。海柔的「货箱到人」ACR模式直接存取目标料箱——存储密度提升4倍、拣选效率提升3-5倍。闪攀系统（HaiPick Climb）更将ACR从「地面行驶」升级为「三维行走」，平均机器人数量减少>20%、单机效率提升30%。这体现了对仓库ROI的深刻理解：追求「每平方米产出最大化」。</p>
+      </div>
+
+      <div class="analysis-block" id="a3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>海柔创新的股东几乎集齐了「半个主流创投圈」。但D+轮融资附带的赎回权导致赎回负债高达50.74亿元——远超公司账面现金和净资产。这种「被倒逼上市」的处境与极智嘉（曾面临约70亿赎回负债）非常相似。递表前夕早期机构清仓离场、李泽湘旗下XBOT PARK基金从10%稀释至0.22%，说明早期投资者对后续估值增长空间存在不同预期。</p>
+      </div>
+
+      <div class="analysis-block" id="a4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>海柔历史上最显著的路径调整有两方面。第一是产品聚焦的「减法」：早期尝试过多品类扩展，2019年前后主动收缩聚焦到ACR核心品类。第二是海外扩张的「加速」：2022年前海外收入占比很低，从2023年的24.2%到2025年前三季度的39.6%——公司找到了「与全球系统集成商合作」这一可复制的出海模式。最大的未完成调整是盈利能力——毛利率已从16%提升至28.9%，但距离盈亏平衡还有差距。</p>
+      </div>
+
+      <div class="analysis-block" id="a5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>海柔创新的定位是「箱式仓储机器人（ACR）赛道的绝对定义者——从品类开创到市占率第一」。31.4%份额、2,394项专利、先发部署3万台机器人形成了「场景数据飞轮」。竞争压力来自三个方向：极智嘉、海康机器人等AMR巨头的正面竞争；快仓智能等同类ACR玩家的追赶；亚马逊Kiva等终端客户可能自研。公司目前选择了「优先增长、控制亏损幅度」的策略。</p>
+      </div>
+
+      <div class="analysis-block" id="a6">
+        <h4>2.6 其他重要观察</h4>
+        <p>海柔创新与极智嘉存在显著的对称性——都是中国仓储机器人龙头、都选择港交所上市、都面临对赌赎回压力。但差异在于：极智嘉（2025年营收31.71亿）体量是海柔（2024年13.6亿）的2.3倍且已盈利；而海柔增速（68.5%）是极智嘉（31.6%）的2倍以上，且在ACR品类中市占率更高（31.4% vs 9%）。海柔的核心风险是第一大客户集中度从12.7%飙升至30.4%。另一个观察：海柔在具身智能方向上的布局目前仍为空白——与极智嘉发布Gino 1轮式人形机器人不同，「纯ACR公司」与「ACR+具身智能公司」的估值逻辑可能产生分化。</p>
+      </div>
+
+      <h2 id="refs">3 参考资料</h2>
+      <div class="references">
+      <ol>
+        <li><a href="https://4g.stockstar.com/detail/IG2026022800012312" target="_blank">做到全球第一却累亏28亿，大疆教父力挺的海柔创新冲刺「ACR第一股」— 证券之星</a></li>
+        <li><a href="https://www.donews.com/news/detail/1/6429710.html" target="_blank">海柔创新冲刺港交所：收入和出货量均排名全球第一 — DoNews</a></li>
+        <li><a href="https://www.21jingji.com/article/20260303/herald/8632da7c7b45bc0dcb70c3da62628efe.html" target="_blank">李泽湘系又一独角兽冲刺上市，或成「港股ACR第一股」— 21世纪经济报道</a></li>
+        <li><a href="https://m.163.com/dy/article/KN6F51HD05119C3G.html" target="_blank">深圳宝安将跑出一个IPO！三位学霸造仓储机器人 — 网易</a></li>
+        <li><a href="https://wap.stockstar.com/detail/SS2026030600021418" target="_blank">海柔创新「流血」冲刺港交所 — 证券之星</a></li>
+        <li><a href="https://finance.sina.com.cn/stock/observe/2026-02-26/doc-inhpcqkk7296530.shtml" target="_blank">海柔创新港股IPO：存货高增、经营性现金流持续为负 — 新浪财经</a></li>
+        <li><a href="https://news.qq.com/rain/a/20260304A0436400" target="_blank">融了15轮，深圳独角兽要IPO了 — 腾讯新闻</a></li>
+        <li><a href="https://www.21jingji.com/article/20220113/herald/21d483c157513b2a1f21f9ec95ebcdb3.html" target="_blank">理工学霸打造机器人独角兽：估值100亿元，市占率90% — 21世纪经济报道</a></li>
+        <li><a href="https://www.polyu.edu.hk/publications/excelximpact/sc/issue/202112/feature-story/fostering-the-success-of-a-unicorn-hai-robotics" target="_blank">成功培育「独角兽」— 海柔创新 — 香港理工大学</a></li>
+        <li><a href="http://materialflow.com.cn/znwl/2026/0209/5608.html" target="_blank">从ACR到闪攀，海柔创新以流通+制造为全球创造智能物流价值 — 现代物流杂志</a></li>
+        <li><a href="https://static.nfnews.com/content/202503/19/c11097564.html" target="_blank">每小时可处理4000+料箱，海柔创新仓储机器人next level — 南方+</a></li>
+        <li><a href="https://ex.chinadaily.com.cn/exchange/partners/82/rss/channel/cn/columns/sz8srm/stories/WG0364ca310205377034afc.html" target="_blank">海柔创新闪攀系统LET展位引围观 — 中国日报</a></li>
+        <li><a href="https://www.nepconasia.com/zh-cn/news-center/news/2025/8/10.html" target="_blank">海柔创新「闪攀系统」助力李宁智能仓储 — NEPCON电子展</a></li>
+        <li><a href="https://www.baoanone.com/content206400.html" target="_blank">海柔创新亮相亚洲物流展 新智造中心提升10倍产能 — 宝安湾</a></li>
+        <li><a href="http://zhineng518.com/page108?article_id=4207" target="_blank">海柔创新携手美国Pop.capacity — 智能518</a></li>
+        <li><a href="https://www.zhineng518.com/page108?article_id=8869" target="_blank">GreyOrange × 海柔创新 — 智能518</a></li>
+        <li><a href="https://www.szhzxw.cn/114751.html" target="_blank">普洛斯 × 海柔创新达成战略合作</a></li>
+        <li><a href="https://xueqiu.com/6620276709/376462142" target="_blank">亏损近30亿元！海柔创新冲击港交所「ACR第一股」— 雪球</a></li>
+        <li><a href="https://finance.sina.cn/2026-03-10/detail-inhqpnue6078861.d.html" target="_blank">中国境外市场毛利率超40% — 每日经济新闻</a></li>
+        <li><a href="https://finance.eastmoney.com/a/202603173674353655.html" target="_blank">海柔创新，拟港股IPO — 东方财富</a></li>
+        <li><a href="https://www.hairobotics.cn/news/founded-5-years" target="_blank">成立五年估值一百亿 — 海柔创新官网</a></li>
+        <li><a href="https://www.21jingji.com/article/20260330/herald/d95d417b9e036f684cd0a46a577d154c.html" target="_blank">严重资不抵债，为何多家深企纷纷「带病」上市？— 21世纪经济报道</a></li>
+      </ol>
+      </div>
+
+    </article>
+  </div>
+  <div class="page-footer">此页面最后编辑于2026年5月16日 · 内容遵循具身智能Wiki编辑规范 · 所有数据来自公开可查来源（含港交所招股书）</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

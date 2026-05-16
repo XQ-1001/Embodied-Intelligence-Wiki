@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>知来具身（魔狸科技） — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style></head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> <span class="breadcrumb-sep">›</span> <span>知来具身（魔狸科技）</span></div>
+  <div class="wiki-header"><h1>知来具身（魔狸科技）</h1><div class="subtitle">Foresee Robotics · 2021年成立 · 三轮市场化融资 · AI视觉+力控赋能汽车制造 · ~100人</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#team">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financials">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#misc">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#analysis1">2.1 团队背景与场景选择的匹配度</a></li>
+        <li class="toc-lvl4"><a href="#analysis2">2.2 技术路线与场景的适配性</a></li>
+        <li class="toc-lvl4"><a href="#analysis3">2.3 股东/资本结构对战略的影响</a></li>
+        <li class="toc-lvl4"><a href="#analysis4">2.4 试错过程与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#analysis5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#analysis6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#references">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">知来具身（魔狸科技）</div>
+        <div class="ib-row"><div class="ib-label">官网</div><div class="ib-value"><a href="https://www.foreseerobotics.com/">foreseerobotics.com</a></div></div>
+        <div class="ib-row"><div class="ib-label">英文品牌</div><div class="ib-value">Foresee Robotics / Foresee Embodied Intelligence</div></div>
+        <div class="ib-row"><div class="ib-label">标语</div><div class="ib-value">Foresee the Future, Automate the Present</div></div>
+        <div class="ib-row"><div class="ib-label">愿景</div><div class="ib-value">Aid the world with AI</div></div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">魔狸科技（上海）有限公司<br>知来具身智能科技（苏州）有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">品牌名</div><div class="ib-value">知来具身（SageBot）</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2021年8月（魔狸科技上海）</div></div>
+        <div class="ib-row"><div class="ib-label">注册地</div><div class="ib-value">上海（总部）/ 苏州 / 杭州 / 重庆</div></div>
+        <div class="ib-row"><div class="ib-label">创始人</div><div class="ib-value">陈敏敏（董事长）、俞琼（CEO）</div></div>
+        <div class="ib-section">融资数据</div>
+        <div class="ib-row"><div class="ib-label">最新轮次</div><div class="ib-value">完成三轮市场化融资（金额/投资方未公开）</div></div>
+        <div class="ib-row"><div class="ib-label">最新估值</div><div class="ib-value">未公开</div></div>
+        <div class="ib-section">规模与场景</div>
+        <div class="ib-row"><div class="ib-label">员工</div><div class="ib-value">~100人（硕博占比>70%）</div></div>
+        <div class="ib-row"><div class="ib-label">应用场景</div><div class="ib-value"><span class="tag t-industry">汽车制造</span></div></div>
+        <div class="ib-row"><div class="ib-label">核心客户</div><div class="ib-value">李尔、安道拓、宁德时代、延锋</div></div>
+        <div class="ib-row"><div class="ib-label">母公司</div><div class="ib-value">数预智能科技（上海）有限公司（MagicBI）</div></div>
+      </aside>
+
+      <div class="article-intro">
+        <p><strong>知来具身</strong>（品牌名，英文 Foresee Robotics，对应魔狸科技/Moli Robotics）是一家聚焦汽车制造领域的垂直场景具身智能公司，成立于2021年。公司不生产机器人本体，而是以自研AI视觉+力控算法赋能传统工业机器人，专注解决汽车内饰包覆、打磨、检测、装配等具体工序的智能化替代。母公司为数预智能科技（上海）有限公司（品牌名MagicBI），主营AI数据智能分析。</p>
+        <p>据官网自述，公司累计部署超过5,000台机器人，覆盖200+工厂、10+行业，客户平均ROI达4.7倍，设备平均回收期1.3年，部署速度较传统方案快3-8倍。2025-2026年先后与港股上市公司华众控股（06830.HK）和A股上市公司秦安股份（603758.SH）达成战略合作，商业化进入加速期。</p>
+        <p>知来具身是行业中的"务实派"——不做人形、不追通用平台风口，专注于汽车制造中AI能直接变现的工序级痛点。这种策略使其在当前估值叙事中不够"性感"，但带来了较高的商业落地确定性。公司已获发那科FANUC J519协议授权，是极少数能对接发那科底层控制协议的中国公司。</p>
+      </div>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 基本信息</h3>
+      <div class="table-wrapper">
+      <table class="wikitable infotable">
+        <tr><th>项目</th><th>内容</th></tr>
+        <tr><td>公司全称</td><td>魔狸科技（上海）有限公司</td></tr>
+        <tr><td>子公司</td><td>知来具身智能科技（苏州）有限公司（100%）、知来具身智能科技（重庆）有限公司（51%）、知来具身智能科技（杭州）有限公司</td></tr>
+        <tr><td>母公司</td><td>数预智能科技（上海）有限公司（MagicBI，法定代表人陈敏敏，注册资本281.28万，成立于2020年8月）</td></tr>
+        <tr><td>上海主体</td><td>魔狸科技（上海），注册资本3,374万人民币（港澳台法人独资），唯一股东HongKong Data Foresight Limited</td></tr>
+        <tr><td>苏州主体</td><td>知来具身智能科技（苏州），注册资本300万，实缴100万，成立于2024年1月19日</td></tr>
+        <tr><td>重庆主体</td><td>知来具身智能科技（重庆），注册资本500万，全额实缴（两个法人股东51%+49%）</td></tr>
+        <tr><td>杭州主体</td><td>知来具身智能科技（杭州）——研发中心</td></tr>
+        <tr><td>品牌更名</td><td>魔狸科技苏州→知来具身智能科技（苏州）2025-11-12；魔狸科技重庆→知来具身智能科技（重庆）2025-11-19</td></tr>
+        <tr><td>总部地址</td><td>上海市浦东新区张江，张衡路200号2幢3层（张江数链，叠加自贸区政策）</td></tr>
+        <tr><td>研发中心</td><td>杭州市西湖区西投浙滨西源大厦G2号楼13层</td></tr>
+        <tr><td>制造基地</td><td>苏州市相城区元和街道活力商务广场D幢</td></tr>
+        <tr><td>营销中心</td><td>重庆市高新区白市驿镇农科大道66号</td></tr>
+        <tr><td>官网</td><td><a href="https://www.foreseerobotics.com/">https://www.foreseerobotics.com/</a>（Next.js网站，中英文双语）</td></tr>
+        <tr><td>ICP备案</td><td><a href="https://www.foresee-robotics.com/">foresee-robotics.com</a> 苏ICP备2026026235号-1（2026-04-30审核通过）</td></tr>
+        <tr><td>英文品牌</td><td>Foresee Robotics / Foresee Embodied Intelligence Co., Ltd.</td></tr>
+        <tr><td>品牌标语</td><td>Foresee the Future, Automate the Present</td></tr>
+        <tr><td>公司愿景</td><td>Aid the world with AI</td></tr>
+        <tr><td>核心价值观</td><td>Kindness（关爱生命）、Sincerity（诚信为本）、Courage（勇于创新）</td></tr>
+        <tr><td>社交媒体</td><td>Twitter/X <a href="https://twitter.com/foresee_robotics">@foresee_robotics</a> · GitHub · LinkedIn</td></tr>
+        <tr><td>官网数据</td><td>5,000+机器人部署 · 200+工厂 · 10+行业 · 4.7×客户平均ROI · 1.3年平均回收期 · 3-8×更快部署速度</td></tr>
+      </table>
+      </div>
+
+      <h3 id="team">1.2 创始人及核心团队</h3>
+      <table class="wikitable infotable">
+        <tr><th>角色</th><th>姓名</th><th>背景</th><th>负责方向</th></tr>
+        <tr><td>创始人/实控人</td><td>陈敏敏</td><td>浙江大学博士，前蚂蚁集团算法负责人；同时为母公司数预智能（MagicBI）创始人</td><td>技术/产品/整体战略</td></tr>
+        <tr><td>联合创始人/CEO</td><td>俞琼</td><td>汽车行业老兵（公开渠道无具体履历信息）；亦担任重庆元熙运筹执行事务合伙人</td><td>市场/商务/产业合作</td></tr>
+      </table>
+      <p><strong>团队规模</strong>：~100人级别。上海总部社保10人，加杭州/苏州/重庆各地团队。团队核心来源包括阿里、CCF资深技术专家、主机厂行业专家。学术合作方包括上海交大、南京大学、北大信研院教授团队。博士背景成员来自CMU、上海交大、浙大、南大、哈工大、南开、电子科大等，硕博占比>70%。</p>
+      <p><strong>专利发明人</strong>：田有朋、邢冰、邹晓川、李忠金、俞琼、刘丹丹等（2025-2026年专利）</p>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <table class="wikitable infotable">
+        <tr><th>轮次</th><th>时间</th><th>金额</th><th>投资方</th><th>估值</th></tr>
+        <tr><td>第一轮（未公开）</td><td>未公开</td><td>未公开</td><td>未公开</td><td>未公开</td></tr>
+        <tr><td>第二轮（未公开）</td><td>未公开</td><td>未公开</td><td>未公开</td><td>未公开</td></tr>
+        <tr><td>第三轮（未公开）</td><td>未公开</td><td>未公开</td><td>未公开</td><td>未公开</td></tr>
+      </table>
+      <p><strong>融资透明度评估</strong>：极低。三轮融资的具体金额和投资方均未在任何公开渠道披露，这在行业中较为少见。从招聘信息描述的"100人级高速发展具身机器人创业公司"来看，可能处于早期阶段。</p>
+      <p><strong>政府资金支持</strong>：</p>
+      <ul>
+        <li><strong>相城区科技领军人才计划</strong>：魔狸科技（苏州）有限公司入选2024年第二批"创业领军人才"类别（公示期2025年5月），可获得最高300万元项目资助、最高100万元安家补贴、3年研发办公用房租金补贴等。</li>
+        <li><strong>上海市高新技术企业</strong>：已获认定，享受企业所得税15%优惠税率及研发费用加计扣除。</li>
+        <li><strong>张江科学城+自贸区双政策覆盖</strong>：上海总部位于张江数链，叠加自贸区政策，可享受跨境投融资便利和科创企业专项扶持。</li>
+      </ul>
+      <p><strong>股权结构</strong>：上海魔狸为港澳台法人独资（唯一股东HongKong Data Foresight Limited），苏州及杭州为法人独资，重庆为合资（51%+49%）。俞琼通过重庆元熙运筹商业管理合伙企业（有限合伙）拥有独立的资本运作实体（注册资本3,400万元）。</p>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <h4>四大核心技术方向</h4>
+      <table class="wikitable">
+        <tr><th>方向</th><th>内容</th><th>技术特征</th></tr>
+        <tr><td>视觉</td><td>机器视觉感知与微观缺陷检测</td><td>飞拍检测、AI缺陷识别；官网称"Neural Vision"——全球首个汽车座椅飞拍检测系统</td></tr>
+        <tr><td>位控</td><td>机器人位置精准控制</td><td>空间瞬移级位控（国内少数掌握）</td></tr>
+        <tr><td>力控</td><td>力觉感知与控制</td><td>视觉-力觉融合系统（自研）；官网称"Embodied Control"——专有位力控制</td></tr>
+        <tr><td>智能末端</td><td>灵巧手等末端执行器</td><td>正在研发中，与华众联合开发；灵巧手电子皮肤为2026年与秦安股份合作方向</td></tr>
+      </table>
+
+      <h4>官网宣传的核心能力</h4>
+      <ul>
+        <li><strong>具身控制（Embodied Control）</strong>——专有位力控制算法，用于复杂工业流程</li>
+        <li><strong>神经视觉（Neural Vision）</strong>——飞拍检测系统，搭载最新神经模型，全球首创</li>
+        <li><strong>工业可靠性</strong>——已在头部产线验证，订单排至2026年底</li>
+        <li><strong>成本与产能</strong>——将工人从危险、枯燥、重复的劳动中解放</li>
+      </ul>
+
+      <h4>独特技术壁垒</h4>
+      <ol>
+        <li><strong>发那科J519协议授权</strong>：极少数获得发那科底层通信/控制协议授权的中国公司。J519（Stream Motion）是发那科控制器的软件选项，允许外部系统以4ms/8ms周期实时发送运动指令。来源说明：此信息源自小宇宙FM《一路瞳行》EP108播客简介（公司自述+播客转述），未找到发那科官方公开授权名单或第三方独立验证，信息可信度中等偏上，建议作为公司自述保持审慎。</li>
+        <li><strong>小脑运控算法</strong>：针对高频实时控制的专用算法层，类似Figure AI三层脑架构中的System 0（反射层）。</li>
+        <li><strong>视觉-力觉融合系统</strong>：将视觉感知与力觉反馈融合，突破传统工业机器人在非结构化环境中的自适应瓶颈。</li>
+        <li><strong>核心指标</strong>：检测漏检率降至千分之一，效率提升40%。</li>
+      </ol>
+
+      <h4>专利列表</h4>
+      <table class="wikitable">
+        <tr><th>专利名称</th><th>公开号/申请号</th><th>申请/公开日</th><th>方向</th></tr>
+        <tr><td>基于人类反馈的机器人模仿学习和强化学习框架</td><td>202511840926.6</td><td>2025-12-09（申请）</td><td>模仿学习+强化学习</td></tr>
+        <tr><td>基于人工智能的机器人协同多专家模型系统</td><td>CN121683862A</td><td>2026-03-17</td><td>多模型协同</td></tr>
+        <tr><td>融合世界模型架构的人工智能机器人控制系统</td><td>CN121649989A</td><td>2026-03-13</td><td>世界模型+控制</td></tr>
+        <tr><td>基于人类视频学习的人工智能机器人系统</td><td>CN121447590A</td><td>2026-02-03</td><td>模仿学习</td></tr>
+        <tr><td>AI机器人动态路径修正方法</td><td>—</td><td>2026-03-18</td><td>运动控制</td></tr>
+        <tr><td>基于人工智能的机器人示教数据生成方法</td><td>CN121649955A</td><td>2026</td><td>数据生成</td></tr>
+      </table>
+      <p>注：截至2026年5月，知来具身苏州公司累计拥有约14~17条专利信息。发明人包括田有朋、邢冰、邹晓川、李忠金、俞琼、刘丹丹。专利覆盖模仿学习、世界模型、视觉感知、示教数据生成等技术方向。</p>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <table class="wikitable">
+        <tr><th>产品</th><th>应用工序</th><th>详细技术特征</th><th>客户行业</th></tr>
+        <tr><td>飞拍检测机器人</td><td>高速运动中瞬态视觉质检</td><td>AI视觉+飞拍技术，微米级检测；全球首套汽车座椅飞拍检测系统，"快速、精准、易用"；可检测座椅、门板、轮毂等部件</td><td>汽车零部件</td></tr>
+        <tr><td>打磨机器人</td><td>金属压铸件去毛刺、抛光</td><td>力控+视觉融合，动态力补偿工件公差；AI自适应无需编程示教；适用于转向节等复杂部件</td><td>汽车零部件</td></tr>
+        <tr><td>包覆机器人</td><td>汽车内饰皮革/柔性材料包覆</td><td>柔性材料操作+力觉反馈</td><td>汽车内饰</td></tr>
+        <tr><td>装配机器人</td><td>精密装配工序</td><td>视觉引导+高频力控，复杂部件柔顺插装；螺栓拧紧、线束插接等工序</td><td>汽车/3C</td></tr>
+        <tr><td>熨烫机器人</td><td>汽车内饰件表面处理</td><td>自研位力混合控制，视觉检测后精准熨烫；参数智能学习，适应复杂曲面</td><td>汽车内饰</td></tr>
+        <tr><td>喷涂机器人</td><td>涂胶、喷涂作业</td><td>路径规划+流量精确控制</td><td>汽车</td></tr>
+        <tr><td>缝纫机器人</td><td>柔性材料缝纫</td><td>视觉追踪+张力控制</td><td>汽车内饰</td></tr>
+        <tr><td>刹车盘检测机器人</td><td>制动安全部件质检</td><td>AI视觉+高精度传感器，安全关键部件验证</td><td>汽车零部件</td></tr>
+        <tr><td>φ超控机</td><td>超级工控/边缘计算</td><td>PLC-free一体化设计，融合上位机与下位机，消除系统碎片化</td><td>工厂数智化</td></tr>
+      </table>
+      <p><strong>核心特征</strong>：不做自研本体，基于传统工业机器人（发那科等）进行AI算法赋能。每款产品对应汽车制造中的具体痛点工序而非通用平台。</p>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <table class="wikitable">
+        <tr><th>场景</th><th>产品</th><th>客户类型</th></tr>
+        <tr><td>汽车内饰包覆</td><td>包覆机器人</td><td>座椅/内饰Tier 1（Lear、Adient、延锋）</td></tr>
+        <tr><td>金属压铸件打磨</td><td>打磨机器人</td><td>汽车零部件供应商（秦安股份等）</td></tr>
+        <tr><td>内饰件表面处理</td><td>熨烫机器人</td><td>汽车内饰Tier 1</td></tr>
+        <tr><td>柔性材料缝纫</td><td>缝纫机器人</td><td>汽车内饰Tier 1</td></tr>
+        <tr><td>高速动态视觉质检</td><td>飞拍检测机器人</td><td>汽车零部件/电池（CATL）</td></tr>
+        <tr><td>安全部件质检</td><td>刹车盘检测机器人</td><td>汽车零部件</td></tr>
+        <tr><td>涂胶/喷涂</td><td>喷涂机器人</td><td>汽车零部件（华众等）</td></tr>
+        <tr><td>精密装配（螺栓/线束）</td><td>装配机器人</td><td>汽车/3C</td></tr>
+        <tr><td>工厂数智化</td><td>φ超控机</td><td>制造业工厂</td></tr>
+      </table>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <h4>标杆客户</h4>
+      <ul>
+        <li><strong>李尔（Lear）</strong>：全球汽车座椅/电子系统巨头——视觉检测、打磨</li>
+        <li><strong>安道拓（Adient）</strong>：全球最大汽车座椅供应商——包覆、装配</li>
+        <li><strong>宁德时代（CATL）</strong>：全球最大动力电池制造商——视觉检测</li>
+        <li><strong>延锋（Yanfeng）</strong>：全球最大汽车内饰供应商——包覆、熨烫</li>
+      </ul>
+      <h4>战略合作</h4>
+      <ul>
+        <li><strong>2025.10 — 华众车载控股（06830.HK）</strong>：港股上市公司。四大方向：AI数智工厂、具身机器人应用、灵巧手联合开发、轻量化材料。签约后股价涨近12%。</li>
+        <li><strong>2026.02 — 秦安股份（603758.SH）</strong>：A股汽车压铸件头部。智能具身应用、全自动数智化工厂、灵巧手电子皮肤、视觉检测、打磨机器人。</li>
+      </ul>
+      <h4>商业模式</h4>
+      <p>AI视觉/力控算法 + 传统工业机器人本体集成 → 以"方案"而非"单品"交付。产品价值主张：替代人工 + 提升良率 + 降低漏检。客户验证周期偏长（汽车供应链的严苛认证要求），但一旦切入续约率较高。官网展示有产品视频（飞拍检测、熨烫、刹车盘检测等），表明已进入面向客户的主动营销阶段。</p>
+
+      <h3 id="financials">1.8 财务数据</h3>
+      <table class="wikitable infotable">
+        <tr><th>指标</th><th>数据</th></tr>
+        <tr><td>营收</td><td>未公开</td></tr>
+        <tr><td>融资总额</td><td>未公开（三轮市场化融资）</td></tr>
+        <tr><td>最新估值</td><td>未公开</td></tr>
+        <tr><td>员工规模</td><td>~100人</td></tr>
+        <tr><td>政府资助</td><td>相城区领军人才计划（最高300万项目资助+100万安家补贴）</td></tr>
+      </table>
+
+      <h3 id="misc">1.9 其他信息</h3>
+      <ul>
+        <li><strong>已获荣誉</strong>：上海市高新技术企业、创客中国"最具投资价值企业50强"、2023全球开放式创新百强、海外项目人工智能领域Top20、2024年度优秀工业大模型应用大奖、年度新锐人物Top10</li>
+        <li><strong>官网运营数据</strong>（公司自述，截至2026年5月）：累计部署5,000+台机器人、覆盖200+工厂、服务10+行业、客户平均ROI 4.7倍、平均投资回收期1.3年、部署速度较传统方案快3-8倍</li>
+        <li><strong>社交媒体</strong>：Twitter/X <a href="https://twitter.com/foresee_robotics">@foresee_robotics</a>、GitHub、LinkedIn；官网提供中英文双语切换</li>
+        <li><strong>人才招聘</strong>：2025-2026年在招岗位包括机器人打磨工程师（薪资1.5-2.5万·13薪）、视觉工程师、Python开发工程师（杭州，涉及灵巧手/双臂/全身控制算法）、人事经理等，显示公司处于持续扩张阶段</li>
+        <li><strong>盖世汽车供应商</strong>：已进入盖世汽车社区配套供应商体系，直接/间接配套客户信息需联系获取</li>
+        <li><strong>官网技术栈</strong>：使用Next.js框架构建，展示产品视频（含飞拍检测、熨烫、刹车盘检测工作实拍），域名ICP备案于2026年4月30日完成</li>
+        <li><strong>母公司信息</strong>：数预智能科技（上海）有限公司（MagicBI），成立于2020年8月，法定代表人陈敏敏，注册资本281.28万元。主营AI数据智能搜索与分析平台。数预智能曾涉及（2022）沪73知民初962号侵害技术秘密纠纷案（原告涉及蚂蚁智信），已于2023年开庭。</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block">
+        <h4 id="analysis1">2.1 团队背景与场景选择的匹配度</h4>
+        <p><strong>高度匹配。</strong>陈敏敏（浙大博士、前蚂蚁算法负责人）提供AI算法和工程化能力，俞琼（汽车行业老兵）提供产业资源和商务落地能力。这种"技术+产业"互补搭档在具身智能赛道中极为常见。</p>
+        <p>团队硕博占比>70%且来自头部高校和阿里/蚂蚁等大厂，在与汽车客户对接时具备技术可信度。选择汽车制造（而非3C/物流/零售）作为核心场景，与俞琼的产业资源积累一致——能同时拿下Lear+Adient+Yanfeng三家头部Tier1的团队，在汽车内饰/座椅供应链中必然有深厚人脉。专利发明人阵容（田有朋、邢冰、邹晓川等）表明公司已建立一支有实际工程产出的技术团队。</p>
+      </div>
+
+      <div class="analysis-block">
+        <h4 id="analysis2">2.2 技术路线与场景的适配性</h4>
+        <p><strong>场景驱动技术的务实路线。</strong>知来具身的技术栈（视觉+力控+位控）高度围绕汽车制造的核心痛点设计：</p>
+        <ul>
+          <li>飞拍检测针对高速产线质检瓶颈，漏检率千分之一瞄准的是人工质检的疲劳缺陷。官网展示的座椅/门板/轮毂检测方案显示该技术已在多个产线细分场景落地。</li>
+          <li>力控+视觉融合打磨针对机械加工中人工去毛刺的一致性差问题，官网强调动态力补偿工件公差和AI自适应无需编程示教——这些是工业客户真正关心的操作性痛点。</li>
+          <li>包覆/熨烫/缝纫均针对织物皮革类柔性材料——这类材料无法用传统工业机器人的刚性力控处理，需要AI级别的力觉反馈。</li>
+          <li>装配机器人覆盖螺栓拧紧和线束插接两个具体场景，而非泛泛的"精密装配"。</li>
+        </ul>
+        <p>不做通用人形、不做自研本体的路径，在汽车制造场景中反而是合理的——发那科等工业机器人的本体已经成熟可靠，知来具身的价值完全体现在算法层。</p>
+      </div>
+
+      <div class="analysis-block">
+        <h4 id="analysis3">2.3 股东/资本结构对战略的影响</h4>
+        <p><strong>不透明的融资结构可能影响长期扩张能力。</strong>三轮融资均未披露投资方和估值，这在行业中属于异常低调。可能的原因包括：融资规模较小、投资方结构特殊（产业资本或政府背景基金有保密要求）、或公司主动选择低调策略。</p>
+        <p>母公司数预智能（MagicBI）主营AI数据智能分析，与机器人行业无直接关联。这种"跨领域母集团+新业务子公司"的结构可能带来资源分配摩擦。此外，数预智能涉及与蚂蚁智信的知识产权纠纷案（2022），尽管案件标的未知，但创始人同时运营两家公司的法律风险需关注。</p>
+        <p>值得注意的是，俞琼通过重庆元熙运筹（注册资本3,400万元，执行事务合伙人）拥有独立的资本运作实体，这可能意味着公司有除沪深股权融资之外的额外资金来源。</p>
+      </div>
+
+      <div class="analysis-block">
+        <h4 id="analysis4">2.4 试错过程与路径调整</h4>
+        <p>从公开信息来看，知来具身2021年成立后的路径保持了较高的战略稳定性：始终围绕汽车制造场景、始终不做本体、始终聚焦视觉+力控。未出现明显的试错或方向调整——这可能是因为俞琼的产业背景使得公司从第一天起就明确了客户和场景。</p>
+        <p>2024年启用"知来具身"品牌名和2025-2026年密集申请机器人专利（14-17条），表明公司在技术资产沉淀上正在加速。2025-2026年完成ICP备案并上线Next.js官网（中英双语、含产品视频），说明公司正在从早期低调阶段转向正式市场推广阶段。</p>
+      </div>
+
+      <div class="analysis-block">
+        <h4 id="analysis5">2.5 竞争定位与取舍</h4>
+        <p><strong>与行业主流路线的关键差异</strong>：</p>
+        <ul>
+          <li><strong>vs 人形机器人公司（Figure/智元）</strong>：知来具身不做通用人形，选择更窄的汽车制造垂直场景，TAM更小但商业化确定性更高</li>
+          <li><strong>vs 非夕Flexiv</strong>：同为力控路线，但非夕自研自适应机器人本体，知来具身不做本体</li>
+          <li><strong>vs 优艾智合</strong>：优艾智合为移动操作机器人（多场景），知来具身为固定工位操作（仅汽车）</li>
+          <li><strong>vs 工业机器人厂商（发那科/ABB）</strong>：如果发那科自研AI层，知来具身的生态位会被挤压——这是最大的战略风险。公司拥有的J519授权是生态位保障，但授权性质（是否为排他性合作）不明确</li>
+        </ul>
+        <p><strong>核心取舍</strong>：选择"确定性"而非"可能性"。用更小的TAM换取更高的商业落地成功率。这种策略在当前（2026年"部署态元年"）有优势，但当行业规模化后可能面临天花板。</p>
+      </div>
+
+      <div class="analysis-block">
+        <h4 id="analysis6">2.6 其他重要观察</h4>
+        <ul>
+          <li><strong>客户集中度风险高</strong>：全部收入依赖汽车行业，单一行业周期下行直接冲击公司生存。2025-2026年中国汽车行业竞争加剧（价格战、利润率压缩），Tier1供应商的资本开支意愿可能下降。</li>
+          <li><strong>"发那科J519授权"的价值与风险</strong>：这一授权如果是通过标准软件选项购买获得（非排他性合作），则技术壁垒低于其表面上看起来的稀缺性。发那科作为日本企业，对底层协议的开放性有严格管控，授权随时可能被限制或取消。</li>
+          <li><strong>不做本体的双刃剑</strong>：轻资产模式有利于快速扩张和调整，但无法在硬件层面建立差异化。竞争对手可以在同样的发那科本体上开发类似的AI软件层。</li>
+          <li><strong>官网数据的可信度</strong>：官网宣称5,000+台机器人部署和200+工厂覆盖，但考虑到公司~100人的规模和融资不透明的状态，该数据可能包含累计集成的机器人总量而非纯自有产品销售。建议将此数据视为公司宣传口径，保持审慎。</li>
+          <li><strong>母公司法律风险</strong>：数预智能涉及与蚂蚁智信的技术秘密纠纷案（2022），可能反映创始人与前雇主的紧张关系。该案件走向值得关注。</li>
+          <li><strong>2026年行业转折</strong>：行业进入"部署态元年"后，投资人越来越看重真实收入而非Demo效果。知来具身虽然没有炫酷的Demo视频，但有头部客户背书和上市公司合作，在当前的融资环境中可能反而有利。</li>
+        </ul>
+      </div>
+
+      <h2 id="references">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://www.foreseerobotics.com/">知来具身（Foresee Robotics）官方网站</a></li>
+          <li><a href="https://www.foreseerobotics.com/about/">Foresee Robotics - About Us</a></li>
+          <li><a href="https://www.foreseerobotics.com/products/">Foresee Robotics - Products</a></li>
+          <li><a href="https://www.foreseerobotics.com/solutions/">Foresee Robotics - Solutions</a></li>
+          <li><a href="https://twitter.com/foresee_robotics">知来具身官方Twitter/X (@foresee_robotics)</a></li>
+          <li><a href="https://caifuhao.eastmoney.com/news/20260211233148776524880">秦安股份与知来具身签定战略合作协议 - 东方财富</a></li>
+          <li><a href="https://egs.stcn.com/news/detail/2152794.html">华众控股与魔狸科技达成具身智能领域战略合作 - 证券时报</a></li>
+          <li><a href="https://earsonme.com/episodes/4ymQeYtB32g1">小宇宙FM《一路瞳行》EP108：对话魔狸科技</a></li>
+          <li><a href="https://m.shuidi.cn/company-a72701963db01282c67d41d1cd06e201.html">知来具身智能科技（苏州）有限公司 - 水滴信用</a></li>
+          <li><a href="https://m.shuidi.cn/company-054221465539a689b0a337e5ba05c301.html">知来具身智能科技（重庆）有限公司 - 水滴信用</a></li>
+          <li><a href="https://m-harmony.qcc.com/firm/1c511662b3e49357604c37523d1cb43f.html">魔狸科技（上海）有限公司 - 企查查</a></li>
+          <li><a href="https://m.qixin.com/company/08200361-a809-4a84-9ec7-25d79c4421af">数预智能科技（上海）有限公司 - 启信宝</a></li>
+          <li><a href="https://i.gasgoo.com/supplier/35479762/?Jump=financing">魔狸科技 - 盖世汽车社区</a></li>
+          <li><a href="https://www.patent9.com/patent/202511840926.6.html">专利：基于人类反馈的机器人模仿学习和强化学习框架</a></li>
+          <li><a href="https://www.163.com/dy/article/KNTVTDST0519QIKK.html">专利：融合世界模型架构的人工智能机器人控制系统</a></li>
+          <li><a href="https://www.163.com/dy/article/KL3O85970519QIKK.html">专利：基于人类视频学习的人工智能机器人系统</a></li>
+          <li><a href="https://www.163.com/dy/article/KNU0D1DR0519QIKK.html">专利：基于人工智能的机器人示教数据生成方法</a></li>
+          <li><a href="https://www.beianx.cn/search/foresee-robotics.com">foresee-robotics.com ICP备案信息</a></li>
+          <li><a href="https://ncss.cn/student/jobs/F9PKTyXAp41QrkJQL8GLTu/corp.html">国家大学生就业服务平台 - 知来具身杭州</a></li>
+          <li><a href="https://hk.stockstar.com/IG2025112700008456.shtml">华众车载与魔狸科技签约后股价涨近12% - 证券之星</a></li>
+          <li><a href="https://m.qixin.com/company/1f053180-e107-11ee-825e-00163f001b09">重庆元熙运筹工商信息 - 启信宝</a></li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer"><p>具身智能Wiki · 知来具身（魔狸科技） · 最后更新 2026-05-16</p></div>
+</div>
+</body>
+</html>
