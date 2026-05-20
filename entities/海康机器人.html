@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>海康机器人 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> › <span>海康机器人</span></div>
+  <div class="wiki-header"><h1>海康机器人</h1><div class="subtitle">Hikrobot · 杭州海康机器人股份有限公司 · 2016年成立 · 海康威视(002415.SZ)控股 · 机器视觉+移动机器人双龙头 · 拟分拆创业板IPO</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#team">1.2 核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 IPO与股权结构</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financials">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#a1">2.1 母子公司协同与独立性悖论</a></li>
+        <li class="toc-lvl4"><a href="#a2">2.2 规模壁垒与增长瓶颈</a></li>
+        <li class="toc-lvl4"><a href="#a3">2.3 IPO进程的战略意义</a></li>
+        <li class="toc-lvl4"><a href="#a4">2.4 产品矩阵与商业模式</a></li>
+        <li class="toc-lvl4"><a href="#a5">2.5 竞争格局与护城河</a></li>
+        <li class="toc-lvl4"><a href="#a6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#references">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">海康机器人 Hikrobot</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">杭州海康机器人股份有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">英文品牌</div><div class="ib-value">Hikrobot</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2016年4月20日</div></div>
+        <div class="ib-row"><div class="ib-label">总部</div><div class="ib-value">杭州市滨江区</div></div>
+        <div class="ib-row"><div class="ib-label">法定代表人</div><div class="ib-value">贾永华</div></div>
+        <div class="ib-row"><div class="ib-label">控股股东</div><div class="ib-value">海康威视（60%），实控人中国电科</div></div>
+        <div class="ib-row"><div class="ib-label">员工规模</div><div class="ib-value">3,400+（2022年），研发2,000+</div></div>
+        <div class="ib-section">关键经营数据（2025年）</div>
+        <div class="ib-row"><div class="ib-label">营收</div><div class="ib-value">64.52亿元（+8.82%）</div></div>
+        <div class="ib-row"><div class="ib-label">机器视觉出货</div><div class="ib-value">累计超1,000万台</div></div>
+        <div class="ib-row"><div class="ib-label">移动机器人</div><div class="ib-value">累计下线超18万台</div></div>
+        <div class="ib-row"><div class="ib-label">全球客户</div><div class="ib-value">超2万家</div></div>
+        <div class="ib-section">IPO信息</div>
+        <div class="ib-row"><div class="ib-label">上市板块</div><div class="ib-value">深交所创业板（审核中）</div></div>
+        <div class="ib-row"><div class="ib-label">受理日期</div><div class="ib-value">2023年3月7日</div></div>
+        <div class="ib-row"><div class="ib-label">拟募资</div><div class="ib-value">60亿元</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">赛道</div><div class="ib-value"><span class="tag">机器视觉</span><span class="tag">移动机器人</span><span class="tag">具身智造</span><span class="tag">AMR</span></div></div>
+      <div class="ib-row"><div class="ib-label">官网</div><div class="ib-value"><a href="https://www.hikrobotics.com" target="_blank">www.hikrobotics.com</a></div></div>
+      </aside>
+
+      <p class="article-intro"><b>海康机器人</b>（Hikrobot，杭州海康机器人股份有限公司），是海康威视（002415.SZ）控股的机器视觉和移动机器人子公司，成立于2016年4月，总部位于杭州。公司面向全球提供机器视觉、移动机器人及关节机器人产品与解决方案，已形成"手、眼、脚"三轮驱动的核心业务矩阵。在国内市场，每两台工业相机、每三台移动机器人中就有一台来自海康机器人<sup><a href="#ref1">[1]</a></sup>。2025年全年营收64.52亿元，机器视觉产品累计出货超1,000万台，移动机器人下线突破18万台<sup><a href="#ref1">[1]</a></sup>。公司于2023年3月向深交所创业板提交IPO申请，拟募资60亿元，历经多次中止后于2026年3月重新启动分拆上市筹备<sup><a href="#ref2">[2]</a></sup>。2026年4月，CEO贾永华首次提出"具身智造"理念<sup><a href="#ref1">[1]</a></sup>。</p>
+
+      <h2 id="facts">1 事实层</h2>
+      <p style="font-size:0.82rem;color:#54595d;margin-bottom:10px;">来源可靠性标注：<span class="tag tag-info">招股书[0]</span> = 深交所创业板IPO招股说明书申报稿（经审计） · <span class="tag tag-info">年报</span> = 上市公司年报 · <span class="tag tag-info">媒体报道</span> = 第三方独立报道 · <span class="tag tag-info">公司自述</span> = 公司官方披露</p>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper"><table class="wikitable infotable">
+        <tr><th>项目</th><th>内容</th><th>来源</th></tr>
+        <tr><td>公司全称</td><td>杭州海康机器人股份有限公司</td><td><sup><a href="#ref10">[10]</a></sup></td></tr>
+        <tr><td>英文品牌</td><td>Hikrobot</td><td><sup><a href="#ref10">[10]</a></sup></td></tr>
+        <tr><td>成立时间</td><td>2016年4月20日（有限公司）；2022年7月21日（整体变更为股份公司）</td><td><sup><a href="#ref0">[0]</a></sup></td></tr>
+	        <tr><td>注册资本</td><td>7.2亿元人民币</td><td><sup><a href="#ref0">[0]</a></sup></td></tr>
+        <tr><td>法定代表人/CEO</td><td>贾永华</td><td><sup><a href="#ref10">[10]</a></sup></td></tr>
+        <tr><td>控股股东</td><td>海康威视（002415.SZ）持股60%，实控人中国电子科技集团（国资委）</td><td><sup><a href="#ref10">[10]</a></sup><sup><a href="#ref4">[4]</a></sup></td></tr>
+        <tr><td>注册地</td><td>杭州市滨江区</td><td><sup><a href="#ref10">[10]</a></sup></td></tr>
+        <tr><td>上市状态</td><td>拟分拆至深交所创业板IPO（2023年3月受理，审核中）</td><td><sup><a href="#ref2">[2]</a></sup></td></tr>
+        <tr><td>员工规模</td><td>3,410人（2022年9月），其中研发技术人员2,000余人</td><td><sup><a href="#ref13">[9]</a></sup></td></tr>
+        <tr><td>专利</td><td>804项授权专利（截至2023年6月30日，境内641项+境外163项），计算机软件著作权37项；2026年增至约1,800项</td><td><sup><a href="#ref0">[0]</a></sup><sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>定位</td><td>机器视觉+移动机器人+关节机器人全栈解决方案提供商</td><td><sup><a href="#ref1">[1]</a></sup></td></tr>
+      </table></div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>时间</th><th>事件</th><th>来源</th></tr>
+        <tr><td>2016年4月</td><td>杭州海康机器人技术有限公司成立（海康威视子公司）</td><td><sup><a href="#ref0">[0]</a></sup></td></tr>
+        <tr><td>2019年</td><td>营收突破9.41亿元；启动移动机器人大规模商业化</td><td><sup><a href="#ref4">[4]</a></sup></td></tr>
+        <tr><td>2021年</td><td>营收27.68亿元，净利润4.82亿元；机器视觉国内市占率第一</td><td><sup><a href="#ref4">[4]</a></sup></td></tr>
+        <tr><td>2023年3月</td><td>向深交所创业板提交IPO申请并获受理，拟募资60亿元</td><td><sup><a href="#ref2">[2]</a></sup></td></tr>
+        <tr><td>2023-2024年</td><td>经历两轮深交所问询，因财务资料超期多次中止审核</td><td><sup><a href="#ref2">[2]</a></sup></td></tr>
+        <tr><td>2025年1月</td><td>完成审核中心意见落实函回复</td><td><sup><a href="#ref4">[4]</a></sup></td></tr>
+        <tr><td>2025年3月</td><td>第四次因财务资料超期被中止审核</td><td><sup><a href="#ref2">[2]</a></sup></td></tr>
+        <tr><td>2026年1月</td><td>桐庐智能制造基地全面竣工投产（占地200+亩，年产AMR 7.5万台+视觉500万台）</td><td><sup><a href="#ref1">[1]</a></sup><sup><a href="#ref2">[2]</a></sup></td></tr>
+        <tr><td>2026年3月31日</td><td>海康威视公告重启海康机器人分拆上市筹备工作</td><td><sup><a href="#ref2">[2]</a></sup></td></tr>
+        <tr><td>2026年4月</td><td>智造大会2026：首次提出"具身智造"理念；发布超35款新品</td><td><sup><a href="#ref1">[1]</a></sup></td></tr>
+      </table></div>
+
+      <h3 id="team">1.2 核心团队</h3>
+      <p>海康机器人法定代表人兼CEO为<b>贾永华</b>，同时担任海康威视高级副总经理。公司研发技术人员超2,000人<sup><a href="#ref1">[1]</a></sup>。副总裁张文聪在2026年智造大会上代表公司阐述人形机器人策略和AI技术路线<sup><a href="#ref1">[1]</a></sup>。核心管理团队多来自海康威视体系，具备丰富的安防、视觉和智能制造产业经验。</p>
+
+      <h3 id="funding">1.3 IPO与股权结构</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>阶段</th><th>时间</th><th>要点</th><th>来源</th></tr>
+        <tr><td>IPO受理</td><td>2023年3月7日</td><td>深交所创业板受理，保荐人中信证券，拟募资60亿元</td><td><sup><a href="#ref2">[2]</a></sup></td></tr>
+        <tr><td>第一轮问询</td><td>2023年5月</td><td>深交所首轮问询，聚焦关联交易公允性、核心技术独立性</td><td><sup><a href="#ref2">[2]</a></sup></td></tr>
+        <tr><td>第二轮问询</td><td>2023年8月</td><td>补充问询关联交易、毛利率下滑、业绩持续性</td><td><sup><a href="#ref2">[2]</a></sup></td></tr>
+        <tr><td>多次中止</td><td>2023-2025年</td><td>四次因财务资料超期被中止审核</td><td><sup><a href="#ref2">[2]</a></sup></td></tr>
+        <tr><td>重启筹备</td><td>2026年3月31日</td><td>海康威视公告重新启动分拆上市筹备工作</td><td><sup><a href="#ref2">[2]</a></sup></td></tr>
+      </table></div>
+      <p>股权结构：海康威视直接持股60%，中电海康集团间接持股，实际控制人为中国电子科技集团（国务院国资委）<sup><a href="#ref4">[4]</a></sup>。作为海康威视子公司，海康机器人未进行独立的外部股权融资，资金和人才早期得到母公司大力支持<sup><a href="#ref5">[5]</a></sup>。</p>
+      <p>募资用途：拟将60亿元募资主要用于桐庐智能制造基地建设（已竣工投产）、研发中心建设及补充流动资金<sup><a href="#ref2">[2]</a></sup>。</p>
+      <p>IPO核心障碍包括：采购端曾超60%依赖母公司代工；生产办公场地超50%租赁自母公司；重合客户600余家（收入占比15.78%），监管对经营独立性存疑<sup><a href="#ref2">[2]</a></sup><sup><a href="#ref6">[6]</a></sup>。</p>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <p>海康机器人已形成"手、眼、脚"协同的技术体系<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref2">[2]</a></sup>：</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>技术方向</th><th>说明</th><th>来源</th></tr>
+        <tr><td>2D/2.5D机器视觉</td><td>高速线阵2.5D检测、穹顶光2.5D、CIS微距检测；累计出货超1,000万台，国内市占率第一</td><td><sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>3D高精度视觉</td><td>激光振镜立体相机、DS结构光传感器、双目散斑3D相机；中高端市场仍被国外垄断，正投入大量资源追赶</td><td><sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>AI智能视觉（大模型）</td><td>VAC系列AI推理终端（国产AI加速卡）；VM算法平台5.0融合工业视觉大模型；场景迁移所需样本量仅为原来的1/10</td><td><sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>移动机器人（AMR）</td><td>潜伏系列、叉取系列、料箱系列、重载系列；全球出货量连续三年第一；国内市占率近30%</td><td><sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>关节机器人</td><td>SCARA、重载165kg/210kg系列</td><td><sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>工业软件平台</td><td>VM算法平台（累计出库45万+台）、RCS-2000调度系统（支持宝马全球3,700台AGV统一调度）、iWMS、PlantMirror仿真、EasyAMR；自研软件授权用户超60万人次</td><td><sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>AI技术三路线并行</td><td>专用小模型 + 通用大模型 + 端到端VLA大模型</td><td><sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>人形机器人策略</td><td>定位"互补"：AMR/机械臂是"专业工"，人形机器人是"多能工"；已推出轮式人形产品；为部分人形机器人品牌供应视觉感知产品</td><td><sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>具身数据采集</td><td>双轨并行：真实数据采集+仿真数据预训练</td><td><sup><a href="#ref1">[1]</a></sup></td></tr>
+      </table></div>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>产品类别</th><th>代表型号/系列</th><th>关键参数</th><th>来源</th></tr>
+        <tr><td>工业相机（2D/2.5D）</td><td>高速线阵2.5D检测系统、穹顶光2.5D、CIS微距检测</td><td>累计出货超1,000万台</td><td><sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>3D视觉传感器</td><td>激光振镜立体相机、DS结构光传感器、双目散斑3D相机</td><td>—</td><td><sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>AI推理终端</td><td>VAC系列</td><td>国产AI加速卡，功耗低，支持多卡并行</td><td><sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>潜伏式AMR</td><td>Q3S刀片式潜伏（125mm超薄）、Q1P潜伏</td><td>—</td><td><sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>叉取式AMR</td><td>潜伏叉取2.0（1.5m极窄巷道）、F3小金刚叉取</td><td>—</td><td><sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>料箱机器人</td><td>STU料箱机器人（最高20m+）、STRP高密度存储方案</td><td>—</td><td><sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>关节机器人</td><td>HAR165/HAR210重载系列</td><td>负载165kg/210kg</td><td><sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>软件平台</td><td>VM 5.0、RCS-2000、iWMS、PlantMirror、EasyAMR</td><td>VM累计出库45万+台，授权用户60万+</td><td><sup><a href="#ref1">[1]</a></sup></td></tr>
+      </table></div>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>行业</th><th>典型应用/客户</th><th>来源</th></tr>
+        <tr><td>汽车制造</td><td>吉利、一汽丰田/大众、华晨宝马（RCS-2000统一调度全球3,700台AGV）、广汽本田（400+台AMR）、极氪、长安汽车</td><td><sup><a href="#ref1">[1]</a></sup><sup><a href="#ref2">[2]</a></sup></td></tr>
+        <tr><td>医药</td><td>华润医药南通智能仓（STRP方案，50+台机器人）</td><td><sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>电商/物流</td><td>韩国HanExpress（4,000㎡智能仓，50+台AMR）、圆通、万德隆、日上智慧物流（300+台AMR）</td><td><sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>3C/半导体</td><td>深科技（近200台潜伏机器人）</td><td><sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>食品饮料</td><td>康师傅、泸州老窖、卫龙</td><td><sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>新能源</td><td>光伏、锂电行业</td><td><sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>海外</td><td>覆盖70+国家；韩国、日本、新加坡、意大利、法国、泰国设有分支机构</td><td><sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>工业质检（AI）</td><td>机械臂+智能相机一体化柔性质检方案，覆盖划痕、磕碰及深度学习缺陷定位</td><td><sup><a href="#ref1">[1]</a></sup></td></tr>
+      </table></div>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>指标</th><th>数据</th><th>时点</th><th>来源</th></tr>
+        <tr><td>全球客户数</td><td>超2万家</td><td>2026年4月</td><td><sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>机器视觉客户</td><td>超1.5万家</td><td>2026年4月</td><td><sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>生态合作伙伴</td><td>超500家</td><td>2025-2026年</td><td><sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>认证视觉工程师</td><td>超20万名</td><td>2026年4月</td><td><sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>业务覆盖场景</td><td>超1,000个细分场景</td><td>2026年4月</td><td><sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>海外覆盖</td><td>70+国家/地区，海外收入占比约35%</td><td>2026年</td><td><sup><a href="#ref5">[5]</a></sup></td></tr>
+        <tr><td>国内市占率（机器视觉）</td><td>第一（约50%，每两台工业相机占一台）</td><td>2026年4月</td><td><sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>国内市占率（移动机器人）</td><td>近30%</td><td>2026年4月</td><td><sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>移动机器人全球排名</td><td>出货量连续三年全球第一</td><td>2026年4月</td><td><sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>中国移动合作伙伴</td><td>松下电器（战略合作）、富瀚微（视觉芯片已量产出货）</td><td>2025-2026年</td><td><sup><a href="#ref5">[5]</a></sup></td></tr>
+      </table></div>
+
+      <h3 id="financials">1.8 财务数据</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>指标</th><th>2019</th><th>2020</th><th>2021</th><th>2022</th><th>2023</th><th>2024 (Q1-Q3)</th><th>2025 (全年)</th><th>来源</th></tr>
+        <tr><td>营收（亿元）</td><td>9.41<sup><a href="#ref0">[0]</a></sup></td><td>15.25<sup><a href="#ref0">[0]</a></sup></td><td>27.68<sup><a href="#ref0">[0]</a></sup></td><td>39.42<sup><a href="#ref0">[0]</a></sup></td><td>49.63<sup><a href="#ref4">[4]</a></sup></td><td>42.14<sup><a href="#ref4">[4]</a></sup></td><td>64.52<sup><a href="#ref1">[1]</a></sup></td><td><sup><a href="#ref0">[0]</a></sup><sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>营收增速</td><td>—</td><td>~62%</td><td>~82%</td><td>~42%</td><td>~26%</td><td>19.4%</td><td>8.82%</td><td><sup><a href="#ref4">[4]</a></sup></td></tr>
+        <tr><td>归母净利润（亿元）</td><td>0.45<sup><a href="#ref0">[0]</a></sup></td><td>0.65<sup><a href="#ref0">[0]</a></sup></td><td>4.82<sup><a href="#ref0">[0]</a></sup></td><td>6.41<sup><a href="#ref0">[0]</a></sup></td><td>7.98<sup><a href="#ref4">[4]</a></sup></td><td>4.17<sup><a href="#ref4">[4]</a></sup></td><td>未单独披露</td><td><sup><a href="#ref0">[0]</a></sup><sup><a href="#ref4">[4]</a></sup></td></tr>
+        <tr><td>主营业务毛利率</td><td>—</td><td>44.55%</td><td>44.28%</td><td>43.57%</td><td>—</td><td>—</td><td>—</td><td><sup><a href="#ref4">[4]</a></sup></td></tr>
+        <tr><td>移动机器人毛利率</td><td>—</td><td>42.89%</td><td>38.61%</td><td>35.28%</td><td>34.84% (H1)</td><td>—</td><td>—</td><td><sup><a href="#ref4">[4]</a></sup></td></tr>
+        <tr><td>研发费用（亿元）</td><td>3.21</td><td>3.83</td><td>4.50</td><td>6.42</td><td>—</td><td>—</td><td>—</td><td><sup><a href="#ref13">[9]</a></sup></td></tr>
+        <tr><td>研发费用率</td><td>34.11%</td><td>25.09%</td><td>16.27%</td><td>16.28%</td><td>—</td><td>—</td><td>—</td><td><sup><a href="#ref13">[9]</a></sup></td></tr>
+      </table></div>
+      <p>注：2019-2022年及2023年H1数据直接引自招股说明书（申报稿）经审计财务报告，单位为人民币万元（已折算为亿元）。其中2020年归母净利润精确值为6,509.64万元，2021年为48,219.26万元，2022年为64,086.42万元<sup><a href="#ref0">[0]</a></sup>。</p><p>其他关键财务信号（来自招股书披露）：经营性现金流2020-2023H1累计净流出约11.8亿元<sup><a href="#ref6">[6]</a></sup>；资产负债率长期约70%（同行均值约30%）<sup><a href="#ref6">[6]</a></sup>；应收账款2023年6月末达15.72亿元；存货占流动资产比例约34-41%<sup><a href="#ref6">[6]</a></sup>。</p>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li><b>"具身智造"理念</b>：2026年4月智造大会上由CEO贾永华首次提出，聚焦"高柔性智能体"（多任务、多工艺、多节拍运行的通用能力）和"可复制的场景应用能力"两大核心<sup><a href="#ref1">[1]</a></sup>。</li>
+        <li><b>桐庐基地</b>：2026年1月全面竣工投产，占地200+亩，总建筑面积约36万㎡，以"机器人造机器人"为核心特色，年产AMR 7.5万台、机器视觉500万台、关节机器人2万套。原计划支撑5年产能，实际可能仅支撑2-3年，已启动下一个基地选址<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref2">[2]</a></sup>。</li>
+        <li><b>人形机器人定位</b>：副总裁张文聪明确表示"互补，而非替代"——AMR/机械臂是"专业工"（节拍快、效率高），人形机器人是"多能工"（补充空间狭窄、柔性要求高的环节）。已有"轮式人形"产品适配工业场景<sup><a href="#ref1">[1]</a></sup>。</li>
+        <li><b>视觉芯片合作</b>：富瀚微面向海康机器人客户开发的视觉芯片已量产出货<sup><a href="#ref5">[5]</a></sup>。</li>
+        <li><b>松下合作</b>：2025年与松下电器签署战略合作协议，深化智能物流领域合作<sup><a href="#ref5">[5]</a></sup>。</li>
+        <li><b>宝马项目</b>：RCS-2000调度系统支持宝马全球3,700台多品牌AGV统一集中调度<sup><a href="#ref2">[2]</a></sup>。</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+      <p style="font-size:0.82rem;color:#54595d;margin-bottom:10px;">以下分析基于公开信息综合判断。</p>
+
+      <div class="analysis-block" id="a1">
+        <h4>2.1 母子公司协同与独立性悖论</h4>
+        <p>海康机器人与母公司海康威视的关系是其最核心的结构性特征。一方面，海康威视的品牌、渠道、供应链和研发资源为海康机器人提供了创业公司难以企及的起点——机器视觉的核心成像技术和供应链很大程度上共享了母公司安防业务的积累。但另一方面，这种深度绑定恰恰构成了IPO的最大障碍：监管对关联交易公允性和经营独立性的质疑贯穿整个审核过程。</p>
+        <p>关键的独立性指标包括：采购端曾超60%依赖母公司代工、生产办公场地超50%租赁自母公司、与母公司存在600余家重合客户。2026年1月桐庐基地的全面投产是一个分水岭——自有产能的建立有助于缓解"生产独立性"的质疑。但销售渠道、品牌认知层面的独立性，短期内难以根本改变。</p>
+      </div>
+
+      <div class="analysis-block" id="a2">
+        <h4>2.2 规模壁垒与增长瓶颈</h4>
+        <p>海康机器人的规模优势显著：机器视觉累计出货超1,000万台，移动机器人下线超18万台。这种量级的出货意味着规模效应带来的成本优势（采购议价能力、制造效率、售后服务网络），是后来者难以复制的护城河。</p>
+        <p>但增长瓶颈同样明显。营收增速从2021年的82%逐年放缓至2025年的8.82%，存在三重压力：（1）机器视觉行业整体增速从2021年的40%回落至个位数；（2）移动机器人市场CR5仅12.6%，格局极度分散，低价竞争加剧（移动机器人毛利率从42.89%降至34.84%）；（3）收入约75%集中于汽车、新能源、3C电子三个行业，存在行业集中度风险。</p>
+        <p>公司的应对策略是"把蛋糕做大"：通过AI大模型突破传统制造业的碎片化质检场景、向食品/药品/家具等传统行业渗透、以3D视觉开拓高端市场。但这些方向均面临技术难度高、碎片化严重的挑战。</p>
+      </div>
+
+      <div class="analysis-block" id="a3">
+        <h4>2.3 IPO进程的战略意义</h4>
+        <p>IPO对海康机器人的战略价值远超融资本身。60亿元募资中，桐庐基地已经竣工，募资的实际用途将更多转向研发和补流。更重要的战略价值在于：（1）建立独立融资渠道，摆脱对母公司的资金依赖；（2）通过上市公司地位获得品牌独立性和客户信任；（3）为海外扩张提供资本和信用背书；（4）以股权激励吸引和留住人才。</p>
+        <p>但三年未果的IPO进程已经产生实质影响——桐庐基地原本规划的5年产能由于需求增长，实际可能仅支撑2-3年，扩产需求已迫在眉睫。若IPO继续延迟，公司可能被迫依靠内部现金流和借款扩张，进一步加剧本已紧张的现金流（经营现金流累计净流出约11.8亿元）。</p>
+      </div>
+
+      <div class="analysis-block" id="a4">
+        <h4>2.4 产品矩阵与商业模式</h4>
+        <p>海康机器人"手、眼、脚"的产品矩阵战略具有内在协同逻辑：机器视觉（眼）负责感知，移动机器人（脚）负责物流转运，关节机器人（手）负责操作执行，三者组合可覆盖智能制造中从检测到搬运到装配的完整流程。工业软件（VM、RCS-2000、iWMS等）作为粘合剂提升了整体方案的锁定效应。</p>
+        <p>商业模式从"卖硬件"向"卖方案+软件+服务"升级的趋势明显：自研软件授权用户已超60万人次，RCS-2000支持多品牌AGV统一调度（开放的生态策略），培训认证工程师超20万名。这种"硬件铺量→软件锁定→生态粘性"的路径与海康威视在安防领域的打法一脉相承，是经过验证的成熟模式。</p>
+        <p>但机器视觉和移动机器人两大业务的协同性也存在边界——机器视觉的核心客户是设备制造商和产线集成商，移动机器人的核心客户是仓储物流运营方，两者的采购决策链并不完全重叠。</p>
+      </div>
+
+      <div class="analysis-block" id="a5">
+        <h4>2.5 竞争格局与护城河</h4>
+        <p>海康机器人的竞争地位在两条主线上呈现不同态势：</p>
+        <p><b>机器视觉</b>：国内市占率第一（约50%），规模护城河极其深厚。但增长空间受限于工业相机市场的增速放缓和高端3D视觉领域仍被国外企业（基恩士、康耐视等）主导。AI大模型驱动的缺陷检测是潜在的第二增长曲线——一旦技术突破，市场天花板将从工业相机硬件扩展到产线人工目检替代，空间急剧放大。</p>
+        <p><b>移动机器人</b>：全球出货量第一，但行业CR5仅12.6%，格局极为分散。主要竞争对手包括极智嘉（Geek+，约178亿市值）、快仓、新松、旷视等。与极智嘉相比，海康机器人的差异化在于：（1）依托母公司安防渠道的销售网络；（2）机器视觉+移动机器人的协同方案能力；（3）更广泛的行业覆盖（20,000+客户 vs 极智嘉主要聚焦物流电商）。</p>
+        <p><b>人形机器人赛道的策略性观望</b>：海康机器人对双足人形持"互补"定位而非正面竞争，并已通过轮式人形产品和视觉感知供应进行轻度布局。这一策略在当前阶段是理性的——既不错过赛道，也不在主业未稳时过度投入。</p>
+      </div>
+
+      <div class="analysis-block" id="a6">
+        <h4>2.6 其他重要观察</h4>
+        <p><b>（1）"具身智造"的战略升维</b>：从"机器视觉+移动机器人"升级为"具身智造"，本质上是将公司从"设备供应商"重新定位为"智能制造系统重构者"。这一叙事若能落地，对估值逻辑有显著影响——工业自动化设备商通常享受20-30倍PE，而具身智能平台公司可能获得更高溢价。但概念与实质之间仍有距离。</p>
+        <p><b>（2）现金流的隐忧</b>：经营现金流连续多年为负（累计净流出约11.8亿元），存货和应收账款快速增长——这反映了项目制业务（移动机器人方案）应收周期长、占用资金大的行业特性。IPO是缓解现金流压力的关键一招，若持续受阻，公司可能面临融资压力。</p>
+        <p><b>（3）海外布局的双刃剑</b>：海外收入占比约35%，覆盖70+国家，但地缘政治风险（尤其欧美对中国科技企业的态度）不可忽视。公司通过本地化生产、供应链多元化等策略应对，在制造环节已具备一定应变能力。</p>
+        <p><b>（4）估值参考</b>：以2025年营收64.52亿元、净利润估计约8-10亿元（参考2023年7.98亿利润率和2024年前三季度趋势），对标A股工业自动化板块35-48倍PE，IPO后估值中枢约在280-400亿元区间。考虑IPO募资60亿元的新增股本稀释，投后估值约300-350亿元。</p>
+        <p><span style="color:#7a5d00;">审慎提示：2025年全年净利润未单独披露（仅在母公司年报中体现机器人业务营收），利润预测存在不确定性。IPO进展受监管审批影响，时间表不确定。</span></p>
+      </div>
+
+      <h2 id="references">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li id="ref0"><a href="http://reportdocs.static.szse.cn/UpFiles/rasinfodisc1/202309/RAS_202309_204DB8FF3F994698A3201470AE90CF07.pdf" target="_blank">杭州海康机器人股份有限公司首次公开发行股票并在创业板上市招股说明书（申报稿）</a> — 中信证券保荐，2023-09-28签署。深交所创业板IPO申报文件，含经审计的2019-2022年及2023年1-6月财务数据、公司基本信息、股权结构、专利数量、募集资金用途等完整一手数据。</li>
+	          <li id="ref1"><a href="https://m.21jingji.com/article/20260424/herald/c84ebe4b3138799154fbe06c9cc1508b.html" target="_blank">海康机器人：首提"具身智造"、营收65亿，正寻下一个生产基地</a> — 21世纪经济报道，邓浩，2026-04-24。含2025年全年营收、出货量、桐庐基地、人形机器人策略、AI视觉大模型等核心信息。</li>
+          <li id="ref2"><a href="https://finance.sina.cn/2026-05-13/detail-inhxuwsw9009630.d.html" target="_blank">三年冲刺IPO未果！海康机器人何时能圆梦？</a> — 新浪财经/上市之家，2026-05-13。含完整IPO历程、财务数据、市占率、生产基地、35款新品等。</li>
+          <li id="ref10"><a href="https://www.jiemian.com/article/9029570.html" target="_blank">海康机器人：拟冲刺创业板IPO上市，预计投入募资60亿元</a> — 界面新闻，2023-03-07。直接引用招股说明书（申报稿）原文，含公司基本信息、控股股权结构、发行方案、2019-2022前三季度精确财务数据（营收/归母净利润）、募资用途明细、无人机业务转让等。</li>
+          <li id="ref4"><a href="https://news.futunn.com/post/71439118" target="_blank">海康威视分拆海康机器人IPO：业绩高增长，能走多远？</a> — 富途牛牛，2025年。含2019-2024财务数据、毛利率趋势、研发费用率、专利数量等完整招股书数据。</li>
+          <li id="ref5"><a href="https://xueqiu.com/8176602961/374244364" target="_blank">海康威视调研核心问答（含海康机器人IPO进展、合作伙伴、海外布局）</a> — 雪球，2026年1月。含松下合作、富瀚微芯片、海外收入占比等。</li>
+          <li id="ref6"><a href="https://www.163.com/dy/article/JRDGVFQS0519A6FP.html" target="_blank">海康机器IPO：独立性不足且业绩和资金均陷危机</a> — 网易/一财，2024年。含关联交易、经营现金流、资产负债率等风险分析。</li>
+          <li id="ref7"><a href="https://www.nbd.com.cn/articles/2023-03-07/2700120.html" target="_blank">杭州海康机器人股份有限公司拟IPO — 招股说明书（申报稿）摘要</a> — 每日经济新闻，2023-03-07。直接引用招股书申报稿，含发行股数、募资用途明细（六大项目对应金额）、公司主营业务定位。</li>
+	          <li id="ref11"><a href="https://www.iyiou.com/news/202604241128084" target="_blank">"眼脚手"全栈协同，海康机器人发布超35款新品</a> — 亿欧，2026-04-24。含智造大会2026新品发布详情。</li>
+          <li id="ref12"><a href="https://www.chinatimes.net.cn/article/125572.html" target="_blank">计划募资60亿元，海康机器人冲刺创业板</a> — 华夏时报，2023年。含IPO募资计划和早期财务数据。</li>
+          <li id="ref13"><a href="https://www.sohu.com/a/875016818_114984" target="_blank">海康机器IPO：独立性不足且业绩和资金均陷危机</a> — 搜狐，2023年。含员工人数、研发投入、专利数、现金流等招股书数据。</li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer"><p>具身智能Wiki · 海康机器人 Hikrobot · 最后更新 2026-05-19</p></div>
+</div>
+</body>
+</html>
