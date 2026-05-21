@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>Generalist AI — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> › <span>Generalist AI</span></div>
+  <div class="wiki-header"><h1>Generalist AI</h1><div class="subtitle">Generalist AI, Inc. · 2024年成立 · 估值$4.4亿 · DeepMind+波士顿动力团队 · 具身智能基础模型先锋</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#team">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financials">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#a2-1">2.1 团队背景与场景匹配度</a></li>
+        <li class="toc-lvl4"><a href="#a2-2">2.2 技术路线与场景适配性</a></li>
+        <li class="toc-lvl4"><a href="#a2-3">2.3 股东/资本结构影响</a></li>
+        <li class="toc-lvl4"><a href="#a2-4">2.4 试错与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#a2-5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#a2-6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#references">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">Generalist AI</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">Generalist AI, Inc.</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2024年上半年</div></div>
+        <div class="ib-row"><div class="ib-label">总部</div><div class="ib-value">美国加州San Mateo</div></div>
+        <div class="ib-row"><div class="ib-label">创始人/CEO</div><div class="ib-value">Pete Florence</div></div>
+        <div class="ib-row"><div class="ib-label">CTO</div><div class="ib-value">Andrew (Andy) Barry</div></div>
+        <div class="ib-row"><div class="ib-label">首席科学家</div><div class="ib-value">Andy Zeng</div></div>
+        <div class="ib-row"><div class="ib-label">上市状态</div><div class="ib-value">未上市（私人公司）</div></div>
+        <div class="ib-section">估值与融资</div>
+        <div class="ib-row"><div class="ib-label">最新估值</div><div class="ib-value">~$4.4亿（约32亿人民币，2025.03）</div></div>
+        <div class="ib-row"><div class="ib-label">累计融资</div><div class="ib-value">~$1.4亿（约10亿人民币）</div></div>
+        <div class="ib-row"><div class="ib-label">最新轮次</div><div class="ib-value">种子轮 / $1.4亿（2025.03）</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">员工</div><div class="ib-value">~61人（2026.03）</div></div>
+        <div class="ib-row"><div class="ib-label">产品代际</div><div class="ib-value">GEN-0 (2025.10) → GEN-1 (2026.04)</div></div>
+        <div class="ib-row"><div class="ib-label">预训练数据</div><div class="ib-value">50万+小时物理交互（GEN-1）</div></div>
+        <div class="ib-row"><div class="ib-label">AI架构</div><div class="ib-value">Harmonic Reasoning（自研）</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-value" style="width:100%;padding:6px"><span class="tag">具身基础模型</span><span class="tag">通用机器人大脑</span><span class="tag">Scaling Law验证</span><span class="tag">跨本体泛化</span><span class="tag">美国</span></div></div>
+        <div class="ib-section">官网</div>
+        <div class="ib-row"><div class="ib-value" style="width:100%;padding:4px"><a href="https://generalistai.com" target="_blank">generalistai.com</a></div></div>
+      </aside>
+
+      <p class="article-intro"><strong>Generalist AI</strong>是一家总部位于美国加州San Mateo的具身智能基础模型公司，由Google DeepMind前高级研究科学家Pete Florence（CEO）、波士顿动力前资深专家Andrew Barry（CTO）和Google DeepMind前研究科学家Andy Zeng（首席科学家）于2024年共同创立。公司致力于打造通用机器人"大脑"——不从零开始为每个任务编程，而是训练一个能从海量物理交互数据中自主学习通用操作技能的AI模型。2025年10月发布首个具身基础模型GEN-0，首次在机器人领域验证Scaling Law；2026年4月发布GEN-1，在多项任务中达到99%成功率，速度提升约3倍，被行业视为具身智能的"GPT-3时刻"。公司已融资约$1.4亿，估值约$4.4亿，投资方包括英伟达NVentures、Spark Capital和贝索斯旗下基金。<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref2">[2]</a></sup></p>
+
+      <h2 id="facts">1 事实层</h2>
+      <p style="font-size:0.82rem;color:#54595d;margin-bottom:10px;">来源可靠性标注：<span class="tag tag-info">官网/公司自述</span> = 公司官方披露 · <span class="tag tag-info">媒体报道</span> = 第三方独立报道 · <span class="tag tag-info">行业机构</span> = 第三方行业报告 · <span class="tag tag-info">播客</span> = 创始人访谈/播客自述</p>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper"><table class="wikitable infotable">
+        <tr><th>项目</th><th>内容</th></tr>
+        <tr><td>公司全称</td><td>Generalist AI, Inc.<sup><a href="#ref3">[3]</a></sup></td></tr>
+        <tr><td>成立时间</td><td>2024年上半年<sup><a href="#ref4">[4]</a></sup></td></tr>
+        <tr><td>注册地</td><td>美国特拉华州</td></tr>
+        <tr><td>总部地址</td><td>San Mateo, California, United States<sup><a href="#ref3">[3]</a></sup></td></tr>
+        <tr><td>上市状态</td><td>未上市（私人公司）</td></tr>
+        <tr><td>创始人/CEO</td><td>Pete Florence</td></tr>
+        <tr><td>CTO</td><td>Andrew (Andy) Barry</td></tr>
+        <tr><td>首席科学家</td><td>Andy Zeng</td></tr>
+        <tr><td>官网</td><td>https://generalistai.com<sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>X (Twitter)</td><td>@GeneralistAI<sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>员工规模</td><td>~61人（截至2026年3月）<sup><a href="#ref3">[3]</a></sup></td></tr>
+      </table></div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>时间</th><th>事件</th></tr>
+        <tr><td>2024年上半年</td><td>Pete Florence、Andrew Barry、Andy Zeng共同创立Generalist AI，目标"让通用机器人成为现实，将体力劳动边际成本降至为零"<sup><a href="#ref4">[4]</a></sup></td></tr>
+        <tr><td>2024-2025年</td><td>隐秘研发期，逐步吸纳来自OpenAI、Waymo、Boston Dynamics等机构的顶尖人才；大规模部署低成本可穿戴设备采集人类物理交互数据<sup><a href="#ref5">[5]</a></sup></td></tr>
+        <tr><td>2025年3月</td><td>完成种子轮融资约$1.4亿，估值约$4.4亿，英伟达NVentures、Spark Capital、Boldstart Ventures、Bezos Expeditions等参投<sup><a href="#ref2">[2]</a></sup><sup><a href="#ref3">[3]</a></sup></td></tr>
+        <tr><td>2025年10月</td><td>发布首个具身基础模型GEN-0：基于27万小时真实物理交互数据预训练，首次在机器人领域验证Scaling Law，平均成功率~64%<sup><a href="#ref6">[6]</a></sup></td></tr>
+        <tr><td>2026年3月</td><td>在NVIDIA GTC大会现场使用UR7e机械臂+MiR移动底座进行全天候实时Demo，展示跨本体快速泛化部署能力<sup><a href="#ref7">[7]</a></sup></td></tr>
+        <tr><td>2026年4月2日</td><td>发布GEN-1模型：基于50万小时人类行为数据从零训练，多项任务成功率超99%，速度提升约3倍，被福布斯称为机器人"GPT-3时刻"<sup><a href="#ref8">[8]</a></sup><sup><a href="#ref9">[9]</a></sup></td></tr>
+        <tr><td>2026年4月7日</td><td>CEO Pete Florence发表长文《Going Beyond World Models & VLAs》，阐述公司"目标驱动而非方法驱动"的研发哲学，明确GEN-1约99%参数从零训练<sup><a href="#ref10">[10]</a></sup></td></tr>
+        <tr><td>2026年4-5月</td><td>首席科学家Andy Zeng接受采访时表示计划将GEN-1模型商业化，测试市场并为后续更强模型奠定基础<sup><a href="#ref11">[11]</a></sup></td></tr>
+      </table></div>
+
+      <h3 id="team">1.2 创始人及核心团队</h3>
+      <p>Generalist AI的三位联合创始人全部来自MIT CSAIL / Google DeepMind / Boston Dynamics体系，构成具身智能领域罕见的"学术深度+产业经验"黄金三角。三人渊源深厚：Pete Florence与Andrew Barry同为MIT CSAIL机器人学博士（导师Russ Tedrake），Pete Florence与Andy Zeng在Google DeepMind长期合作发表了17+篇论文。三人合并论文引用超数万次，共同开创了VLA（Vision-Language-Action）概念和PaLM-E等里程碑项目。<sup><a href="#ref4">[4]</a></sup></p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+        <tr><td>联合创始人/CEO</td><td>Pete Florence</td><td>普林斯顿大学化学本科、剑桥大学物理硕士、MIT CSAIL机器人学博士（导师Russ Tedrake）。Google DeepMind高级研究科学家（4年），主导PaLM-E（多模态具身视觉语言模型）、RT-2（全球首个VLA模型）、Code as Policies、Socratic Models等里程碑项目。论文引用超19,000次。博士论文《Dense Visual Learning for Robot Manipulation》。<sup><a href="#ref4">[4]</a></sup></td></tr>
+        <tr><td>联合创始人/CTO</td><td>Andrew (Andy) Barry</td><td>富兰克林·W·奥林工程学院本科、MIT CSAIL机器人学博士（导师Russ Tedrake，为Pete同门师弟）。Boston Dynamics高级机器人科学家（5年），参与Atlas、Spot机械臂、Stretch等项目。MIT期间首创"Pushbroom Stereo"无人机高速避障算法。曾跨界在Broad Institute从事脑靶向基因递送研究。<sup><a href="#ref4">[4]</a></sup></td></tr>
+        <tr><td>联合创始人/首席科学家</td><td>Andy Zeng</td><td>UC Berkeley数学+计算机双本科、普林斯顿大学计算机科学博士（导师Funkhouser）。Google DeepMind研究科学家&技术负责人。TossingBot（RSS 2019最佳系统论文提名，《纽约时报》报道），与Pete合作17+篇论文。具身智能领域最具代表性的华人学者之一。<sup><a href="#ref4">[4]</a></sup></td></tr>
+        <tr><td>核心团队成员</td><td>Evan Morikawa</td><td>OpenAI工程负责人，曾领导ChatGPT、GPT-4、DALL·E工程团队。<sup><a href="#ref4">[4]</a></sup></td></tr>
+        <tr><td>核心团队成员</td><td>Kamyar Ghasemipour</td><td>Founding MTS，多伦多大学博士（辍学），CoRL 2019最佳论文。<sup><a href="#ref4">[4]</a></sup></td></tr>
+        <tr><td>核心团队成员</td><td>Kathleen Brandes</td><td>MTS，Adagy Robotics联合创始人/CTO，前Tesla自动驾驶工程师、Boston Dynamics工程师。<sup><a href="#ref4">[4]</a></sup></td></tr>
+        <tr><td>核心团队来源</td><td>—</td><td>团队背景横跨Google DeepMind（AI/ML研究）、Boston Dynamics（硬件/运动控制）、OpenAI（大模型工程）、Waymo/Zoox（自动驾驶）、Tesla（制造工程）等顶尖机构，约61人的精干团队体现了"精英小团队"模式。<sup><a href="#ref3">[3]</a></sup><sup><a href="#ref4">[4]</a></sup></td></tr>
+      </table></div>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <p>Generalist AI目前仅完成一轮正式融资——种子轮约$1.4亿，在具身智能初创公司中属于少见的高额种子轮，体现了投资方对创始团队顶级履历的极高认可。<sup><a href="#ref2">[2]</a></sup></p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>轮次</th><th>时间</th><th>金额</th><th>投后估值</th><th>核心投资方</th></tr>
+        <tr><td>种子轮</td><td>2025.03</td><td>~$1.4亿</td><td>~$4.4亿</td><td>NVIDIA（NVentures）、Spark Capital、Boldstart Ventures、Bezos Expeditions（贝索斯旗下基金）、NFDG<sup><a href="#ref2">[2]</a></sup><sup><a href="#ref3">[3]</a></sup></td></tr>
+      </table></div>
+      <p>关键股东生态特征：NVIDIA NVentures的投资确保了算力芯片（H100/Blackwell）的优先供应；Bezos Expeditions（Jeff Bezos个人基金）的参与赋予物流/仓储场景的想象空间；Spark Capital和Boldstart Ventures为硅谷顶级早期风投，善于孵化从0到1的平台型公司。目前未公开创始人持股比例。<sup><a href="#ref2">[2]</a></sup></p>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <div class="table-wrapper"><table class="wikitable infotable">
+        <tr><th>维度</th><th>内容</th></tr>
+        <tr><td>AI架构</td><td>自研Harmonic Reasoning（谐波推理）：感知流（Perception Stream）与动作流（Action Stream）在连续时间域内异步交织，摒弃传统"System 1（快速反射）+ System 2（慢速规划）"双系统架构。约99%参数从零训练，非VLM精调+动作头。<sup><a href="#ref10">[10]</a></sup></td></tr>
+        <tr><td>数据方案</td><td>零机器人预训练范式：基础模型完全基于低成本可穿戴设备（"Data Hands"）采集的人类日常活动数据从零训练，保留自然力觉反馈和高速动态操作信息。新任务仅需约1小时机器人数据微调。每周新增1万+小时数据。<sup><a href="#ref8">[8]</a></sup></td></tr>
+        <tr><td>推理优化</td><td>自研Paged Attention（分页注意力）机制——针对机器人控制优化的KV Cache管理，允许动态在非连续内存块中分配多模态历史上下文，配合自定义CUDA内核加速推理。<sup><a href="#ref8">[8]</a></sup></td></tr>
+        <tr><td>训练体系</td><td>全栈系统：预训练（大规模人类交互数据从零训练）+ 后训练（任务SFT微调）+ 强化学习（RL提升速度与鲁棒性）+ 多模态人类引导 + 推理时技术（Harmonic Reasoning演进）。<sup><a href="#ref8">[8]</a></sup></td></tr>
+        <tr><td>跨本体泛化</td><td>架构为"机器人不可知"（Robot-agnostic）设计：同一套基础模型可驱动6-DoF/7-DoF工业机械臂，也适用于16+自由度半人形机器人。<sup><a href="#ref8">[8]</a></sup></td></tr>
+        <tr><td>Scaling Law</td><td>GEN-0首次在具身智能领域验证幂律缩放定律（下游任务误差与预训练数据量呈幂律关系），发现7B参数为智能"相变"临界点。GEN-1从50万+小时数据中涌现即兴应变能力（Improvisation Intelligence）。<sup><a href="#ref6">[6]</a></sup><sup><a href="#ref8">[8]</a></sup></td></tr>
+        <tr><td>全栈/平台</td><td>纯基础模型平台路线：不制造机器人硬件本体，定位为"机器人大脑/操作系统"，类比Android模式，适配各厂商硬件。<sup><a href="#ref10">[10]</a></sup><sup><a href="#ref12">[12]</a></sup></td></tr>
+      </table></div>
+      <p>Generalist AI的技术路线最特别之处在于两个"抛弃"：一是抛弃了VLA（Vision-Language-Action）标签——尽管创始团队共同开创了VLA概念（RT-2等），但明确表示GEN-1不是VLA，并认为"目标比方法的标签更重要"。二是抛弃了仿真+遥操作的主流数据路径，选择了纯人类穿戴数据预训练范式。这种"非本体数据预训练+少量真机微调"路线在数据成本和泛化性上形成独特壁垒。<sup><a href="#ref10">[10]</a></sup></p>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>产品</th><th>发布时间</th><th>核心参数</th><th>主要特点</th></tr>
+        <tr><td>GEN-0</td><td>2025.10</td><td>27万小时预训练数据；7B参数相变临界点，已扩展至10B+；平均成功率~64%</td><td>首个验证具身智能Scaling Law的基础模型；Harmonic Reasoning架构首秀；跨6-DoF到16+DoF异构机器人驱动；发现7B参数为智能"相变"临界点<sup><a href="#ref6">[6]</a></sup></td></tr>
+        <tr><td>GEN-1</td><td>2026.04.02</td><td>50万+小时预训练数据（每周新增1万+小时）；99%成功率（多项任务）；~3倍速度提升（折纸盒34s→12.1s；装手机43s→15.5s）；1小时机器人数据即可适配新任务；涌现即兴应变能力</td><td>约99%参数从零训练；零机器人预训练范式（纯人类穿戴数据）；连续装箱1800次/折叠T恤86次/汽车配件分拣1小时+无误；仅需GEN-0 1/10任务数据量达到同等性能；多项任务首次跨越商业化成功率门槛；被CEO称为"GPT-3时刻"<sup><a href="#ref8">[8]</a></sup><sup><a href="#ref9">[9]</a></sup></td></tr>
+      </table></div>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>场景类别</th><th>具体场景</th><th>部署进度</th><th>合作方/备注</th></tr>
+        <tr><td>3C电子制造</td><td>组装细小零件、处理柔性排线、手机装盒（15.5秒完成）、电子产品包装</td><td>实验室验证阶段</td><td>GEN-1 Demo已展示手机装盒等任务<sup><a href="#ref8">[8]</a></sup></td></tr>
+        <tr><td>物流与电商</td><td>包装袋处理、异形商品分拣、退货处理、折叠纸盒（12.1秒完成）、积木装箱（连续1800次无干预）</td><td>实验室验证阶段；GTC 2026现场Demo</td><td>NVIDIA GTC 2026现场全天候运行实时演示<sup><a href="#ref7">[7]</a></sup></td></tr>
+        <tr><td>汽车零部件</td><td>长时序汽车套件组装、垫圈分拣与双手协同操作</td><td>实验室验证阶段</td><td>GEN-1已展示汽车配件分拣1小时+无误<sup><a href="#ref8">[8]</a></sup></td></tr>
+        <tr><td>家庭服务</td><td>折叠衣物（连续86次无干预）、维护扫地机器人（200+次）</td><td>原型验证阶段</td><td>长期目标场景<sup><a href="#ref8">[8]</a></sup></td></tr>
+      </table></div>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <p><strong>当前阶段：</strong>公司目前处于商业化前夜——GEN-1发布后，首席科学家Andy Zeng在接受采访时明确表示："公司确实计划将GEN-1模型商业化，这款模型将帮助我们测试市场，并为未来更强大的模型奠定基础。"<sup><a href="#ref11">[11]</a></sup>CEO Pete Florence在2026年GTC Demo博客中也提到GEN-1将实现"广泛商业可行性"（broad commercial viability）。<sup><a href="#ref7">[7]</a></sup></p>
+      <p><strong>商业模式：</strong>不制造机器人整机，而是将GEN-1作为"通用机器人大脑/操作系统"授权给不同硬件厂商，类似Android模式。客户仅需提供约1小时机器人数据即可将模型适配到新任务和新硬件平台。<sup><a href="#ref12">[12]</a></sup></p>
+      <p><strong>合作伙伴生态：</strong>已与Universal Robots（UR）在NVIDIA GTC 2026上使用UR7e机械臂+MiR移动底座进行现场Demo验证，展示了模型在全新硬件平台上的快速泛化能力。数据标注方面与Scale AI合作建立"物理AI数据引擎"。<sup><a href="#ref7">[7]</a></sup></p>
+
+      <h3 id="financials">1.8 财务数据</h3>
+      <p>Generalist AI为未上市公司，财务数据不公开。已知信息如下：</p>
+      <div class="table-wrapper"><table class="wikitable infotable">
+        <tr><th>项目</th><th>数据</th></tr>
+        <tr><td>累计融资总额</td><td>~$1.4亿（约10亿人民币）<sup><a href="#ref2">[2]</a></sup></td></tr>
+        <tr><td>最新估值</td><td>~$4.4亿（约32亿人民币，2025.03种子轮）<sup><a href="#ref2">[2]</a></sup></td></tr>
+        <tr><td>收入状态</td><td>尚未产生规模营收（2026年计划开始商业化）<sup><a href="#ref11">[11]</a></sup></td></tr>
+        <tr><td>员工数</td><td>~61人（截至2026年3月）<sup><a href="#ref3">[3]</a></sup></td></tr>
+      </table></div>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li><strong>从VLA开创者到"抛弃VLA"：</strong>Pete Florence和团队是VLA（Vision-Language-Action）概念的共同发明人（RT-2, 2023），但在2026年4月公开表示拒绝VLA和世界模型标签——核心理由是"目标比方法的标签更重要"（Goals are more powerful than methods），以及"当你有足够的数据和算力时，从零训练总是赢"（training from scratch always wins）。这一立场在行业引发了关于"具身智能是否需要语言模型作为桥梁"的深层讨论。<sup><a href="#ref10">[10]</a></sup><sup><a href="#ref13">[13]</a></sup></td></li>
+        <li><strong>"GPT-3时刻"的叙事：</strong>CEO Pete Florence明确将GEN-1称为机器人领域的"GPT-3时刻"，暗示具身智能已跨越从实验室演示到商业可行的关键门槛。这一叙事被福布斯、Ars Technica等主流媒体广泛引用。<sup><a href="#ref9">[9]</a></sup></li>
+        <li><strong>数据伦理争议：</strong>2026年5月的媒体报道揭示，Generalist AI通过Objectways、Instawork等零工平台从印度、尼日利亚、菲律宾等地采集工人动作数据（"无本体数据"），引发了关于AI替代发展中国家人类劳动的伦理讨论。<sup><a href="#ref14">[14]</a></sup></li>
+        <li><strong>"共同创业前传"：</strong>三位创始人在创业前曾共同创办教育项目"Stage One Education"，体现了三人在价值观层面的长期契合。<sup><a href="#ref4">[4]</a></sup></li>
+        <li><strong>GTC 2026现场Demo：</strong>在NVIDIA GTC 2026大会上，Generalist使用此前从未部署过的UR7e机械臂+MiR移动底座，在大会现场搭建系统并全天候运行实时演示，充分验证了模型的跨本体快速泛化能力。合作联系邮箱为partnerships@generalistai.com。<sup><a href="#ref7">[7]</a></sup></li>
+      </ul>
+
+            <h2 id="analysis">2 分析层</h2>
+      <p style="font-size:0.82rem;color:#54595d;margin-bottom:10px;">分析层数据综合来自 <span class="tag tag-info">媒体报道</span>（第三方独立报道）、<span class="tag tag-info">官网/公司自述</span>（公司官方披露）、<span class="tag tag-info">行业机构</span>（第三方行业报告）。公司自述数据与独立验证数据已在事实层标注区分，分析层观点仅供参考。</p>
+
+      <div class="analysis-block" id="a2-1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>Generalist AI的创始团队构成在具身智能赛道中相当独特——三位联合创始人分别覆盖了具身智能三个最核心的能力维度：Pete Florence的深度学习+多模态感知（PaLM-E、RT-2），Andrew Barry的硬件+运动控制（波士顿动力Atlas/Spot/Stretch），Andy Zeng的机器人操作+算法创新（TossingBot、Transporter Networks）。这种"AI研究+硬件工程+算法创新"的三角配置使其具备从底层模型架构到上层应用的全栈理解能力，也是公司敢于选择"纯基础模型平台"路线（不做硬件本体）的人才基础。团队选择了"工业先行"的场景策略——优先验证制造装配、物流分拣等高确定性的结构化场景——这与团队中波士顿动力出身的硬件工程基因高度一致。家庭场景被定位为长期目标而非近期发力点，体现了务实的场景优先级判断。</p>
+      </div>
+
+      <div class="analysis-block" id="a2-2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>Harmonic Reasoning架构和"零机器人预训练"范式是Generalist AI区别于所有竞品的核心技术壁垒。放弃VLA路线的核心逻辑是：当你有足够多的物理交互数据时，语言模型作为"知识桥梁"的必要性降低——直接让模型从物理数据中学习操作规律，可能比通过语言间接理解世界更高效。这一路线的适配场景是"动作密集型"任务（如装配、分拣、折叠），而非需要复杂语义理解的任务（如"给我一杯咖啡"级别的家庭服务）。GEN-1展现的即兴应变能力（零件歪斜时自主恢复、双手协同重抓取、利用外部环境辅助）在工业场景中有重要价值——这正是传统工业机器人最大的短板（对结构化环境的依赖）。但GEN-1也存在一些已知局限：并非所有任务都能达到99%成功率；部分工业场景需更高成功率/速度才能实际商用；涌现的即兴行为需要更好的"对齐"机制来约束。<sup><a href="#ref8">[8]</a></sup></p>
+      </div>
+
+      <div class="analysis-block" id="a2-3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>NVIDIA NVentures的领投为Generalist提供了算力（H100/Blackwell）的战略保障——这是大模型训练最核心的生产资料。Jeff Bezos个人基金的参与虽未公开具体的业务协同，但Amazon作为全球最大物流/仓储运营商的想象空间不可忽视——如果GEN-1未来进入Amazon的仓储分拣场景，将是其商业化路径中最大的催化剂之一。Spark Capital和Boldstart Ventures作为硅谷顶级早期VC，对"从0到1的平台型公司"有丰富的陪跑经验，不会过早施加变现压力。目前只有一轮种子融资的结构，意味着公司尚处于"验证技术可行性→证明商业可行性"的关键过渡期，下一轮融资的估值和投资方结构将是检验市场对GEN-1商业化前景认可度的关键信号。</p>
+      </div>
+
+      <div class="analysis-block" id="a2-4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>Generalist AI成立仅约两年，公开的路径调整尚不显著。值得注意的一个演变是：从GEN-0到GEN-1，公司对外叙事从"我们发现了Scaling Law"转向"我们验证了商业可行性"（99%成功率+3倍速度+1小时适配），体现了从实验室突破到市场就绪的战略转变。另一个隐含的路径选择是"不做硬件"的坚定立场——尽管团队拥有波士顿动力出身的顶级硬件人才（Andrew Barry及多名波士顿动力资深机械工程师），公司至今未涉足机器人本体制造。这在具身智能赛道中是一种有意识的取舍：与其分散资源同时做硬件和软件，不如聚焦定义"机器人的大脑"这一更有差异化价值的层面。</p>
+      </div>
+
+      <div class="analysis-block" id="a2-5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>Generalist AI在具身智能分层中处于"平台层"（通用机器人大脑），与Physical Intelligence（Pi）和Skild AI直接竞争。三者的核心差异：Generalist选择"人类穿戴数据预训练+少量真机微调"路线，强调数据获取的低成本和快速泛化——新任务1小时机器人数据即可适配；Physical Intelligence（估值$56亿）走仿真+遥操作数据路线，π0.6已开源，强调跨形态泛化的广度；Skild AI（估值~$140亿）覆盖多形态泛化，适配人形/四足/臂等异构平台。Generalist与Figure AI（整机路线）、Tesla Optimus（自用工厂+制造规模）不构成直接竞争——前者是"大脑供应商"，后者是"整机厂商"，更接近生态互补而非替代关系。但长期看，如果Figure/Tesla的自研AI模型达到足够的通用性，他们可能不再需要外部"大脑"——这是所有平台型公司的终极风险。Generalist的核心取舍是"不做硬件"= 不赚整机利润但可服务全行业，"不做VLA"= 放弃语言理解带来的语义交互能力但获得更纯粹的操作泛化能力。</p>
+      </div>
+
+      <div class="analysis-block" id="a2-6">
+        <h4>2.6 其他重要观察</h4>
+        <p>其一，Generalist AI的"从零训练"主张（99%参数从零训练）在技术上是激进的——这意味着公司需要在大模型训练基础设施（分布式训练、PB级数据吞吐）上进行极其重度的投入，而公司目前仅61人，这对工程执行力构成巨大考验。其二，$1.4亿种子轮/$4.4亿估值与竞品Physical Intelligence的$11亿融资/$56亿估值之间存在显著差距——Generalist需要在下一轮融资中证明其"1小时数据适配+99%成功率"的商业价值足以支撑更高的估值溢价。其三，数据伦理问题（从发展中国家采集工人数据训练模型）虽然在媒体报道中并非主流叙事，但可能在ESG敏感的机构投资者和大型企业客户中成为采纳障碍——如何回应"用发展中国家工人的汗水训练AI然后替代他们的工作"这一指控，将是Generalist在商业化过程中无法回避的问题。其四，GEN-1的"99%成功率"这一数字本身需要仔细解读——官方博客明确承认"并非所有尝试的任务都能达到99%+"，且部分任务需更高成功率或速度才能实际商用，因此媒体将99%作为通用标签可能存在过度简化的风险。</p>
+      </div>
+
+      <h2 id="references">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li id="ref1"><a href="https://generalistai.com" target="_blank">Generalist AI 官方网站</a>（公司自述）</li>
+          <li id="ref2"><a href="https://tracxn.com/d/companies/generalistai/__TaFrISSyLZQX6OYhyWKASir1Itlg9FAM-PKgk6cKzYE" target="_blank">Tracxn: Generalist AI — 2026 Company Profile & Team</a>（行业机构）</li>
+          <li id="ref3"><a href="https://view.inews.qq.com/k/20260407A06SL700" target="_blank">腾讯新闻：美国具身公司Generalist联创——计划将新模型商业化（2026.04.07）</a>（媒体报道）</li>
+          <li id="ref4"><a href="https://baike.baidu.com/item/Generalist%20AI/67269359" target="_blank">百度百科: Generalist AI</a>（综合参考，已与一手来源交叉验证）</li>
+          <li id="ref5"><a href="https://m.36kr.com/p/3561332469627784" target="_blank">36氪：Generalist发现具身智能的Scaling Law，还让模型能同时思考与行动</a>（媒体报道）</li>
+          <li id="ref6"><a href="https://generalistai.com/blog/apr-02-2026-GEN-1" target="_blank">Generalist AI 官方博客：GEN-1: Scaling Embodied Foundation Models to Mastery（2026.04.02）</a>（官网/公司自述）</li>
+          <li id="ref7"><a href="https://generalistai.com/blog/mar-24-2026-gtc-demo" target="_blank">Generalist AI 官方博客：The real breakthrough behind our GTC demo（2026.03.24）</a>（官网/公司自述）</li>
+          <li id="ref8"><a href="https://arstechnica.com/ai/2026/04/generalists-new-physical-robotics-ai-brings-production-level-success-rates/" target="_blank">Ars Technica: From folding boxes to fixing vacuums, GEN-1 robotics model hits 99% reliability（2026.04）</a>（媒体报道）</li>
+          <li id="ref9"><a href="https://www.forbes.com/sites/annatong/2026/04/02/generalist-is-betting-its-robot-training-gloves-will-usher-in-robotics-chatgpt-moment/" target="_blank">Forbes: Generalist Is Betting Its Robot-Training Gloves Will Usher In Robotics' ChatGPT Moment（2026.04.02）</a>（媒体报道）</li>
+          <li id="ref10"><a href="https://generalistai.com/blog/apr-07-2026-beyond-world-models" target="_blank">Generalist AI 官方博客：Going Beyond World Models & VLAs（2026.04.07）</a>（官网/公司自述）</li>
+          <li id="ref11"><a href="https://www.chinaz.com/ainews/22619.shtml" target="_blank">站长之家：机器人迎来"ChatGPT时刻"！Generalist发布GEN-0（2025.10）</a>（媒体报道）</li>
+          <li id="ref12"><a href="https://www.qbitai.com/2026/04/397951.html" target="_blank">量子位：Generalist最新长文定调——具身原生才是正道（2026.04）</a>（媒体报道）</li>
+          <li id="ref13"><a href="https://m.163.com/dy/article/KQ7ULCP905568W0A.html" target="_blank">网易：开创VLA的那帮人，正在抛弃VLA（2026.04）</a>（媒体报道）</li>
+          <li id="ref14"><a href="https://m.thepaper.cn/newsDetail_forward_32893061" target="_blank">澎湃新闻：数据更少、成功率更高，美国Generalist公司发布新一代具身模型（2026.04）</a>（媒体报道）</li>
+          <li id="ref15"><a href="https://boldstart.vc/news/generalistai-when-robots-start-to-improvise-welcome-to-boldstart/" target="_blank">Boldstart Ventures: GeneralistAI — When Robots Start to Improvise（2026）</a>（投资方博客，公司自述数据）</li>
+          <li id="ref16"><a href="https://m.zhidx.com/p/546006.html" target="_blank">智东西：12秒折完一个纸箱，速度快三倍，Generalist AI最强具身模型发布了（2026.04）</a>（媒体报道）</li>
+          <li id="ref17"><a href="https://www.thedeepview.com/articles/robotics-startup-is-on-a-quest-for-physical-agi" target="_blank">The Deep View: Robotics startup is on a quest for physical AGI（2026）</a>（媒体报道）</li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">本页面为具身智能Wiki项目自动生成 · 数据截至2026年5月 · 由Cowork调度系统维护</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const target = tocLinks.item(
+          Array.from(tocLinks).findIndex(link => link.getAttribute('href') === '#' + entry.target.id)
+        );
+        if (target) target.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-80px 0px -70% 0px' });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body>
+</html>
