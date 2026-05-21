@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>Sunday Robotics — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> › <span>Sunday Robotics</span></div>
+  <div class="wiki-header"><h1>Sunday Robotics</h1><div class="subtitle">Sunday Robotics · 2024年成立 · 估值$11.5亿 · Coatue领投B轮 · 全球首个家庭家务机器人独角兽</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#team">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financials">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#a2-1">2.1 团队背景与场景匹配度</a></li>
+        <li class="toc-lvl4"><a href="#a2-2">2.2 技术路线与场景适配性</a></li>
+        <li class="toc-lvl4"><a href="#a2-3">2.3 股东/资本结构影响</a></li>
+        <li class="toc-lvl4"><a href="#a2-4">2.4 试错与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#a2-5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#a2-6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#references">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">Sunday Robotics</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">Sunday Inc.（对外品牌 Sunday / Sunday Robotics / Sunday.ai）</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2024年<sup><a href="#ref1">[1]</a></sup></div></div>
+        <div class="ib-row"><div class="ib-label">总部</div><div class="ib-value">美国加州Mountain View<sup><a href="#ref1">[1]</a></sup></div></div>
+        <div class="ib-row"><div class="ib-label">创始人/CEO</div><div class="ib-value">赵子豪（Tony Zhao）</div></div>
+        <div class="ib-row"><div class="ib-label">CTO</div><div class="ib-value">迟宬（Cheng Chi）</div></div>
+        <div class="ib-row"><div class="ib-label">上市状态</div><div class="ib-value">未上市（私人公司）</div></div>
+        <div class="ib-section">估值与融资</div>
+        <div class="ib-row"><div class="ib-label">最新估值</div><div class="ib-value">$11.5亿（约83亿人民币，2026.03 B轮）</div></div>
+        <div class="ib-row"><div class="ib-label">累计融资</div><div class="ib-value">~$2亿（约14亿人民币）</div></div>
+        <div class="ib-row"><div class="ib-label">最新轮次</div><div class="ib-value">B轮 / $1.65亿（2026.03）</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">员工</div><div class="ib-value">~70+人（2026.03）</div></div>
+        <div class="ib-row"><div class="ib-label">旗舰产品</div><div class="ib-value">Memo轮式家务机器人</div></div>
+        <div class="ib-row"><div class="ib-label">AI模型</div><div class="ib-value">ACT-1（零机器人数据VLA）</div></div>
+        <div class="ib-row"><div class="ib-label">数据规模</div><div class="ib-value">1000万+条真实家务操作片段</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-value" style="width:100%;padding:6px"><span class="tag">家庭服务机器人</span><span class="tag">端到端VLA</span><span class="tag">数据飞轮</span><span class="tag">全栈自研</span><span class="tag">独角兽</span><span class="tag">美国</span></div></div>
+        <div class="ib-section">官网</div>
+        <div class="ib-row"><div class="ib-value" style="width:100%;padding:4px"><a href="https://www.sunday.ai" target="_blank">sunday.ai</a></div></div>
+      </aside>
+
+      <p class="article-intro"><strong>Sunday Robotics</strong>（公司注册名 Sunday Inc.）是一家总部位于美国加州Mountain View的全栈家庭服务机器人公司，由斯坦福华人博士赵子豪（Tony Zhao）和迟宬（Cheng Chi）于2024年共同创立。公司致力于打造能真正融入日常家庭生活的自主家务机器人，首款旗舰产品Memo为轮式升降双臂机器人，核心AI模型ACT-1为零机器人数据训练的端到端VLA基础模型。Sunday以$400低成本"技能捕捉手套"构建了覆盖500+美国家庭、累积超1000万条家务操作片段的数据飞轮。2025年11月以$3500万A轮走出隐身模式，仅4个月后于2026年3月完成$1.65亿B轮融资，估值达$11.5亿，成为全球首个家庭家务机器人独角兽。CEO明确战略："这笔钱只有一个目的——不再只做Demo。"<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref2">[2]</a></sup><sup><a href="#ref3">[3]</a></sup></p>
+
+      <h2 id="facts">1 事实层</h2>
+      <p style="font-size:0.82rem;color:#54595d;margin-bottom:10px;">来源可靠性标注：<span class="tag tag-info">官网/公司自述</span> = 公司官方披露 · <span class="tag tag-info">媒体报道</span> = 第三方独立报道 · <span class="tag tag-info">行业机构</span> = 第三方行业报告</p>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper"><table class="wikitable infotable">
+        <tr><th>项目</th><th>内容</th></tr>
+        <tr><td>公司全称</td><td>Sunday Inc.（对外品牌 Sunday / Sunday Robotics / Sunday.ai）<sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>成立时间</td><td>2024年<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref4">[4]</a></sup></td></tr>
+        <tr><td>注册地</td><td>美国特拉华州</td></tr>
+        <tr><td>总部地址</td><td>Mountain View, California, United States<sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>上市状态</td><td>未上市（私人公司）</td></tr>
+        <tr><td>创始人/CEO</td><td>赵子豪（Tony Z. Zhao）</td></tr>
+        <tr><td>创始人/CTO</td><td>迟宬（Cheng Chi）</td></tr>
+        <tr><td>官网</td><td>https://www.sunday.ai<sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>员工规模</td><td>~70+人（截至2026年3月），计划年底大幅扩张<sup><a href="#ref2">[2]</a></sup></td></tr>
+      </table></div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>时间</th><th>事件</th></tr>
+        <tr><td>2024年</td><td>赵子豪与迟宬共同创立Sunday Robotics，目标"让每个家庭都拥有真正有用的机器人"<sup><a href="#ref4">[4]</a></sup></td></tr>
+        <tr><td>2024-2025年</td><td>隐秘研发期：开发Memo机器人硬件+ACT-1基础模型+Skill Capture Glove数据采集系统；在500+美国家庭中部署手套采集数据<sup><a href="#ref5">[5]</a></sup></td></tr>
+        <tr><td>2025年11月</td><td>走出隐身模式：发布旗舰产品Memo家务机器人Demo，同步完成$3500万A轮融资（Benchmark、Conviction领投）；开放"Founding Family Beta"家庭测试申请<sup><a href="#ref6">[6]</a></sup></td></tr>
+        <tr><td>2025年12月</td><td>发布ACT-1技术报告：完全基于零机器人数据训练的VLA模型，展示"餐桌到洗碗机"33步全流程自主操作<sup><a href="#ref7">[7]</a></sup></td></tr>
+        <tr><td>2026年3月12日</td><td>完成$1.65亿B轮融资，Coatue Management领投，估值$11.5亿成为独角兽；累计融资约$2亿。CEO宣布"不再只做Demo"，战略关键词为"部署+研究"<sup><a href="#ref2">[2]</a></sup><sup><a href="#ref3">[3]</a></sup></td></tr>
+        <tr><td>2026年感恩节前</td><td>计划向50个真实家庭交付首批Beta Memo机器人，开启家庭端实际部署验证<sup><a href="#ref2">[2]</a></sup></td></tr>
+      </table></div>
+
+      <h3 id="team">1.2 创始人及核心团队</h3>
+      <p>Sunday Robotics的两位联合创始人均为具身智能学术界的"顶流"青年学者，其发表的ALOHA、ACT、Diffusion Policy、UMI等工作构成了当前模仿学习与机器人操作领域的核心方法论。两人合计论文引用数万次，且均具备顶级工业实验室（DeepMind、Tesla、Google X）的实战经验。<sup><a href="#ref4">[4]</a></sup><sup><a href="#ref8">[8]</a></sup></p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+        <tr><td>联合创始人/CEO</td><td>赵子豪（Tony Z. Zhao）</td><td>UC Berkeley计算机本科，师从Sergey Levine（Physical Intelligence联合创始人）。Stanford计算机博士肄业创业，师从Chelsea Finn（Physical Intelligence联合创始人）。前Google DeepMind研究科学家、Tesla Autopilot工程师、Google X Intrinsic研究员。ALOHA（低成本双臂遥操作平台）、ACT（Action Chunking Transformer）、Mobile ALOHA（移动操作平台）等明星项目的核心作者。Stanford期间在模仿学习与机器人操作领域做出开创性工作。<sup><a href="#ref4">[4]</a></sup><sup><a href="#ref8">[8]</a></sup></td></tr>
+        <tr><td>联合创始人/CTO</td><td>迟宬（Cheng Chi）</td><td>密歇根大学本科。Stanford计算机博士（师从宋舒然/Shuran Song），Columbia大学联合博士。Diffusion Policy（基于扩散模型的机器人策略，CoRL 2023最佳论文入围）一作。UMI（Universal Manipulation Interface，通用操控接口）一作。Open X-Embodiment（全球最大规模跨机器人数据集）核心贡献者。Droid数据集贡献者。曾在Nuro、Uber ATG、Apple实习。RSS最佳论文奖得主。<sup><a href="#ref4">[4]</a></sup><sup><a href="#ref8">[8]</a></sup></td></tr>
+        <tr><td>核心团队来源</td><td>—</td><td>团队已从35人增长至70+人。成员来自Stanford、Berkeley、Tesla（Optimus/Autopilot，含至少10名前特斯拉AI/机器人项目员工）、Google DeepMind、Waymo、Meta、OpenAI、Apple等顶尖机构。CTO迟宬曾表示团队招聘标准极为严格，"必须是自己领域里全世界最好的那几个人之一"。<sup><a href="#ref2">[2]</a></sup><sup><a href="#ref9">[9]</a></sup></td></tr>
+      </table></div>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <p>Sunday Robotics的融资节奏在具身智能赛道中极快——从A轮（$3500万）到B轮（$1.65亿）仅隔4个月，估值从~$2亿飙升至$11.5亿，增长近6倍，体现了资本市场对"家庭服务机器人+数据飞轮+斯坦福明星团队"组合叙事的高度认可。<sup><a href="#ref2">[2]</a></sup></p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>轮次</th><th>时间</th><th>金额</th><th>投后估值</th><th>核心投资方</th></tr>
+        <tr><td>A轮</td><td>2025.11</td><td>$3,500万</td><td>~$1.5-2亿</td><td>Benchmark（Eric Vishria）、Conviction（Sarah Guo）领投<sup><a href="#ref6">[6]</a></sup></td></tr>
+        <tr><td>B轮</td><td>2026.03</td><td>$1.65亿</td><td>$11.5亿</td><td>Coatue Management领投（普通合伙人Thomas Laffont加入董事会）；Bain Capital Ventures、Fidelity、Tiger Global跟投；老股东Benchmark、Conviction加码；Xtal Ventures参投<sup><a href="#ref2">[2]</a></sup><sup><a href="#ref3">[3]</a></sup></td></tr>
+      </table></div>
+      <p>关键股东生态特征：Coatue为全球顶级成长期投资机构（曾投资字节跳动、Snapchat、DoorDash），其对退出路径有严格要求的风格表明Sunday可能在3-5年内走向IPO或被并购。Benchmark为硅谷顶级早期VC（Uber、Snap早期投资方），为产品-市场匹配阶段提供深度陪跑。Bain Capital Ventures与Fidelity的加入为后续Pre-IPO轮和公开市场定价提供了机构信用背书。Tiger Global的参与赋予全球化扩张想象空间。<sup><a href="#ref3">[3]</a></sup></p>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <div class="table-wrapper"><table class="wikitable infotable">
+        <tr><th>维度</th><th>内容</th></tr>
+        <tr><td>AI架构</td><td>自研ACT-1端到端VLA（Vision-Language-Action）基础模型，基于Transformer架构，支持语音模态输入。直接从多模态传感器输入（RGB视觉+本体感受器）→全身动作控制输出。针对长序列操作（30+步）进行专门优化。技术宣言："零机器人数据训练"——完全基于人类穿戴手套数据从零训练。<sup><a href="#ref7">[7]</a></sup><sup><a href="#ref10">[10]</a></sup></td></tr>
+        <tr><td>数据方案</td><td>分布式低成本数据飞轮闭环：Skill Capture Glove（$200-400）采集人类操作数据 → Skill Transform运动学重定向（>90%转换成功率）→ 训练ACT-1 → 部署Memo → 真实家庭运行产生新数据 → 回馈模型训练。数据采集网络覆盖500+美国家庭、2000+副手套、累积1000万+条家务操作片段。2026年底数据量预计增长5倍。<sup><a href="#ref5">[5]</a></sup><sup><a href="#ref7">[7]</a></sup></td></tr>
+        <tr><td>Skill Transform</td><td>核心技能转换管线：(1)运动学对齐——将人类手臂运动学映射到机器人手臂；(2)视觉域对齐——消除摄像头中"人类手臂"与"机器人手臂"的视觉域鸿沟；(3)最终生成高保真训练数据，视觉和运动轨迹完全等同于机器人自产数据。<sup><a href="#ref7">[7]</a></sup></td></tr>
+        <tr><td>数据采集成本</td><td>手套成本$200-400/副，仅为传统遥操作设备（$20,000+）的1/50-1/100。手套与Memo机器人手部1:1同构设计，消除数据转换断层。设计核心原则："只要人类戴手套能做到的动作，机器人也能做到。"<sup><a href="#ref5">[5]</a></sup></td></tr>
+        <tr><td>硬件架构</td><td>轮式升降底盘（非双足）——被动稳定性设计，兼顾安全性、静音性和能效。三段式升降柱使机器人可在1.7m至2.1m高度范围操作。双臂各7-DOF+4-DOF三指UMI手（刚性+弹性聚合物混合材质，兼备柔顺性与安全性）。续航约4小时（充电1小时）。<sup><a href="#ref6">[6]</a></sup></td></tr>
+        <tr><td>全栈/平台</td><td>全栈自研：硬件（Memo机器人本体）+ AI模型（ACT-1）+ 数据系统（Skill Capture Glove + Skill Transform）全链垂直整合。不拆分软硬件独立销售。CTO迟宬的Diffusion Policy和UMI等学术工作直接构成技术栈底层。<sup><a href="#ref2">[2]</a></sup><sup><a href="#ref8">[8]</a></sup></td></tr>
+      </table></div>
+      <p>Sunday的技术路线在具身智能赛道中有两个根本性的差异化选择：一是选择了"家庭场景"这一最具挑战性但也最具市场规模的环境，直面非结构化场景的复杂性问题；二是以$400手套构建了极具成本优势的分布式数据飞轮——相比使用$20,000+遥操作设备的同行，Sunday能够以1/50的成本在海量真实家庭中并行采集数据，为Scaling Law在具身智能领域的应用提供了独特的数据基础设施。<sup><a href="#ref5">[5]</a></sup></p>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>产品</th><th>发布时间</th><th>核心参数</th><th>主要特点</th></tr>
+        <tr><td>Memo</td><td>2025.11 Demo / 2026感恩节前Beta交付</td><td>轮式升降双臂机器人；身高1.7m（可升至2.1m）；重77kg；双臂各7-DOF；4-DOF三指UMI手（钳状"面包手"：拇指+食指+其余三指合一）；续航约4h；充电1h</td><td>全栈自研硬件+AI；专为家庭场景优化（安全、静音、亲和设计）；刚性+弹性聚合物混合手部材质；非双足轮式设计确保被动稳定性；当前手工版约$2万，量产后目标<$1万；竞品对标1X Technologies NEO<sup><a href="#ref6">[6]</a></sup></td></tr>
+        <tr><td>Skill Capture Glove</td><td>2024-2025年</td><td>成本$200-400/副；与Memo手部1:1同构；集成运动+触觉传感器</td><td>已向全球开发者寄出2000+副；覆盖500+美国家庭；采集1000万+条家务操作片段；核心数据飞轮入口<sup><a href="#ref5">[5]</a></sup></td></tr>
+        <tr><td>ACT-1</td><td>2025.12技术报告</td><td>端到端VLA；Transformer架构；语音输入支持；零机器人数据训练</td><td>餐桌→洗碗机33步全流程自主操作（21种物体/68次灵巧交互/40米自主导航）；6个陌生Airbnb户型零样本泛化；叠袜子（应对形变与自遮挡）、操作咖啡机（空中压粉毫米级精度）<sup><a href="#ref7">[7]</a></sup></td></tr>
+      </table></div>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>场景类别</th><th>具体场景</th><th>部署进度</th><th>合作方/备注</th></tr>
+        <tr><td>家庭家务</td><td>收拾餐桌→分拣餐具→装入洗碗机（33步完整循环，20次演示零失误）；折叠衣物（应对形变与自遮挡）；洗衣服；冲咖啡（空中压粉毫米级精度）</td><td>实验室验证完成；2026年感恩节前50个真实家庭Beta交付</td><td>Founding Family Beta已收到数千份申请；在6个陌生Airbnb户型完成零样本泛化验证<sup><a href="#ref2">[2]</a></sup><sup><a href="#ref7">[7]</a></sup></td></tr>
+        <tr><td>家庭收纳</td><td>杂物整理、桌面清洁、日常物品归位</td><td>Demo展示阶段</td><td>长时序移动操作能力已初步验证<sup><a href="#ref6">[6]</a></sup></td></tr>
+        <tr><td>长期愿景</td><td>"每天可靠服务"的全方位家务助手——覆盖厨房、洗衣房、客厅等全屋场景</td><td>规划中</td><td>CEO愿景：让机器人解放人类周末时间<sup><a href="#ref2">[2]</a></sup></td></tr>
+      </table></div>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <p><strong>当前阶段：</strong>Sunday正处于从实验室Demo到真实家庭Beta部署的关键过渡期。2026年3月B轮融资完成后，CEO赵子豪在官方博客中明确写道："No More Demos（不再只做Demo）"，宣布战略关键词为"部署（Deployment）+ 研究（Research）"。核心目标：在2026年感恩节前向50个真实家庭交付首批Beta Memo机器人，验证在"孩子、宠物、杂乱环境、不完整指令"等复杂场景下的可靠性。<sup><a href="#ref2">[2]</a></sup></p>
+      <p><strong>定价与量产：</strong>当前手工版Memo定价约$20,000（约14万人民币）；量产目标降至$10,000以下（约7万人民币），与高端家电相当。CEO赵子豪在采访中表示："我们的目标是让一个机器人的价格低于一辆车。"<sup><a href="#ref6">[6]</a></sup></p>
+      <p><strong>中国市场：</strong>赵子豪已开通小红书账号，正在中国组建团队，计划在深圳或上海设立办公室。中国市场被Sunday视为"最重要的潜在消费市场之一"，但公司明确当前阶段仍以美国市场Beta部署为首要任务。<sup><a href="#ref2">[2]</a></sup></p>
+
+      <h3 id="financials">1.8 财务数据</h3>
+      <p>Sunday Robotics为未上市公司，财务数据不公开。已知信息如下：</p>
+      <div class="table-wrapper"><table class="wikitable infotable">
+        <tr><th>项目</th><th>数据</th></tr>
+        <tr><td>累计融资总额</td><td>~$2亿（约14亿人民币）<sup><a href="#ref3">[3]</a></sup></td></tr>
+        <tr><td>最新估值</td><td>$11.5亿（约83亿人民币，2026.03 B轮）<sup><a href="#ref2">[2]</a></sup></td></tr>
+        <tr><td>收入状态</td><td>尚未产生规模营收（Beta交付前阶段）<sup><a href="#ref2">[2]</a></sup></td></tr>
+        <tr><td>B轮单轮额</td><td>$1.65亿（具身智能赛道家庭场景方向最大单轮融资之一）<sup><a href="#ref2">[2]</a></sup></td></tr>
+        <tr><td>员工数</td><td>~70+人（截至2026年3月）；计划年底工程团队扩3倍、研究团队扩4倍<sup><a href="#ref2">[2]</a></sup></td></tr>
+        <tr><td>手套部署量</td><td>2000+副<sup><a href="#ref5">[5]</a></sup></td></tr>
+      </table></div>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li><strong>"猫级智能"的产品哲学：</strong>Sunday对Memo的智能定位并非"人类级AI"，而是务实且充满产品洞察的"猫级智能（Cat-level Intelligence）"——理解环境但不全能，可靠执行特定任务但不追求通用认知。这一叙事既降低了消费者预期（减少失望风险），又在工程上设定了可检验的里程碑（猫能独立完成吃饭、用猫砂盆等闭环任务）。<sup><a href="#ref11">[11]</a></sup></td></li>
+        <li><strong>"零机器人数据"的技术宣言：</strong>ACT-1的技术报告中明确宣称模型完全基于人类穿戴手套数据训练（零机器人数据），这与Generalist AI的GEN-1（也声称零机器人预训练）在数据路线上不约而同——二者均认为具身智能的根本瓶颈是数据成本而非模型架构。<sup><a href="#ref7">[7]</a></sup></td></li>
+        <li><strong>"师门"与竞争的交织：</strong>CEO赵子豪在Stanford期间同时师从Sergey Levine和Chelsea Finn——这两人恰好是Physical Intelligence（Pi，估值$56亿）的联合创始人。CTO迟宬的导师宋舒然则是具身智能学术界最受尊敬的华人教授之一。这种"师出同门但各立门户"的格局，在具身智能赛道中构成了一种独特的竞争+合作关系。<sup><a href="#ref4">[4]</a></sup></td></li>
+        <li><strong>轮式vs双足的战略选择：</strong>Sunday坚定选择了轮式底盘而非双足行走，CEO赵子豪的解释是"家庭是结构化环境——有地板和门框，不需要翻山越岭。轮式更安全、更省电、更安静，且能更快推向市场。"这一选择与Figure、Tesla Optimus的人形双足路线形成鲜明对比。<sup><a href="#ref6">[6]</a></sup></td></li>
+        <li><strong>与Figure的"洗碗机大战"：</strong>2026年初，Figure与Sunday几乎同时发布了将餐具装入洗碗机的Demo视频，被媒体戏称为"洗碗机大战"。这一事件标志着家庭服务机器人赛道从学术研究走向产品竞争的转折点。<sup><a href="#ref12">[12]</a></sup></td></li>
+      </ul>
+
+            <h2 id="analysis">2 分析层</h2>
+      <p style="font-size:0.82rem;color:#54595d;margin-bottom:10px;">分析层数据综合来自 <span class="tag tag-info">媒体报道</span>（第三方独立报道）、<span class="tag tag-info">官网/公司自述</span>（公司官方披露）、<span class="tag tag-info">行业机构</span>（第三方行业报告）。公司自述数据与独立验证数据已在事实层标注区分，分析层观点仅供参考。</p>
+
+      <div class="analysis-block" id="a2-1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>Sunday的两位创始人的学术背景与公司选择的"家庭服务机器人"场景之间存在深层的匹配关系。赵子豪的ALOHA/ACT/Mobile ALOHA体系本质上是围绕"低成本、易部署的机器人操作学习"构建的——ALOHA证明了$2万级别的双臂系统可以做精细操作，ACT解决了长序列动作的连贯性问题，Mobile ALOHA拓展到移动场景。这些学术积累直接映射到Sunday的产品策略：低成本硬件（Memo目标<$1万）+ 低成本数据（$400手套）+ 长序列家务任务（33步洗碗流程）。同样，迟宬的Diffusion Policy为机器人在嘈杂真实环境中生成多样化操作轨迹提供了算法基础，UMI则直接启发了Skill Capture Glove的1:1同构设计理念。团队从Tesla Optimus/Autopilot挖来至少10名工程师，为量产制造和真实环境部署提供了关键的工程执行力补充——学术界出身的机器人公司最容易在"Demo→产品"的鸿沟中跌倒，而Tesla出身的工程师恰好带来了从原型到量产的完整经验。</p>
+      </div>
+
+      <div class="analysis-block" id="a2-2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>Sunday的"零机器人数据"ACT-1路线与家庭场景高度适配。家庭环境的核心特点不是动作难度（相比工业装配），而是场景多样性——每个家庭的厨房布局、餐具类型、杂物状态都不同。传统工业机器人的"精确编程"范式在这种环境中完全失效。Sunday的解决方案逻辑清晰：与其花大量时间在机器人本体上调试每个任务，不如用$400手套在500+个真实家庭中采集1000万+条自然操作数据——这种"数据多样性覆盖场景多样性"的策略，在算法层面比机器人遥操作采集更具成本效率。轮式底盘的选择在家庭场景中是明智的工程取舍：家庭环境有地板和门框，不需要双足行走的翻山越岭能力，而轮式的被动稳定性解决了家庭场景中最敏感的安全问题（摔倒风险）。潜在挑战在于：1000万条数据听起来庞大，但分布在数十种家务任务中，每种任务的实际数据量可能不足以覆盖极端边缘案例——这是Beta测试（50个家庭）要验证的关键假设。</p>
+      </div>
+
+      <div class="analysis-block" id="a2-3">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>Coatue的领投是Sunday本轮融资中最值得关注的结构性信号。Coatue以对"退出纪律"的严格要求著称（此前投资字节跳动、Snapchat、DoorDash均以IPO或重大并购退出），其普通合伙人Thomas Laffont加入Sunday董事会，意味着Sunday被押注为3-5年内有IPO潜力的平台型公司——而非等待10年才见回报的深科技长跑。Benchmark（Uber、Snap早期投资方）的持续加码则为产品-市场匹配阶段提供了"陪跑到IPO"的经验。Tiger Global的参与暗示了全球化扩张（尤其是亚洲市场）的资本储备。但也存在一个潜在张力：Coatue和Benchmark这类以"速度+规模"为导向的资本，可能推动Sunday加速商业化节奏——而家庭服务机器人是一个需要极高可靠性门槛的领域（一次失败的家务操作可能摧毁用户的信任），"快"与"稳"之间的平衡将是管理层的重要考验。</p>
+      </div>
+
+      <div class="analysis-block" id="a2-4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>Sunday成立仅约两年，公开的路径调整尚不显著，但有几个值得关注的演变。第一，早期赵子豪曾探索过人形双足路线，但很快转向轮式设计——这是基于"家庭场景中地板是平面"这一朴素工程判断的务实放弃。第二，数据策略从早期小规模的手套部署（几十副）迅速扩展到2000+副的分布式网络，体现了对"数据飞轮是这个赛道唯一护城河"的清晰认知。第三，B轮融资后的战略关键词从"研究"转为"部署+研究"，体现了从"证明技术可行"到"证明产品可用"的阶段性跨越。最大的未经验证的假设是：在实验室环境中33步洗碗流程的成功率（20次演示零失误），能否在50个不同家庭中复现。如果复现率显著低于预期，可能需要调整任务范围（如先聚焦更简单的桌面清洁而非全流程洗碗）或增加环境自适应模块。</p>
+      </div>
+
+      <div class="analysis-block" id="a2-5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>Sunday在具身智能赛道中占据了最独特的生态位——"专注于家庭场景的全栈服务机器人"。与主要竞品的差异化清晰：vs Figure AI（$395亿估值，工业→家庭）：Figure走"工业验证→家庭扩展"的自上而下路线，Sunday走"家庭原生→从0到1验证"的自下而上路线。vs 1X Technologies（NEO，同价位轮式家庭机器人）：1X来自挪威，以安全设计著称，但融资额和团队规模较小；Sunday在数据飞轮和学术积累上更具优势。vs Tesla Optimus（双足人形，工厂优先）：Tesla走"百万台制造规模"路线但场景聚焦工厂，家庭非短期重点。vs Physical Intelligence（Pi，$56亿估值）：Pi做通用机器人大脑平台，不做硬件本体——Sunday做全栈（硬件+AI），与Pi是潜在合作方而非直接竞品。Sunday的核心取舍：不做工业场景（放弃短期收入机会）、不做双足人形（放弃"科幻感"叙事和复杂地形能力）、坚持全栈（不做纯软件平台，放弃了与更多硬件伙伴合作的机会）。这些取舍的回报是：在家庭机器人这一"最难但最大"的市场中获得先发优势。</p>
+      </div>
+
+      <div class="analysis-block" id="a2-6">
+        <h4>2.6 其他重要观察</h4>
+        <p>其一，Sunday从A轮到B轮的4个月估值增速令人瞩目（~$2亿→$11.5亿），但这部分反映了资本对"家庭机器人风口"的FOMO情绪——在2026年初Physical Intelligence以$56亿估值完成$11亿融资、Generalist以$4.4亿估值完成$1.4亿种子轮之后，"具身智能"已从一个学术赛道变成了资本风口，Sunday作为"家庭场景第一股"享受了显著的估值溢价。其二，"猫级智能"的叙事虽然巧妙，但实际产品中的"猫级"和消费者期望的"管家级"之间可能存在落差——如何处理用户对机器人能力的失望情绪，将是Beta测试阶段的关键产品挑战。其三，中国团队的组建是一个值得关注但风险并存的动作：中国市场确实是全球最大的家庭机器人潜在消费市场（扫地机器人渗透率全球最高），但中美科技冷战背景下，一家硅谷公司在中国设立研发中心可能面临技术出口管制和数据安全审查的双重约束，这需要Sunday在法律合规层面做充分准备。其四，$10,000以下的目标售价意味着到量产阶段需要极强的供应链管理和成本控制能力——这正是Tesla出身团队的核心优势所在，但能否在70+人规模的初创公司中复现这种能力，仍有待验证。</p>
+      </div>
+
+      <h2 id="references">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li id="ref1"><a href="https://www.sunday.ai" target="_blank">Sunday Robotics 官方网站</a>（官网/公司自述）</li>
+          <li id="ref2"><a href="https://www.sunday.ai/journal/series-b" target="_blank">Sunday Robotics 官方博客：Sunday's Series B: No More Demos（2026.03）</a>（官网/公司自述）</li>
+          <li id="ref3"><a href="https://techfundingnews.com/sunday-165m-series-b-1-15b-valuation-home-robots/" target="_blank">Tech Funding News: Sunday raises $165M at $1.15B valuation to make it happen（2026.03）</a>（媒体报道）</li>
+          <li id="ref4"><a href="https://m.thepaper.cn/newsDetail_forward_32005105" target="_blank">澎湃新闻：斯坦福最火机器人的开发者创业了（2025.11）</a>（媒体报道）</li>
+          <li id="ref5"><a href="https://m.36kr.com/p/3722286289648009" target="_blank">36氪：为了让机器人学会做家务，这家公司做了一副200美元的「技能手套」（2025.12）</a>（媒体报道）</li>
+          <li id="ref6"><a href="https://hub.baai.ac.cn/view/50453" target="_blank">BAAI智源社区：2位斯坦福顶流博士，携手具身创业（2025.11）</a>（媒体报道）</li>
+          <li id="ref7"><a href="https://www.sunday.ai/journal/no-robot-data" target="_blank">Sunday Robotics 官方博客：ACT-1: A Robot Foundation Model Trained on Zero Robot Data（2025.12）</a>（官网/公司自述）</li>
+          <li id="ref8"><a href="https://hub.baai.ac.cn/view/53114" target="_blank">BAAI智源社区：华人博士4个月干出具身独角兽！斯坦福家务机器人再融11亿（2026.03）</a>（媒体报道）</li>
+          <li id="ref9"><a href="https://www.qbitai.com/2026/03/387072.html" target="_blank">量子位：华人博士4个月干出具身独角兽！斯坦福家务机器人再融11亿，开建中国团队（2026.03）</a>（媒体报道）</li>
+          <li id="ref10"><a href="https://damodev.csdn.net/697818407c1d88441d8fd5f8.html" target="_blank">CSDN：Sunday的ACT-1分享！未使用任何机器人本体数据训练的VLA（2025.12）</a>（行业机构）</li>
+          <li id="ref11"><a href="http://www.jushenyanxishe.com/archives/498922" target="_blank">具身研习社：Memo —— 主打一个"猫级智能"，家庭服务机器人太会整活了！（2025.11）</a>（行业机构）</li>
+          <li id="ref12"><a href="https://zhidx.com/p/539923.html" target="_blank">智东西：硅谷机器人独角兽融资11亿，斯坦福、哥大华人博士创办（2026.03）</a>（媒体报道）</li>
+          <li id="ref13"><a href="https://baincapitalventures.com/insight/robots-finally-at-home/" target="_blank">Bain Capital Ventures: Home Robots Finally Arrive: Inside Sunday Robotics（2026.03）</a>（投资方博客/行业机构）</li>
+          <li id="ref14"><a href="https://siliconangle.com/2026/03/12/sunday-raises-165m-1-15b-valuation-launch-memo-household-robot/" target="_blank">SiliconANGLE: Sunday raises $165M at $1.15B valuation to launch Memo household robot（2026.03）</a>（媒体报道）</li>
+          <li id="ref15"><a href="https://www.gfan.com/info/595645.html" target="_blank">搞趣网：Sunday Robotics 发布首款家用机器人"Memo"（2025.11）</a>（媒体报道）</li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">本页面为具身智能Wiki项目自动生成 · 数据截至2026年5月 · 由Cowork调度系统维护</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const target = tocLinks.item(
+          Array.from(tocLinks).findIndex(link => link.getAttribute('href') === '#' + entry.target.id)
+        );
+        if (target) target.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-80px 0px -70% 0px' });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body>
+</html>
