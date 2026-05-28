@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sanctuary AI — 具身智能Wiki</title>
+<style>
+:root { --bg: #ffffff; --text: #202122; --link: #0645ad; --border: #a2a9b1; --accent: #1a3a5c; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑',sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+.top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; gap: 8px; align-items: center; }
+.top-nav a { color: var(--link); text-decoration: none; }
+.page-container { max-width: 1200px; margin: 0 auto; background: #fff; }
+.page-title { padding: 28px 32px 16px; }
+.page-title h1 { font-family: 'Georgia',serif; font-size: 1.75rem; font-weight: 400; }
+.page-title .subtitle { font-size: 0.85rem; color: #54595d; }
+.content-wrapper { display: flex; gap: 20px; padding: 0 32px 40px; }
+.main-content { flex: 1; min-width: 0; }
+.infobox { width: 270px; flex-shrink: 0; border: 1px solid var(--border); background: #f9f9f9; font-size: 0.78rem; }
+.infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 10px; font-weight: 600; }
+.infobox-section-title { background: #e8f0fe; color: #1a3a5c; text-align: center; padding: 4px 10px; font-weight: 600; font-size: 0.76rem; border-top: 1px solid var(--border); }
+.infobox-row { display: flex; padding: 3px 10px; border-bottom: 1px solid #e8e8e8; }
+.infobox-label { width: 80px; color: #54595d; flex-shrink: 0; }
+.infobox-value { flex: 1; }
+h2 { font-family: 'Georgia',serif; font-size: 1.25rem; font-weight: 400; border-bottom: 1px solid var(--border); padding-bottom: 4px; margin: 28px 0 12px; }
+p { margin: 8px 0; }
+.wikitable { border-collapse: collapse; margin: 10px 0; font-size: 0.8rem; width: 100%; border: 1px solid var(--border); }
+.wikitable th { background: #eaecf0; border: 1px solid var(--border); padding: 5px 8px; text-align: center; font-weight: 600; font-size: 0.75rem; }
+.wikitable td { border: 1px solid var(--border); padding: 5px 8px; vertical-align: top; }
+.wikitable tr:nth-child(even) td { background: #f8f9fa; }
+sup a { color: #0645ad; text-decoration: none; font-size: 0.7rem; }
+.refs { font-size: 0.8rem; } .refs ol { padding-left: 24px; } .refs li { margin-bottom: 4px; } .refs a { color: var(--link); }
+.page-footer { border-top: 1px solid var(--border); padding: 14px 32px 24px; font-size: 0.78rem; color: #54595d; text-align: center; }
+.page-footer a { color: var(--link); text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="page-container">
+<div class="top-nav"><a href="../index.html">具身智能Wiki</a> › <a href="../index.html">海外具身智能</a> › Sanctuary AI</div>
+<div class="page-title"><h1>Sanctuary AI</h1><div class="subtitle">加拿大人形机器人先驱 · Phoenix + Carbon AI 控制平台</div></div>
+<div class="content-wrapper">
+<div class="main-content">
+
+<h2>1 公司概况</h2>
+<p>Sanctuary AI 于 <b>2018 年</b>在加拿大温哥华成立，是全球领先的通用人形机器人公司。公司致力于创造"世界上首个具有类人智能的通用机器人"，核心产品为人形机器人 <b>Phoenix</b> 和自研 AI 控制系统 <b>Carbon</b><sup><a href="#ref1">[1]</a></sup>。</p>
+
+<h2>2 技术路线</h2>
+<p>Phoenix 机器人采用<b>液压驱动灵巧手</b>（每手 21 个自由度），配备先进的触觉传感器（7 单元微气压计阵列，可检测低至 5 毫牛顿的力）。Carbon AI 是 Sanctuary 自研的认知架构，模仿人脑子系统（记忆、视觉、声音、触觉）并将自然语言转化为物理动作，采用可解释 AI 设计<sup><a href="#ref1">[1]</a></sup>。</p>
+<p>训练采用<b>遥操作到自主</b>（teleoperation-to-autonomy）流水线：人类操作员远程演示 → 机器人学习 → 自主执行。2025 年开始使用 NVIDIA Isaac Lab 加速灵巧操作学习<sup><a href="#ref2">[2]</a></sup>。</p>
+
+<h2>3 融资与股东</h2>
+<table class="wikitable">
+<tr><th>轮次</th><th>时间</th><th>金额</th><th>投资方</th></tr>
+<tr><td>A 轮</td><td>2022.03</td><td>C$7,550 万</td><td>Bell、Verizon Ventures、Magna、Workday Ventures</td></tr>
+<tr><td>政府拨款</td><td>2022.11</td><td>C$3,000 万</td><td>加拿大政府战略创新基金</td></tr>
+<tr><td>战略投资</td><td>2024.03</td><td>未公开</td><td>Accenture Ventures</td></tr>
+<tr><td>A-V 轮</td><td>2024.07</td><td>$1,100 万</td><td>BDC Capital、InBC</td></tr>
+<tr><td>可转债</td><td>2025.01</td><td>$250 万</td><td>未公开</td></tr>
+</table>
+<p>累计融资约 <b>$1.47 亿</b><sup><a href="#ref2">[2]</a></sup>。Magna International 自 2021 年起即为战略投资方。</p>
+
+<h2>4 产品与部署</h2>
+<p><b>Phoenix Gen8</b>（2024.12）：170cm，~70kg，最大行走速度 4.8 km/h，举重能力 25kg。已在 <b>Canadian Tire/Mark's 零售门店</b>完成 110+ 种任务（拣选、包装、清洁、标签等），覆盖约 40% 的门店任务<sup><a href="#ref1">[1]</a></sup>。</p>
+<p><b>Magna 制造工厂</b>：2024 年 4 月建立三方合作（部署+制造+投资），Phoenix 在 Magna 奥地利工厂为 Mercedes-Benz、Jaguar、BMW 等汽车产线测试。2025 年底实现 <b>24 小时内</b>掌握新装配任务<sup><a href="#ref2">[2]</a></sup>。</p>
+
+<h2>5 参考资料</h2>
+<div class="refs"><ol>
+<li id="ref1"><a href="https://www.sanctuary.ai/technology" target="_blank">Sanctuary AI — Technology (Carbon AI + Phoenix)</a></li>
+<li id="ref2"><a href="https://www.therobotreport.com/tag/Sanctuary-AI/" target="_blank">Sanctuary AI Archives — The Robot Report, 2025-2026</a></li>
+</ol></div>
+</div>
+<aside class="infobox">
+<div class="infobox-title">Sanctuary AI</div>
+<div class="infobox-section-title">基本信息</div>
+<div class="infobox-row"><span class="infobox-label">成立时间</span><span class="infobox-value">2018</span></div>
+<div class="infobox-row"><span class="infobox-label">总部</span><span class="infobox-value">加拿大温哥华</span></div>
+<div class="infobox-row"><span class="infobox-label">员工</span><span class="infobox-value">~163 人</span></div>
+<div class="infobox-row"><span class="infobox-label">官网</span><span class="infobox-value">sanctuary.ai</span></div>
+<div class="infobox-section-title">关键数据</div>
+<div class="infobox-row"><span class="infobox-label">核心产品</span><span class="infobox-value">Phoenix 人形<br>Carbon AI</span></div>
+<div class="infobox-row"><span class="infobox-label">累计融资</span><span class="infobox-value">~$1.47 亿</span></div>
+<div class="infobox-row"><span class="infobox-label">关键合作</span><span class="infobox-value">Magna International<br>Accenture<br>Canadian Tire</span></div>
+</aside>
+</div>
+<div class="page-footer"><p>最后更新 2026-05-27 · <a href="../index.html">返回主索引</a></p></div>
+</div>
+</body>
+</html>

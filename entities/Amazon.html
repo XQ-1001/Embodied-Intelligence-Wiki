@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Amazon — 具身智能布局 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+:root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+.top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 8px; }
+.top-nav a { color: var(--link); text-decoration: none; }
+.page-container { max-width: 1200px; margin: 0 auto; background: #fff; }
+.page-title { padding: 28px 32px 16px; }
+.page-title h1 { font-family: 'Georgia','Times New Roman',serif; font-size: 1.75rem; font-weight: 400; color: #000; margin-bottom: 4px; }
+.page-title .subtitle { font-size: 0.85rem; color: #54595d; }
+.content-wrapper { display: flex; gap: 20px; padding: 0 32px 40px; }
+.main-content { flex: 1; min-width: 0; }
+.infobox { width: 270px; flex-shrink: 0; border: 1px solid #a2a9b1; background: #f9f9f9; font-size: 0.78rem; line-height: 1.5; }
+.infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 10px; font-weight: 600; font-size: 0.85rem; }
+.infobox-subtitle { background: #e8f0fe; color: #1a3a5c; font-size: 0.72rem; text-align: center; padding: 2px 10px; }
+.infobox-section-title { background: #e8f0fe; color: #1a3a5c; text-align: center; padding: 4px 10px; font-weight: 600; font-size: 0.76rem; border-top: 1px solid #a2a9b1; }
+.infobox-row { display: flex; padding: 3px 10px; border-bottom: 1px solid #e8e8e8; }
+.infobox-label { width: 90px; color: #54595d; flex-shrink: 0; }
+.infobox-value { flex: 1; }
+h2 { font-family: 'Georgia','Times New Roman',serif; font-size: 1.25rem; font-weight: 400; border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+h3 { font-size: 1rem; font-weight: 600; margin: 20px 0 8px; }
+p { margin: 8px 0; }
+.wikitable { border-collapse: collapse; margin: 10px 0 18px; font-size: 0.8rem; width: 100%; border: 1px solid #a2a9b1; }
+.wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; font-size: 0.75rem; }
+.wikitable td { border: 1px solid #a2a9b1; padding: 5px 8px; vertical-align: top; }
+.wikitable tr:nth-child(even) td { background: var(--table-stripe); }
+.wikitable a { color: var(--link); text-decoration: none; }
+.wikitable a:hover { text-decoration: underline; }
+sup a { color: #0645ad; text-decoration: none; font-size: 0.7rem; }
+sup a:hover { text-decoration: underline; }
+.tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.7rem; margin: 1px 2px; border: 1px solid #c8d9e8; white-space: nowrap; }
+.timeline { border-left: 3px solid #ddd; padding-left: 20px; margin: 12px 0 12px 6px; }
+.timeline-entry { margin-bottom: 14px; position: relative; }
+.timeline-entry::before { content: ''; position: absolute; left: -27px; top: 5px; width: 9px; height: 9px; background: var(--accent); border: 2px solid #fff; outline: 1px solid var(--accent); border-radius: 50%; }
+.timeline-date { font-weight: 600; color: var(--accent); font-size: 0.82rem; }
+.timeline-title { font-weight: 600; margin: 1px 0; font-size: 0.84rem; }
+.timeline-desc { color: #54595d; font-size: 0.78rem; }
+.refs { font-size: 0.8rem; line-height: 1.7; }
+.refs ol { padding-left: 24px; }
+.refs li { margin-bottom: 4px; }
+.refs a { color: var(--link); }
+.page-footer { border-top: 1px solid #a2a9b1; padding: 14px 32px 24px; font-size: 0.78rem; color: #54595d; text-align: center; }
+.page-footer a { color: var(--link); text-decoration: none; }
+@media (max-width: 768px) { .content-wrapper { flex-direction: column; } .infobox { width: 100%; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+<div class="top-nav"><a href="../index.html">具身智能Wiki</a> <span>›</span> <a href="../index.html#tech-giants">科技巨头具身布局</a> <span>›</span> Amazon</div>
+
+<div class="page-title">
+<h1>Amazon — 具身智能布局</h1>
+<div class="subtitle">Amazon.com, Inc.（纳斯达克：AMZN）· 全球最大机器人部署者</div>
+</div>
+
+<div class="content-wrapper">
+<div class="main-content">
+
+<h2>1 具身智能战略定位</h2>
+<p>Amazon 是全球部署机器人数量最多的公司——截至 2025 年中，其全球履约网络中运行的机器人已<b>超过 100 万台</b>，覆盖约 75% 的客户订单<sup><a href="#ref1">[1]</a></sup>。CEO Andy Jassy 将机器人技术定位为"更快交付、更低成本"的核心驱动，2026 年资本支出预算高达 <b>$2,000 亿</b>，其中 AI 和自动化基础设施占最大份额<sup><a href="#ref1">[1]</a></sup>。</p>
+<p>与 NVIDIA 和 Google 的"平台赋能"路线不同，Amazon 的具身智能战略是<b>"场景驱动 + 垂直整合"</b>：以自营仓储物流为最大应用场景，通过<b>自研 + 收购 + 投资</b>三管齐下构建完整的机器人能力栈——从仓储 AMR（Proteus/Hercules）、分拣机械臂（Sparrow/Robin）、触觉机器人（Vulcan）到消费级人形（Fauna Robotics）和最后一公里配送（Rivr），覆盖了"仓内→干线→末梢→家庭"的完整链条<sup><a href="#ref2">[2]</a></sup>。</p>
+<p>Amazon 同时通过 AWS 与 NVIDIA 合作推进"Physical AI"工具链，在云端提供 Isaac Sim/Isaac Lab/Cosmos 等机器人开发生态，并联合运营 MassRobotics Physical AI Fellowship 加速初创企业<sup><a href="#ref3">[3]</a></sup>。</p>
+
+<h2>2 核心技术/产品平台</h2>
+
+<table class="wikitable">
+<tr><th>产品/系统</th><th>类型</th><th>发布时间</th><th>核心能力</th></tr>
+<tr><td><b>Proteus</b></td><td>全自主移动机器人</td><td>2022</td><td>首款可与人自由共存的 AMR，无需安全围栏</td></tr>
+<tr><td><b>Sequoia</b></td><td>库存存储与检索系统</td><td>2023</td><td>存储提速 75%，集成 Hercules/Titan 驱动机器人</td></tr>
+<tr><td><b>Sparrow / Robin / Cardinal</b></td><td>AI 分拣机械臂</td><td>2022-2023</td><td>物品抓取、分类、包装处理</td></tr>
+<tr><td><b>Vulcan</b></td><td>触觉机器人</td><td>2025</td><td>物理 AI + 触觉传感，处理易碎品，目标 80%+ 物品覆盖率、300 件/小时<sup><a href="#ref2">[2]</a></sup></td>
+</tr>
+<tr><td><b>DeepFleet</b></td><td>AI 基础模型</td><td>2025</td><td>协调全球机器人编队的调度基础模型<sup><a href="#ref2">[2]</a></sup></td>
+</tr>
+<tr><td><b>Fauna Sprout</b></td><td>消费级人形</td><td>2026.01</td><td>1.07m 高、29 DOF、~$50,000，开发者平台<sup><a href="#ref4">[4]</a></sup></td>
+</tr>
+<tr><td><b>Rivr</b></td><td>轮式配送机器人</td><td>2026.03 收购</td><td>最后一公里人行道配送<sup><a href="#ref5">[5]</a></sup></td>
+</tr>
+</table>
+
+<p>Amazon 机器人体系的独特之处在于<b>规模驱动的迭代</b>——100 万台机器人的实际运行数据反馈到 AI 模型训练中，形成其他公司难以复制的数据飞轮。DeepFleet 作为全网络的机器人调度基础模型，目标是将所有机器人动作协同优化<sup><a href="#ref2">[2]</a></sup>。</p>
+<p>2024 年 8 月，Amazon 以 $3.8 亿获得了 Covariant 的 AI 模型、软件和专利许可，并吸收了其核心团队（含联合创始人 Pieter Abbeel）<sup><a href="#ref6">[6]</a></sup>。Covariant 的 RFM-1（80 亿参数机器人基础模型）技术已被整合进 Amazon 机器人开发流程，Blue Jay 六臂机器人从概念到量产仅一年多的速度直接受益于此<sup><a href="#ref6">[6]</a></sup>。</p>
+
+<h2>3 投资与收购布局</h2>
+
+<table class="wikitable">
+<tr><th>交易对象</th><th>时间</th><th>类型</th><th>方向</th></tr>
+<tr><td><b>Fauna Robotics</b></td><td>2026.03</td><td>收购</td><td>消费级人形 Sprout，开发者平台<sup><a href="#ref4">[4]</a></sup></td></tr>
+<tr><td><b>Rivr</b></td><td>2026.03</td><td>收购</td><td>瑞士最后一公里配送机器人<sup><a href="#ref5">[5]</a></sup></td></tr>
+<tr><td><b>Covariant</b></td><td>2024.08</td><td>"反向挖角"式许可</td><td>$3.8 亿获 AI 模型+团队，Pieter Abbeel 加入 Amazon AGI<sup><a href="#ref6">[6]</a></sup></td></tr>
+<tr><td><b>Agility Robotics</b></td><td>2023</td><td>试点合作（Digit 测试）</td><td>物流人形机器人测试<sup><a href="#ref7">[7]</a></sup></td></tr>
+</table>
+
+<h2>4 合作伙伴生态</h2>
+<p>AWS 与 NVIDIA 联合推进 Physical AI 工具链：Cosmos 世界模型作为 NIM 微服务在 AWS EKS 上运行，Isaac Sim/Isaac Lab 在 GPU 驱动的 EC2 实例上部署，AWS IoT Greengrass 负责边缘设备部署，Amazon SageMaker 进行模型重训练<sup><a href="#ref3">[3]</a></sup>。2025 年起，AWS × NVIDIA × MassRobotics 联合运营 Physical AI Fellowship，已加速两批共 17 家机器人创业公司（含 Wandercraft、Diligent Robotics、Generalist AI 等）<sup><a href="#ref3">[3]</a></sup>。</p>
+
+<h2>5 具身生态关系网络</h2>
+<table class="wikitable">
+<tr><th>关系类型</th><th>涉及公司/平台</th><th>具体关系</th></tr>
+<tr><td><b>自研</b></td><td>Proteus/Sequoia/Sparrow/Vulcan/DeepFleet</td><td>Amazon Robotics 内部开发和部署</td></tr>
+<tr><td><b>收购</b></td><td>Fauna Robotics、Rivr</td><td>2026 年收购，保留独立运营<sup><a href="#ref4">[4]</a></sup><sup><a href="#ref5">[5]</a></sup></td></tr>
+<tr><td><b>技术吸收</b></td><td>Covariant</td><td>$3.8 亿反向挖角，团队并入 Amazon AGI<sup><a href="#ref6">[6]</a></sup></td></tr>
+<tr><td><b>试点合作</b></td><td>Agility Robotics (Digit)</td><td>仓储场景人形机器人测试</td></tr>
+<tr><td><b>云平台合作</b></td><td>NVIDIA (Isaac/Cosmos)</td><td>AWS 上提供物理 AI 工具链<sup><a href="#ref3">[3]</a></sup></td></tr>
+<tr><td><b>竞争关系</b></td><td>Tesla (Optimus)、Figure AI</td><td>物流人形赛道直接竞争</td></tr>
+</table>
+
+<h2>6 具身智能发展时间线</h2>
+<div class="timeline">
+<div class="timeline-entry">
+<div class="timeline-date">2026.03</div><div class="timeline-title">收购 Fauna Robotics + Rivr</div><div class="timeline-desc">同月收购消费级人形和配送机器人两家公司，标志从仓储向消费和最后一公里延伸<sup><a href="#ref4">[4]</a></sup><sup><a href="#ref5">[5]</a></sup>。</div></div>
+<div class="timeline-entry">
+<div class="timeline-date">2025</div><div class="timeline-title">Vulcan + DeepFleet 发布</div><div class="timeline-desc">触觉机器人 Vulcan 和全网络调度 AI 模型 DeepFleet 上线<sup><a href="#ref2">[2]</a></sup>。</div></div>
+<div class="timeline-entry">
+<div class="timeline-date">2024.08</div><div class="timeline-title">Covariant 技术吸收</div><div class="timeline-desc">$3.8 亿获得 Covariant AI 模型和团队，Pieter Abbeel 升任 Amazon AGI 前沿模型研究负责人<sup><a href="#ref6">[6]</a></sup>。</div></div>
+<div class="timeline-entry">
+<div class="timeline-date">2024</div><div class="timeline-title">Shreveport 全自动仓库开业</div><div class="timeline-desc">首座"机器人优先"设计的履约中心，计划 2027 年前复制至 40 座<sup><a href="#ref1">[1]</a></sup>。</div></div>
+<div class="timeline-entry">
+<div class="timeline-date">2022</div><div class="timeline-title">Proteus AMR 发布</div><div class="timeline-desc">首款无需安全围栏的全自主移动机器人<sup><a href="#ref1">[1]</a></sup>。</div></div>
+<div class="timeline-entry">
+<div class="timeline-date">2012</div><div class="timeline-title">收购 Kiva Systems</div><div class="timeline-desc">$7.75 亿收购仓储机器人先驱，奠定 Amazon Robotics 部门基础。</div></div>
+</div>
+
+<h2>7 行业影响力评估</h2>
+<p>Amazon 对具身智能产业的影响方式与其他巨头不同：其 100 万台机器人的实际运行规模产生了<b>无与伦比的真实场景数据</b>，Amazon Robotics 约 75% 自动化率的目标如果实现，将彻底重塑全球物流和制造业的成本结构<sup><a href="#ref1">[1]</a></sup>。但 Amazon 的垂直整合策略也意味着其机器人技术目前<b>主要服务于自身业务</b>，不像 NVIDIA 或 Google 那样对外赋能。</p>
+
+<h2>8 分析层</h2>
+<h3>优势</h3>
+<ul><li>全球最大的机器人部署规模和真实运行数据</li><li>自研+收购+投资三管齐下，覆盖仓储→配送→消费全链条</li><li>$2,000 亿年资本支出为机器人研发提供充足弹药</li><li>Covariant 团队为 AI 能力注入顶尖人才</li></ul>
+<h3>挑战/风险</h3>
+<ul><li>对外赋能的商业化路径不清晰（Amazon Bot Services 仍在内测）</li><li>仓储人形（如 Digit 测试）尚未进入大规模部署阶段</li><li>消费级人形（Fauna）的商业模式和监管路径不明朗</li></ul>
+
+<h2>9 参考资料</h2>
+<div class="refs"><ol>
+<li id="ref1"><a href="https://www.therobotreport.com/amazon-ceo-says-robotics-key-faster-delivery-lower-costs/" target="_blank">"Amazon CEO says robotics is key for faster delivery, lower costs" — The Robot Report, 2026</a></li>
+<li id="ref2"><a href="https://vention.io/blogs/industry/warehouse-automation-1091" target="_blank">"Amazon's Vulcan and the Platform-Driven Future of Warehouse Automation" — Vention, 2025-2026</a></li>
+<li id="ref3"><a href="https://aws-news.com/article/2026-04-15-accelerating-physical-ai-with-aws-and-nvidia" target="_blank">"Accelerating physical AI with AWS and NVIDIA" — AWS News, 2026.04.15</a></li>
+<li id="ref4"><a href="https://www.therobotreport.com/what-amazon-saw-in-fauna-robotics-humanoid-strategy/" target="_blank">"What Amazon saw in Fauna Robotics' humanoid strategy" — The Robot Report, 2026.03</a></li>
+<li id="ref5"><a href="https://aibusiness.com/robotics/amazon-buys-robot-maker-fauna" target="_blank">"Amazon Buys 'Approachable' Robot Maker, Fauna" — AI Business, 2026.03</a></li>
+<li id="ref6"><a href="https://www.automate.org/industry-insights/blue-jay-way" target="_blank">"How Amazon Leveraged Covariant's Technology to Accelerate Robot Development" — A3 Automate, 2025</a></li>
+<li id="ref7"><a href="https://www.supplychain247.com/article/amazon-ai-robotics-delivery-strategy-2026/automation" target="_blank">"Amazon Bets Big on AI, Robotics, and Faster Delivery in CEO Letter" — SupplyChain247, 2026</a></li>
+</ol></div>
+</div>
+
+<aside class="infobox">
+<div class="infobox-title">Amazon.com, Inc.</div>
+<div class="infobox-subtitle">科技巨头 · 具身智能布局</div>
+<div class="infobox-section-title">母公司概况</div>
+<div class="infobox-row"><span class="infobox-label">公司全称</span><span class="infobox-value">Amazon.com, Inc.</span></div>
+<div class="infobox-row"><span class="infobox-label">股票代码</span><span class="infobox-value">NASDAQ: AMZN</span></div>
+<div class="infobox-row"><span class="infobox-label">成立时间</span><span class="infobox-value">1994 年</span></div>
+<div class="infobox-row"><span class="infobox-label">总部</span><span class="infobox-value">美国华盛顿州西雅图</span></div>
+<div class="infobox-row"><span class="infobox-label">CEO</span><span class="infobox-value">Andy Jassy</span></div>
+<div class="infobox-row"><span class="infobox-label">官网</span><span class="infobox-value"><a href="https://www.aboutamazon.com" target="_blank">aboutamazon.com</a></span></div>
+<div class="infobox-section-title">具身业务概况</div>
+<div class="infobox-row"><span class="infobox-label">具身业务负责人</span><span class="infobox-value">Pieter Abbeel<br><small>Amazon AGI 前沿模型研究负责人</small></span></div>
+<div class="infobox-row"><span class="infobox-label">生态定位</span><span class="infobox-value"><span class="tag" style="background:#fff3e0;color:#e65100;">场景运营方</span><span class="tag" style="background:#e3f2fd;color:#1565c0;">云平台</span></span></div>
+<div class="infobox-row"><span class="infobox-label">核心平台</span><span class="infobox-value">Amazon Robotics · DeepFleet · AWS Physical AI · Fauna</span></div>
+<div class="infobox-row"><span class="infobox-label">具身业务起始</span><span class="infobox-value">2012 年（收购 Kiva）</span></div>
+<div class="infobox-row"><span class="infobox-label">战略定位</span><span class="infobox-value">全球最大机器人部署者<br>（场景驱动 + 垂直整合）</span></div>
+<div class="infobox-section-title">母公司规模 (FY2025)</div>
+<div class="infobox-row"><span class="infobox-label">年营收</span><span class="infobox-value">约 $6,380 亿</span></div>
+<div class="infobox-row"><span class="infobox-label">2026 CapEx</span><span class="infobox-value">$2,000 亿</span></div>
+<div class="infobox-row"><span class="infobox-label">员工</span><span class="infobox-value">约 156 万</span></div>
+<div class="infobox-section-title">具身部署规模</div>
+<div class="infobox-row" style="display:block;padding:5px 10px;font-size:0.76rem;">
+机器人部署超 100 万台<br>
+覆盖率约 75% 客户订单<br>
+40 座全自动仓库 2027 年前建成
+</div>
+</aside>
+</div>
+<div class="page-footer"><p>此页面最后更新于 2026-05-27 · 来源以 The Robot Report、AWS 官方公告、SupplyChain247 为主 · <a href="../index.html">返回主索引</a></p></div>
+</div>
+</body>
+</html>

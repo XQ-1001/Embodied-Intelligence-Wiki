@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Toyota TRI — 具身智能布局 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+:root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+.top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 8px; }
+.top-nav a { color: var(--link); text-decoration: none; }
+.page-container { max-width: 1200px; margin: 0 auto; background: #fff; }
+.page-title { padding: 28px 32px 16px; }
+.page-title h1 { font-family: 'Georgia','Times New Roman',serif; font-size: 1.75rem; font-weight: 400; color: #000; margin-bottom: 4px; }
+.page-title .subtitle { font-size: 0.85rem; color: #54595d; }
+.content-wrapper { display: flex; gap: 20px; padding: 0 32px 40px; }
+.main-content { flex: 1; min-width: 0; }
+.infobox { width: 270px; flex-shrink: 0; border: 1px solid #a2a9b1; background: #f9f9f9; font-size: 0.78rem; line-height: 1.5; }
+.infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 10px; font-weight: 600; font-size: 0.85rem; }
+.infobox-subtitle { background: #e8f0fe; color: #1a3a5c; font-size: 0.72rem; text-align: center; padding: 2px 10px; }
+.infobox-section-title { background: #e8f0fe; color: #1a3a5c; text-align: center; padding: 4px 10px; font-weight: 600; font-size: 0.76rem; border-top: 1px solid #a2a9b1; }
+.infobox-row { display: flex; padding: 3px 10px; border-bottom: 1px solid #e8e8e8; }
+.infobox-label { width: 90px; color: #54595d; flex-shrink: 0; }
+.infobox-value { flex: 1; }
+h2 { font-family: 'Georgia','Times New Roman',serif; font-size: 1.25rem; font-weight: 400; border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+h3 { font-size: 1rem; font-weight: 600; margin: 20px 0 8px; }
+p { margin: 8px 0; }
+.wikitable { border-collapse: collapse; margin: 10px 0 18px; font-size: 0.8rem; width: 100%; border: 1px solid #a2a9b1; }
+.wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; font-size: 0.75rem; }
+.wikitable td { border: 1px solid #a2a9b1; padding: 5px 8px; vertical-align: top; }
+.wikitable tr:nth-child(even) td { background: var(--table-stripe); }
+sup a { color: #0645ad; text-decoration: none; font-size: 0.7rem; }
+.tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.7rem; margin: 1px 2px; border: 1px solid #c8d9e8; white-space: nowrap; }
+.timeline { border-left: 3px solid #ddd; padding-left: 20px; margin: 12px 0 12px 6px; }
+.timeline-entry { margin-bottom: 14px; position: relative; }
+.timeline-entry::before { content: ''; position: absolute; left: -27px; top: 5px; width: 9px; height: 9px; background: var(--accent); border: 2px solid #fff; outline: 1px solid var(--accent); border-radius: 50%; }
+.timeline-date { font-weight: 600; color: var(--accent); font-size: 0.82rem; }
+.timeline-title { font-weight: 600; margin: 1px 0; font-size: 0.84rem; }
+.timeline-desc { color: #54595d; font-size: 0.78rem; }
+.refs { font-size: 0.8rem; line-height: 1.7; } .refs ol { padding-left: 24px; } .refs li { margin-bottom: 4px; } .refs a { color: var(--link); }
+.page-footer { border-top: 1px solid #a2a9b1; padding: 14px 32px 24px; font-size: 0.78rem; color: #54595d; text-align: center; }
+.page-footer a { color: var(--link); text-decoration: none; }
+@media (max-width: 768px) { .content-wrapper { flex-direction: column; } .infobox { width: 100%; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+<div class="top-nav"><a href="../index.html">具身智能Wiki</a> <span>›</span> <a href="../index.html#tech-giants">科技巨头具身布局</a> <span>›</span> Toyota TRI</div>
+<div class="page-title"><h1>Toyota — 具身智能布局</h1><div class="subtitle">Toyota Motor Corporation（东证：7203）· 大型行为模型 + 人形基础研究</div></div>
+<div class="content-wrapper"><div class="main-content">
+
+<h2>1 具身智能战略定位</h2>
+<p>Toyota Research Institute（TRI）是丰田汽车旗下的 AI 研究机构，在具身智能领域聚焦<b>基础算法研究</b>——其 Diffusion Policy 和 Large Behavior Models（LBM）已成为人形机器人产业的<b>事实标准技术路线</b><sup><a href="#ref1">[1]</a></sup>。TRI 不造量产机器人，而是作为<b>"研究基座"</b>为整个行业提供算法创新。</p>
+<p>2024 年 10 月，TRI 与 Boston Dynamics 建立联合研究伙伴关系。2025 年 8 月，双方首次展示将 LBM 部署至 Atlas 人形机器人，实现了从自然语言指令到全身操控的端到端执行<sup><a href="#ref2">[2]</a></sup>。TRI CEO Gill Pratt 将 LBM 类比为机器人领域的 LLM——多任务、大容量模型在跨技能泛化上远超单任务模型<sup><a href="#ref1">[1]</a></sup>。</p>
+
+<h2>2 核心技术/产品平台</h2>
+<table class="wikitable">
+<tr><th>技术</th><th>类型</th><th>核心贡献</th></tr>
+<tr><td><b>Diffusion Policy</b></td><td>动作生成算法</td><td>2023 年与哥大联合提出：将机器人动作生成为条件去噪扩散过程，15 个基准平均提升 46.9%<sup><a href="#ref1">[1]</a></sup></td></tr>
+<tr><td><b>Large Behavior Models (LBM)</b></td><td>多任务通用策略</td><td>4.5 亿参数 Diffusion Transformer + Flow Matching，30Hz 全身控制（50 DoF），单句指令驱动多步骤任务<sup><a href="#ref2">[2]</a></sup></td></tr>
+<tr><td><b>Trustworthy Learning</b></td><td>安全/可靠性框架</td><td>实时故障检测、统计性能界限、数据归因追踪<sup><a href="#ref1">[1]</a></sup></td></tr>
+</table>
+
+<h2>3 具身生态关系网络</h2>
+<table class="wikitable">
+<tr><th>关系类型</th><th>涉及公司</th><th>具体关系</th></tr>
+<tr><td><b>联合研究</b></td><td>Boston Dynamics</td><td>LBM 驱动 Atlas，2024.10 起持续合作<sup><a href="#ref2">[2]</a></sup></td></tr>
+<tr><td><b>技术影响</b></td><td>NVIDIA (GR00T)、Physical Intelligence、Figure AI</td><td>Diffusion Policy 已成为行业通用动作生成架构<sup><a href="#ref1">[1]</a></sup></td></tr>
+</table>
+
+<h2>4 具身智能发展时间线</h2>
+<div class="timeline">
+<div class="timeline-entry"><div class="timeline-date">2026.03</div><div class="timeline-title">LBM 扩展至自动驾驶</div><div class="timeline-desc">TRI 将 Diffusion Policy 和 LBM 研究扩展至端到端自动驾驶<sup><a href="#ref1">[1]</a></sup>。</div></div>
+<div class="timeline-entry"><div class="timeline-date">2025.08</div><div class="timeline-title">Atlas + LBM 首次公开演示</div><div class="timeline-desc">Boston Dynamics Atlas 通过 LBM 完成长序列打包分拣任务，自主纠错<sup><a href="#ref2">[2]</a></sup>。</div></div>
+<div class="timeline-entry"><div class="timeline-date">2024.10</div><div class="timeline-title">TRI × Boston Dynamics 联合研究</div><div class="timeline-desc">建立正式合作伙伴关系<sup><a href="#ref2">[2]</a></sup>。</div></div>
+<div class="timeline-entry"><div class="timeline-date">2023</div><div class="timeline-title">Diffusion Policy 发表</div><div class="timeline-desc">TRI 与哥伦比亚大学联合提出，成为机器人动作生成的新范式<sup><a href="#ref1">[1]</a></sup>。</div></div>
+</div>
+
+<h2>5 行业影响力评估</h2>
+<p>TRI 是具身智能领域最被低估的玩家之一。Diffusion Policy 已成为人形机器人行业<b>默认的动作生成架构</b>——NVIDIA GR00T、Physical Intelligence π、Figure Helix 等头部模型均受其影响<sup><a href="#ref1">[1]</a></sup>。TRI 与 Boston Dynamics 的 Atlas 合作展示代表了 2025 年人形全身操控的公开最高水平。但 TRI 作为纯研究机构，不直接参与产品化和市场竞争。</p>
+
+<h2>6 分析层</h2>
+<h3>优势</h3><ul><li>Diffusion Policy/LBM 是行业技术标准的制定者</li><li>Boston Dynamics Atlas 作为验证平台具有标杆意义</li><li>Toyota 母公司在汽车制造领域的场景资源和资本支撑</li></ul>
+<h3>挑战</h3><ul><li>纯研究机构，无商业化产品</li><li>System 1（快速反应）→ System 2（深度推理）的跨越尚未解决</li></ul>
+
+<h2>7 参考资料</h2>
+<div class="refs"><ol>
+<li id="ref1"><a href="https://www.tri.global/our-work/large-behavior-models" target="_blank">"Large Behavior Models" — Toyota Research Institute, 2025-2026</a></li>
+<li id="ref2"><a href="https://pressroom.toyota.com/ai-powered-robot-by-boston-dynamics-and-toyota-research-institute-takes-a-key-step-towards-general-purpose-humanoids/" target="_blank">"AI-Powered Robot by Boston Dynamics and TRI Takes Key Step Toward General-Purpose Humanoids" — Toyota Pressroom, 2025.08.20</a></li>
+</ol></div>
+</div>
+
+<aside class="infobox">
+<div class="infobox-title">Toyota Motor Corporation</div>
+<div class="infobox-subtitle">科技巨头 · 具身智能布局</div>
+<div class="infobox-section-title">母公司概况</div>
+<div class="infobox-row"><span class="infobox-label">公司全称</span><span class="infobox-value">Toyota Motor Corporation</span></div>
+<div class="infobox-row"><span class="infobox-label">股票代码</span><span class="infobox-value">东证: 7203 / NYSE: TM</span></div>
+<div class="infobox-row"><span class="infobox-label">成立时间</span><span class="infobox-value">1937 年</span></div>
+<div class="infobox-row"><span class="infobox-label">总部</span><span class="infobox-value">日本爱知县丰田市</span></div>
+<div class="infobox-section-title">具身业务概况</div>
+<div class="infobox-row"><span class="infobox-label">TRI CEO</span><span class="infobox-value">Gill Pratt</span></div>
+<div class="infobox-row"><span class="infobox-label">LBM 负责人</span><span class="infobox-value">Russ Tedrake<br><small>SVP, Large Behavior Models</small></span></div>
+<div class="infobox-row"><span class="infobox-label">生态定位</span><span class="infobox-value"><span class="tag" style="background:#e3f2fd;color:#1565c0;">基础模型平台</span></span></div>
+<div class="infobox-row"><span class="infobox-label">核心贡献</span><span class="infobox-value">Diffusion Policy · LBM · 人形全身操控研究基座</span></div>
+<div class="infobox-section-title">母公司规模</div>
+<div class="infobox-row"><span class="infobox-label">年营收</span><span class="infobox-value">约 ¥45 万亿（~$3,000 亿）</span></div>
+<div class="infobox-row"><span class="infobox-label">市值</span><span class="infobox-value">约 ¥40 万亿（~$2,700 亿）</span></div>
+</aside>
+</div>
+<div class="page-footer"><p>此页面最后更新于 2026-05-27 · 来源以 TRI 官网、Toyota Pressroom 为主 · <a href="../index.html">返回主索引</a></p></div>
+</div>
+</body>
+</html>

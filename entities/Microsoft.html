@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Microsoft — 具身智能布局 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+:root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+.top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 8px; }
+.top-nav a { color: var(--link); text-decoration: none; }
+.page-container { max-width: 1200px; margin: 0 auto; background: #fff; }
+.page-title { padding: 28px 32px 16px; }
+.page-title h1 { font-family: 'Georgia','Times New Roman',serif; font-size: 1.75rem; font-weight: 400; color: #000; margin-bottom: 4px; }
+.page-title .subtitle { font-size: 0.85rem; color: #54595d; }
+.content-wrapper { display: flex; gap: 20px; padding: 0 32px 40px; }
+.main-content { flex: 1; min-width: 0; }
+.infobox { width: 270px; flex-shrink: 0; border: 1px solid #a2a9b1; background: #f9f9f9; font-size: 0.78rem; line-height: 1.5; }
+.infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 10px; font-weight: 600; font-size: 0.85rem; }
+.infobox-subtitle { background: #e8f0fe; color: #1a3a5c; font-size: 0.72rem; text-align: center; padding: 2px 10px; }
+.infobox-section-title { background: #e8f0fe; color: #1a3a5c; text-align: center; padding: 4px 10px; font-weight: 600; font-size: 0.76rem; border-top: 1px solid #a2a9b1; }
+.infobox-row { display: flex; padding: 3px 10px; border-bottom: 1px solid #e8e8e8; }
+.infobox-label { width: 90px; color: #54595d; flex-shrink: 0; }
+.infobox-value { flex: 1; }
+h2 { font-family: 'Georgia','Times New Roman',serif; font-size: 1.25rem; font-weight: 400; border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+h3 { font-size: 1rem; font-weight: 600; margin: 20px 0 8px; }
+p { margin: 8px 0; }
+.wikitable { border-collapse: collapse; margin: 10px 0 18px; font-size: 0.8rem; width: 100%; border: 1px solid #a2a9b1; }
+.wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; font-size: 0.75rem; }
+.wikitable td { border: 1px solid #a2a9b1; padding: 5px 8px; vertical-align: top; }
+.wikitable tr:nth-child(even) td { background: var(--table-stripe); }
+sup a { color: #0645ad; text-decoration: none; font-size: 0.7rem; }
+.tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.7rem; margin: 1px 2px; border: 1px solid #c8d9e8; white-space: nowrap; }
+.timeline { border-left: 3px solid #ddd; padding-left: 20px; margin: 12px 0 12px 6px; }
+.timeline-entry { margin-bottom: 14px; position: relative; }
+.timeline-entry::before { content: ''; position: absolute; left: -27px; top: 5px; width: 9px; height: 9px; background: var(--accent); border: 2px solid #fff; outline: 1px solid var(--accent); border-radius: 50%; }
+.timeline-date { font-weight: 600; color: var(--accent); font-size: 0.82rem; }
+.timeline-title { font-weight: 600; margin: 1px 0; font-size: 0.84rem; }
+.timeline-desc { color: #54595d; font-size: 0.78rem; }
+.refs { font-size: 0.8rem; line-height: 1.7; } .refs ol { padding-left: 24px; } .refs li { margin-bottom: 4px; } .refs a { color: var(--link); }
+.page-footer { border-top: 1px solid #a2a9b1; padding: 14px 32px 24px; font-size: 0.78rem; color: #54595d; text-align: center; }
+.page-footer a { color: var(--link); text-decoration: none; }
+@media (max-width: 768px) { .content-wrapper { flex-direction: column; } .infobox { width: 100%; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+<div class="top-nav"><a href="../index.html">具身智能Wiki</a> <span>›</span> <a href="../index.html#tech-giants">科技巨头具身布局</a> <span>›</span> Microsoft</div>
+<div class="page-title"><h1>Microsoft — 具身智能布局</h1><div class="subtitle">Microsoft Corporation（纳斯达克：MSFT）· 云平台 + 基础模型 + 战略投资</div></div>
+<div class="content-wrapper"><div class="main-content">
+
+<h2>1 具身智能战略定位</h2>
+<p>Microsoft 在具身智能领域采取<b>"云平台 + 基础模型 + 战略投资"三线并行</b>策略：Azure 作为具身 AI 训练和推理的云基础设施、Microsoft Research 直接研发机器人基础模型（Rho-alpha）、通过投资 Figure AI 等头部公司间接进入人形赛道<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref2">[2]</a></sup>。</p>
+<p>与 NVIDIA 的"芯片+模型"全栈路线不同，Microsoft 的核心资产是<b>Azure 云平台和 OpenAI 生态关系</b>。Microsoft 通过 Azure IoT Operations、Fabric Real-Time Intelligence 等服务将具身 AI 从云端延伸到边缘设备，与 NVIDIA 在 Physical AI 工具链上深度合作而非竞争<sup><a href="#ref3">[3]</a></sup>。</p>
+
+<h2>2 核心技术/产品平台</h2>
+<table class="wikitable">
+<tr><th>产品</th><th>类型</th><th>时间</th><th>核心能力</th></tr>
+<tr><td><b>Rho-alpha</b></td><td>VLA+ 基础模型</td><td>2025</td><td>Phi 系列首个机器人模型，视觉-语言-动作+触觉传感，自然语言→物理动作<sup><a href="#ref2">[2]</a></sup></td></tr>
+<tr><td><b>Magma</b></td><td>多模态模型</td><td>2025</td><td>数字-物理跨域代理，使用 Set-of-Mark 标注<sup><a href="#ref2">[2]</a></sup></td></tr>
+<tr><td><b>Azure IoT Operations</b></td><td>边缘设备管理</td><td>持续迭代</td><td>机器人边缘部署与数据采集<sup><a href="#ref1">[1]</a></sup></td></tr>
+<tr><td><b>Fabric R-T Intelligence</b></td><td>实时数据分析</td><td>2025</td><td>机器人运行数据的实时智能分析<sup><a href="#ref1">[1]</a></sup></td></tr>
+</table>
+<p><b>Rho-alpha</b> 是 Microsoft Research 的旗舰机器人模型，基于 Phi 系列。其核心创新在于将视觉、语言、动作与<b>触觉传感</b>融合（VLA+），训练数据来自物理演示、NVIDIA Isaac Sim on Azure 合成数据以及互联网视觉数据。模型支持通过 3D 鼠标进行人类遥操作纠错，实现持续学习<sup><a href="#ref2">[2]</a></sup>。</p>
+
+<h2>3 投资布局</h2>
+<table class="wikitable">
+<tr><th>被投/合作对象</th><th>时间</th><th>类型</th><th>详情</th></tr>
+<tr><td><b>Figure AI</b></td><td>2024.02</td><td>B 轮参与</td><td>$6.75 亿 B 轮投资方之一（估值 $26 亿），后续 C 轮继续参与<sup><a href="#ref4">[4]</a></sup></td></tr>
+<tr><td><b>OpenAI</b></td><td>2019-2025</td><td>战略合作+累计 $130 亿+ 投资</td><td>OpenAI 重建机器人实验室后，Microsoft 通过 Azure 和投资间接参与具身智能<sup><a href="#ref4">[4]</a></sup></td></tr>
+</table>
+
+<h2>4 合作伙伴生态</h2>
+<p><b>Hexagon Robotics</b>：2026 年 1 月 CES 宣布战略合作，AEON 工业人形机器人整合 Azure IoT、Fabric 和 App Service，面向汽车/航空/制造/物流场景<sup><a href="#ref1">[1]</a></sup>。</p>
+<p><b>NVIDIA</b>：Azure 上提供 Isaac Sim/Isaac Lab/Cosmos 等物理 AI 工具链，联合 MassRobotics 运营 Physical AI Fellowship<sup><a href="#ref3">[3]</a></sup>。</p>
+<p><b>Richtech Robotics</b>：2026 年 1 月通过 Microsoft AI Co-Innovation Labs 将 Azure AI 嵌入 ADAM 服务机器人，实现视觉+语音+自主推理。</p>
+
+<h2>5 具身生态关系网络</h2>
+<table class="wikitable">
+<tr><th>关系类型</th><th>涉及公司</th><th>具体关系</th></tr>
+<tr><td><b>投资</b></td><td>Figure AI</td><td>B 轮/C 轮参与<sup><a href="#ref4">[4]</a></sup></td></tr>
+<tr><td><b>战略合作</b></td><td>Hexagon Robotics</td><td>AEON 人形 + Azure 平台<sup><a href="#ref1">[1]</a></sup></td></tr>
+<tr><td><b>战略合作</b></td><td>OpenAI（间接）</td><td>Azure + $130 亿+投资，OpenAI 自建机器人实验室</td></tr>
+<tr><td><b>云平台合作</b></td><td>NVIDIA（Isaac/Cosmos）</td><td>Azure 提供物理 AI 仿真与训练基础设施<sup><a href="#ref3">[3]</a></sup></td></tr>
+</table>
+
+<h2>6 具身智能发展时间线</h2>
+<div class="timeline">
+<div class="timeline-entry">
+<div class="timeline-date">2026.01</div><div class="timeline-title">Hexagon Robotics × Microsoft 战略合作</div><div class="timeline-desc">CES 宣布合作，AEON 工业人形集成 Azure 平台<sup><a href="#ref1">[1]</a></sup>。</div></div>
+<div class="timeline-entry">
+<div class="timeline-date">2026.01</div><div class="timeline-title">Richtech Robotics × Microsoft AI Labs</div><div class="timeline-desc">ADAM 服务机器人整合 Azure AI agentic 能力。</div></div>
+<div class="timeline-entry">
+<div class="timeline-date">2025</div><div class="timeline-title">Rho-alpha 发布</div><div class="timeline-desc">Microsoft Research 首个机器人 VLA+ 模型，融合触觉传感<sup><a href="#ref2">[2]</a></sup>。</div></div>
+<div class="timeline-entry">
+<div class="timeline-date">2024.02</div><div class="timeline-title">投资 Figure AI（B 轮 $6.75 亿）</div><div class="timeline-desc">与 NVIDIA、OpenAI、Jeff Bezos 等共同投资<sup><a href="#ref4">[4]</a></sup>。</div></div>
+</div>
+
+<h2>7 行业影响力评估</h2>
+<p>Microsoft 的具身智能影响力主要通过<b>Azure 基础设施和投资杠杆</b>实现。Rho-alpha 模型展示了 Microsoft 在机器人基础模型上的研发深度，但与 Google Gemini Robotics 和 NVIDIA GR00T 相比规模较小<sup><a href="#ref2">[2]</a></sup>。Azure 作为全球第二大云平台为机器人公司提供训练和部署基础设施，与 NVIDIA 的硬件生态形成互补<sup><a href="#ref3">[3]</a></sup>。</p>
+
+<h2>8 分析层</h2>
+<h3>优势</h3>
+<ul><li>Azure 云平台为机器人训练和部署提供基础</li><li>通过投资 Figure AI 间接进入人形赛道</li><li>Rho-alpha × Isaac Sim on Azure 工具链有差异化</li></ul>
+<h3>挑战/风险</h3>
+<ul><li>缺乏自有机器人硬件或深度绑定的人形合作伙伴</li><li>Figure AI 转向自研 Helix 模型后与 Microsoft/OpenAI 的关系可能疏远</li><li>在具身基础模型竞赛中落后于 Google Gemini Robotics 和 NVIDIA GR00T</li></ul>
+
+<h2>9 参考资料</h2>
+<div class="refs"><ol>
+<li id="ref1"><a href="https://robotics.hexagon.com/hexagon-robotics-partners-with-microsoft-to-advance-physical-ai/" target="_blank">"Hexagon Robotics partners with Microsoft to advance Physical AI" — Hexagon, 2026.01.07</a></li>
+<li id="ref2"><a href="https://www.webpronews.com/rho-alpha-unleashed-microsofts-bid-to-wire-ai-into-robots/" target="_blank">"Rho-Alpha Unleashed: Microsoft's Bid to Wire AI into Robots" — WebProNews, 2025</a></li>
+<li id="ref3"><a href="https://blogs.microsoft.com/blog/2026/03/16/microsoft-at-nvidia-gtc-new-solutions-for-microsoft-foundry-azure-ai-infrastructure-and-physical-ai/" target="_blank">"Microsoft at NVIDIA GTC: New solutions for Physical AI" — Microsoft Blog, 2026.03.16</a></li>
+<li id="ref4"><a href="https://www.eesel.ai/blog/figure-ai" target="_blank">"Figure AI: The $39B humanoid robot startup explained" — eesel AI, 2025-2026</a></li>
+</ol></div>
+</div>
+
+<aside class="infobox">
+<div class="infobox-title">Microsoft Corporation</div>
+<div class="infobox-subtitle">科技巨头 · 具身智能布局</div>
+<div class="infobox-section-title">母公司概况</div>
+<div class="infobox-row"><span class="infobox-label">公司全称</span><span class="infobox-value">Microsoft Corporation</span></div>
+<div class="infobox-row"><span class="infobox-label">股票代码</span><span class="infobox-value">NASDAQ: MSFT</span></div>
+<div class="infobox-row"><span class="infobox-label">成立时间</span><span class="infobox-value">1975 年</span></div>
+<div class="infobox-row"><span class="infobox-label">总部</span><span class="infobox-value">美国华盛顿州雷德蒙德</span></div>
+<div class="infobox-row"><span class="infobox-label">CEO</span><span class="infobox-value">Satya Nadella</span></div>
+
+<div class="infobox-section-title">具身业务概况</div>
+<div class="infobox-row"><span class="infobox-label">具身业务负责人</span><span class="infobox-value">Ashley Llorens<br><small>VP, Microsoft Research Accelerator</small></span></div>
+<div class="infobox-row"><span class="infobox-label">生态定位</span><span class="infobox-value"><span class="tag" style="background:#e3f2fd;color:#1565c0;">云平台</span><span class="tag" style="background:#e8f5e9;color:#2e7d32;">基础模型平台</span></span></div>
+<div class="infobox-row"><span class="infobox-label">核心平台</span><span class="infobox-value">Rho-alpha · Azure IoT · Fabric · OpenAI 生态</span></div>
+<div class="infobox-row"><span class="infobox-label">战略定位</span><span class="infobox-value">云平台 + 基础模型 + 战略投资</span></div>
+<div class="infobox-section-title">母公司规模</div>
+<div class="infobox-row"><span class="infobox-label">年营收</span><span class="infobox-value">约 $2,700 亿</span></div>
+<div class="infobox-row"><span class="infobox-label">市值</span><span class="infobox-value">约 $3 万亿+</span></div>
+</aside>
+</div>
+<div class="page-footer"><p>此页面最后更新于 2026-05-27 · 来源以 Hexagon 官方、WebProNews、Microsoft Blog 为主 · <a href="../index.html">返回主索引</a></p></div>
+</div>
+</body>
+</html>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>Dyna Robotics — 具身智能Wiki</title>
+<style>:root { --bg: #fff; --text: #202122; --link: #0645ad; --border: #a2a9b1; --accent: #1a3a5c; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑',sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+.top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; gap: 8px; align-items: center; }
+.top-nav a { color: var(--link); text-decoration: none; }
+.page-container { max-width: 1200px; margin: 0 auto; background: #fff; }
+.page-title { padding: 28px 32px 16px; } .page-title h1 { font-family: 'Georgia',serif; font-size: 1.75rem; font-weight: 400; }
+.content-wrapper { display: flex; gap: 20px; padding: 0 32px 40px; } .main-content { flex: 1; min-width: 0; }
+.infobox { width: 270px; flex-shrink: 0; border: 1px solid var(--border); background: #f9f9f9; font-size: 0.78rem; }
+.infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 10px; font-weight: 600; }
+.infobox-section-title { background: #e8f0fe; color: #1a3a5c; text-align: center; padding: 4px 10px; font-weight: 600; font-size: 0.76rem; border-top: 1px solid var(--border); }
+.infobox-row { display: flex; padding: 3px 10px; border-bottom: 1px solid #e8e8e8; } .infobox-label { width: 80px; color: #54595d; flex-shrink: 0; } .infobox-value { flex: 1; }
+h2 { font-family: 'Georgia',serif; font-size: 1.25rem; font-weight: 400; border-bottom: 1px solid var(--border); padding-bottom: 4px; margin: 28px 0 12px; }
+p { margin: 8px 0; }
+.wikitable { border-collapse: collapse; margin: 10px 0; font-size: 0.8rem; width: 100%; border: 1px solid var(--border); }
+.wikitable th { background: #eaecf0; border: 1px solid var(--border); padding: 5px 8px; text-align: center; font-weight: 600; font-size: 0.75rem; }
+.wikitable td { border: 1px solid var(--border); padding: 5px 8px; vertical-align: top; } .wikitable tr:nth-child(even) td { background: #f8f9fa; }
+sup a { color: #0645ad; text-decoration: none; font-size: 0.7rem; }
+.refs { font-size: 0.8rem; } .refs ol { padding-left: 24px; } .refs li { margin-bottom: 4px; } .refs a { color: var(--link); }
+.page-footer { border-top: 1px solid var(--border); padding: 14px 32px 24px; font-size: 0.78rem; color: #54595d; text-align: center; }
+</style></head>
+<body><div class="page-container">
+<div class="top-nav"><a href="../index.html">具身智能Wiki</a> › <a href="../index.html">海外具身智能</a> › Dyna Robotics</div>
+<div class="page-title"><h1>Dyna Robotics</h1><div class="subtitle" style="font-size:0.85rem;color:#54595d;">单权重通用机器人基础模型 · 商业服务场景先行部署</div></div>
+<div class="content-wrapper"><div class="main-content">
+
+<h2>1 公司概况</h2>
+<p>Dyna Robotics 总部位于加州 Redwood City，由连续创业者 <b>Lindon Gao</b>（CEO，前 Caper AI 以 $3.5 亿出售）和 <b>York Yang</b> 联合创立，首席科学家 <b>Jason Ma</b> 来自 Google DeepMind<sup><a href="#ref1">[1]</a></sup>。公司累计融资约 <b>$1.44 亿</b>（种子轮 $2,350 万 + A 轮 $1.2 亿），A 轮投资方包括 NVentures（NVIDIA）、Amazon Industrial Innovation Fund、Samsung Next、LG Technology Ventures 等。投后估值约 <b>$5 亿</b><sup><a href="#ref1">[1]</a></sup>。</p>
+
+<h2>2 技术路线</h2>
+<p>核心产品 <b>DYNA-1</b> 是首个<b>单权重通用机器人基础模型</b>，不同任务和环境下使用同一个模型权重、无需重新训练。拥有自研<b>工程化奖励模型（RM）</b>处理边缘案例和实时纠错。据公司披露，24 小时连续运行成功率超过 99%<sup><a href="#ref1">[1]</a></sup>。</p>
+
+<h2>3 商业化进展</h2>
+<p>已在<b>酒店、餐厅、洗衣房、健身房</b>等商业服务场景部署，机器人每日运行 16 小时，6 个月内从零到商业规模<sup><a href="#ref1">[1]</a></sup>。战略定位是"先验证真实场景部署，再扩展至更多行业"。</p>
+
+<h2>4 参考资料</h2>
+<div class="refs"><ol>
+<li id="ref1"><a href="https://www.therobotreport.com/dyna-robotics-closes-120m-funding-round-to-scale-robotics-foundation-model/" target="_blank">"Dyna Robotics closes $120M funding round" — The Robot Report, 2025.09</a></li>
+</ol></div>
+</div>
+<aside class="infobox">
+<div class="infobox-title">Dyna Robotics</div>
+<div class="infobox-section-title">基本信息</div>
+<div class="infobox-row"><span class="infobox-label">总部</span><span class="infobox-value">美国加州 Redwood City</span></div>
+<div class="infobox-row"><span class="infobox-label">CEO</span><span class="infobox-value">Lindon Gao</span></div>
+<div class="infobox-section-title">关键数据</div>
+<div class="infobox-row"><span class="infobox-label">核心产品</span><span class="infobox-value">DYNA-1 通用基础模型</span></div>
+<div class="infobox-row"><span class="infobox-label">累计融资</span><span class="infobox-value">$1.44 亿</span></div>
+<div class="infobox-row"><span class="infobox-label">估值</span><span class="infobox-value">约 $5 亿</span></div>
+<div class="infobox-row"><span class="infobox-label">投资方</span><span class="infobox-value">NVIDIA·Amazon·Samsung·LG</span></div>
+</aside>
+</div></div></body></html>

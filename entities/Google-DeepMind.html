@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Google — 具身智能布局 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+
+:root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+
+.top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 8px; }
+.top-nav a { color: var(--link); text-decoration: none; }
+
+.page-container { max-width: 1200px; margin: 0 auto; background: #fff; }
+
+.page-title { padding: 28px 32px 16px; }
+.page-title h1 { font-family: 'Georgia','Times New Roman',serif; font-size: 1.75rem; font-weight: 400; color: #000; margin-bottom: 4px; }
+.page-title .subtitle { font-size: 0.85rem; color: #54595d; }
+
+.content-wrapper { display: flex; gap: 20px; padding: 0 32px 40px; }
+.main-content { flex: 1; min-width: 0; }
+
+.infobox { width: 270px; flex-shrink: 0; border: 1px solid #a2a9b1; background: #f9f9f9; font-size: 0.78rem; line-height: 1.5; }
+.infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 10px; font-weight: 600; font-size: 0.85rem; }
+.infobox-subtitle { background: #e8f0fe; color: #1a3a5c; font-size: 0.72rem; text-align: center; padding: 2px 10px; }
+.infobox-section-title { background: #e8f0fe; color: #1a3a5c; text-align: center; padding: 4px 10px; font-weight: 600; font-size: 0.76rem; border-top: 1px solid #a2a9b1; }
+.infobox-row { display: flex; padding: 3px 10px; border-bottom: 1px solid #e8e8e8; }
+.infobox-label { width: 90px; color: #54595d; flex-shrink: 0; }
+.infobox-value { flex: 1; }
+
+h2 { font-family: 'Georgia','Times New Roman',serif; font-size: 1.25rem; font-weight: 400; border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+h3 { font-size: 1rem; font-weight: 600; margin: 20px 0 8px; }
+p { margin: 8px 0; }
+
+.wikitable { border-collapse: collapse; margin: 10px 0 18px; font-size: 0.8rem; width: 100%; border: 1px solid #a2a9b1; }
+.wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; font-size: 0.75rem; }
+.wikitable td { border: 1px solid #a2a9b1; padding: 5px 8px; vertical-align: top; }
+.wikitable tr:nth-child(even) td { background: var(--table-stripe); }
+.wikitable a { color: var(--link); text-decoration: none; }
+.wikitable a:hover { text-decoration: underline; }
+
+sup a { color: #0645ad; text-decoration: none; font-size: 0.7rem; }
+sup a:hover { text-decoration: underline; }
+
+.tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.7rem; margin: 1px 2px; border: 1px solid #c8d9e8; white-space: nowrap; }
+
+.timeline { border-left: 3px solid #ddd; padding-left: 20px; margin: 12px 0 12px 6px; }
+.timeline-entry { margin-bottom: 14px; position: relative; }
+.timeline-entry::before { content: ''; position: absolute; left: -27px; top: 5px; width: 9px; height: 9px; background: var(--accent); border: 2px solid #fff; outline: 1px solid var(--accent); border-radius: 50%; }
+.timeline-date { font-weight: 600; color: var(--accent); font-size: 0.82rem; }
+.timeline-title { font-weight: 600; margin: 1px 0; font-size: 0.84rem; }
+.timeline-desc { color: #54595d; font-size: 0.78rem; }
+
+.refs { font-size: 0.8rem; line-height: 1.7; }
+.refs ol { padding-left: 24px; }
+.refs li { margin-bottom: 4px; }
+.refs a { color: var(--link); }
+
+.page-footer { border-top: 1px solid #a2a9b1; padding: 14px 32px 24px; font-size: 0.78rem; color: #54595d; text-align: center; }
+.page-footer a { color: var(--link); text-decoration: none; }
+
+@media (max-width: 768px) { .content-wrapper { flex-direction: column; } .infobox { width: 100%; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+<div class="top-nav"><a href="../index.html">具身智能Wiki</a> <span>›</span> <a href="../index.html#tech-giants">科技巨头具身布局</a> <span>›</span> Google</div>
+
+<div class="page-title">
+<h1>Google — 具身智能布局</h1>
+<div class="subtitle">Alphabet Inc.（纳斯达克：GOOGL）· 具身大脑 + 机器人操作系统</div>
+</div>
+
+<div class="content-wrapper">
+<div class="main-content">
+
+<h2>1 具身智能战略定位</h2>
+<p>Google 在具身智能领域实施<b>"双引擎"战略</b>：DeepMind 提供具身 AI 基础模型（Gemini Robotics），Intrinsic 提供工业机器人软件平台（Flowstate），两条线在 2026 年同步并入 Google 本部后形成更强的协同效应<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref2">[2]</a></sup>。</p>
+<p>DeepMind CEO Demis Hassabis 将 Google 的定位明确描述为"机器人产业的 Android"——为任何机器人硬件制造商提供 AI 大脑和操作系统<sup><a href="#ref3">[3]</a></sup>。这一策略与 NVIDIA 的全栈芯片路线形成差异化竞争：Google 的优势在于 Gemini 多模态模型的语义理解和推理能力、与 Google Cloud 的云边协同、以及 Google Search/YouTube 数据基础。</p>
+<p>在具身智能价值链中，Google 占据<b>基础模型层和软件平台层</b>两个关键位置，同时通过 Google Cloud 提供训练基础设施，通过 Alphabet 的投资部门（CapitalG、GV）覆盖多家头部具身公司<sup><a href="#ref4">[4]</a></sup>。</p>
+
+<h2>2 核心技术/产品平台</h2>
+
+<table class="wikitable">
+<tr><th>产品</th><th>类型</th><th>发布时间</th><th>核心能力</th><th>开放程度</th></tr>
+<tr>
+  <td><b>Gemini Robotics</b></td>
+  <td>VLA 基础模型家族</td>
+  <td>2025 年</td>
+  <td>多模态视觉-语言-动作，含推理模型（ER）和执行模型两大分支<sup><a href="#ref5">[5]</a></sup></td>
+  <td>Gemini API + Google AI Studio</td>
+</tr>
+<tr>
+  <td><b>Gemini Robotics-ER 1.6</b></td>
+  <td>具身推理模型</td>
+  <td>2026.04.14</td>
+  <td>空间推理、多视图理解、仪表读数（准确率 93%）、安全危害检测<sup><a href="#ref5">[5]</a></sup></td>
+  <td>开放 API</td>
+</tr>
+<tr>
+  <td><b>Intrinsic Flowstate</b></td>
+  <td>机器人软件开发平台</td>
+  <td>2023 年</td>
+  <td>低代码"技能块"开发、硬件无关、仿真到真机部署<sup><a href="#ref2">[2]</a></sup></td>
+  <td>商业</td>
+</tr>
+<tr>
+  <td><b>Intrinsic Vision Model (IVM)</b></td>
+  <td>AI 视觉感知模型</td>
+  <td>2025 年底</td>
+  <td>复杂零件识别、力传感器融合、未知物体抓取<sup><a href="#ref2">[2]</a></sup></td>
+  <td>集成于 Flowstate</td>
+</tr>
+<tr>
+  <td><b>Gemini 3.0 Flash</b></td>
+  <td>多模态基座模型</td>
+  <td>2025</td>
+  <td>为 Gemini Robotics 提供底层多模态理解能力<sup><a href="#ref5">[5]</a></sup></td>
+  <td>开放 API</td>
+</tr>
+</table>
+
+<p><b>Gemini Robotics-ER（Embodied Reasoning）</b>的独特设计理念是<b>"推理先行、动作后行"</b>：ER 模型不直接控制机器人电机，而是作为高层"大脑"理解物理环境、分解任务步骤、调用工具（包括 Google Search、第三方 VLA 模型），并判断任务是否成功。上一代 ER 1.5 在模拟仪表读数任务上准确率仅 23%，ER 1.6 通过"agentic vision"技术（缩放+指向+代码执行+世界知识）将准确率提升至 93%<sup><a href="#ref5">[5]</a></sup>。</p>
+<p><b>Intrinsic Flowstate</b> 是 Google 面向工业自动化的核心软件平台。与 DeepMind 的基础模型研究不同，Flowstate 聚焦实际工厂部署——通过"技能块"（skill blocks）让开发者无需机器人编程深度即可构建工作流，支持 FANUC、KUKA、Comau 等多种机器人品牌<sup><a href="#ref2">[2]</a></sup>。2025 年 10 月与富士康合资成立美国公司，目标打造 AI 驱动的"未来智能工厂"，首先聚焦电子制造中的装配、检测、物料搬运场景<sup><a href="#ref6">[6]</a></sup>。</p>
+
+<h2>3 投资布局</h2>
+
+<table class="wikitable">
+<tr><th>被投公司</th><th>投资时间</th><th>投资角色</th><th>公司方向</th><th>最新估值/融资额</th></tr>
+<tr>
+  <td><b>Apptronik</b></td>
+  <td>2025.02</td>
+  <td>A 轮参与 + 后续跟投</td>
+  <td>工业人形 Apollo</td>
+  <td>累计 A 轮 $9.35 亿，估值 ~$55 亿<sup><a href="#ref4">[4]</a></sup></td>
+</tr>
+<tr>
+  <td><b>Agile Robots SE</b></td>
+  <td>2025（具体未公开）</td>
+  <td>战略投资 + 技术合作</td>
+  <td>工业力控机器人</td>
+  <td>已部署 20,000+ 台<sup><a href="#ref7">[7]</a></sup></td>
+</tr>
+</table>
+
+<p>Google 的投资策略与 NVIDIA 的全赛道覆盖不同，更<b>聚焦于能用 Gemini Robotics 模型赋能的整机公司</b>。通过 Apptronik（人形）和 Agile Robots（工业力控）两大标的，Google 获得了将 Gemini Robotics 从实验室推向真实工厂场景的载体<sup><a href="#ref4">[4]</a></sup><sup><a href="#ref7">[7]</a></sup>。此外，Alphabet 旗下 CapitalG 和 GV 还通过风险投资覆盖了大量早期 AI 和机器人公司。</p>
+
+<h2>4 合作伙伴生态</h2>
+
+<h3>人形机器人</h3>
+<p><b>Boston Dynamics</b>：2026 年 1 月 CES 宣布战略合作，Gemini Robotics 模型将驱动新一代 Atlas 人形机器人的感知、推理和操作能力。Atlas 将在 Hyundai 汽车工厂率先部署<sup><a href="#ref8">[8]</a></sup>。前 Boston Dynamics CTO Aaron Saunders 于 2025 年 11 月加入 Google DeepMind 任机器人硬件工程 VP<sup><a href="#ref8">[8]</a></sup>。</p>
+<p><b>Apptronik</b>：2025 年 12 月公开展示 Apptronik Apollo 人形机器人在 Gemini Robotics 驱动下完成叠衣、收纳等家庭任务。Google 同时为 Apptronik A 轮投资方<sup><a href="#ref4">[4]</a></sup>。</p>
+
+<h3>工业机器人</h3>
+<p><b>Agile Robots SE</b>：2026 年 3 月宣布合作，在 Agile Robots 已部署的 20,000+ 台工业机器人上集成 Gemini Robotics 模型，实现从预编程到 AI 驱动的任务级自动化<sup><a href="#ref7">[7]</a></sup>。</p>
+<p><b>Foxconn（富士康）</b>：2025 年 10 月与 Intrinsic 成立美国合资公司，利用 Flowstate 平台和 IVM 视觉模型打造 AI 驱动电子制造工厂<sup><a href="#ref6">[6]</a></sup>。</p>
+<p><b>FANUC、KUKA、Comau</b>：Flowstate 平台已支持多种工业机器人品牌<sup><a href="#ref2">[2]</a></sup>。</p>
+
+<h3>云端与基础设施</h3>
+<p>Google Cloud 为 Gemini Robotics 的模型训练和推理提供 TPU/GPU 算力基础设施，并通过 Vertex AI 向企业客户开放机器人模型部署<sup><a href="#ref1">[1]</a></sup>。</p>
+
+<h2>5 具身生态关系网络</h2>
+
+<table class="wikitable">
+<tr><th>关系类型</th><th>涉及公司</th><th>具体关系</th></tr>
+<tr>
+  <td><b>战略合作（人形）</b></td>
+  <td>Boston Dynamics</td>
+  <td>Gemini Robotics 驱动 Atlas；前 BD CTO 加入 DeepMind<sup><a href="#ref8">[8]</a></sup></td>
+</tr>
+<tr>
+  <td><b>战略合作（人形）</b></td>
+  <td>Apptronik</td>
+  <td>Apollo + Gemini Robotics 家庭任务演示；Google 为投资方<sup><a href="#ref4">[4]</a></sup></td>
+</tr>
+<tr>
+  <td><b>战略合作（工业）</b></td>
+  <td>Agile Robots SE</td>
+  <td>20,000+ 台机器人集成 Gemini Robotics<sup><a href="#ref7">[7]</a></sup></td>
+</tr>
+<tr>
+  <td><b>战略合作（工业）</b></td>
+  <td>Foxconn（富士康）</td>
+  <td>Intrinsic 合资，AI 工厂<sup><a href="#ref6">[6]</a></sup></td>
+</tr>
+<tr>
+  <td><b>竞争关系（模型层）</b></td>
+  <td>NVIDIA（GR00T）</td>
+  <td>VLA 基础模型直接竞争<sup><a href="#ref3">[3]</a></sup></td>
+</tr>
+<tr>
+  <td><b>竞争关系（软件平台）</b></td>
+  <td>NVIDIA（Isaac/Omniverse）</td>
+  <td>Flowstate vs Isaac 仿真+部署平台<sup><a href="#ref2">[2]</a></sup></td>
+</tr>
+<tr>
+  <td><b>竞争关系（模型层）</b></td>
+  <td>Physical Intelligence (π)、Skild AI</td>
+  <td>同属通用机器人大脑赛道<sup><a href="#ref3">[3]</a></sup></td>
+</tr>
+<tr>
+  <td><b>独立路线（平台层）</b></td>
+  <td>Tesla (Optimus)、Amazon Robotics</td>
+  <td>完全自研或不依赖外部模型平台</td>
+</tr>
+</table>
+
+<h2>6 具身智能发展时间线</h2>
+
+<div class="timeline">
+
+<div class="timeline-entry">
+<div class="timeline-date">2026.04.14</div>
+<div class="timeline-title">Gemini Robotics-ER 1.6 发布</div>
+<div class="timeline-desc">仪表读数准确率从 23% 跃升至 93%，新增空间推理、多视图理解、成功检测等能力。通过 Gemini API 和 Google AI Studio 向第三方开发者开放<sup><a href="#ref5">[5]</a></sup>。</div>
+</div>
+
+<div class="timeline-entry">
+<div class="timeline-date">2026.04.08</div>
+<div class="timeline-title">Boston Dynamics Spot 集成 Gemini Robotics</div>
+<div class="timeline-desc">Spot 四足机器人通过 Orbit AIVI-Learning 平台接入 Gemini Robotics-ER，实现工业仪表自动巡检<sup><a href="#ref5">[5]</a></sup>。</div>
+</div>
+
+<div class="timeline-entry">
+<div class="timeline-date">2026.03.24</div>
+<div class="timeline-title">Agile Robots 与 DeepMind 合作</div>
+<div class="timeline-desc">在 20,000+ 台已部署的工业机器人上集成 Gemini Robotics 模型<sup><a href="#ref7">[7]</a></sup>。</div>
+</div>
+
+<div class="timeline-entry">
+<div class="timeline-date">2026.02.25</div>
+<div class="timeline-title">Intrinsic 正式并入 Google</div>
+<div class="timeline-desc">Alphabet 旗下机器人软件公司 Intrinsic 重新整合入 Google，获得 DeepMind AI 和 Google Cloud 直接访问权限<sup><a href="#ref2">[2]</a></sup>。</div>
+</div>
+
+<div class="timeline-entry">
+<div class="timeline-date">2026.01.05（CES）</div>
+<div class="timeline-title">Boston Dynamics × Google DeepMind 战略合作</div>
+<div class="timeline-desc">宣布 Gemini Robotics 将驱动新一代 Atlas 人形机器人，目标打造"全球最先进机器人基础模型"<sup><a href="#ref8">[8]</a></sup>。</div>
+</div>
+
+<div class="timeline-entry">
+<div class="timeline-date">2025.12</div>
+<div class="timeline-title">Apptronik Apollo + Gemini Robotics 演示</div>
+<div class="timeline-desc">公开展示 Apollo 人形在 Gemini Robotics 驱动下完成家庭灵巧操作任务<sup><a href="#ref4">[4]</a></sup>。</div>
+</div>
+
+<div class="timeline-entry">
+<div class="timeline-date">2025.11</div>
+<div class="timeline-title">Aaron Saunders 加入 DeepMind</div>
+<div class="timeline-desc">Boston Dynamics 前 CTO（近 20 年任期）加入 Google DeepMind 任机器人硬件工程 VP<sup><a href="#ref8">[8]</a></sup>。</div>
+</div>
+
+<div class="timeline-entry">
+<div class="timeline-date">2025.10</div>
+<div class="timeline-title">Intrinsic × Foxconn 合资</div>
+<div class="timeline-desc">宣布成立美国合资公司，打造 AI 驱动的"未来智能工厂"<sup><a href="#ref6">[6]</a></sup>。</div>
+</div>
+
+<div class="timeline-entry">
+<div class="timeline-date">2025</div>
+<div class="timeline-title">Gemini Robotics 模型家族发布</div>
+<div class="timeline-desc">首个 Gemini Robotics 模型发布，分推理模型（ER）和执行模型两类，标志 Google 正式进入具身基础模型赛道<sup><a href="#ref5">[5]</a></sup>。</div>
+</div>
+
+<div class="timeline-entry">
+<div class="timeline-date">2023</div>
+<div class="timeline-title">Everyday Robots 关闭，Flowstate 发布</div>
+<div class="timeline-desc">Google 关闭 Everyday Robots 项目（内部自研轮式家庭机器人），转向"不造硬件、做平台"路线。Intrinsic 发布 Flowstate 平台。</div>
+</div>
+
+<div class="timeline-entry">
+<div class="timeline-date">2021</div>
+<div class="timeline-title">Intrinsic 从 X 分拆</div>
+<div class="timeline-desc">Intrinsic 在 Alphabet X 孵化 5 年后成为独立子公司。</div>
+</div>
+
+<div class="timeline-entry">
+<div class="timeline-date">2013-2017</div>
+<div class="timeline-title">Google 机器人早期探索</div>
+<div class="timeline-desc">2013 年收购 Boston Dynamics 等 8 家机器人公司（Andy Rubin 主导），2017 年将 Boston Dynamics 出售给软银。此后转向 AI 模型路线。</div>
+</div>
+
+</div>
+
+<h2>7 行业影响力评估</h2>
+<p>Google 在具身智能领域的独特优势在于<b>Gemini 多模态模型的底层能力</b>——Gemini 3.0 Flash 的视觉理解和自然语言推理能力为其机器人模型提供了强大的"上游"基础，这是 NVIDIA GR00T 和 Physical Intelligence π 系列不具备的先发优势<sup><a href="#ref3">[3]</a></sup>。</p>
+<p>2026 年上半年，Google 的具身布局明显加速：Intrinsic 2 月并入 Google 本部、Boston Dynamics 合作从 CES 宣布到 Spot 实装仅 3 个月、Agile Robots 合作从宣布到 20,000+ 台部署同步推进。ARC Advisory Group 评价 Gemini Robotics-ER 1.6 的仪表读数能力是"将 AI 推理嵌入物理世界的里程碑"<sup><a href="#ref5">[5]</a></sup>。</p>
+<p>但与 NVIDIA 相比，Google 缺少自主的机器人边缘计算硬件（GPU/TPU 不适合低功耗边缘场景），且尚未建立如 NVIDIA Isaac/Cosmos 那样的仿真-训练-部署闭环。在"软硬一体"的全栈性上，Google 仍处于追赶位置。</p>
+
+<h2>8 分析层</h2>
+
+<h3>优势</h3>
+<ul>
+<li><b>多模态基座优势</b>：Gemini 模型家族的视觉理解和推理能力是进入具身智能的天然跳板，这是纯机器人创业公司无法获得的底层能力</li>
+<li><b>云+AI 协同</b>：Google Cloud（Vertex AI）+ Gemini + Intrinsic Flowstate 形成从训练到部署的完整链条</li>
+<li><b>合作阵容强大</b>：Boston Dynamics（技术标杆）+ Apptronik（资本布局）+ Agile Robots（20,000+ 台部署）+ Foxconn（制造体量）</li>
+<li><b>软件平台先发</b>：Flowstate 是业界最早面向非机器人专家的低代码开发平台之一</li>
+</ul>
+
+<h3>挑战/风险</h3>
+<ul>
+<li><b>无自有硬件</b>：不像 NVIDIA 有 Jetson、Tesla 有 Dojo，Google 在机器人边缘算力上依赖第三方</li>
+<li><b>组织惯性</b>：2013 年大举收购→2017 年出售 Boston Dynamics→2023 年关闭 Everyday Robots→2026 年重归，频繁转向消耗内部信心</li>
+<li><b>仿真能力短板</b>：NVIDIA Isaac/Omniverse 的仿真-训练-Sim2Real 闭环是 Google 目前不具备的</li>
+<li><b>与合作伙伴的竞合关系</b>：作为"机器人 Android"，合作伙伴是否愿意深度绑定而非自研，取决于 Gemini Robotics 能否持续证明技术领先</li>
+</ul>
+
+<h3>关键变量（未来 2-3 年）</h3>
+<ul>
+<li>Atlas + Gemini Robotics 在人形量产场景中的真实表现（2026-2027）</li>
+<li>Intrinsic + Foxconn 智能工厂能否在电子制造中实现降本增效的量化 ROI</li>
+<li>Gemini Robotics 能否在 API 生态中建立类似 CUDA 的开发者锁定效应</li>
+</ul>
+
+<h2>9 参考资料</h2>
+<div class="refs">
+<ol>
+<li id="ref1"><a href="https://deepmind.google/models/gemini-robotics/" target="_blank">Gemini Robotics — Google DeepMind 官方模型页</a></li>
+<li id="ref2"><a href="https://techcrunch.com/2026/02/25/alphabet-owned-robotics-software-company-intrinsic-joins-google/" target="_blank">"Alphabet-owned robotics software company Intrinsic joins Google" — TechCrunch, 2026.02.25</a></li>
+<li id="ref3"><a href="https://techround.co.uk/tech/robots-that-understand-the-world-are-coming-google-deepminds-latest-model-is-a-big-step-closer/" target="_blank">"Robots That Understand The World Are Coming" — TechRound, 2026.04</a></li>
+<li id="ref4"><a href="https://www.forbes.com/sites/johnkoetsier/2025/12/10/home-humanoid-google-deepmind-shows-apptroniks-robot-doing-real-world-tasks/" target="_blank">"Home Humanoid: Google DeepMind Shows Apptronik's Robot Doing Real-World Tasks" — Forbes, 2025.12.10</a></li>
+<li id="ref5"><a href="https://deepmind.google/blog/gemini-robotics-er-1-6/" target="_blank">"Gemini Robotics ER 1.6: Enhanced Embodied Reasoning" — Google DeepMind Blog, 2026.04.14</a></li>
+<li id="ref6"><a href="https://www.foxconn.com/en-us/press-center/press-releases/latest-news/1906" target="_blank">"Foxconn And Intrinsic Launch Joint Venture To Build AI Factory Of The Future" — Foxconn, 2025.11.21</a></li>
+<li id="ref7"><a href="https://techcrunch.com/2026/03/24/agile-robots-becomes-the-latest-robotics-company-to-partner-with-google-deepmind/" target="_blank">"Agile Robots becomes the latest robotics company to partner with Google DeepMind" — TechCrunch, 2026.03.24</a></li>
+<li id="ref8"><a href="https://bostondynamics.com/blog/boston-dynamics-google-deepmind-form-new-ai-partnership/" target="_blank">"Boston Dynamics & Google DeepMind Form New AI Partnership" — Boston Dynamics Blog, 2026.01.05</a></li>
+</ol>
+</div>
+
+</div>
+
+<aside class="infobox">
+<div class="infobox-title">Alphabet Inc. (Google)</div>
+<div class="infobox-subtitle">科技巨头 · 具身智能布局</div>
+
+<div class="infobox-section-title">母公司概况</div>
+<div class="infobox-row"><span class="infobox-label">公司全称</span><span class="infobox-value">Alphabet Inc.</span></div>
+<div class="infobox-row"><span class="infobox-label">股票代码</span><span class="infobox-value">NASDAQ: GOOGL / GOOG</span></div>
+<div class="infobox-row"><span class="infobox-label">成立时间</span><span class="infobox-value">1998 年（Google）<br>2015 年（Alphabet 重组）</span></div>
+<div class="infobox-row"><span class="infobox-label">总部</span><span class="infobox-value">美国加州山景城</span></div>
+<div class="infobox-row"><span class="infobox-label">CEO</span><span class="infobox-value">Sundar Pichai</span></div>
+<div class="infobox-row"><span class="infobox-label">官网</span><span class="infobox-value"><a href="https://deepmind.google" target="_blank">deepmind.google</a></span></div>
+
+<div class="infobox-section-title">具身业务概况</div>
+<div class="infobox-row"><span class="infobox-label">具身业务负责人</span><span class="infobox-value">Carolina Parada<br><small>Sr. Director, Robotics, DeepMind</small></span></div>
+<div class="infobox-row"><span class="infobox-label">硬件工程 VP</span><span class="infobox-value">Aaron Saunders<br><small>前 Boston Dynamics CTO</small></span></div>
+<div class="infobox-row"><span class="infobox-label">Intrinsic CEO</span><span class="infobox-value">Wendy Tan White</span></div>
+<div class="infobox-row"><span class="infobox-label">生态定位</span><span class="infobox-value"><span class="tag" style="background:#e3f2fd;color:#1565c0;">基础模型平台</span><span class="tag" style="background:#e8f5e9;color:#2e7d32;">软件/数据/算法平台</span></span></div>
+<div class="infobox-row"><span class="infobox-label">核心平台</span><span class="infobox-value">Gemini Robotics · Intrinsic Flowstate · IVM · Google Cloud</span></div>
+<div class="infobox-row"><span class="infobox-label">战略定位</span><span class="infobox-value">具身大脑 + 机器人 OS<br>（"机器人产业的 Android"）</span></div>
+
+<div class="infobox-section-title">母公司规模 (FY2025)</div>
+<div class="infobox-row"><span class="infobox-label">年营收</span><span class="infobox-value">$4,028 亿</span></div>
+<div class="infobox-row"><span class="infobox-label">净利润</span><span class="infobox-value">约 $1,058-1,322 亿</span></div>
+<div class="infobox-row"><span class="infobox-label">市值</span><span class="infobox-value">约 $2.8-4.0 万亿</span></div>
+<div class="infobox-row"><span class="infobox-label">员工</span><span class="infobox-value">约 191,000 人</span></div>
+
+<div class="infobox-section-title">具身合作覆盖</div>
+<div class="infobox-row" style="display:block;padding:5px 10px;font-size:0.76rem;">
+人形：Boston Dynamics · Apptronik<br>
+工业：Agile Robots (20,000+台) · Foxconn<br>
+软件平台：Flowstate (FANUC/KUKA/Comau)<br>
+云端：Google Cloud (Vertex AI)
+</div>
+</aside>
+</div>
+
+<div class="page-footer">
+<p>此页面最后更新于 2026-05-27 · 来源以 DeepMind 官方博客、TechCrunch、Forbes 为主 · <a href="../index.html">返回主索引</a></p>
+</div>
+</div>
+</body>
+</html>

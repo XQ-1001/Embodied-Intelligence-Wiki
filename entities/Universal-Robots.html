@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>Universal Robots — 具身智能Wiki</title>
+<style>
+:root{--bg:#fff;--text:#202122;--link:#0645ad;--border:#a2a9b1;--accent:#1a3a5c}
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:-apple-system,BlinkMacSystemFont,'微软雅黑',sans-serif;font-size:.875rem;line-height:1.6;color:var(--text);background:#f6f6f6}
+.top-nav{background:#fff;border-bottom:1px solid #c8ccd1;padding:8px 20px;font-size:.8rem;color:#54595d;display:flex;gap:8px;align-items:center}.top-nav a{color:var(--link);text-decoration:none}
+.page-container{max-width:1200px;margin:0 auto;background:#fff}.page-title{padding:28px 32px 16px}.page-title h1{font-family:'Georgia',serif;font-size:1.75rem;font-weight:400}
+.content-wrapper{display:flex;gap:20px;padding:0 32px 40px}.main-content{flex:1;min-width:0}
+.infobox{width:270px;flex-shrink:0;border:1px solid var(--border);background:#f9f9f9;font-size:.78rem}
+.infobox-title{background:var(--accent);color:#fff;text-align:center;padding:6px 10px;font-weight:600}
+.infobox-section-title{background:#e8f0fe;color:#1a3a5c;text-align:center;padding:4px 10px;font-weight:600;font-size:.76rem;border-top:1px solid var(--border)}
+.infobox-row{display:flex;padding:3px 10px;border-bottom:1px solid #e8e8e8}.infobox-label{width:85px;color:#54595d;flex-shrink:0}.infobox-value{flex:1}
+h2{font-family:'Georgia',serif;font-size:1.25rem;font-weight:400;border-bottom:1px solid var(--border);padding-bottom:4px;margin:28px 0 12px}h3{font-size:1rem;font-weight:600;margin:20px 0 8px}p{margin:8px 0}
+.wikitable{border-collapse:collapse;margin:10px 0;font-size:.8rem;width:100%;border:1px solid var(--border)}
+.wikitable th{background:#eaecf0;border:1px solid var(--border);padding:5px 8px;text-align:center;font-weight:600;font-size:.75rem}
+.wikitable td{border:1px solid var(--border);padding:5px 8px}.wikitable tr:nth-child(even) td{background:#f8f9fa}
+.timeline{border-left:3px solid #ddd;padding-left:20px;margin:12px 0 12px 6px}
+.timeline-entry{margin-bottom:14px;position:relative}.timeline-entry::before{content:'';position:absolute;left:-27px;top:5px;width:9px;height:9px;background:var(--accent);border:2px solid #fff;outline:1px solid var(--accent);border-radius:50%}
+.timeline-date{font-weight:600;color:var(--accent);font-size:.82rem}.timeline-title{font-weight:600;margin:1px 0;font-size:.84rem}.timeline-desc{color:#54595d;font-size:.78rem}
+sup a{color:#0645ad;text-decoration:none;font-size:.7rem}
+.refs{font-size:.8rem}.refs ol{padding-left:24px}.refs li{margin-bottom:4px}.refs a{color:var(--link)}
+.page-footer{border-top:1px solid var(--border);padding:14px 32px 24px;font-size:.78rem;color:#54595d;text-align:center}
+</style></head><body><div class="page-container">
+<div class="top-nav"><a href="../index.html">具身智能Wiki</a> › <a href="../index.html#overseas-eco">海外具身生态</a> › Universal Robots</div>
+<div class="page-title"><h1>Universal Robots / Teradyne Robotics</h1><div class="subtitle" style="font-size:.85rem;color:#54595d;">全球协作机器人市场份额第一 · 母公司 Teradyne (NASDAQ:TER)</div></div>
+<div class="content-wrapper"><div class="main-content">
+
+<h2>1 概况</h2>
+<p><b>Universal Robots (UR)</b> 于 2005 年由 Esben Østergaard、Kasper Støy 和 Kristian Kassow 在丹麦欧登塞创立，是全球协作机器人（cobots）品类的开创者和市场份额最大的公司<sup><a href="#ref1">[1]</a></sup>。UR 累计销售超过 90,000 台协作机器人，部署在汽车、电子、制药、食品等行业的焊接、装配、码垛、质检等场景中<sup><a href="#ref1">[1]</a></sup>。</p>
+<p>2015 年，美国半导体测试设备巨头 <b>Teradyne (NASDAQ:TER)</b> 以 $3.5 亿收购 UR；2018 年 Teradyne 又收购了丹麦移动机器人公司 MiR，成立 <b>Teradyne Robotics</b> 部门<sup><a href="#ref1">[1]</a></sup>。2026 Q1 Teradyne Robotics 营收 $9,100 万，连续四季增长。NVIDIA GTC 2026 将 UR 列为物理 AI 生态核心合作伙伴，UR 在 GTC 上演示了整合 Isaac/Omniverse 的复杂物理 AI 工作单元<sup><a href="#ref2">[2]</a></sup>。</p>
+
+<h2>2 产品与部署</h2>
+<table class="wikitable">
+<tr><th>产品系列</th><th>类型</th><th>关键特征</th></tr>
+<tr><td><b>UR3e / UR5e / UR10e / UR16e / UR20 / UR30</b></td><td>协作机械臂</td><td>3-30kg 负载范围，即插即用，无需安全围栏</td></tr>
+<tr><td><b>UR+ 生态</b></td><td>第三方配件平台</td><td>500+ 认证末端执行器、传感器、软件，即插即用</td></tr>
+<tr><td><b>MiR 系列</b></td><td>自主移动机器人</td><td>MiR100/250/500/1350，与 UR 协作臂组合成移动操作单元</td></tr>
+</table>
+
+<h2>3 具身生态关系网络</h2>
+<table class="wikitable">
+<tr><th>关系类型</th><th>涉及公司/平台</th><th>具体关系</th></tr>
+<tr><td><b>母公司</b></td><td>Teradyne (NASDAQ:TER)</td><td>2015 年 $3.5 亿收购，与 MiR 共同构成 Teradyne Robotics</td></tr>
+<tr><td><b>平台合作</b></td><td>NVIDIA (Isaac/Omniverse)</td><td>GTC 2026 生态核心；物理 AI 工作单元演示<sup><a href="#ref2">[2]</a></sup></td></tr>
+<tr><td><b>大型客户</b></td><td>Amazon (推测 Vulcan 使用 UR 机械臂)</td><td>电商物流场景的大规模协作机器人部署</td></tr>
+<tr><td><b>生态系统</b></td><td>UR+ 认证 500+ 合作伙伴</td><td>OnRobot、Robotiq、Schunk、SICK 等</td></tr>
+<tr><td><b>竞争关系</b></td><td>FANUC CRX、ABB GoFa、KUKA LBR iisy</td><td>传统工业机器人厂商的协作机器人产品线</td></tr>
+</table>
+
+<h2>4 发展时间线</h2>
+<div class="timeline">
+<div class="timeline-entry"><div class="timeline-date">2026 Q1</div><div class="timeline-title">营收 $9,100 万创 Q1 纪录</div><div class="timeline-desc">Teradyne Robotics 连续四季增长，AI 相关收入达 15%。</div></div>
+<div class="timeline-entry"><div class="timeline-date">2025</div><div class="timeline-title">NVIDIA GTC 物理 AI 合作</div><div class="timeline-desc">在 GTC 上与 Generalist 合作演示 Isaac/Omniverse 驱动的复杂物理 AI 工作单元。</div></div>
+<div class="timeline-entry"><div class="timeline-date">2018</div><div class="timeline-title">Teradyne 收购 MiR</div><div class="timeline-desc">收购丹麦移动机器人公司 MiR，与 UR 共同构成 Teradyne Robotics。</div></div>
+<div class="timeline-entry"><div class="timeline-date">2015</div><div class="timeline-title">Teradyne 收购 UR（$3.5 亿）</div><div class="timeline-desc">UR 保持丹麦独立运营，获得全球化资源支持。</div></div>
+<div class="timeline-entry"><div class="timeline-date">2008</div><div class="timeline-title">UR5 首发</div><div class="timeline-desc">全球首款商用协作机器人，5kg 负载，定义了协作机器人品类。</div></div>
+</div>
+
+<h2>5 分析层</h2>
+<h3>优势</h3><ul><li>协作机器人品类开创者 + 市场份额第一</li><li>累计 90,000+ 台出货量提供了无可比拟的部署经验</li><li>UR+ 生态 500+ 认证伙伴形成网络效应</li><li>NVIDIA 生态整合使其成为物理 AI 时代的标准硬件载体</li></ul>
+<h3>挑战</h3><ul><li>2023-2024 年营收下降（$3.26 亿→$2.93 亿），2025 年裁员两次（总计 24%）</li><li>传统工业机器人厂商（FANUC、ABB、KUKA）正在加速推出协作产品线</li><li>中国本土协作机器人品牌（节卡、艾利特、遨博）价格竞争激烈</li></ul>
+<h3>待核验</h3><ul><li>Amazon Vulcan 是否使用 UR 机械臂尚未得到官方确认</li><li>UR 在中国市场的具体份额数据</li></ul>
+
+<h2>6 参考资料</h2>
+<div class="refs"><ol>
+<li id="ref1"><a href="https://www.universal-robots.com/about/" target="_blank">About Universal Robots — official website</a></li>
+<li id="ref2"><a href="https://www.therobotreport.com/teradyne-robotics-revenue-rises-start-2026/" target="_blank">"Teradyne Robotics revenue rises at the start of 2026" — The Robot Report, 2026</a></li>
+</ol></div>
+</div>
+<aside class="infobox">
+<div class="infobox-title">Universal Robots</div>
+<div class="infobox-section-title">基本信息</div>
+<div class="infobox-row"><span class="infobox-label">母公司</span><span class="infobox-value">Teradyne (NASDAQ:TER)</span></div>
+<div class="infobox-row"><span class="infobox-label">总部</span><span class="infobox-value">丹麦欧登塞</span></div>
+<div class="infobox-row"><span class="infobox-label">成立</span><span class="infobox-value">2005</span></div>
+<div class="infobox-row"><span class="infobox-label">联席品牌</span><span class="infobox-value">Teradyne Robotics (含 MiR)</span></div>
+<div class="infobox-section-title">核心数据</div>
+<div class="infobox-row"><span class="infobox-label">累计出货</span><span class="infobox-value">90,000+ 台</span></div>
+<div class="infobox-row"><span class="infobox-label">Q1 2026 营收</span><span class="infobox-value">$9,100 万 (Teradyne Robotics)</span></div>
+<div class="infobox-row"><span class="infobox-label">生态定位</span><span class="infobox-value">协作机器人标准硬件载体</span></div>
+<div class="infobox-row"><span class="infobox-label">关键合作</span><span class="infobox-value">NVIDIA Isaac/Omniverse</span></div>
+</aside></div>
+<div class="page-footer"><p>最后更新 2026-05-28 · <a href="../index.html">返回主索引</a></p></div>
+</div></body></html>

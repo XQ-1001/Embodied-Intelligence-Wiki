@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>ANYbotics — 具身智能Wiki</title>
+<style>
+:root{--bg:#fff;--text:#202122;--link:#0645ad;--border:#a2a9b1;--accent:#1a3a5c}
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:-apple-system,BlinkMacSystemFont,'微软雅黑',sans-serif;font-size:.875rem;line-height:1.6;color:var(--text);background:#f6f6f6}
+.top-nav{background:#fff;border-bottom:1px solid #c8ccd1;padding:8px 20px;font-size:.8rem;color:#54595d;display:flex;gap:8px;align-items:center}.top-nav a{color:var(--link);text-decoration:none}
+.page-container{max-width:1200px;margin:0 auto;background:#fff}.page-title{padding:28px 32px 16px}.page-title h1{font-family:'Georgia',serif;font-size:1.75rem;font-weight:400}
+.content-wrapper{display:flex;gap:20px;padding:0 32px 40px}.main-content{flex:1;min-width:0}
+.infobox{width:270px;flex-shrink:0;border:1px solid var(--border);background:#f9f9f9;font-size:.78rem}
+.infobox-title{background:var(--accent);color:#fff;text-align:center;padding:6px 10px;font-weight:600}
+.infobox-section-title{background:#e8f0fe;color:#1a3a5c;text-align:center;padding:4px 10px;font-weight:600;font-size:.76rem;border-top:1px solid var(--border)}
+.infobox-row{display:flex;padding:3px 10px;border-bottom:1px solid #e8e8e8}.infobox-label{width:85px;color:#54595d;flex-shrink:0}.infobox-value{flex:1}
+h2{font-family:'Georgia',serif;font-size:1.25rem;font-weight:400;border-bottom:1px solid var(--border);padding-bottom:4px;margin:28px 0 12px}h3{font-size:1rem;font-weight:600;margin:20px 0 8px}p{margin:8px 0}
+.wikitable{border-collapse:collapse;margin:10px 0;font-size:.8rem;width:100%;border:1px solid var(--border)}
+.wikitable th{background:#eaecf0;border:1px solid var(--border);padding:5px 8px;text-align:center;font-weight:600;font-size:.75rem}
+.wikitable td{border:1px solid var(--border);padding:5px 8px}.wikitable tr:nth-child(even) td{background:#f8f9fa}
+.timeline{border-left:3px solid #ddd;padding-left:20px;margin:12px 0 12px 6px}
+.timeline-entry{margin-bottom:14px;position:relative}.timeline-entry::before{content:'';position:absolute;left:-27px;top:5px;width:9px;height:9px;background:var(--accent);border:2px solid #fff;outline:1px solid var(--accent);border-radius:50%}
+.timeline-date{font-weight:600;color:var(--accent);font-size:.82rem}.timeline-title{font-weight:600;margin:1px 0;font-size:.84rem}.timeline-desc{color:#54595d;font-size:.78rem}
+sup a{color:#0645ad;text-decoration:none;font-size:.7rem}
+.refs{font-size:.8rem}.refs ol{padding-left:24px}.refs li{margin-bottom:4px}.refs a{color:var(--link)}
+.page-footer{border-top:1px solid var(--border);padding:14px 32px 24px;font-size:.78rem;color:#54595d;text-align:center}
+</style></head><body><div class="page-container">
+<div class="top-nav"><a href="../index.html">具身智能Wiki</a> › <a href="../index.html#overseas-eco">海外具身生态</a> › ANYbotics</div>
+<div class="page-title"><h1>ANYbotics</h1><div class="subtitle" style="font-size:.85rem;color:#54595d;">ETH Zurich 孵化 · 全球工业四足巡检机器人领导者</div></div>
+<div class="content-wrapper"><div class="main-content">
+
+<h2>1 概况</h2>
+<p>ANYbotics 于 <b>2016 年</b>从苏黎世联邦理工学院（ETH Zurich）机器人与自主系统实验室（RSL）分拆成立，CEO Péter Fankhauser、CTO Christian Gehring、学术创始人 Marco Hutter 和 Roland Siegwart<sup><a href="#ref1">[1]</a></sup>。公司累计融资超 <b>$1.5 亿</b>，2023 年 B 轮 $5,000 万，2024 年追加 $6,000 万（Aramco Ventures、Qualcomm Ventures），2025 年 9 月 Climate Investment（OGCI 旗下，成员含 Aramco、BP、Shell、ExxonMobil 等）战略注资<sup><a href="#ref2">[2]</a></sup>。</p>
+<p>旗舰产品 <b>ANYmal D</b> 已出货 200+ 台，在石油/天然气/采矿/电力/金属行业每周执行数千次自主巡检。下一代 <b>ANYmal X</b> 是<b>全球首款获 ATEX/IECEx 防爆认证</b>的腿式机器人，可在 Zone 1 爆炸性环境中连续自主作业，2026 年 Q1 开始交付<sup><a href="#ref2">[2]</a></sup>。</p>
+
+<h2>2 产品与部署</h2>
+<table class="wikitable">
+<tr><th>产品</th><th>时间</th><th>关键特征</th></tr>
+<tr><td><b>ANYmal D</b></td><td>2021</td><td>IP67 防护，工业级端到端巡检；200+ 台出货</td></tr>
+<tr><td><b>ANYmal X</b></td><td>2026 Q1</td><td>全球首款 ATEX/IECEx Ex 认证四足，Zone 1 爆炸性环境自主巡检</td></tr>
+</table>
+<p><b>标杆部署：Northern Lights CCS</b>（挪威，Equinor/TotalEnergies/Shell 合资的全球首个跨境碳捕集项目）。ANYmal 自主巡逻未载人设施，监测 CO₂ 浓度，执行视觉/热成像/声学巡检。CO₂ 泄漏检测响应时间从未部署前的"数小时到数天"缩减至<b>数分钟</b><sup><a href="#ref2">[2]</a></sup>。部署客户还包括 Equinor、ENI、Petrobras、BP、Petronas，合作伙伴含 Siemens Energy、GE Vernova、SLB、NVIDIA、AWS<sup><a href="#ref2">[2]</a></sup>。</p>
+
+<h2>3 具身生态关系网络</h2>
+<table class="wikitable">
+<tr><th>关系类型</th><th>涉及公司</th><th>具体关系</th></tr>
+<tr><td><b>战略投资方</b></td><td>Climate Investment (OGCI)</td><td>Aramco、BP、Shell、ExxonMobil 等 12 家能源巨头间接持股</td></tr>
+<tr><td><b>关键客户</b></td><td>Equinor、ENI、Petrobras、BP、Shell、Petronas</td><td>直接部署 ANYmal 进行工业巡检</td></tr>
+<tr><td><b>技术合作</b></td><td>NVIDIA、AWS、Siemens Energy、GE Vernova</td><td>AI 推理、云端管理、工业集成</td></tr>
+<tr><td><b>竞争关系</b></td><td>Boston Dynamics (Spot)</td><td>同属四足工业巡检赛道，Spot 通用性更强但无 Ex 认证</td></tr>
+</table>
+
+<h2>4 发展时间线</h2>
+<div class="timeline">
+<div class="timeline-entry"><div class="timeline-date">2026 Q1</div><div class="timeline-title">ANYmal X 首批交付</div><div class="timeline-desc">全球首款防爆认证腿式机器人进入商业化部署。</div></div>
+<div class="timeline-entry"><div class="timeline-date">2025.09</div><div class="timeline-title">Climate Investment 战略注资</div><div class="timeline-desc">累计融资突破 $1.5 亿，获 OGCI 旗下 12 家能源巨头支持。</div></div>
+<div class="timeline-entry"><div class="timeline-date">2024.12</div><div class="timeline-title">$6,000 万追加融资</div><div class="timeline-desc">Aramco Ventures、Qualcomm Ventures 领投。</div></div>
+<div class="timeline-entry"><div class="timeline-date">2023</div><div class="timeline-title">B 轮 $5,000 万</div><div class="timeline-desc">NGP Capital、Bessemer 领投，ANYmal X 发布。</div></div>
+<div class="timeline-entry"><div class="timeline-date">2021</div><div class="timeline-title">ANYmal D 工业级发布</div><div class="timeline-desc">深度学习驱动运动控制，被 Equinor 等能源公司采用。</div></div>
+<div class="timeline-entry"><div class="timeline-date">2019</div><div class="timeline-title">ANYmal C + 自主充电站</div><div class="timeline-desc">IP67 防护，360° 视觉，首次实现无人值守连续巡检。</div></div>
+<div class="timeline-entry"><div class="timeline-date">2018</div><div class="timeline-title">首次海上平台部署</div><div class="timeline-desc">TenneT 北海海上变流平台——全球首例自主海上机器人部署。</div></div>
+<div class="timeline-entry"><div class="timeline-date">2016</div><div class="timeline-title">ANYbotics 成立</div><div class="timeline-desc">ETH Zurich RSL 实验室分拆，8 人创始团队。</div></div>
+</div>
+
+<h2>5 分析层</h2>
+<h3>优势</h3><ul><li>全球唯一拥有防爆认证（ATEX/IECEx）四足巡检机器人的公司，打开 $100 亿+ 危险环境巡检市场</li><li>OGCI 12 家能源巨头股东结构提供了直接部署通道</li><li>Northern Lights CCS 等标杆案例验证了自主巡检的降本增效能力</li></ul>
+<h3>挑战</h3><ul><li>200+ 台出货量仍处早期阶段，规模效应未形成</li><li>Boston Dynamics Spot 在通用巡检场景构成竞争</li><li>营收未公开，盈利能力不明确</li></ul>
+<h3>待核验</h3><ul><li>公司营收未公开</li><li>ANYmal X 的 2026 年交付量和定价未披露</li></ul>
+
+<h2>6 参考资料</h2>
+<div class="refs"><ol>
+<li id="ref1"><a href="https://www.anybotics.com/" target="_blank">ANYbotics — Official Website</a></li>
+<li id="ref2"><a href="https://www.climateinvestment.com/news/climate-investment-ci-joins-investment-in-anybotics-to-transform-oil-gas-inspection-through-autonomous-robotics" target="_blank">"Climate Investment Joins ANYbotics" — CI, 2025.09</a></li>
+</ol></div>
+</div>
+<aside class="infobox">
+<div class="infobox-title">ANYbotics</div>
+<div class="infobox-section-title">基本信息</div>
+<div class="infobox-row"><span class="infobox-label">总部</span><span class="infobox-value">瑞士苏黎世</span></div>
+<div class="infobox-row"><span class="infobox-label">成立</span><span class="infobox-value">2016</span></div>
+<div class="infobox-row"><span class="infobox-label">起源</span><span class="infobox-value">ETH Zurich RSL 孵化</span></div>
+<div class="infobox-row"><span class="infobox-label">CEO</span><span class="infobox-value">Péter Fankhauser</span></div>
+<div class="infobox-section-title">核心数据</div>
+<div class="infobox-row"><span class="infobox-label">产品</span><span class="infobox-value">ANYmal D / ANYmal X</span></div>
+<div class="infobox-row"><span class="infobox-label">累计融资</span><span class="infobox-value">$1.5 亿+</span></div>
+<div class="infobox-row"><span class="infobox-label">出货量</span><span class="infobox-value">200+ 台 ANYmal D</span></div>
+<div class="infobox-row"><span class="infobox-label">核心差异化</span><span class="infobox-value">全球唯一 ATEX 防爆四足</span></div>
+</aside></div>
+<div class="page-footer"><p>最后更新 2026-05-28 · <a href="../index.html">返回主索引</a></p></div>
+</div></body></html>

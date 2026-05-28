@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NVIDIA — 具身智能布局 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+
+:root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; --nvidia-green: #76b900; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+
+.top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 8px; }
+.top-nav a { color: var(--link); text-decoration: none; }
+
+.page-container { max-width: 1200px; margin: 0 auto; background: #fff; }
+
+.page-title { padding: 28px 32px 16px; }
+.page-title h1 { font-family: 'Georgia','Times New Roman',serif; font-size: 1.75rem; font-weight: 400; color: #000; margin-bottom: 4px; }
+.page-title .subtitle { font-size: 0.85rem; color: #54595d; }
+
+.content-wrapper { display: flex; gap: 20px; padding: 0 32px 40px; }
+.main-content { flex: 1; min-width: 0; }
+
+.infobox { width: 270px; flex-shrink: 0; border: 1px solid #a2a9b1; background: #f9f9f9; font-size: 0.78rem; line-height: 1.5; }
+.infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 10px; font-weight: 600; font-size: 0.85rem; }
+.infobox-subtitle { background: #e8f0fe; color: #1a3a5c; font-size: 0.72rem; text-align: center; padding: 2px 10px; }
+.infobox-section-title { background: #e8f0fe; color: #1a3a5c; text-align: center; padding: 4px 10px; font-weight: 600; font-size: 0.76rem; border-top: 1px solid #a2a9b1; }
+.infobox-row { display: flex; padding: 3px 10px; border-bottom: 1px solid #e8e8e8; }
+.infobox-label { width: 90px; color: #54595d; flex-shrink: 0; }
+.infobox-value { flex: 1; }
+.infobox-row-full { padding: 3px 10px; border-bottom: 1px solid #e8e8e8; text-align: center; }
+
+h2 { font-family: 'Georgia','Times New Roman',serif; font-size: 1.25rem; font-weight: 400; border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+h3 { font-size: 1rem; font-weight: 600; margin: 20px 0 8px; }
+p { margin: 8px 0; }
+
+.wikitable { border-collapse: collapse; margin: 10px 0 18px; font-size: 0.8rem; width: 100%; border: 1px solid #a2a9b1; }
+.wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; font-size: 0.75rem; }
+.wikitable td { border: 1px solid #a2a9b1; padding: 5px 8px; vertical-align: top; }
+.wikitable tr:nth-child(even) td { background: var(--table-stripe); }
+.wikitable a { color: var(--link); text-decoration: none; }
+.wikitable a:hover { text-decoration: underline; }
+
+sup a { color: #0645ad; text-decoration: none; font-size: 0.7rem; }
+sup a:hover { text-decoration: underline; }
+
+.tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.7rem; margin: 1px 2px; border: 1px solid #c8d9e8; white-space: nowrap; }
+
+/* 时间线 */
+.timeline { border-left: 3px solid #ddd; padding-left: 20px; margin: 12px 0 12px 6px; }
+.timeline-entry { margin-bottom: 14px; position: relative; }
+.timeline-entry::before { content: ''; position: absolute; left: -27px; top: 5px; width: 9px; height: 9px; background: var(--accent); border: 2px solid #fff; outline: 1px solid var(--accent); border-radius: 50%; }
+.timeline-date { font-weight: 600; color: var(--accent); font-size: 0.82rem; }
+.timeline-title { font-weight: 600; margin: 1px 0; font-size: 0.84rem; }
+.timeline-desc { color: #54595d; font-size: 0.78rem; }
+
+.refs { font-size: 0.8rem; line-height: 1.7; }
+.refs ol { padding-left: 24px; }
+.refs li { margin-bottom: 4px; }
+.refs a { color: var(--link); }
+
+.page-footer { border-top: 1px solid #a2a9b1; padding: 14px 32px 24px; font-size: 0.78rem; color: #54595d; text-align: center; }
+.page-footer a { color: var(--link); text-decoration: none; }
+
+@media (max-width: 768px) { .content-wrapper { flex-direction: column; } .infobox { width: 100%; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+<div class="top-nav"><a href="../index.html">具身智能Wiki</a> <span>›</span> <a href="../index.html#tech-giants">科技巨头具身布局</a> <span>›</span> NVIDIA</div>
+
+<div class="page-title">
+<h1>NVIDIA — 具身智能布局</h1>
+<div class="subtitle">NVIDIA Corporation（纳斯达克：NVDA）· 物理 AI 全栈平台</div>
+</div>
+
+<div class="content-wrapper">
+<div class="main-content">
+
+<h2>1 具身智能战略定位</h2>
+<p>NVIDIA 将具身智能（Embodied AI / Physical AI）定位为公司继数据中心 AI 之后的<b>下一个核心增长引擎</b>。CEO 黄仁勋在 2026 年 GTC 大会上宣告"物理 AI 已经到来，每一家工业公司都将成为机器人公司"<sup><a href="#ref1">[1]</a></sup>，在 CES 2026 上更进一步称"机器人技术的 ChatGPT 时刻已然到来"<sup><a href="#ref2">[2]</a></sup>。</p>
+<p>NVIDIA 的具身智能战略是<b>全栈平台化</b>：从底层芯片（Jetson Thor）、中层模拟与开发平台（Omniverse + Isaac Lab）、到上层基础模型（GR00T + Cosmos），再到云端编排（OSMO），构建了业界唯一的端到端物理 AI 技术栈。其目标是成为机器人产业的<b>"Android 操作系统"</b>——不造机器人，但让所有机器人都运行在其平台上<sup><a href="#ref3">[3]</a></sup>。</p>
+<p>与传统机器人厂商的垂直整合不同，NVIDIA 走<b>横向赋能</b>路线：为全球工业机器人四大家族（FANUC、ABB、Yaskawa、KUKA，合计装机量超 200 万台）、头部人形机器人公司（1X、Figure、Boston Dynamics、Agility 等）以及医疗手术机器人（CMR Surgical、Medtronic、J&J）同时提供 AI 计算基础设施<sup><a href="#ref4">[4]</a></sup>。通过 CUDA 生态锁定和 Hugging Face LeRobot 社区整合（连接 200 万 NVIDIA 开发者 + 1300 万 Hugging Face AI 构建者），NVIDIA 正在将机器人开发标准化到其平台之上<sup><a href="#ref4">[4]</a></sup>。</p>
+<p>黄仁勋明确将机器人与自动驾驶并列为"Physical AI"的两大支柱，强调这一市场的规模最终将超过当前的数据中心 AI 市场<sup><a href="#ref5">[5]</a></sup>。</p>
+
+<h2>2 核心技术/产品平台</h2>
+<p>NVIDIA 在具身智能领域拥有从硬件到模型的<b>六层技术栈</b>：<sup><a href="#ref4">[4]</a></sup><sup><a href="#ref6">[6]</a></sup></p>
+
+<table class="wikitable">
+<tr><th>层级</th><th>产品</th><th>发布时间</th><th>类型</th><th>核心能力</th><th>开放程度</th></tr>
+<tr>
+  <td style="text-align:center;"><b>基础模型</b></td>
+  <td><b>Isaac GR00T N1.7</b></td>
+  <td style="text-align:center;">2026.03 GTC</td>
+  <td>VLA 基础模型</td>
+  <td>人形机器人全身控制与灵巧操作，含商业授权<sup><a href="#ref6">[6]</a></sup></td>
+  <td>早期体验（商业授权）</td>
+</tr>
+<tr>
+  <td style="text-align:center;"><b>基础模型</b></td>
+  <td><b>GR00T N2（预览）</b></td>
+  <td style="text-align:center;">2026 年底</td>
+  <td>世界动作模型</td>
+  <td>基于 DreamZero 架构，新任务成功率为主流 VLA 模型的 2 倍+，RoboArena 排名第一<sup><a href="#ref7">[7]</a></sup></td>
+  <td>待定</td>
+</tr>
+<tr>
+  <td style="text-align:center;"><b>世界模型</b></td>
+  <td><b>Cosmos 3</b></td>
+  <td style="text-align:center;">2026.03 GTC</td>
+  <td>统一世界基础模型</td>
+  <td>合成世界生成、视觉推理、动作模拟三合一<sup><a href="#ref6">[6]</a></sup></td>
+  <td>开放</td>
+</tr>
+<tr>
+  <td style="text-align:center;"><b>仿真平台</b></td>
+  <td><b>Isaac Lab 3.0</b></td>
+  <td style="text-align:center;">2026.03 GTC</td>
+  <td>机器人仿真框架</td>
+  <td>基于 Newton Physics Engine，DGX 级大规模策略评估与强化学习<sup><a href="#ref4">[4]</a></sup></td>
+  <td>开源</td>
+</tr>
+<tr>
+  <td style="text-align:center;"><b>数字孪生</b></td>
+  <td><b>Omniverse + Mega</b></td>
+  <td style="text-align:center;">持续迭代</td>
+  <td>3D 协作与数字孪生</td>
+  <td>多机器人协同测试、虚拟工厂调机、CAD-to-USD 转换<sup><a href="#ref4">[4]</a></sup></td>
+  <td>开放</td>
+</tr>
+<tr>
+  <td style="text-align:center;"><b>云端编排</b></td>
+  <td><b>OSMO</b></td>
+  <td style="text-align:center;">2026 GTC</td>
+  <td>云原生编排平台</td>
+  <td>统一管理合成数据生成、模型训练、SIL/HIL 测试全流程<sup><a href="#ref4">[4]</a></sup></td>
+  <td>开放</td>
+</tr>
+<tr>
+  <td style="text-align:center;"><b>边缘计算</b></td>
+  <td><b>Jetson T4000</b></td>
+  <td style="text-align:center;">2026.01 CES</td>
+  <td>边缘 AI 模组</td>
+  <td>Blackwell 架构，1200 FP4 TOPS，64GB 内存，40-70W<sup><a href="#ref2">[2]</a></sup></td>
+  <td>商业</td>
+</tr>
+<tr>
+  <td style="text-align:center;"><b>边缘计算</b></td>
+  <td><b>Jetson Thor</b></td>
+  <td style="text-align:center;">2024.03 GTC</td>
+  <td>人形机器人计算平台</td>
+  <td>专为人形机器人设计的 SoC，实时感知与 AI 推理<sup><a href="#ref8">[8]</a></sup></td>
+  <td>商业</td>
+</tr>
+<tr>
+  <td style="text-align:center;"><b>物理引擎</b></td>
+  <td><b>Newton 1.0</b></td>
+  <td style="text-align:center;">2026.03 GTC</td>
+  <td>开源物理引擎</td>
+  <td>精确碰撞检测、刚体/柔性系统模拟、灵巧操作物理<sup><a href="#ref6">[6]</a></sup></td>
+  <td>开源</td>
+</tr>
+<tr>
+  <td style="text-align:center;"><b>数据采集</b></td>
+  <td><b>Isaac Teleop</b></td>
+  <td style="text-align:center;">2026.03 GTC</td>
+  <td>遥操作数据采集</td>
+  <td>XR 头盔+身体追踪器+手套，直接采集演示数据训练机器人<sup><a href="#ref4">[4]</a></sup></td>
+  <td>商业</td>
+</tr>
+</table>
+
+<p><b>Cosmos 世界模型系列</b>是 NVIDIA 区别于其他 AI 公司的关键差异。Cosmos 3 首次将合成世界生成、视觉推理和动作模拟统一在一个模型中，使机器人可以在模拟中"预演"数百万种场景后再部署到真实世界。结合 OSMO 的 Physical AI Data Factory，可将单一真实场景转换为数千个合成变体用于训练<sup><a href="#ref4">[4]</a></sup>。</p>
+
+<p>GR00T 系列的演化速度极快：从 2024 年 3 月的初始宣布，到 2025 年 GTC 的 N1 版本，到 2026 年 1 月 CES 的 N1.6（全身控制），再到 2026 年 3 月的 N1.7（商业授权级别），不到两年内完成了从概念到可商业部署的跨越<sup><a href="#ref6">[6]</a></sup><sup><a href="#ref8">[8]</a></sup>。</p>
+
+<h2>3 投资布局</h2>
+<p>NVIDIA 通过其风险投资部门 NVentures 和战略投资，在人形机器人、配送机器人、机器人 AI 等方向进行了广泛布局：<sup><a href="#ref9">[9]</a></sup><sup><a href="#ref10">[10]</a></sup></p>
+
+<table class="wikitable">
+<tr><th>被投公司</th><th>首次投资时间</th><th>参与轮次</th><th>公司方向</th><th>最新估值</th></tr>
+<tr>
+  <td><b>Figure AI</b></td>
+  <td style="text-align:center;">2024.02</td>
+  <td>B 轮（$5000 万）+ C 轮跟投</td>
+  <td>通用人形机器人</td>
+  <td>$390 亿（2025.09 C 轮）</td>
+</tr>
+<tr>
+  <td><b>Serve Robotics</b></td>
+  <td style="text-align:center;">2022</td>
+  <td>领投 $1000 万 + 2023 年跟投</td>
+  <td>人行道配送机器人</td>
+  <td>~$8 亿（NASDAQ:SERV）<br><small>注：NVIDIA 已 2024 年底清仓</small></td>
+</tr>
+<tr>
+  <td><b>Agility Robotics</b></td>
+  <td style="text-align:center;">2024.10</td>
+  <td>C 轮参投</td>
+  <td>物流人形 Digit</td>
+  <td>$15-25 亿</td>
+</tr>
+<tr>
+  <td><b>Skild AI</b></td>
+  <td style="text-align:center;">2025</td>
+  <td>投资人（具体未公开）</td>
+  <td>通用机器人大脑</td>
+  <td>~$140 亿（2026.01 C 轮）</td>
+</tr>
+<tr>
+  <td><b>Field AI</b></td>
+  <td style="text-align:center;">2025</td>
+  <td>投资人</td>
+  <td>机器人基础模型</td>
+  <td>未公开</td>
+</tr>
+</table>
+
+<p>NVIDIA 的投资策略具有鲜明的<b>"芯片+模型"生态绑定</b>特征。每笔投资背后都是被投公司采用 NVIDIA 硬件和软件平台——Figure 使用 NVIDIA GPU 训练 Helix VLA 模型，Serve 的 Gen3 机器人由 Jetson Orin 驱动，Agility 使用 Cosmos 和 Isaac Sim 进行数字孪生验证<sup><a href="#ref10">[10]</a></sup>。此外，NVIDIA 还通过 Inception 创业加速器覆盖了超过 40,000 家 AI 创业公司<sup><a href="#ref4">[4]</a></sup>。</p>
+
+<h2>4 合作伙伴生态</h2>
+<p>NVIDIA 在具身智能领域的合作网络覆盖了整个产业链：<sup><a href="#ref4">[4]</a></sup></p>
+
+<h3>工业机器人</h3>
+<p>全球工业机器人四大家族——<b>FANUC、ABB、Yaskawa、KUKA</b>——合计超过 200 万台装机量，全部在整合 Omniverse Kit 与 Isaac 仿真框架，并将 Jetson 模组嵌入机器人控制器中<sup><a href="#ref11">[11]</a></sup>。此外，Universal Robots、Franka Robotics 等协作机器人品牌也在生态内。</p>
+
+<h3>人形机器人</h3>
+<p>GTC 2026 正式列名的人形合作伙伴包括：<b>1X、AGIBOT（智元）、Agility Robotics、Agile Robots、Boston Dynamics、Figure、Hexagon Robotics、Humanoid、Mentee Robotics、NEURA Robotics</b><sup><a href="#ref4">[4]</a></sup>。几乎覆盖了全球除 Tesla Optimus 外所有人形头部公司。</p>
+
+<h3>手术/医疗机器人</h3>
+<p><b>Medtronic、Johnson & Johnson MedTech、CMR Surgical、Moon Surgical、PeritasAI</b> 利用 Cosmos-H 和 IGX Thor 进行手术精度验证与功能安全认证<sup><a href="#ref4">[4]</a></sup>。</p>
+
+<h3>机器人大脑开发商</h3>
+<p><b>Skild AI、Field AI、World Labs、Generalist AI、Physical Intelligence</b> 等通用机器人大脑创业公司均在 NVIDIA 平台上进行模型训练和部署。其中 Skild AI 已与 Foxconn 合作，为 NVIDIA Blackwell 芯片产线进行 AI 驱动的高精度双臂装配<sup><a href="#ref12">[12]</a></sup>。</p>
+
+<h3>云平台与供应链</h3>
+<p><b>Microsoft Azure、Nebius、CoreWeave、Alibaba Cloud</b> 提供云端训练基础设施；<b>KION Group、GXO、Accenture</b> 在物流仓储场景推进大规模 AMR 部署<sup><a href="#ref4">[4]</a></sup>。</p>
+
+<h2>5 具身生态关系网络</h2>
+<table class="wikitable">
+<tr><th>关系类型</th><th>涉及公司</th><th>具体关系</th></tr>
+<tr><td><b>平台用户（工业机器人）</b></td><td>FANUC、ABB、安川电机、库卡</td><td>均整合 Omniverse + Isaac 框架 + Jetson 模组</td></tr>
+<tr><td><b>平台用户（人形机器人）</b></td><td>1X Technologies、Figure AI、Agility Robotics、Boston Dynamics、Apptronik、Neura Robotics、Skild AI</td><td>使用 Cosmos / Isaac / GR00T / Jetson Thor 等平台</td></tr>
+<tr><td><b>平台用户（医疗机器人）</b></td><td>CMR Surgical</td><td>使用 Isaac for Healthcare / Cosmos-H</td></tr>
+<tr><td><b>投资关系</b></td><td>Figure AI、Agility Robotics、Skild AI</td><td>NVIDIA 为投资方，被投公司深度使用 NVIDIA 平台</td></tr>
+<tr><td><b>竞争关系（模型层）</b></td><td>Physical Intelligence (π)、Generalist AI、Flexion AI</td><td>GR00T vs π 系列 / GEN-1 等机器人基础模型直接竞争</td></tr>
+<tr><td><b>独立路线（不用 NVIDIA 模型栈）</b></td><td>Tesla (Optimus)</td><td>完全自研 AI 训练基础设施（Dojo），不依赖 NVIDIA 机器人模型生态</td></tr>
+</table>
+
+<h2>6 具身智能发展时间线</h2>
+
+<div class="timeline">
+
+<div class="timeline-entry">
+<div class="timeline-date">2026.03 GTC</div>
+<div class="timeline-title">GR00T N2 预览、Cosmos 3、Isaac Lab 3.0、Newton 1.0</div>
+<div class="timeline-desc">黄仁勋宣告"物理 AI"全面到来。GR00T N2 在 RoboArena 排名第一；Cosmos 3 统一世界模型发布；迪士尼雪宝机器人登台展示<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref6">[6]</a></sup>。</div>
+</div>
+
+<div class="timeline-entry">
+<div class="timeline-date">2026.01 CES</div>
+<div class="timeline-title">GR00T N1.6 开源 + Jetson T4000 发布</div>
+<div class="timeline-desc">发布 Blackwell 架构的 Jetson T4000（1200 TOPS）。宣布"机器人技术的 ChatGPT 时刻已然到来"<sup><a href="#ref2">[2]</a></sup>。</div>
+</div>
+
+<div class="timeline-entry">
+<div class="timeline-date">2025.10</div>
+<div class="timeline-title">Hugging Face LeRobot 整合</div>
+<div class="timeline-desc">将 Isaac 与 GR00T 整合进 LeRobot 开源框架，连接 200 万 + 1300 万开发者社区<sup><a href="#ref4">[4]</a></sup>。</div>
+</div>
+
+<div class="timeline-entry">
+<div class="timeline-date">2025.09</div>
+<div class="timeline-title">Figure AI C 轮跟投</div>
+<div class="timeline-desc">Figure AI 以 $390 亿估值完成超 $10 亿 C 轮融资，成为全球估值最高人形机器人公司，NVIDIA 继续跟投<sup><a href="#ref9">[9]</a></sup>。</div>
+</div>
+
+<div class="timeline-entry">
+<div class="timeline-date">2025.03 GTC</div>
+<div class="timeline-title">GR00T N1 + Cosmos 系列首个版本</div>
+<div class="timeline-desc">发布 GR00T N1 基础模型和 Cosmos 世界模型首个版本，确立"Physical AI"战略框架<sup><a href="#ref8">[8]</a></sup>。</div>
+</div>
+
+<div class="timeline-entry">
+<div class="timeline-date">2024.03 GTC</div>
+<div class="timeline-title">Project GR00T 首次发布 + Jetson Thor 亮相</div>
+<div class="timeline-desc">宣布人形机器人通用基础模型 Project GR00T 和专用计算平台 Jetson Thor<sup><a href="#ref8">[8]</a></sup>。</div>
+</div>
+
+<div class="timeline-entry">
+<div class="timeline-date">2024.02</div>
+<div class="timeline-title">首次投资 Figure AI</div>
+<div class="timeline-desc">参与 Figure AI 的 $6.75 亿 B 轮融资，标志大规模入场人形机器人赛道<sup><a href="#ref10">[10]</a></sup>。</div>
+</div>
+
+<div class="timeline-entry">
+<div class="timeline-date">2022</div>
+<div class="timeline-title">领投 Serve Robotics</div>
+<div class="timeline-desc">以 $1000 万领投 Serve Robotics，首次直投具身智能创业公司<sup><a href="#ref10">[10]</a></sup>。</div>
+</div>
+
+<div class="timeline-entry">
+<div class="timeline-date">2021</div>
+<div class="timeline-title">Omniverse 正式发布</div>
+<div class="timeline-desc">3D 协作与数字孪生平台上线，为后续 Isaac 整合奠定基础。</div>
+</div>
+
+<div class="timeline-entry">
+<div class="timeline-date">2018</div>
+<div class="timeline-title">Jetson Xavier + Isaac SDK 发布</div>
+<div class="timeline-desc">首个专为机器人设计的 AI 计算平台和软件开发包，开启机器人平台化战略。</div>
+</div>
+
+<div class="timeline-entry">
+<div class="timeline-date">2015</div>
+<div class="timeline-title">Jetson TK1 / TX1 平台发布</div>
+<div class="timeline-desc">NVIDIA 正式进入嵌入式 AI 与机器人计算领域。</div>
+</div>
+
+</div>
+
+<h2>7 行业影响力评估</h2>
+<p>NVIDIA 在具身智能领域的影响力在 2025-2026 年快速上升，已从"重要芯片供应商"演变为<b>"不可替代的全栈平台商"</b>。</p>
+
+<p>摩根士丹利在 2025 年底的分析报告中指出，NVIDIA 正在通过 GR00T + Cosmos + Isaac 三件套，将机器人开发从"手写规则"时代推向"基础模型驱动"时代，其商业模式类似于云计算时代的 AWS——开发者无需自建基础设施即可在 NVIDIA 平台上训练和部署机器人模型<sup><a href="#ref5">[5]</a></sup>。</p>
+
+<p>TrendForce 在 GTC 2026 后评估认为，NVIDIA 已经完成了"芯片-机电生态"的闭环：NVIDIA 处理器为"大脑"，Infineon/NXP/TI 等提供"身体"的安全电子与运动控制，形成了完整的产业分工<sup><a href="#ref6">[6]</a></sup>。在人形机器人商业化加速的背景下，GR00T N1.7 的商业授权标志着 NVIDIA 从"赋能"角色向"标准化"角色转变——其模型正在成为人形机器人产业的事实标准。</p>
+
+<p>但 NVIDIA 在具身领域的竞争也在加剧。Google DeepMind 的 Gemini Robotics 模型在空间推理和安全性方面具有差异化优势，Boston Dynamics + DeepMind 的合作直接竞争 NVIDIA 的人形客户群。而 Tesla Optimus 走的是完全自研路线，不使用 NVIDIA 的机器人模型栈。此外，Amazon 通过 Covariant 吸收和自研机器人，也在减少对第三方平台的依赖<sup><a href="#ref5">[5]</a></sup>。</p>
+
+<h2>8 分析层</h2>
+
+<h3>优势</h3>
+<ul>
+<li><b>全栈唯一性</b>：NVIDIA 是全球唯一拥有"芯片→模型→模拟→部署"完整物理 AI 栈的公司，竞争对手要么缺芯片（Google/Meta），要么缺模型生态（Intel/AMD）</li>
+<li><b>CUDA 锁定效应</b>：全球 400 万+ CUDA 开发者是 NVIDIA 最深的护城河，机器人公司迁移到其他芯片平台成本极高</li>
+<li><b>先发+规模优势</b>：已覆盖全球 200 万+ 工业机器人装机量和几乎所有头部人形公司，网络效应正在形成</li>
+<li><b>资本布局</b>：通过投资 Figure AI、Skild AI 等确保关键客户不流失</li>
+</ul>
+
+<h3>挑战/风险</h3>
+<ul>
+<li><b>硬件绑定 vs 软件价值</b>：投资者关注 NVIDIA 能否在芯片之外建立可收费的软件/模型收入流，而不仅是卖 Jetson 硬件</li>
+<li><b>巨头生态分裂</b>：Google/Boston Dynamics、Tesla Optimus、Amazon 都在构建自有的封闭生态，可能削弱 NVIDIA 的平台地位</li>
+<li><b>人形商业化节奏不确定性</b>：如果人形机器人商业化进度慢于预期，NVIDIA 的平台投入可能面临过长回报周期</li>
+<li><b>地缘政治风险</b>：对华出口管制限制 Jetson Thor 等高性能产品进入中国市场，而中国是人形机器人最大的潜在市场之一</li>
+</ul>
+
+<h3>关键变量（未来 2-3 年）</h3>
+<ul>
+<li>GR00T N2 是否能如其承诺的"2 倍成功率"颠覆现有 VLA 格局</li>
+<li>Jetson Thor 生态中能否出现年出货量破万的机器人型号（目前所有头部人形公司均在小批量阶段）</li>
+<li>与 Google DeepMind 的生态竞争——谁的标准成为人形机器人产业的"Android"</li>
+</ul>
+
+<h2>9 参考资料</h2>
+<div class="refs">
+<ol>
+<li id="ref1"><a href="https://www.manufacturingdive.com/news/industrial-robotics-companies-everywhere-says-nvidia-ceo-gtc-2026-abb-fanuc-ai/815042/" target="_blank">"Nvidia CEO says 'every industrial company will become a robotics company'" — Manufacturing Dive, 2026.03.17</a></li>
+<li id="ref2"><a href="https://www.embedded.com/nvidia-announces-new-technologies-for-physical-ai-at-ces/" target="_blank">"Nvidia Announces New Technologies for Physical AI at CES" — Embedded.com, 2026.01</a></li>
+<li id="ref3"><a href="https://techcrunch.com/2026/01/05/nvidia-wants-to-be-the-android-of-generalist-robotics/" target="_blank">"Nvidia wants to be the Android of generalist robotics" — TechCrunch, 2026.01.05</a></li>
+<li id="ref4"><a href="https://blogs.nvidia.com.tw/blog/nvidia-and-global-robotics-leaders-take-physical-ai-to-the-real-world/" target="_blank">"NVIDIA 與全球機器人領導者將物理 AI 帶入真實世界" — NVIDIA 官方博客, 2026.03.17 (GTC 2026)</a></li>
+<li id="ref5"><a href="https://www.zdnet.com/article/nvidia-physical-ai-gtc-2026/" target="_blank">"Nvidia's 'ChatGPT moment' for self-driving cars, and other key AI announcements at GTC 2026" — ZDNet, 2026.03</a></li>
+<li id="ref6"><a href="https://www.trendforce.com/news/2026/03/19/insights-nvidia-expands-robotics-ecosystem-at-gtc-as-physical-ai-moves-toward-large-scale-deployment/" target="_blank">"NVIDIA Expands Robotics Ecosystem at GTC as Physical AI Moves Toward Large-Scale Deployment" — TrendForce, 2026.03.19</a></li>
+<li id="ref7"><a href="https://en.theblockbeats.news/flash/336534" target="_blank">"NVIDIA GTC Bot Worldview: Cosmos 3 Unified World Model Release, GR00T N2 Tops Robot Strategy Leaderboard" — BlockBeats, 2026.03</a></li>
+<li id="ref8"><a href="https://siliconangle.com/2024/03/18/nvidia-unveils-project-gr00t-ai-foundation-model-humanoid-robots-isaac-platform-updates/" target="_blank">"NVIDIA unveils Project GR00T AI foundation model for humanoid robots" — SiliconANGLE, 2024.03.18</a></li>
+<li id="ref9"><a href="https://zhidx.com/p/504601.html" target="_blank">"全球估值最高的机器人公司，刚刚融了71亿，黄仁勋又投了" — 智东西, 2025.09</a></li>
+<li id="ref10"><a href="https://www.fool.com/investing/2025/09/26/a-450-billion-opportunity-serve-robotics-buy-now/" target="_blank">"A $450 Billion Opportunity: Is Serve Robotics Stock a Buy Right Now?" — The Motley Fool, 2025.09.26</a></li>
+<li id="ref11"><a href="https://www.automate.org/ai/industry-insights/nvidia-declares-big-bang-of-physical-ai-at-gtc-2026" target="_blank">"NVIDIA Declares Big Bang of Physical AI at GTC 2026" — A3 Automate, 2026.03</a></li>
+<li id="ref12"><a href="https://www.trendforce.com/news/2026/03/19/insights-nvidia-expands-robotics-ecosystem-at-gtc-as-physical-ai-moves-toward-large-scale-deployment/" target="_blank">"Skild AI partners with Foxconn for NVIDIA Blackwell chip production assembly" — TrendForce, 2026.03.19</a></li>
+</ol>
+</div>
+
+</div>
+
+<aside class="infobox">
+<div class="infobox-title">NVIDIA Corporation</div>
+<div class="infobox-subtitle">科技巨头 · 具身智能布局</div>
+
+<div class="infobox-section-title">母公司概况</div>
+<div class="infobox-row"><span class="infobox-label">公司全称</span><span class="infobox-value">NVIDIA Corporation</span></div>
+<div class="infobox-row"><span class="infobox-label">股票代码</span><span class="infobox-value">NASDAQ: NVDA</span></div>
+<div class="infobox-row"><span class="infobox-label">成立时间</span><span class="infobox-value">1993 年 4 月</span></div>
+<div class="infobox-row"><span class="infobox-label">总部</span><span class="infobox-value">美国加州圣克拉拉</span></div>
+<div class="infobox-row"><span class="infobox-label">CEO / 创始人</span><span class="infobox-value">黄仁勋 (Jensen Huang)</span></div>
+<div class="infobox-row"><span class="infobox-label">官网</span><span class="infobox-value"><a href="https://www.nvidia.com" target="_blank">nvidia.com</a></span></div>
+
+<div class="infobox-section-title">具身业务概况</div>
+<div class="infobox-row"><span class="infobox-label">具身业务负责人</span><span class="infobox-value">Deepu Talla<br><small>VP, Robotics & Edge AI</small></span></div>
+<div class="infobox-row"><span class="infobox-label">具身业务起始</span><span class="infobox-value">2015 年（Jetson 平台）</span></div>
+<div class="infobox-row"><span class="infobox-label">生态定位</span><span class="infobox-value"><span class="tag" style="background:#fff3e0;color:#e65100;">芯片/算力供应商</span><span class="tag" style="background:#e3f2fd;color:#1565c0;">基础模型平台</span><span class="tag" style="background:#e8f5e9;color:#2e7d32;">仿真/数据工具链</span></div>
+<div class="infobox-row"><span class="infobox-label">核心平台</span><span class="infobox-value">GR00T · Cosmos · Isaac · Jetson · Omniverse · OSMO</span></div>
+<div class="infobox-row"><span class="infobox-label">战略定位</span><span class="infobox-value">物理 AI 全栈平台<br>（机器人产业的 "Android"）</span></div>
+
+<div class="infobox-section-title">母公司规模 (FY2026)</div>
+<div class="infobox-row"><span class="infobox-label">年营收</span><span class="infobox-value">$2,159 亿</span></div>
+<div class="infobox-row"><span class="infobox-label">净利润</span><span class="infobox-value">约 $1,200 亿</span></div>
+<div class="infobox-row"><span class="infobox-label">市值</span><span class="infobox-value">约 $5 万亿+</span></div>
+<div class="infobox-row"><span class="infobox-label">员工</span><span class="infobox-value">约 42,000 人</span></div>
+
+<div class="infobox-section-title">具身合作覆盖</div>
+<div class="infobox-row-full">工业机器人 200 万+ 台<br>人形机器人 10+ 头部公司<br>医疗手术 5+ 头部公司<br>Inception 创业生态 40,000+ 家</div>
+</aside>
+</div>
+
+<div class="page-footer">
+<p>此页面最后更新于 2026-05-27 · 来源以 NVIDIA GTC 官方公告、科技媒体、分析师报告为主 · <a href="../index.html">返回主索引</a></p>
+</div>
+</div>
+</body>
+</html>

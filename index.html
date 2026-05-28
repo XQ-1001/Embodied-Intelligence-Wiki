@@ -13,14 +13,15 @@
   .wiki-header { background: linear-gradient(135deg, #1a3a5c 0%, #2c5f8a 100%); color: #fff; padding: 40px 32px 28px; }
   .wiki-header h1 { font-family: 'Georgia','Times New Roman',serif; font-size: 2rem; font-weight: 400; margin-bottom: 6px; }
   .wiki-header .subtitle { font-size: 0.9rem; color: #b8d4f0; }
-  .stats-bar { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 14px 32px; display: flex; gap: 28px; font-size: 0.82rem; color: #54595d; }
+  .stats-bar { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 14px 32px; display: flex; flex-wrap: wrap; gap: 12px 28px; font-size: 0.82rem; color: #54595d; }
   .stats-bar strong { color: #1a3a5c; font-size: 1.1rem; }
   .content { background: #fff; padding: 24px 32px 40px; min-height: 60vh; }
   h2 { font-family: 'Georgia','Times New Roman',serif; font-size: 1.3rem; font-weight: 400; border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 14px; }
   .section-desc { font-size: 0.82rem; color: #54595d; margin-bottom: 10px; }
   .wikitable { border-collapse: collapse; margin: 8px 0 20px; font-size: 0.82rem; width: 100%; border: 1px solid #a2a9b1; }
   .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 6px 8px; text-align: center; font-weight: 600; font-size: 0.78rem; }
-  .wikitable td { border: 1px solid #a2a9b1; padding: 6px 10px; vertical-align: middle; white-space: nowrap; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 6px 10px; vertical-align: middle; }
+.content { overflow-x: auto; }
   .wikitable tr:nth-child(even) td { background: var(--table-stripe); }
   .wikitable th:nth-child(1) { width: 32px; }
   .wikitable th:nth-child(2) { width: 200px; }
@@ -31,6 +32,15 @@
   td:nth-child(1) { text-align: center; font-weight: 600; color: #54595d; }
   .wikitable a { color: var(--link); text-decoration: none; font-weight: 600; }
   .wikitable a:hover { text-decoration: underline; }
+  .tech-table th:nth-child(1) { width: 32px; }
+  .tech-table th:nth-child(2) { width: 170px; }
+  .tech-table th:nth-child(3) { width: 140px; }
+  .tech-table th:nth-child(4) { width: 220px; }
+  .tech-table th:nth-child(5) { width: 300px; }
+  .tech-table th:nth-child(6) { width: 160px; }
+  .tech-table td:nth-child(5) { white-space: normal; font-size: 0.76rem; }
+.content { overflow-x: auto; }
+@media (max-width: 900px) { .wikitable { font-size: 0.72rem; } .wikitable td, .wikitable th { padding: 4px 5px; } }
   .co-name { font-weight: 600; }
   .co-en { color: #888; font-size: 0.74rem; }
   .co-code { color: #1a5096; font-size: 0.72rem; }
@@ -58,8 +68,22 @@
 <div class="page-container">
 <div class="top-nav"><a href="index.html">具身智能Wiki</a> <span>› 主索引</span></div>
 <div class="wiki-header"><h1>具身智能Wiki</h1><div class="subtitle">Embodied AI Wiki — 全球具身智能公司百科</div></div>
-<div class="stats-bar"><div>海外公司 <strong>21</strong></div><div>国内公司 <strong>173</strong></div><div>具身生态 <strong>14</strong></div><div>总计 <strong>208</strong></div><div>更新于 <strong>2026-05-26</strong></div></div>
+<div class="stats-bar"><div>科技巨头 <strong>8</strong></div><div>海外公司 <strong>25</strong></div><div>国内公司 <strong>173</strong></div><div>海外生态 <strong>4</strong></div><div>国内生态 <strong>14</strong></div><div>总计 <strong>224</strong></div><div>更新于 <strong>2026-05-27</strong></div></div>
 <div class="content">
+
+	<h2 id="tech-giants">科技巨头具身布局</h2>
+	<p class="section-desc">收录全球主要科技巨头在具身智能领域的战略布局。此类公司不直接构成完整具身系统，但其技术平台、AI 模型、资本布局和产业合作深刻影响具身智能产业走向。</p>
+	<table class="wikitable tech-table">
+	<tr><th>#</th><th>公司</th><th>具身战略定位</th><th>核心平台/产品</th><th>关键布局（投资/合作）</th><th>具身投入规模</th></tr>
+	<tr><td>1</td><td><a href="entities/NVIDIA.html" class="co-name">NVIDIA</a> <span class="co-en">NVIDIA</span> <span class="co-code">(NASDAQ:NVDA)</span></td><td><span class="tag">物理AI全栈平台</span></td><td><span class="tag">GR00T</span><span class="tag">Cosmos</span><span class="tag">Isaac</span><span class="tag">Jetson</span><span class="tag">Omniverse</span></td><td>投资Figure AI·Skild AI·Agility；合作FANUC·ABB·1X·Boston Dynamics·Agility等全生态</td><td class="val-cell">内部研发为主，具身为核心战略方向</td></tr>
+<tr><td>2</td><td><a href="entities/Google-DeepMind.html" class="co-name">Google</a> <span class="co-en">Alphabet / DeepMind</span> <span class="co-code">(NASDAQ:GOOGL)</span></td><td><span class="tag">具身大脑+机器人OS</span></td><td><span class="tag">Gemini Robotics</span><span class="tag">Intrinsic Flowstate</span><span class="tag">IVM</span></td><td>Boston Dynamics·Apptronik·Agile Robots·Foxconn合作；投资Apptronik·Agile Robots</td><td class="val-cell">DeepMind+Intrinsic双引擎研发投入</td></tr>
+<tr><td>3</td><td><a href="entities/Amazon.html" class="co-name">Amazon</a> <span class="co-en">Amazon</span> <span class="co-code">(NASDAQ:AMZN)</span></td><td><span class="tag">全球最大机器人部署者</span></td><td><span class="tag">Proteus</span><span class="tag">Sequoia</span><span class="tag">Vulcan</span><span class="tag">DeepFleet</span><span class="tag">Fauna</span></td><td>100万+机器人部署；收购Fauna·Rivr·Covariant技术；AWS×NVIDIA物理AI工具链</td><td class="val-cell">2026 CapEx $2,000亿；40座全自动仓库</td></tr>
+<tr><td>4</td><td><a href="entities/Microsoft.html" class="co-name">Microsoft</a> <span class="co-en">Microsoft</span> <span class="co-code">(NASDAQ:MSFT)</span></td><td><span class="tag">云平台+基础模型+投资</span></td><td><span class="tag">Rho-alpha</span><span class="tag">Azure IoT</span><span class="tag">Fabric</span></td><td>投资Figure AI；Hexagon合作；Azure×NVIDIA物理AI工具链</td><td class="val-cell">Azure + 研发投入；OpenAI/Figure间接布局</td></tr>
+<tr><td>5</td><td><a href="entities/Meta.html" class="co-name">Meta</a> <span class="co-en">Meta</span> <span class="co-code">(NASDAQ:META)</span></td><td><span class="tag">"机器人Android"平台</span></td><td><span class="tag">ARI全身控制</span><span class="tag">e-Flesh触觉</span><span class="tag">智能眼镜数据</span></td><td>2026.05收购ARI；Robotics Studio ~100人；$1,250亿+ CapEx</td><td class="val-cell">2026 CapEx $1,250-1,450亿</td></tr>
+<tr><td>6</td><td><a href="entities/Toyota-TRI.html" class="co-name">Toyota TRI</a> <span class="co-en">Toyota Research Institute</span> <span class="co-code">(TSE:7203)</span></td><td><span class="tag">人形基础算法研究</span></td><td><span class="tag">Diffusion Policy</span><span class="tag">LBM</span><span class="tag">Atlas联合研究</span></td><td>Boston Dynamics Atlas联合研究；行业通用动作生成架构</td><td class="val-cell">TRI纯研究机构，母公司年营收¥45万亿</td></tr>
+<tr><td>7</td><td><a href="entities/SoftBank.html" class="co-name">SoftBank</a> <span class="co-en">SoftBank Group</span> <span class="co-code">(TSE:9984)</span></td><td><span class="tag">资本/资产整合者</span></td><td><span class="tag">ABB Robotics</span><span class="tag">Roze AI</span><span class="tag">Skild AI</span></td><td>$54亿收购ABB；Roze AI目标$1,000亿IPO；投资Skild AI·OpenAI</td><td class="val-cell">ABB收购$54亿+Roze AI+Berkshire Grey等</td></tr>
+<tr><td>8</td><td><a href="entities/Samsung-Rainbow.html" class="co-name">Samsung</a> <span class="co-en">Samsung / Rainbow Robotics</span> <span class="co-code">(KRX:005930)</span></td><td><span class="tag">垂直整合</span></td><td><span class="tag">Rainbow Robotics</span><span class="tag">RB-Y1</span><span class="tag">协作机器人</span></td><td>35%控股Rainbow Robotics；KAIST HUBO技术；三星重工测试</td><td class="val-cell">约$1.81亿投资；目标2028商业化</td></tr>
+	</table>
 
 <h2>海外具身智能</h2>
 <p class="section-desc">覆盖北美、欧洲、日本等主要市场的具身智能企业，含人形机器人、工业机器人及特种机器人。</p>
@@ -86,7 +110,22 @@
 <tr><td>19</td><td><a href="entities/K-Scale-Labs.html" class="co-name">K-Scale Labs</a> <span class="co-en">K-Scale</span></td><td><span class="tag">具身智能</span></td><td><span class="t-humanoid">开源人形机器人</span></td><td><span class="tag">通用</span></td><td class="val-cell">3.25亿人民币</td></tr>
 <tr><td>20</td><td><a href="entities/FrodoBots.html" class="co-name">FrodoBots</a> <span class="co-en">FrodoBots</span></td><td><span class="tag">游戏化数据众包</span></td><td><span class="tag">轮式遥控机器人</span></td><td><span class="tag">机器人游戏</span></td><td class="val-cell">1.95亿元</td></tr>
 <tr><td>21</td><td><a href="entities/Cartwheel-Robotics.html" class="co-name">Cartwheel Robotics</a> <span class="co-en">Cartwheel</span></td><td><span class="tag">具身智能</span></td><td><span class="tag">机器人</span></td><td><span class="tag">通用</span></td><td class="val-cell">已倒闭,无估值</td></tr>
+<tr><td>22</td><td><a href="entities/Sanctuary-AI.html" class="co-name">Sanctuary AI</a> <span class="co-en">Sanctuary AI</span></td><td><span class="tag">Carbon AI+遥操作</span></td><td><span class="t-humanoid">人形Phoenix</span></td><td><span class="t-industry">工业</span><span class="tag">零售</span></td><td class="val-cell">~$1.47亿(累计融资)</td></tr>
+<tr><td>23</td><td><a href="entities/FieldAI.html" class="co-name">FieldAI</a> <span class="co-en">FieldAI</span></td><td><span class="tag">物理优先FFMs</span></td><td><span class="tag">多形态机器人通用大脑</span></td><td><span class="t-industry">建筑</span><span class="tag">能源</span><span class="tag">国防</span></td><td class="val-cell">$20亿(~$4.05亿融资,2025)</td></tr>
+<tr><td>24</td><td><a href="entities/Dyna-Robotics.html" class="co-name">Dyna Robotics</a> <span class="co-en">Dyna</span></td><td><span class="tag">DYNA-1单权重通用模型</span></td><td><span class="tag">通用机器人基础模型</span></td><td><span class="t-service">酒店</span><span class="tag">商业服务</span></td><td class="val-cell">~$5亿(2025.09 A轮$1.2亿)</td></tr>
+<tr><td>25</td><td><a href="entities/Genesis-AI.html" class="co-name">Genesis AI</a> <span class="co-en">Genesis</span></td><td><span class="tag">自研物理引擎43万倍加速</span></td><td><span class="tag">通用机器人基础模型+仿真</span></td><td><span class="t-industry">物流</span><span class="tag">制造</span></td><td class="val-cell">$1.05亿种子轮(2025.07)</td></tr>
 </table>
+
+<h2 id="overseas-eco">海外具身生态</h2>
+<p class="section-desc">海外具身智能产业链上下游公司——含零部件、软件/算法平台、开源工具链、芯片/算力供应商等，在产业链中占据关键控制点。</p>
+<table class="wikitable">
+<tr><th>#</th><th>公司</th><th>技术/产品</th><th>产品类型</th><th>生态位置 / 核心控制点</th><th>规模/影响力</th></tr>
+<tr><td>1</td><td><a href="entities/Intrinsic.html" class="co-name">Intrinsic</a> <span class="co-en">Alphabet / Google</span></td><td><span class="tag">Flowstate·IVM</span></td><td><span class="tag">工业机器人软件平台</span></td><td>Foxconn合资；FANUC·KUKA兼容；Google DeepMind软件桥梁</td><td class="val-cell">Alphabet旗下；并入Google</td></tr>
+<tr><td>2</td><td><a href="entities/HuggingFace-LeRobot.html" class="co-name">Hugging Face LeRobot</a> <span class="co-en">Hugging Face</span></td><td><span class="tag">LeRobot·Pollen Reachy</span></td><td><span class="tag">开源机器人平台</span></td><td>NVIDIA GR00T·Isaac整合；全球最大开源AI社区(1300万+)</td><td class="val-cell">估值~$45亿；Pollen Robotics收购</td></tr>
+<tr><td>3</td><td><a href="entities/Universal-Robots.html" class="co-name">Universal Robots</a> <span class="co-en">Teradyne Robotics (TER)</span></td><td><span class="tag">UR协作机器人+MiR AMR</span></td><td><span class="tag">协作机器人标准平台</span></td><td>NVIDIA GTC 2026生态核心；协作机器人全球份额第一</td><td class="val-cell">2026 Q1营收$9,100万(Teradyne Robotics)</td></tr>
+<tr><td>4</td><td><a href="entities/ANYbotics.html" class="co-name">ANYbotics</a> <span class="co-en">ANYbotics</span></td><td><span class="tag">ANYmal D/X四足巡检</span></td><td><span class="tag">防爆四足巡检机器人</span></td><td>全球首款ATEX认证四足；Equinor·Shell·Petrobras部署</td><td class="val-cell">$1.5亿+融资；200+台出货</td></tr>
+</table>
+
 
 <h2>国内具身智能</h2>
 <p class="section-desc">覆盖中国人形机器人、四足机器人、工业协作机器人、商用服务机器人等主要赛道。</p>
@@ -268,7 +307,7 @@
 
 	</table>
 
-<h2>具身生态</h2>
+<h2 id="domestic-eco">国内具身生态</h2>
 <p class="section-desc">属于具身智能生态链但不直接构成完整具身系统的公司——含零部件/组件供应商、软件/算法/数据平台、芯片/算力供应商、非地面具身形态等。</p>
 <table class="wikitable">
 <tr><th>#</th><th>公司</th><th>技术路线</th><th>产品类型</th><th>应用场景 / 细分定位</th><th>最新估值</th></tr>
@@ -290,7 +329,7 @@
 </table>
 
 </div>
-<div class="page-footer"><p>具身智能Wiki · 海外18 + 国内173 + 生态14 · 最后更新 2026-05-26</p></div>
+<div class="page-footer"><p>具身智能Wiki · 科技巨头8 + 海外25 + 国内173 + 海外生态4 + 国内生态14 · 最后更新 2026-05-27</p></div>
 </div>
 </body>
 </html>

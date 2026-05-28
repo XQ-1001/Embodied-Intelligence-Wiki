@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>Intrinsic — 具身智能Wiki</title>
+<style>
+:root{--bg:#fff;--text:#202122;--link:#0645ad;--border:#a2a9b1;--accent:#1a3a5c}
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:-apple-system,BlinkMacSystemFont,'微软雅黑',sans-serif;font-size:.875rem;line-height:1.6;color:var(--text);background:#f6f6f6}
+.top-nav{background:#fff;border-bottom:1px solid #c8ccd1;padding:8px 20px;font-size:.8rem;color:#54595d;display:flex;gap:8px;align-items:center}.top-nav a{color:var(--link);text-decoration:none}
+.page-container{max-width:1200px;margin:0 auto;background:#fff}.page-title{padding:28px 32px 16px}.page-title h1{font-family:'Georgia',serif;font-size:1.75rem;font-weight:400}
+.content-wrapper{display:flex;gap:20px;padding:0 32px 40px}.main-content{flex:1;min-width:0}
+.infobox{width:270px;flex-shrink:0;border:1px solid var(--border);background:#f9f9f9;font-size:.78rem}
+.infobox-title{background:var(--accent);color:#fff;text-align:center;padding:6px 10px;font-weight:600}
+.infobox-section-title{background:#e8f0fe;color:#1a3a5c;text-align:center;padding:4px 10px;font-weight:600;font-size:.76rem;border-top:1px solid var(--border)}
+.infobox-row{display:flex;padding:3px 10px;border-bottom:1px solid #e8e8e8}.infobox-label{width:85px;color:#54595d;flex-shrink:0}.infobox-value{flex:1}
+h2{font-family:'Georgia',serif;font-size:1.25rem;font-weight:400;border-bottom:1px solid var(--border);padding-bottom:4px;margin:28px 0 12px}
+h3{font-size:1rem;font-weight:600;margin:20px 0 8px}p{margin:8px 0}
+.wikitable{border-collapse:collapse;margin:10px 0;font-size:.8rem;width:100%;border:1px solid var(--border)}
+.wikitable th{background:#eaecf0;border:1px solid var(--border);padding:5px 8px;text-align:center;font-weight:600;font-size:.75rem}
+.wikitable td{border:1px solid var(--border);padding:5px 8px;vertical-align:top}.wikitable tr:nth-child(even) td{background:#f8f9fa}
+.timeline{border-left:3px solid #ddd;padding-left:20px;margin:12px 0 12px 6px}
+.timeline-entry{margin-bottom:14px;position:relative}.timeline-entry::before{content:'';position:absolute;left:-27px;top:5px;width:9px;height:9px;background:var(--accent);border:2px solid #fff;outline:1px solid var(--accent);border-radius:50%}
+.timeline-date{font-weight:600;color:var(--accent);font-size:.82rem}.timeline-title{font-weight:600;margin:1px 0;font-size:.84rem}.timeline-desc{color:#54595d;font-size:.78rem}
+sup a{color:#0645ad;text-decoration:none;font-size:.7rem}
+.refs{font-size:.8rem}.refs ol{padding-left:24px}.refs li{margin-bottom:4px}.refs a{color:var(--link)}
+.page-footer{border-top:1px solid var(--border);padding:14px 32px 24px;font-size:.78rem;color:#54595d;text-align:center}
+</style></head><body><div class="page-container">
+<div class="top-nav"><a href="../index.html">具身智能Wiki</a> › <a href="../index.html#overseas-eco">海外具身生态</a> › Intrinsic</div>
+<div class="page-title"><h1>Intrinsic</h1><div class="subtitle" style="font-size:.85rem;color:#54595d;">Alphabet / Google 旗下 · 工业机器人软件平台 · "机器人界的 Android 开发工具"</div></div>
+<div class="content-wrapper"><div class="main-content">
+
+<h2>1 概况</h2>
+<p>Intrinsic 是 Alphabet 旗下的工业机器人软件公司，最初在 Alphabet 的"登月工厂"<b>X</b> 内部孵化 5 年，于 <b>2021 年 7 月</b>正式独立为 Alphabet 子公司<sup><a href="#ref1">[1]</a></sup>。2026 年 2 月，Alphabet 将 Intrinsic 重新并入 Google，使其获得 Google DeepMind 的 Gemini AI 模型和 Google Cloud 基础设施的直接访问权限<sup><a href="#ref1">[1]</a></sup>。</p>
+<p>CEO <b>Wendy Tan White</b>（前 BGF Ventures 合伙人、Moonfruit 创始人）自公司独立以来一直领导 Intrinsic。公司总部位于美国加州 Mountain View（Google 总部园区内），在德国慕尼黑设有工程中心<sup><a href="#ref2">[2]</a></sup>。</p>
+<p>Intrinsic 的战略定位是 <b>Google 具身智能"双引擎"中的工业软件层</b>——DeepMind 的 Gemini Robotics 提供 AI 基础模型，Intrinsic 的 Flowstate 提供将模型部署到真实工厂产线的软件工具链<sup><a href="#ref3">[3]</a></sup>。首席产品官 Stefan Nusser 在 2026 年 5 月访谈中指出，传统自动化的核心问题是"成本过高且过于僵化"——一套自动化方案只能用于单一产品生命周期，而 AI 驱动的可复用自动化系统可在 7-10 年内跨多产品使用，彻底改变 ROI 方程<sup><a href="#ref2">[2]</a></sup>。</p>
+
+<h2>2 技术/产品平台</h2>
+<table class="wikitable">
+<tr><th>产品</th><th>发布时间</th><th>类型</th><th>核心能力</th></tr>
+<tr><td><b>Flowstate</b></td><td>2023</td><td>Web 低代码开发平台</td><td>可视化"技能块"组装工作流，无需机器人编程深度；硬件无关（FANUC/KUKA/Comau 等）；仿真到真机一键部署</td></tr>
+<tr><td><b>Intrinsic Vision Model (IVM)</b></td><td>2025 年底</td><td>AI 视觉感知模型</td><td>复杂零件识别、力传感器融合、未知物体自适应抓取</td></tr>
+<tr><td><b>Gemini Robotics 集成</b></td><td>2026（并入 Google 后）</td><td>AI 基础模型接入</td><td>利用 Gemini Robotics-ER 的空间推理和任务规划能力增强 Flowstate 技能块</td></tr>
+</table>
+<p>Flowstate 的核心创新是<b>"技能块"（skill blocks）</b>架构。传统工业机器人编程需要数百小时的专用语言编码和精细标定，Flowstate 将常见操作（抓取、放置、焊接、检测）封装为可复用模块，开发者在 Web 界面中拖拽组合即可构建完整的自动化工作流。平台内置物理仿真引擎，在真机部署前完成虚拟验证<sup><a href="#ref2">[2]</a></sup>。</p>
+<p>IVM 是 Intrinsic 在 2022 年收购 AI 公司 <b>Vicarious</b> 后整合其计算机视觉技术开发的成果，截至 2026 年初已有"数千名"开发者在 Flowstate 平台上构建应用<sup><a href="#ref1">[1]</a></sup>。</p>
+
+<h2>3 具身生态关系网络</h2>
+<table class="wikitable">
+<tr><th>关系类型</th><th>涉及公司/平台</th><th>具体关系</th></tr>
+<tr><td><b>母公司</b></td><td>Google / Alphabet</td><td>2026.02 并入 Google，获 DeepMind AI 和 Cloud 直接访问</td></tr>
+<tr><td><b>战略合资</b></td><td>Foxconn（富士康）</td><td>2025.10 成立美国合资公司，Flowstate + IVM 驱动电子制造"未来工厂"<sup><a href="#ref4">[4]</a></sup></td></tr>
+<tr><td><b>技术收购</b></td><td>Vicarious（2022）、部分 Open Robotics 资产（2022）</td><td>Vicarious 计算机视觉技术 → IVM；Open Robotics 资产增强 ROS/Gazebo 兼容性</td></tr>
+<tr><td><b>硬件兼容</b></td><td>FANUC、KUKA、Comau、ABB</td><td>Flowstate 平台原生支持的多品牌工业机器人</td></tr>
+<tr><td><b>AI 模型合作</b></td><td>Google DeepMind (Gemini Robotics)</td><td>Gemini Robotics-ER 模型嵌入 Flowstate 技能块</td></tr>
+<tr><td><b>竞争关系</b></td><td>NVIDIA (Isaac/Omniverse)、Siemens (Tecnomatix)</td><td>同属工业机器人软件/仿真平台赛道</td></tr>
+</table>
+
+<h2>4 发展时间线</h2>
+<div class="timeline">
+<div class="timeline-entry"><div class="timeline-date">2026.02</div><div class="timeline-title">Intrinsic 正式并入 Google</div><div class="timeline-desc">Alphabet 将 Intrinsic 重新整合入 Google，获 Gemini AI 和 Cloud 直接访问。CEO Wendy Tan White 继续领导<sup><a href="#ref1">[1]</a></sup>。</div></div>
+<div class="timeline-entry"><div class="timeline-date">2025.10</div><div class="timeline-title">Foxconn × Intrinsic 合资</div><div class="timeline-desc">在美国成立合资公司，用 Flowstate + IVM 打造 AI 驱动智能工厂，聚焦电子装配、检测和物流<sup><a href="#ref4">[4]</a></sup>。</div></div>
+<div class="timeline-entry"><div class="timeline-date">2025 年底</div><div class="timeline-title">Intrinsic Vision Model (IVM) 发布</div><div class="timeline-desc">整合 Vicarious 计算机视觉技术的 AI 感知模型。</div></div>
+<div class="timeline-entry"><div class="timeline-date">2023</div><div class="timeline-title">Flowstate 平台发布 + 裁员 20%</div><div class="timeline-desc">核心产品 Flowstate 上线。同月裁员约 40 人（~20%），聚焦产品化。</div></div>
+<div class="timeline-entry"><div class="timeline-date">2022</div><div class="timeline-title">收购 Vicarious + Open Robotics 资产</div><div class="timeline-desc">收购 AI 公司 Vicarious（计算机视觉）和开源机器人组织 Open Robotics 的部分资产（含 Gazebo 仿真器团队），增强技术栈。</div></div>
+<div class="timeline-entry"><div class="timeline-date">2021.07</div><div class="timeline-title">Intrinsic 从 X 独立</div><div class="timeline-desc">在 Alphabet X 孵化 5 年后正式成为独立子公司，Wendy Tan White 任 CEO。</div></div>
+<div class="timeline-entry"><div class="timeline-date">~2016</div><div class="timeline-title">在 Alphabet X 开始孵化</div><div class="timeline-desc">作为 Alphabet "登月工厂"的内部项目启动，旨在让工业机器人更易编程和部署。</div></div>
+</div>
+
+<h2>5 分析层</h2>
+<h3>优势</h3>
+<ul>
+<li><b>Google 生态整合</b>：并入 Google 后可直接使用 Gemini Robotics 模型和 Google Cloud 基础设施，这是独立机器人软件公司无法获得的底层能力</li>
+<li><b>Foxconn 制造体量</b>：富士康是全球最大的电子制造服务商（年营收 ~$2,000 亿），合资公司为 Flowstate 提供了无可比拟的真实场景验证平台</li>
+<li><b>硬件无关架构</b>：支持 FANUC、KUKA、Comau、ABB 等主流品牌，避免被单一硬件厂商锁定</li>
+<li><b>Open Robotics 遗产</b>：收购 Gazebo 仿真器核心团队后，在 ROS 生态中具有天然的开发者亲和力</li>
+</ul>
+<h3>挑战</h3>
+<ul>
+<li><b>商业化仍处早期</b>：Flowstate 平台已有"数千名"开发者，但缺乏大规模付费客户和独立营收数据</li>
+<li><b>NVIDIA 生态竞争</b>：NVIDIA Isaac/Omniverse 在仿真和数字孪生方面拥有更成熟的工具链和更广泛的硬件生态（200 万+ 工业机器人装机量）</li>
+<li><b>工业自动化销售周期长</b>：从平台试用到产线级部署通常需要 12-18 个月，增长曲线平缓</li>
+<li><b>2023 年裁员</b>：20% 裁撤可能影响团队士气和研发连续性</li>
+</ul>
+<h3>待核验</h3>
+<ul>
+<li>Flowstate 平台的独立营收、付费客户数量未公开</li>
+<li>Foxconn 合资公司的具体投资金额和股权结构未披露</li>
+<li>Vicarious 和 Open Robotics 的收购金额未公开</li>
+</ul>
+
+<h2>6 参考资料</h2>
+<div class="refs"><ol>
+<li id="ref1"><a href="https://techcrunch.com/2026/02/25/alphabet-owned-robotics-software-company-intrinsic-joins-google/" target="_blank">"Alphabet-owned robotics software company Intrinsic joins Google" — TechCrunch, 2026.02.25</a></li>
+<li id="ref2"><a href="https://m.zhiding.cn/article/3187069.htm" target="_blank">"Intrinsic首席产品官Stefan Nusser：传统自动化成本过高且过于僵化" — 至顶网, 2026.05</a></li>
+<li id="ref3"><a href="https://www.chosun.com/english/industry-en/2026/02/26/NMVTDNDQERFJFP3LZRVE3NIAYU/" target="_blank">"Google Aims for 'Android for Robots' in AI Software Shift" — Chosun, 2026.02.26</a></li>
+<li id="ref4"><a href="https://www.foxconn.com/en-us/press-center/press-releases/latest-news/1906" target="_blank">"Foxconn And Intrinsic Launch Joint Venture To Build AI Factory Of The Future" — Foxconn, 2025.11.21</a></li>
+</ol></div>
+</div>
+<aside class="infobox">
+<div class="infobox-title">Intrinsic</div>
+<div class="infobox-section-title">基本信息</div>
+<div class="infobox-row"><span class="infobox-label">母公司</span><span class="infobox-value">Google / Alphabet</span></div>
+<div class="infobox-row"><span class="infobox-label">CEO</span><span class="infobox-value">Wendy Tan White</span></div>
+<div class="infobox-row"><span class="infobox-label">CPO</span><span class="infobox-value">Stefan Nusser</span></div>
+<div class="infobox-row"><span class="infobox-label">成立</span><span class="infobox-value">2021 (X 分拆)<br>2016 年起在 X 孵化</span></div>
+<div class="infobox-row"><span class="infobox-label">总部</span><span class="infobox-value">美国加州 Mountain View</span></div>
+<div class="infobox-section-title">核心平台</div>
+<div class="infobox-row"><span class="infobox-label">产品</span><span class="infobox-value">Flowstate · IVM</span></div>
+<div class="infobox-row"><span class="infobox-label">定位</span><span class="infobox-value">工业机器人软件平台<br>"机器人 Android 开发工具"</span></div>
+<div class="infobox-row"><span class="infobox-label">硬件兼容</span><span class="infobox-value">FANUC·KUKA·Comau·ABB</span></div>
+<div class="infobox-row"><span class="infobox-label">关键合作</span><span class="infobox-value">Foxconn 合资</span></div>
+<div class="infobox-section-title">收购历史</div>
+<div class="infobox-row"><span class="infobox-label">2022</span><span class="infobox-value">Vicarious (AI视觉)<br>Open Robotics 部分资产</span></div>
+</aside></div>
+<div class="page-footer"><p>最后更新 2026-05-28 · <a href="../index.html">返回主索引</a></p></div>
+</div></body></html>
