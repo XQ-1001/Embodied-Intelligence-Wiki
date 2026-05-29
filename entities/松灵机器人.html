@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>松灵机器人 (AgileX Robotics) — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> › <span>松灵机器人 (AgileX Robotics)</span></div>
+  <div class="wiki-header"><h1>松灵机器人 (AgileX Robotics)</h1><div class="subtitle">松灵机器人（东莞）有限公司 · 2016年成立 · 全球领先移动机器人底盘制造商 · 具身智能科研平台领导者 · XbotPark孵化 · 累计融资约$1,540万</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#team">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financials">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#a2-1">2.1 团队背景与场景匹配度</a></li>
+        <li class="toc-lvl4"><a href="#a2-2">2.2 技术路线与场景适配性</a></li>
+        <li class="toc-lvl4"><a href="#a2-3">2.3 股东/资本结构影响</a></li>
+        <li class="toc-lvl4"><a href="#a2-4">2.4 试错与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#a2-5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#a2-6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#references">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">松灵机器人</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">松灵机器人（东莞）有限公司<sup><a href="#ref1">[1]</a></sup></div></div>
+        <div class="ib-row"><div class="ib-label">英文名</div><div class="ib-value">AgileX Robotics<sup><a href="#ref1">[1]</a></sup></div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2016年（工商注册2017.06）<sup><a href="#ref1">[1]</a></sup></div></div>
+        <div class="ib-row"><div class="ib-label">总部</div><div class="ib-value">广东省东莞市松山湖<sup><a href="#ref1">[1]</a></sup></div></div>
+        <div class="ib-row"><div class="ib-label">创始人/CEO</div><div class="ib-value">魏基栋<sup><a href="#ref2">[2]</a></sup></div></div>
+        <div class="ib-row"><div class="ib-label">员工规模</div><div class="ib-value">~200+人，研发占比>60%<sup><a href="#ref1">[1]</a></sup></div></div>
+        <div class="ib-row"><div class="ib-label">上市状态</div><div class="ib-value">未上市（私人公司）</div></div>
+        <div class="ib-row"><div class="ib-label">官网</div><div class="ib-value"><a href="https://www.agilex.ai" target="_blank">agilex.ai</a><sup><a href="#ref1">[1]</a></sup></div></div>
+        <div class="ib-section">融资概况</div>
+        <div class="ib-row"><div class="ib-label">累计融资</div><div class="ib-value">约$1,540万（公开披露）<sup><a href="#ref3">[3]</a></sup></div></div>
+        <div class="ib-row"><div class="ib-label">最新轮次</div><div class="ib-value">A轮 亿级人民币（2021.07）<sup><a href="#ref4">[4]</a></sup></div></div>
+        <div class="ib-row"><div class="ib-label">主要投资方</div><div class="ib-value">红杉中国、五源资本、祥峰投资、联想之星、XBOTPARK基金<sup><a href="#ref4">[4]</a></sup></div></div>
+        <div class="ib-section">业务定位</div>
+        <div class="ib-row"><div class="ib-label">核心业务</div><div class="ib-value">移动机器人底盘+具身智能科研平台</div></div>
+        <div class="ib-row"><div class="ib-label">子品牌</div><div class="ib-value">库犸动力（Mammotion）<sup><a href="#ref1">[1]</a></sup></div></div>
+        <div class="ib-row"><div class="ib-label">孵化背景</div><div class="ib-value">XbotPark松山湖机器人部落（李泽湘教授）</div></div>
+        <div class="ib-row"><div class="ib-label">客户数</div><div class="ib-value">1000+企业 + 500+高校科研机构</div></div>
+      </aside>
+
+      <p class="article-intro"><strong>松灵机器人（AgileX Robotics）</strong> 成立于 2016 年，由香港科技大学李泽湘教授创办的 XbotPark 松山湖机器人部落孵化，创始团队来自大疆、MathWorks 等企业。公司定位为全球领先的移动机器人底盘制造商和移动机器人系统解决方案服务商，核心产品覆盖全地形移动底盘（SCOUT/HUNTER/BUNKER/RANGER）、6 轴协作机械臂（PiPER）、移动双臂遥操平台（Cobot Magic）及教育机器人（LIMO PRO）等。旗下设有专注户外庭院智能工具的独立品牌<strong>库犸动力（Mammotion）</strong>。累计服务超过 1,000 家企业客户和 500+ 全球高校及科研机构，深度参与 ROS、Hugging Face 等全球开源社区，是具身智能科研领域的重要硬件基础设施提供商。<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref4">[4]</a></sup></p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 基本信息</h3>
+      <table class="wikitable infotable">
+        <tr><th colspan="2">公司信息</th></tr>
+        <tr><td>公司全称</td><td>松灵机器人（东莞）有限公司</td></tr>
+        <tr><td>英文名称</td><td>AgileX Robotics<sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>成立时间</td><td>2016年（工商注册日：2017年6月26日）<sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>总部地址</td><td>广东省东莞市松山湖园区工业北四路1号10栋101室<sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>创始人/CEO</td><td>魏基栋<sup><a href="#ref2">[2]</a></sup></td></tr>
+        <tr><td>孵化机构</td><td>XbotPark 松山湖机器人部落（李泽湘教授创办）<sup><a href="#ref4">[4]</a></sup></td></tr>
+        <tr><td>员工规模</td><td>200+人，研发人员占比超60%<sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>上市状态</td><td>未上市（私人公司）</td></tr>
+        <tr><td>官网</td><td><a href="https://www.agilex.ai" target="_blank">https://www.agilex.ai</a></td></tr>
+        <tr><td>联系邮箱</td><td>sales@agilex.ai</td></tr>
+      </table>
+
+      <h3 id="team">1.2 创始人及核心团队</h3>
+      <p><strong>魏基栋（创始人、董事长兼 CEO）</strong>：大疆创新前高级研发经理，任职三年。大疆全国机器人大赛 RoboMaster 的"一号员工"和联合创始人，在机器人竞赛生态和工程人才培养方面有深厚积累。2016 年创立松灵机器人，公司从机器人底盘制造商逐步进化为具身智能科研平台。<sup><a href="#ref2">[2]</a></sup></p>
+
+      <p>创始及研发团队核心成员来自<strong>大疆、MathWorks、李群自动化</strong>等知名企业和科研院校。公司由香港科技大学教授<strong>李泽湘</strong>创办的 XbotPark 松山湖机器人部落孵化，享受该生态系统的技术、供应链和产业资源支持。李泽湘教授是大疆创新的早期投资人和联合创始人，也是中国机器人创业生态的核心推动者。<sup><a href="#ref4">[4]</a></sup></p>
+
+      <div class="callout">
+        <div class="callout-title">创始人能力画像</div>
+        <p>魏基栋的核心能力集中在<strong>移动机器人工程</strong>和<strong>机器人竞赛生态运营</strong>两个维度。他在大疆的经历覆盖了从 RoboMaster 赛事运营到产品研发的全链条——既理解硬件工程的复杂性，又懂得如何构建开发者社区。这种"工程+社区"的双重能力，使得松灵机器人在底盘产品获得工业客户认可的同时，也在全球高校科研圈建立了强大的品牌认知。<sup><a href="#ref2">[2]</a></sup></p>
+      </div>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <table class="wikitable">
+        <tr><th>轮次</th><th>时间</th><th>金额</th><th>投资方</th></tr>
+        <tr><td>天使轮</td><td>2017年7月</td><td>数百万元人民币</td><td>联想之星、清水湾资本（XBOTPARK基金）</td></tr>
+        <tr><td>A轮</td><td>2021年7月</td><td>亿级人民币</td><td>红杉中国、五源资本、祥峰投资中国基金、HKX创新基金</td></tr>
+        <tr><td>股权融资</td><td>2022年1月</td><td>未披露</td><td>红杉中国、祥峰投资</td></tr>
+      </table>
+
+      <p><strong>累计融资</strong>：公开披露约 <strong>$1,540 万</strong>（Tracxn 数据）。<sup><a href="#ref3">[3]</a></sup></p>
+
+      <div class="callout">
+        <div class="callout-title">融资分析</div>
+        <p>松灵机器人的融资规模在具身智能赛道中相对偏小（累计仅约 $1,500 万级别），但其背后有 XbotPark 生态的强力支撑——包括供应链资源、产业对接和后续融资通道。红杉中国和五源资本的入场（2021年A轮）标志着公司从"孵化项目"向"规模化商业公司"的转折。2021年A轮之后至今（2026年）未披露新融资，可能表明公司已实现正向现金流或不依赖外部融资维持运营。<sup><a href="#ref3">[3]</a></sup><sup><a href="#ref4">[4]</a></sup></p>
+      </div>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <p>松灵机器人的技术体系以<strong>移动底盘</strong>为根基，向上延伸至<strong>机械臂、遥操作、多模态感知</strong>，构建了一套面向具身智能研究的完整硬件栈。<sup><a href="#ref1">[1]</a></sup></p>
+
+      <h4>核心技术能力</h4>
+      <ul>
+        <li><strong>全地形移动底盘技术</strong>：覆盖轮式（SCOUT、HUNTER）、履带式（BUNKER）、四轮四转（RANGER）等多种驱动形态，具备室内外全场景适应能力。底盘内置运动控制、SLAM 自主导航、多传感器融合和路径规划能力。<sup><a href="#ref1">[1]</a></sup></li>
+        <li><strong>PiPER 轻量化机械臂</strong>：6 自由度协作机械臂，面向具身智能和高校科研场景设计，强调轻量化和易用性。<sup><a href="#ref5">[5]</a></sup></li>
+        <li><strong>Cobot Magic 移动双臂遥操平台</strong>：基于 Mobile ALOHA 架构，是松灵切入具身智能数据采集的标志性产品。集成移动底盘+双臂+视觉系统，专为模仿学习和远程操作数据采集设计。已在中国具身智能学术界成为最主流的数据采集硬件之一。<sup><a href="#ref5">[5]</a></sup></li>
+      </ul>
+
+      <h4>开源与社区策略</h4>
+      <ul>
+        <li>深度参与 <strong>ROS</strong> 和 <strong>Hugging Face</strong> 等全球开源社区，所有底盘和机械臂产品提供 ROS/ROS2 驱动支持</li>
+        <li>2025 年推出<strong>"百万级"数据赋能计划</strong>，向全球开发者提供 AI 训练与算法迭代的基础支持</li>
+        <li>与智源具身智能联合发布 <strong>RoboCOIN</strong>（基于 Cobot Magic 的开源双臂数据采集方案）</li>
+      </ul>
+
+      <h4>具身智能数据生态</h4>
+      <p>松灵联合京东探索研究院、地瓜机器人、中国科学技术大学、深圳大学、睿尔曼智能、清华 RDT 团队等机构，提出了业内首个基于三轮数据驱动的<strong>原子技能库构建框架</strong>，旨在解决具身智能领域的数据匮乏问题。<sup><a href="#ref5">[5]</a></sup></p>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <table class="wikitable">
+        <tr><th>产品系列</th><th>型号/类型</th><th>特点</th><th>目标用户</th></tr>
+        <tr><td rowspan="4"><strong>移动底盘</strong></td><td><strong>SCOUT</strong> 系列</td><td>全能型可编程通用底盘，适应室内外及崎岖路径</td><td>工业自动化、科研教育</td></tr>
+        <tr><td><strong>HUNTER</strong> 系列</td><td>汽车思维设计，速度快、载重大，专注无人驾驶</td><td>园区快递、无人物流、景区巡逻</td></tr>
+        <tr><td><strong>BUNKER</strong> 系列</td><td>履带增强驱动，复杂地形，高载重高稳定性</td><td>军事侦察、灾难救援、野外勘探、重型工业巡检</td></tr>
+        <tr><td><strong>RANGER</strong> 系列</td><td>四轮四驱四转，灵活机动</td><td>特殊地形、窄空间作业</td></tr>
+        <tr><td><strong>机械臂</strong></td><td><strong>PiPER</strong></td><td>6DoF 轻量化协作机械臂，面向具身智能科研</td><td>高校实验室、科研机构</td></tr>
+        <tr><td><strong>移动操作</strong></td><td><strong>Cobot Magic</strong></td><td>基于 Mobile ALOHA 架构的移动双臂遥操平台，集成底盘+双臂+视觉</td><td>具身智能数据采集、模仿学习研究</td></tr>
+        <tr><td><strong>教育</strong></td><td><strong>LIMO PRO</strong></td><td>多模态教育机器人，支持多传感器配置</td><td>高校教学、竞赛培训</td></tr>
+        <tr><td><strong>软件</strong></td><td>自动驾驶/平行驾驶方案</td><td>配套底盘产品的软件栈</td><td>工业客户</td></tr>
+      </table>
+
+      <div class="callout">
+        <div class="callout-title">Cobot Magic 的战略意义</div>
+        <p>Cobot Magic 是松灵从"底盘制造商"向"具身智能平台商"转型的关键产品。2025 年，该平台已被智源具身智能、极佳科技、清华大学、北京大学、美的、智元机器人、蚂蚁灵波、香港大学、地平线等十余家顶尖机构采用，累计产出的学术论文覆盖 VLA、世界模型、模仿学习等前沿方向。在中国具身智能学术界，Cobot Magic 已成为与 Stanford ALOHA 齐名的数据采集标准平台。<sup><a href="#ref5">[5]</a></sup></p>
+      </div>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <table class="wikitable">
+        <tr><th>领域</th><th>应用场景</th><th>典型客户/案例</th><th>来源</th></tr>
+        <tr><td>具身智能科研</td><td>移动操作数据采集、模仿学习、VLA 模型训练、双臂协同</td><td>清华、北大、港大、港科大、宾大、智源、智元、美的等</td><td><sup><a href="#ref5">[5]</a></sup></td></tr>
+        <tr><td>高校教育</td><td>机器人教学实训、ROBOCON/RoboMaster 竞赛培训</td><td>电子科大、西安交大、500+ 全球高校</td><td><sup><a href="#ref1">[1]</a></sup><sup><a href="#ref6">[6]</a></sup></td></tr>
+        <tr><td>工业自动化</td><td>室内外物流搬运、巡检、安防</td><td>阿里巴巴、华为、中建三院等</td><td><sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>户外庭院（Mammotion）</td><td>智能割草、扫雪、泳池清洁</td><td>欧美消费市场</td><td><sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>军事/特种</td><td>侦察、排爆、灾难救援</td><td>军博会参展</td><td><sup><a href="#ref7">[7]</a></sup></td></tr>
+        <tr><td>无人配送</td><td>园区快递、无人送餐、景区巡逻</td><td>HUNTER 系列底盘客户</td><td><sup><a href="#ref1">[1]</a></sup></td></tr>
+      </table>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <ul>
+        <li><strong>企业客户</strong>：累计服务 1,000+ 企业级客户，包括阿里巴巴、华为、中建三院等头部企业。<sup><a href="#ref1">[1]</a></sup></li>
+        <li><strong>科研客户</strong>：产品进入 500+ 全球高校和科研机构，包括中科院、卡内基梅隆大学、清华大学、新加坡国立大学、纽约大学等。<sup><a href="#ref1">[1]</a></sup></li>
+        <li><strong>赛事赞助</strong>：累计赞助 RoboMaster、ROBOCON 等顶级赛事超百万元，2025 年发起 30 万元专项赞助覆盖 30 余所高校。<sup><a href="#ref6">[6]</a></sup></li>
+        <li><strong>产教融合</strong>：与电子科技大学共建"具身智能机器人学生科创联合实验室"（2024年12月揭牌）；向西安交通大学捐赠 10 万元及 LIMO PRO 等设备；向松山湖教育基金会捐赠 100 万元。<sup><a href="#ref6">[6]</a></sup></li>
+        <li><strong>子品牌 Mammotion</strong>：库犸动力专注庭院智能机器人（割草、扫雪、泳池清洁），面向欧美消费市场独立运营，团队在深圳、东莞设研发中心，营销中心分布于深圳、北美、日本。<sup><a href="#ref1">[1]</a></sup></li>
+        <li><strong>2025 年 ARTS 大会</strong>：连续两届成为自主机器人技术研讨会（浙江大学主办）合作伙伴。<sup><a href="#ref5">[5]</a></sup></li>
+      </ul>
+
+      <h3 id="financials">1.8 财务数据</h3>
+      <table class="wikitable infotable">
+        <tr><th>指标</th><th>数据</th><th>来源/备注</th></tr>
+        <tr><td>累计融资</td><td>约 $1,540 万</td><td>Tracxn 公开数据<sup><a href="#ref3">[3]</a></sup></td></tr>
+        <tr><td>A 轮融资额</td><td>亿级人民币</td><td>2021年7月，红杉中国等<sup><a href="#ref4">[4]</a></sup></td></tr>
+        <tr><td>员工数</td><td>200+ 人</td><td>官方自述<sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>研发占比</td><td>>60%</td><td>官方自述<sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>企业客户数</td><td>1,000+</td><td>官方自述<sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>高校科研客户</td><td>500+</td><td>官方自述<sup><a href="#ref1">[1]</a></sup></td></tr>
+      </table>
+
+      <div class="callout">
+        <div class="callout-title">⚠️ 审慎提示</div>
+        <p>松灵机器人作为私人公司未公开披露营收和利润数据。公司自 2021 年 A 轮融资后未披露新融资轮次，营收和估值暂无可靠的第三方估算。</p>
+      </div>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li><strong>2025 年具身智能论文合集</strong>：松灵发布了 2025 年度基于其硬件的具身智能科研论文合集，合作机构包括智源具身智能（RoboCOIN）、极佳科技（GigaBrain-0）、清华大学（XVLA/H-RDT/Exo-ViHa）、美的（DexVLA）、北京大学（HybridVLA）、智元机器人（Genie Envisioner）、蚂蚁灵波（LingBot-VLA）、香港大学（kai0）、地平线（SEM）、宾夕法尼亚大学（Maestro）、香港科技大学（ReconVLA）等。<sup><a href="#ref5">[5]</a></sup></li>
+        <li><strong>Cobot Magic 的生态影响力</strong>：在中国具身智能学术界，Cobot Magic 已成为事实上的双臂数据采集标准硬件之一，与该领域的 Stanford ALOHA（使用 ViperX 臂+全身遥操）形成中美对标。多家中国头部具身智能实验室的新论文默认使用 Cobot Magic 作为实验平台。<sup><a href="#ref5">[5]</a></sup></li>
+        <li><strong>与港大联合 Workshop</strong>：2025 年 4 月与香港大学联合举办"大湾区具身智能 Workshop"，汇聚南洋理工、北大、中科院深圳先进院、南方科大、中山大学、上海交大等机构学者，探讨多模态大模型驱动策略、多臂协同操作、具身导航等议题。<sup><a href="#ref5">[5]</a></sup></li>
+        <li><strong>军博会参展</strong>：松灵机器人多次参加深圳军博会，展示 BUNKER 履带底盘等产品在军事侦察、灾难救援等特种场景的应用。<sup><a href="#ref7">[7]</a></sup></li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="a2-1">
+        <h4>2.1 团队背景与场景匹配度</h4>
+        <p>魏基栋从大疆 RoboMaster 出身，天然具备"竞赛基因"——这解释了松灵机器人在高校科研市场的超强渗透力。RoboMaster 是全球规模最大的机器人竞赛之一，魏基栋作为其"一号员工"，深刻理解高校实验室的需求痛点和采购决策逻辑。松灵的产品线从底盘扩展到 PiPER 机械臂和 Cobot Magic 遥操平台，每一步都精准踩中了具身智能学术界的最新需求。</p>
+        <p>但团队的短板同样明显：核心成员主要来自大疆（消费级无人机）和 MathWorks（工业软件），在"具身智能大模型"和"AI 算法"层面缺乏深度。松灵的策略是成为硬件和数据基础设施提供商，而非 AI 算法公司——这是一个清醒的定位，但也意味着公司无法分享具身智能产业链中价值最高的"大脑"层利润。</p>
+      </div>
+
+      <div class="analysis-block" id="a2-2">
+        <h4>2.2 技术路线与场景适配性</h4>
+        <p>松灵的"底盘→机械臂→遥操作→数据生态"技术演进路线与具身智能学术研究的需求高度契合。2023-2025 年，具身智能领域最大的痛点是"缺乏高质量的操作数据"，而 Cobot Magic 恰好提供了低成本、标准化的数据采集方案。这使得松灵从"卖底盘"的硬件公司升级为"卖数据采集平台"的生态公司。</p>
+        <p>但 Cobot Magic 的技术壁垒有限——它本质上是 Mobile ALOHA 架构的商业化实现，任何有底盘+机械臂+视觉集成能力的公司都可以复制。松灵的护城河不在技术独占性，而在于"先发优势+学术生态网络+ROS 开源社区声誉"的组合。如果未来具身智能的数据采集需求转向仿真或更大规模的工业遥操作，松灵需要做出相应的产品调整。</p>
+      </div>
+
+      <div class="analysis-block" id="a2-3">
+        <h4>2.3 股东/资本结构影响</h4>
+        <p>XbotPark 生态是松灵最独特的股东资源。李泽湘教授作为大疆的早期投资人和中国机器人创业教父，其生态内企业（如大疆、云鲸、逸动科技等）形成了从供应链到渠道的协同网络。红杉中国和五源资本的加入为松灵提供了品牌背书和后续融资通道，但自 2021 年 A 轮后未披露新融资可能暗示两种情形：公司现金流健康无需外部输血，或估值/融资环境不理想。</p>
+        <p>Mammotion（库犸动力）作为独立品牌运营，其融资和商业化进展独立于松灵本体，可能形成"松灵做 B2B/科研，Mammotion 做 B2C/庭院"的双轮驱动格局，但也存在资源分散的风险。</p>
+      </div>
+
+      <div class="analysis-block" id="a2-4">
+        <h4>2.4 试错与路径调整</h4>
+        <p>松灵创业初期的定位是"智能停车 AGV 机器人"——这是一个高度垂直的工业场景。天使轮融资时（2017 年）的 BP 仍然围绕停车 AGV 展开。但在随后的 3-4 年中，公司经历了从"垂直应用"到"通用底盘平台"的重大战略转型，最终在 2023-2024 年进一步升级为"具身智能科研基础设施"。这种从"做应用"到"做平台"再到"做生态"的路径，在中国机器人创业公司中具有一定的代表性。</p>
+        <p>Mammotion 的独立运营可能是松灵应对"B2B科研底盘利润薄、增长慢"困境的产物——庭院机器人在欧美有明确的消费市场和更高的毛利率。</p>
+      </div>
+
+      <div class="analysis-block" id="a2-5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>松灵在移动底盘领域的直接竞争对手包括<strong>地瓜机器人</strong>（地平线旗下，同样深耕 ROS 生态）、<strong>睿尔曼智能</strong>（机械臂）、以及多家中小型底盘制造商。在具身智能科研平台维度，竞争对手包括<strong>宇树科技</strong>（四足+人形+机械臂 Z1）、<strong>傅利叶</strong>（人形+科研平台）等。</p>
+        <p>松灵的差异化在于"底盘+机械臂+遥操作+数据生态"的全栈覆盖，以及 XbotPark 生态赋予的高校渠道优势。但公司面临的核心取舍是：做"通用平台"意味着无法在任何单一领域建立深度技术壁垒——底盘不如专业 AGV 公司（如极智嘉），机械臂不如专业臂厂（如节卡、越疆），AI 能力不如算法公司。松灵的价值在于"集成"和"生态"，而非单一维度的技术领先。</p>
+      </div>
+
+      <div class="analysis-block" id="a2-6">
+        <h4>2.6 其他重要观察</h4>
+        <p><strong>Cobot Magic 的"标准制定者"机会</strong>：如果 Cobot Magic 能持续保持在中国具身智能学术界的市占率优势，松灵有可能效仿 NVIDIA 在 AI 训练领域的策略——"开发者用什么硬件，工业界就用什么硬件"。当今天用 Cobot Magic 写论文的博士生明天成为机器人公司的技术负责人时，松灵将获得极强的采购惯性优势。</p>
+        <p><strong>Mammotion 的潜在独立上市</strong>：库犸动力如果能在庭院机器人赛道跑通，其独立上市的可能性高于松灵本体。消费级机器人（割草/扫雪）的市场规模和利润空间远超科研底盘，这可能使松灵集团形成"Mammotion 上市+松灵科研平台"的双层结构。</p>
+        <p><strong>XbotPark 生态的隐形价值</strong>：李泽湘教授生态内已跑出大疆（千亿级）、云鲸（百亿级）等标杆企业。松灵作为该生态的一员，在供应链、产业对接和后续融资方面享有显著的隐性优势，这是独立创业公司难以复制的。</p>
+      </div>
+
+      <h2 id="references">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li id="ref1">松灵机器人官网：<a href="https://www.agilex.ai" target="_blank">https://www.agilex.ai</a>（公司介绍、产品信息、客户规模自述）</li>
+          <li id="ref2">36氪 - 松灵机器人项目信息：<a href="https://pitchhub.36kr.com/project/1678507092571136" target="_blank">https://pitchhub.36kr.com/project/1678507092571136</a></li>
+          <li id="ref3">Tracxn - AgileX Robotics Company Profile（2026）：<a href="https://tracxn.com/d/companies/agilexrobotics/" target="_blank">https://tracxn.com/d/companies/agilexrobotics/</a></li>
+          <li id="ref4">东莞市科技局 - XbotPark 孵化企业松灵机器人完成A轮融资：<a href="http://ssl.dg.gov.cn/kcj/jqrcy/qyxx/content/post_3606328.html" target="_blank">http://ssl.dg.gov.cn/kcj/jqrcy/qyxx/content/post_3606328.html</a></li>
+          <li id="ref5">松灵机器人微信公众号："一文速览2025松灵具身智能科研论文合集！"及 ARTS 2025 相关推文</li>
+          <li id="ref6">电子科技大学 - 松灵机器人捐赠支持"机器人创新基金"：<a href="https://www.smee.uestc.edu.cn/info/1090/21543.htm" target="_blank">https://www.smee.uestc.edu.cn/info/1090/21543.htm</a></li>
+          <li id="ref7">深圳军博会 - 松灵机器人展商推荐：<a href="http://www.81gfchina.com/cnt_174.html" target="_blank">http://www.81gfchina.com/cnt_174.html</a></li>
+          <li id="ref8">铅笔道 - 松灵机器人获数百万元天使投资（2017）：<a href="https://www.pencilnews.cn/p/17327.html" target="_blank">https://www.pencilnews.cn/p/17327.html</a></li>
+          <li id="ref9">腾讯云开发者社区 - 业内首个具身智能原子技能库架构：<a href="https://cloud.tencent.com/developer/article/2498214" target="_blank">https://cloud.tencent.com/developer/article/2498214</a></li>
+        </ol>
+      </div>
+
+      <div class="page-footer">松灵机器人 页面 · 创建于 2026-05-28 · <a href="../index.html">返回具身智能Wiki索引</a></div>
+    </article>
+  </div>
+</div>
+</body>
+</html>
