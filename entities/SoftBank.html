@@ -26,6 +26,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑','Microsoft
 .infobox-value { flex: 1; }
 h2 { font-family: 'Georgia','Times New Roman',serif; font-size: 1.25rem; font-weight: 400; border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
 h3 { font-size: 1rem; font-weight: 600; margin: 20px 0 8px; }
+h4 { font-size: 0.9rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
 p { margin: 8px 0; }
 .wikitable { border-collapse: collapse; margin: 10px 0 18px; font-size: 0.8rem; width: 100%; border: 1px solid #a2a9b1; }
 .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; font-size: 0.75rem; }
@@ -33,6 +34,10 @@ p { margin: 8px 0; }
 .wikitable tr:nth-child(even) td { background: var(--table-stripe); }
 sup a { color: #0645ad; text-decoration: none; font-size: 0.7rem; }
 .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.7rem; margin: 1px 2px; border: 1px solid #c8d9e8; white-space: nowrap; }
+.callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.84rem; }
+.callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+.analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+.analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
 .timeline { border-left: 3px solid #ddd; padding-left: 20px; margin: 12px 0 12px 6px; }
 .timeline-entry { margin-bottom: 14px; position: relative; }
 .timeline-entry::before { content: ''; position: absolute; left: -27px; top: 5px; width: 9px; height: 9px; background: var(--accent); border: 2px solid #fff; outline: 1px solid var(--accent); border-radius: 50%; }
@@ -48,51 +53,171 @@ sup a { color: #0645ad; text-decoration: none; font-size: 0.7rem; }
 <body>
 <div class="page-container">
 <div class="top-nav"><a href="../index.html">具身智能Wiki</a> <span>›</span> <a href="../index.html#tech-giants">科技巨头具身布局</a> <span>›</span> SoftBank</div>
-<div class="page-title"><h1>SoftBank — 具身智能布局</h1><div class="subtitle">SoftBank Group Corp.（东证：9984）· 物理 AI 最大资本豪赌</div></div>
+<div class="page-title"><h1>SoftBank — 具身智能布局</h1><div class="subtitle">SoftBank Group Corp.（东证：9984）· 物理 AI 最大资本豪赌 · 全球最大的机器人资产组合</div></div>
 <div class="content-wrapper"><div class="main-content">
 
 <h2>1 具身智能战略定位</h2>
-<p>软银在具身智能领域扮演<b>"超级资本+资产整合者"</b>角色，通过大规模收购和投资构建全球最大的机器人资产组合。CEO 孙正义将具身智能定义为"Physical AI"——AI 的下一个超级周期<sup><a href="#ref1">[1]</a></sup>。</p>
-<p>2025 年 10 月，软银以 <b>$54 亿</b>收购 ABB 机器人业务（7,000 名员工，2024 年营收 $23 亿），这是全球工业机器人产业史上最大规模的并购之一<sup><a href="#ref1">[1]</a></sup>。2026 年 4 月，软银成立 Roze AI——一家用自主机器人建造 AI 数据中心的公司，目标 <b>$1,000 亿 IPO</b>（已被 Goldman Sachs、JPMorgan 等任命为承销商）<sup><a href="#ref2">[2]</a></sup>。与此同时，软银机器人组合还包括 SoftBank Robotics Group（Pepper/Whiz）、Berkshire Grey（仓储自动化）、AutoStore（立方体仓储）、Agile Robots（力控机器人）和 Skild AI（通用机器人大脑）<sup><a href="#ref3">[3]</a></sup>。</p>
+<p>软银在具身智能领域扮演<b>"超级资本 + 资产整合者"</b>角色——从芯片（ARM/Ampere）到 AI 大脑（OpenAI/Skild AI）到机器人硬件（ABB/Berkshire Grey/AutoStore/Agile Robots）再到数据中心（Stargate/DigitalBridge），软银是全球唯一在同一集团内构建了<b>算力→算法→硬件→基础设施</b>全链条的资本集团。CEO 孙正义（Masayoshi Son）将这一战略定义为 <b>"Physical AI"</b>——AI 的下一个超级周期<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref2">[2]</a></sup>。</p>
 
-<h2>2 核心资产/投资组合</h2>
+<p>孙正义的终极愿景是 <b>Artificial Super Intelligence（ASI）</b>——预测其将在 10 年内达到人类智能的 1 万倍，并占全球 GDP 的 10%。为实现这一目标，软银已从多元化 VC 转型为<b>"AI 时代的产业控股公司"</b><sup><a href="#ref3">[3]</a></sup>。</p>
+
+<h2>2 核心资产与投资组合</h2>
+<h3>2.1 全资/控股资产</h3>
 <table class="wikitable">
-<tr><th>资产</th><th>获得方式</th><th>时间</th><th>方向</th></tr>
-<tr><td><b>ABB Robotics</b></td><td>$54 亿收购</td><td>2025.10</td><td>工业机器人（7,000 员工，$23 亿营收）<sup><a href="#ref1">[1]</a></sup></td></tr>
-<tr><td><b>Roze AI</b></td><td>内部创建</td><td>2026.04</td><td>机器人建造数据中心，目标 $1,000 亿 IPO<sup><a href="#ref2">[2]</a></sup></td></tr>
-<tr><td><b>Berkshire Grey</b></td><td>收购</td><td>2023</td><td>仓储机器人自动化<sup><a href="#ref3">[3]</a></sup></td></tr>
-<tr><td><b>AutoStore</b></td><td>投资</td><td>2021</td><td>立方体仓储系统<sup><a href="#ref3">[3]</a></sup></td></tr>
-<tr><td><b>Skild AI</b></td><td>投资</td><td>2025</td><td>通用机器人大脑（估值 ~$140 亿）<sup><a href="#ref3">[3]</a></sup></td></tr>
-<tr><td><b>SoftBank Robotics Group</b></td><td>自营</td><td>2014</td><td>Pepper/Whiz 服务机器人<sup><a href="#ref3">[3]</a></sup></td></tr>
+<tr><th>资产</th><th>获得方式</th><th>时间</th><th>金额/估值</th><th>详情</th></tr>
+<tr><td><b>ABB Robotics</b></td><td>$54 亿收购（待交割）</td><td>2025.10</td><td>$54 亿</td><td>全球第二大工业机器人厂商，7,000 员工，2024 年营收 $23 亿，EBITDA $3.13 亿，服务 BMW 等客户。预计 2026 年中至年底完成交割<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref4">[4]</a></sup></td></tr>
+<tr><td><b>Roze AI</b></td><td>内部创建</td><td>2026.04</td><td>目标 $1,000 亿 IPO</td><td>用自主机器人建造 AI 数据中心的公司。已任命 Goldman Sachs、JPMorgan、Mizuho、Morgan Stanley 为承销商，KPMG 为审计师。计划 2026 年下半年在美上市<sup><a href="#ref5">[5]</a></sup><sup><a href="#ref6">[6]</a></sup></td></tr>
+<tr><td><b>SoftBank Robotics Group</b></td><td>自营</td><td>2014</td><td>年营收约 $32 亿（含机器人及相关业务）</td><td>Pepper 人形机器人（2014-2021，累计生产约 27,000 台后停产）、Whiz 商用清洁机器人（2019-，全球室内专业移动机器人销量第一）。在东京、巴黎、旧金山、北京设有办公室<sup><a href="#ref7">[7]</a></sup></td></tr>
+<tr><td><b>Berkshire Grey</b></td><td>收购（私有化）</td><td>2023</td><td>未公开</td><td>AI 驱动的仓储拣选和分拣机器人，服务电商和物流客户。原为纳斯达克上市公司（BGRY），软银将其私有化纳入机器人组合<sup><a href="#ref8">[8]</a></sup></td></tr>
+<tr><td><b>Ampere Computing</b></td><td>$65 亿收购</td><td>2025.03</td><td>$65 亿</td><td>美国云端 AI 芯片设计公司，为数据中心提供 ARM 架构处理器。是软银芯片战略的关键棋子<sup><a href="#ref2">[2]</a></sup></td></tr>
+<tr><td><b>DigitalBridge</b></td><td>~$40 亿收购</td><td>2025</td><td>~$40 亿</td><td>数据中心投资公司，旗下包括 AtlasEdge、DataBank、Switch、Vantage Data Centers 等资产，为 Stargate 提供基础设施保障<sup><a href="#ref5">[5]</a></sup></td></tr>
 </table>
 
-<h2>5 具身生态关系网络</h2>
+<h3>2.2 重大少数股权投资</h3>
 <table class="wikitable">
-<tr><th>关系类型</th><th>涉及公司</th><th>具体关系</th></tr>
-<tr><td><b>收购</b></td><td>ABB Robotics</td><td>$54 亿收购，约 2026 年中完成交割<sup><a href="#ref1">[1]</a></sup></td></tr>
-<tr><td><b>投资</b></td><td>Skild AI</td><td>参与后期轮次<sup><a href="#ref3">[3]</a></sup></td></tr>
-<tr><td><b>投资</b></td><td>OpenAI</td><td>$300 亿参与 $1,220 亿超级融资<sup><a href="#ref2">[2]</a></sup></td></tr>
+<tr><th>公司</th><th>投资方式</th><th>时间</th><th>软银投入</th><th>公司估值</th><th>详情</th></tr>
+<tr><td><b>AutoStore</b></td><td>收购 40% 股权</td><td>2021.04</td><td>$28 亿</td><td>$77 亿（交易时）</td><td>挪威立方体仓储机器人公司，全球 35 国部署超 20,000 台机器人。2021 年 9 月完成奥斯陆 IPO<sup><a href="#ref9">[9]</a></sup></td></tr>
+<tr><td><b>Agile Robots（思灵机器人）</b></td><td>领投 C 轮</td><td>2023</td><td>$2.2 亿（C 轮总额）</td><td>约 $10 亿+</td><td>中德协作机器人公司，软银领投，红杉、小米等跟投。产品为力控协作机械臂<sup><a href="#ref10">[10]</a></sup></td></tr>
+<tr><td><b>Skild AI</b></td><td>领投 B 轮 + C 轮谈判中</td><td>2025.05 / 2025.12</td><td>$5 亿（B 轮）+ $10 亿+（C 轮谈判中）</td><td>$47 亿（B 轮）→ $140 亿（C 轮谈判中）</td><td>通用机器人大脑公司，由前 Meta AI 研究员创办。软银领投 B 轮，正与 NVIDIA 联合谈判 C 轮 $10 亿+ 投资<sup><a href="#ref11">[11]</a></sup></td></tr>
+<tr><td><b>OpenAI</b></td><td>多轮投资</td><td>2024-2025</td><td>$225 亿+（另有 $300 亿谈判中）</td><td>~$3,000 亿+</td><td>软银是 OpenAI 最大外部股东之一（~11%），参与 $1,220 亿超级融资轮。已承诺追加最高 $300 亿<sup><a href="#ref3">[3]</a></sup></td></tr>
 </table>
 
-<h2>6 具身智能发展时间线</h2>
+<h2>3 软银机器人集团（SoftBank Robotics Group）历史</h2>
+<p>软银自 2004 年进入机器人领域，2014 年正式成立 SoftBank Robotics Group，经历了从"情感机器人"到"实用商业机器人"的战略转型<sup><a href="#ref7">[7]</a></sup>。</p>
+
+<h4>Pepper（2014-2021）：现象级产品，商业化失败</h4>
+<ul>
+<li>2014 年 6 月 5 日在东京首次亮相，由 Aldebaran Robotics 研发、富士康代工</li>
+<li>身高约 1.2 米，具备面部表情和语音语调的情绪识别能力</li>
+<li>售价 ¥198,000（~$1,931），企业月租 ¥55,000</li>
+<li>首批 1,000 台 60 秒售罄，累计生产约 27,000 台</li>
+<li>部署场景：银行（瑞穗）、餐厅（Hamazushi）、机场（蒙特利尔）、养老院</li>
+<li>2021 年 6 月停产——高成本、有限实用功能导致持续亏损<sup><a href="#ref7">[7]</a></sup></li>
+</ul>
+
+<h4>Whiz（2019-）：务实转型，商业成功</h4>
+<ul>
+<li>2019 年 2 月在日本首发，自主商用地面清洁机器人</li>
+<li>使用 BrainOS 自主操作系统，2D/3D 摄像头 + LIDAR + 碰撞传感器</li>
+<li>月租 ¥25,000（~$222），覆盖约 500 m²/小时，支持热插拔电池</li>
+<li>部署市场：日本、新加坡、韩国、香港、澳大利亚</li>
+<li>2022 年软银机器人集团成为<b>全球室内专业移动机器人销量第一</b><sup><a href="#ref7">[7]</a></sup></li>
+</ul>
+
+<div class="callout"><div class="callout-title">Pepper 的教训与启示</div><p>Pepper 是软银具身智能战略的首次重大尝试。其失败核心不在于技术——Pepper 的情感识别能力在当时是领先的——而在于商业模式：消费者不会为"情感陪伴"支付机器人溢价，企业场景中 Pepper 的实际 ROI 远低于预期。这一教训深刻影响了软银后续的机器人战略：从"造最酷的机器人"转向"买最好的机器人资产并整合"<sup><a href="#ref7">[7]</a></sup>。</p></div>
+
+<h2>4 关键战略协同</h2>
+<h3>4.1 ARM 的芯片底座角色</h3>
+<p>ARM 是软银具身智能战略的<b>算力支柱</b>。2024-2025 年，ARM 在英国设立专门的 AI 芯片部门，计划 2025 年春季完成原型、秋季量产，属于孙正义 $640 亿芯片战略的一部分。ARM 的低功耗架构天然适合机器人边缘计算场景，而收购 Ampere 则补足了数据中心端的高性能 ARM 处理器能力。ARM + Ampere 的组合使软银在<b>云端和边缘两端</b>都拥有了自主芯片能力<sup><a href="#ref2">[2]</a></sup>。</p>
+
+<h3>4.2 Stargate：$5,000 亿 AI 基础设施</h3>
+<p>Stargate 是软银与 OpenAI、Oracle、阿布扎比 MGX 于 2025 年 1 月联合发起的 AI 基础设施项目，目标到 2029 年在美国建设 10 GW AI 算力。旗舰基地位于德克萨斯州 Abilene——400 万平方英尺、1.2 GW 功耗、40 万块 NVIDIA GB200 Blackwell GPU（硬件订单 ~$400 亿）。软银还收购了前通用汽车 Lordstown 工厂（$3.75 亿），与富士康合资生产模块化 AI 服务器机架，将建设周期从 12 个月压缩到 7-8 个月<sup><a href="#ref3">[3]</a></sup><sup><a href="#ref12">[12]</a></sup>。</p>
+
+<h3>4.3 Roze AI：从数据中心到机器人建造</h3>
+<p>Roze AI 是软银将"机器人与数据中心"两大战略交汇的产物。其核心逻辑：AI 数据中心建设面临严重的劳动力和施工瓶颈——而软银同时拥有 ABB 工业机器人和数据中心的土地、能源、基础设施资产。Roze 计划用自主机器人加速数据中心建设，将 ABB 机器人、DigitalBridge 数据中心资产、Ampere 芯片和 OpenAI 模型整合为单一实体。但 Roze 目前尚无收入或商用原型，$1,000 亿 IPO 目标引发内外质疑<sup><a href="#ref5">[5]</a></sup><sup><a href="#ref6">[6]</a></sup>。</p>
+
+<h2>5 具身智能发展时间线</h2>
 <div class="timeline">
-<div class="timeline-entry"><div class="timeline-date">2026.04</div><div class="timeline-title">Roze AI 成立</div><div class="timeline-desc">目标 $1,000 亿 IPO，用自主机器人建造数据中心<sup><a href="#ref2">[2]</a></sup>。</div></div>
-<div class="timeline-entry"><div class="timeline-date">2025.10</div><div class="timeline-title">收购 ABB Robotics</div><div class="timeline-desc">$54 亿收购全球工业机器人第二大厂商<sup><a href="#ref1">[1]</a></sup>。</div></div>
-<div class="timeline-entry"><div class="timeline-date">2023</div><div class="timeline-title">收购 Berkshire Grey</div><div class="timeline-desc">仓储机器人自动化公司。</div></div>
+<div class="timeline-entry"><div class="timeline-date">2026.04</div><div class="timeline-title">Roze AI 成立，任命承销商</div><div class="timeline-desc">目标 2026 年下半年 $1,000 亿 IPO。Goldman Sachs、JPMorgan、Morgan Stanley 被任命为承销商。KPMG 为审计师。计划 7 月在 Texas 举办分析师日<sup><a href="#ref5">[5]</a></sup>。</div></div>
+<div class="timeline-entry"><div class="timeline-date">2025.12</div><div class="timeline-title">Skild AI C 轮谈判</div><div class="timeline-desc">软银与 NVIDIA 联合谈判对 Skild AI 的 $10 亿+ C 轮投资，估值 $140 亿，较 7 个月前翻近 3 倍<sup><a href="#ref11">[11]</a></sup>。</div></div>
+<div class="timeline-entry"><div class="timeline-date">2025.10</div><div class="timeline-title">收购 ABB Robotics</div><div class="timeline-desc">$54 亿收购全球第二大工业机器人厂商。ABB 原计划独立分拆上市，软银以溢价报价拿下<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref4">[4]</a></sup>。</div></div>
+<div class="timeline-entry"><div class="timeline-date">2025.10</div><div class="timeline-title">清仓 NVIDIA 股票</div><div class="timeline-desc">出售所有 NVIDIA 持股，套现约 $58 亿，资金用于 OpenAI 追加投资<sup><a href="#ref3">[3]</a></sup>。</div></div>
+<div class="timeline-entry"><div class="timeline-date">2025.05</div><div class="timeline-title">领投 Skild AI B 轮</div><div class="timeline-desc">$5 亿 B 轮融资，软银领投，NVIDIA、LG、Samsung 跟投，估值 $47 亿<sup><a href="#ref11">[11]</a></sup>。</div></div>
+<div class="timeline-entry"><div class="timeline-date">2025.03</div><div class="timeline-title">收购 Ampere Computing</div><div class="timeline-desc">$65 亿收购美国云端 AI 芯片设计公司<sup><a href="#ref2">[2]</a></sup>。</div></div>
+<div class="timeline-entry"><div class="timeline-date">2025.01</div><div class="timeline-title">Stargate 项目启动</div><div class="timeline-desc">与 OpenAI、Oracle、MGX 联合在白宫发布，目标 2029 年完成 10 GW AI 算力建设<sup><a href="#ref12">[12]</a></sup>。</div></div>
+<div class="timeline-entry"><div class="timeline-date">2024.12</div><div class="timeline-title">OpenAI $225 亿投资</div><div class="timeline-desc">参与 OpenAI $1,220 亿超级融资，获约 11% 股权<sup><a href="#ref3">[3]</a></sup>。</div></div>
+<div class="timeline-entry"><div class="timeline-date">2023</div><div class="timeline-title">收购 Berkshire Grey + 领投 Agile Robots C 轮</div><div class="timeline-desc">将仓储机器人公司 Berkshire Grey 私有化；领投中德协作机器人公司 Agile Robots $2.2 亿 C 轮<sup><a href="#ref8">[8]</a></sup><sup><a href="#ref10">[10]</a></sup>。</div></div>
+<div class="timeline-entry"><div class="timeline-date">2021.06</div><div class="timeline-title">Pepper 停产</div><div class="timeline-desc">累计生产约 27,000 台后正式停产，标志着"情感机器人"战略的终结<sup><a href="#ref7">[7]</a></sup>。</div></div>
+<div class="timeline-entry"><div class="timeline-date">2021.04</div><div class="timeline-title">投资 AutoStore 40%</div><div class="timeline-desc">$28 亿收购挪威仓储机器人公司 40% 股权，估值 $77 亿<sup><a href="#ref9">[9]</a></sup>。</div></div>
+<div class="timeline-entry"><div class="timeline-date">2020.12</div><div class="timeline-title">出售 Boston Dynamics</div><div class="timeline-desc">以约 $11 亿估值将 Boston Dynamics 出售给现代汽车。软银 2017 年从 Google/Alphabet 收购后仅持有 3 年<sup><a href="#ref7">[7]</a></sup>。</div></div>
+<div class="timeline-entry"><div class="timeline-date">2017</div><div class="timeline-title">收购 Boston Dynamics</div><div class="timeline-desc">从 Google/Alphabet 手中收购 Boston Dynamics（未披露价格）<sup><a href="#ref7">[7]</a></sup>。</div></div>
+<div class="timeline-entry"><div class="timeline-date">2016</div><div class="timeline-title">$320 亿收购 ARM</div><div class="timeline-desc">软银史上最大收购，为后续芯片战略奠定基础。2023 年 ARM 在纳斯达克 IPO（$545 亿估值）<sup><a href="#ref2">[2]</a></sup>。</div></div>
+<div class="timeline-entry"><div class="timeline-date">2014.06</div><div class="timeline-title">Pepper 首次亮相</div><div class="timeline-desc">软银机器人集团正式成立，Pepper 在东京发布<sup><a href="#ref7">[7]</a></sup>。</div></div>
 </div>
 
-<h2>7 行业影响力评估</h2>
-<p>软银通过 ABB 收购获得了全球最大的工业机器人装机量之一，叠加 Skild AI 的通用大脑 + Roze AI 的场景落地，是具身智能领域<b>单笔资本投入最大的玩家</b>。但 Roze AI 尚无收入或商用原型即目标 $1,000 亿 IPO，内部和外部质疑声较大<sup><a href="#ref2">[2]</a></sup>。</p>
+<h2>6 具身生态关系网络</h2>
+<table class="wikitable">
+<tr><th>关系类型</th><th>涉及公司</th><th>具体关系</th><th>战略意义</th></tr>
+<tr><td><b>全资收购</b></td><td>ABB Robotics</td><td>$54 亿收购，预计 2026 年中至年底完成交割<sup><a href="#ref1">[1]</a></sup></td><td>获得 7,000 人团队 + 全球工业机器人装机量 + BMW 等客户</td></tr>
+<tr><td><b>全资收购</b></td><td>Ampere Computing</td><td>$65 亿收购（2025.03）<sup><a href="#ref2">[2]</a></sup></td><td>云端 ARM 芯片，补足数据中心算力</td></tr>
+<tr><td><b>全资收购</b></td><td>Berkshire Grey</td><td>私有化收购（2023）<sup><a href="#ref8">[8]</a></sup></td><td>仓储机器人自动化</td></tr>
+<tr><td><b>全资收购</b></td><td>DigitalBridge</td><td>~$40 亿收购（2025）<sup><a href="#ref5">[5]</a></sup></td><td>数据中心资产组合，Stargate 基础设施</td></tr>
+<tr><td><b>40% 股权</b></td><td>AutoStore</td><td>$28 亿投资（2021.04）<sup><a href="#ref9">[9]</a></sup></td><td>立方体仓储机器人全球领先者</td></tr>
+<tr><td><b>领投 + 谈判中</b></td><td>Skild AI</td><td>B 轮领投 $5 亿，C 轮 $10 亿+ 谈判中<sup><a href="#ref11">[11]</a></sup></td><td>通用机器人大脑，连接 AI 模型与机器人硬件</td></tr>
+<tr><td><b>领投 C 轮</b></td><td>Agile Robots（思灵机器人）</td><td>C 轮领投方<sup><a href="#ref10">[10]</a></sup></td><td>力控协作机器人，中德双布局</td></tr>
+<tr><td><b>11% 股权</b></td><td>OpenAI</td><td>$225 亿+ 投资（2024.12），另有 $300 亿谈判中<sup><a href="#ref3">[3]</a></sup></td><td>AI 大脑，ASI 愿景核心</td></tr>
+<tr><td><b>战略合作</b></td><td>Oracle、MGX</td><td>Stargate 合资项目<sup><a href="#ref12">[12]</a></sup></td><td>$5,000 亿 AI 数据中心</td></tr>
+<tr><td><b>战略合作</b></td><td>Foxconn（富士康）</td><td>Lordstown 工厂合资，生产模块化 AI 服务器<sup><a href="#ref3">[3]</a></sup></td><td>数据中心硬件制造</td></tr>
+<tr><td><b>合资</b></td><td>SB Energy</td><td>软银子公司，为 Stargate 提供太阳能+储能<sup><a href="#ref5">[5]</a></sup></td><td>能源保障（1.2 GW Texas 园区）</td></tr>
+<tr><td><b>已出售</b></td><td>Boston Dynamics</td><td>2020.12 出售给现代汽车 ~$11 亿<sup><a href="#ref7">[7]</a></sup></td><td>持有仅 3 年后退出</td></tr>
+</table>
+
+<h2>7 具身智能投资金额汇总</h2>
+<table class="wikitable">
+<tr><th>类别</th><th>总金额（估算）</th></tr>
+<tr><td>工业机器人（ABB Robotics）</td><td>$54 亿</td></tr>
+<tr><td>AI 芯片（ARM 收购 + Ampere）</td><td>$320 亿 + $65 亿</td></tr>
+<tr><td>机器人大脑（Skild AI + OpenAI 机器人相关）</td><td>$5 亿 +（C 轮 $10 亿+ 谈判中）</td></tr>
+<tr><td>仓储自动化（AutoStore 40% + Berkshire Grey）</td><td>$28 亿 + 未公开</td></tr>
+<tr><td>协作机器人（Agile Robots C 轮领投）</td><td>C 轮总额 $2.2 亿（软银领投，具体金额未披露）</td></tr>
+<tr><td>数据中心基础设施（Stargate + DigitalBridge）</td><td>$500 亿（软银承诺部分）+ ~$40 亿</td></tr>
+<tr><td><b>具身相关总投入（估算）</b></td><td><b>超过 $1,000 亿</b>（含 ARM 收购和 Stargate 承诺）</td></tr>
+</table>
+
+<div class="callout"><div class="callout-title">⚠️ 审慎提示</div><p>上表中的金额包含已完成的收购/投资、已承诺但尚未完成交割的交易（如 ABB）、以及仍在谈判中的项目（如 Skild AI C 轮）。Stargate 的 $5,000 亿为项目总规模，软银仅承担其中一部分。实际已到位并用于具身智能的资金远低于此总数。</p></div>
 
 <h2>8 分析层</h2>
-<h3>优势</h3><ul><li>ABB 7,000 人团队 + 200 万+ 装机量提供硬件和客户基础</li><li>Skild AI 提供通用大脑、OpenAI 提供前沿模型能力</li></ul>
-<h3>挑战/风险</h3><ul><li>Roze AI 估值争议（无收入、无商用原型即目标 $1,000 亿 IPO）</li><li>Vision Fund 历史亏损记录（Zume、WeWork）削弱市场信任</li></ul>
+
+<div class="analysis-block">
+<h4>8.1 战略逻辑：从"投资"到"拥有"</h4>
+<p>软银在具身智能领域的布局经历了三个阶段：第一阶段（2014-2020）的"自建"——Pepper 和 Boston Dynamics 都是亲自下场造机器人，均以失败或出售告终。第二阶段（2021-2024）的"参股"——AutoStore、Berkshire Grey、Agile Robots 等均以少数股权投资为主。第三阶段（2025-2026）的"全资控股"——ABB Robotics、Ampere、DigitalBridge 均为全资收购，Roze AI 更是从零打造并直接推向 IPO。这种"从参股到控股"的转变，反映出孙正义对具身智能赛道的信心升级——不再满足于财务回报，而是要<b>掌控产业链关键节点</b>。</p>
+</div>
+
+<div class="analysis-block">
+<h4>8.2 闭环逻辑：ARM→OpenAI→ABB→Stargate</h4>
+<p>ARM 提供芯片（边缘+云端算力），OpenAI 提供 AI 模型（大脑），ABB 提供机器人硬件（身体），Stargate 提供数据中心基础设施（算力底座），Roze AI 提供场景落地（机器人建造数据中心）。这一闭环在全球范围内是<b>独一无二的</b>——没有任何其他资本集团或科技公司在同一体系内同时拥芯片设计、AI 模型、工业机器人制造和数据中心建设四种能力。但这种"大而全"的整合也面临执行风险：软银此前在 WeWork、Zume 等项目上的整合尝试均以失败告终。</p>
+</div>
+
+<div class="analysis-block">
+<h4>8.3 Roze AI 的估值争议</h4>
+<p>Roze AI 是无收入、无商用原型即目标 $1,000 亿 IPO 的极端案例。支持逻辑：AI 数据中心建设需求爆发式增长，自主机器人可能显著压缩建设周期和成本；软银拥有 ABB 机器人 + DigitalBridge 数据中心 + Ampere 芯片 + OpenAI 模型的"全栈"资产，Roze 可以零成本整合这些资源。质疑逻辑：软银历史上多次以超前估值包装资产（WeWork $470 亿 → 破产重组）、Pepper 和 Zume 的失败记录、$1,000 亿估值需要极其激进的增长假设。</p>
+</div>
+
+<div class="analysis-block">
+<h4>8.4 ABB 收购：物理 AI 的关键落子</h4>
+<p>$54 亿收购 ABB Robotics 是软银从"AI 投资者"向"具身智能闭环构建者"转型的标志。ABB 带来：7,000 名员工（工程和制造人才）、全球第二的工业机器人装机量（仅次于发那科）、BMW 等顶级客户关系、工业机器人软件和控制技术栈。但挑战同样明显：ABB 机器人业务 2024 年营收 $23 亿但 EBITDA 仅 $3.13 亿（利润率 13.6%），低于软银通常追求的科技投资回报。且软银此前从未运营过如此规模的工业制造企业——IT/VC 投资基因与 OT（运营技术）/工业制造的融合是全球公认的难题。</p>
+</div>
+
+<div class="analysis-block">
+<h4>8.5 中国因素：无法回避的变量</h4>
+<p>ABB Robotics 在中国拥有巨大的市场份额和制造基地，软银的 Agile Robots（思灵机器人）和 AutoStore 也深度依赖中国供应链和市场。但软银近年来持续减少在华风险暴露（出售阿里股份、PayPay IPO 推迟受中美关系影响）。ABB 收购面临中国监管审查，而软银在 Stargate 项目中被定位为"对抗中国的国家 AI 基础设施项目"——这种两面性使得软银的具身智能战略在地缘政治上高度敏感。</p>
+</div>
+
+<div class="analysis-block">
+<h4>8.6 孙正义的个人赌注</h4>
+<p>2025 年清仓 NVIDIA（套现 ~$58 亿）并全部追加到 OpenAI，这一操作集中体现了孙正义的"All-in"风格。如果他判断正确——ASI 将在 10 年内实现、物理 AI 将成为全球 GDP 的 10%——软银将成为全球最具价值的公司之一。如果判断错误——AI 泡沫破裂、$1,000 亿估值的 Roze 无法兑现——软银将面临比 WeWork 更严重的亏损。值得注意的是，软银的债务水平已达到历史高位，多家银行对其信用质量表示担忧。</p>
+</div>
 
 <h2>9 参考资料</h2>
 <div class="refs"><ol>
-<li id="ref1"><a href="https://www.investing.com/news/stock-market-news/softbank-to-buy-abbs-robot-business-for-54-billion-in-push-to-merge-ai-and-robotics-4276890" target="_blank">"SoftBank to buy ABB's robot business for $5.4 billion" — Reuters/Investing.com, 2025.10</a></li>
-<li id="ref2"><a href="https://techcrunch.com/2026/04/29/softbank-is-creating-a-robotics-company-that-builds-data-centers-and-already-eyeing-a-100b-ipo/" target="_blank">"SoftBank is creating a robotics company that builds data centers" — TechCrunch, 2026.04.29</a></li>
-<li id="ref3"><a href="https://www.constellationr.com/insights/news/softbanks-abb-robotics-purchase-boosts-physical-ai-plans" target="_blank">"SoftBank's ABB robotics purchase boosts physical AI plans" — Constellation Research, 2025</a></li>
+<li id="ref1"><a href="https://www.bloomberg.com/news/articles/2025-10-08/softbank-to-buy-abb-s-robotics-arm-in-5-4-billion-deal" target="_blank">Bloomberg: SoftBank to Buy ABB's Robotics Arm in $5.4 Billion Deal（2025.10.08）</a></li>
+<li id="ref2"><a href="https://www.fabbaloo.com/news/from-algorithms-to-action-softbanks-physical-ai-bet-on-abb" target="_blank">Fabbaloo: From Algorithms to Action — SoftBank's Physical AI Bet on ABB（2025）</a></li>
+<li id="ref3"><a href="https://www.yerepouni-news.com/masayoshi-son-japans-most-notorious-investor-is-betting-everything-on-american-ai/" target="_blank">Masayoshi Son Is Betting Everything on American AI（2025）</a></li>
+<li id="ref4"><a href="https://www.rte.ie/news/business/2025/1008/1537391-softbank-abb-robots-deal/" target="_blank">RTÉ: ABB sells robots business to SoftBank for $5.38 billion（2025.10.08）</a></li>
+<li id="ref5"><a href="https://techcrunch.com/2026/04/29/softbank-is-creating-a-robotics-company-that-builds-data-centers-and-already-eyeing-a-100b-ipo/" target="_blank">TechCrunch: SoftBank creating robotics company that builds data centers, eyeing $100B IPO（2026.04.29）</a></li>
+<li id="ref6"><a href="https://www.ainvest.com/news/softbank-100b-roze-ipo-building-physical-rails-ai-curve-2604/" target="_blank">AInvest: SoftBank's $100B Roze IPO — Building the Physical Rails for AI's Next S-Curve（2026.04）</a></li>
+<li id="ref7"><a href="https://en.wikipedia.org/wiki/Pepper_(robot)" target="_blank">Wikipedia: Pepper (robot) — SoftBank Robotics 历史</a></li>
+<li id="ref8"><a href="https://www.constellationr.com/insights/news/softbanks-abb-robotics-purchase-boosts-physical-ai-plans" target="_blank">Constellation Research: SoftBank's ABB robotics purchase boosts physical AI plans（2025）</a></li>
+<li id="ref9"><a href="https://www.marketwatch.com/story/softbank-snaps-up-2-8-billion-stake-in-norway-robotics-firm-11617701269" target="_blank">MarketWatch: SoftBank snaps up $2.8 billion stake in Norway robotics firm AutoStore（2021.04）</a></li>
+<li id="ref10"><a href="https://www.usmart.hk/zh-hk/news-detail/6843097769364815995" target="_blank">uSmart: 软银领投，思灵机器人完成 $2.2 亿 C 轮融资（2023）</a></li>
+<li id="ref11"><a href="https://techcrunch.com/2025/12/08/softbank-and-nvidia-reportedly-in-talks-to-fund-skildai-at-14b-nearly-tripling-its-value/" target="_blank">TechCrunch: SoftBank and Nvidia in talks to fund Skild AI at $14B valuation（2025.12.08）</a></li>
+<li id="ref12"><a href="https://investor.wedbush.com/wedbush/article/tokenring-2026-1-14-the-half-trillion-dollar-bet-openai-and-softbank-launch-stargate-to-build-the-future-of-agi" target="_blank">Wedbush: The Half-Trillion Dollar Bet — OpenAI and SoftBank Launch Stargate（2026.01）</a></li>
+<li id="ref13"><a href="https://interactanalysis.com/insight/softbank-abb-robotics-ai-investment/" target="_blank">Interact Analysis: SoftBank's $5.4B Robotics Bet — Acquiring ABB to Power Physical AI（2025）</a></li>
+<li id="ref14"><a href="https://www.business-standard.com/amp/world-news/softbank-abb-robotics-acquisition-deal-masayoshi-son-physical-ai-125100800657_1.html" target="_blank">Business Standard: SoftBank to acquire ABB's $5.4 bn robotics arm, boosting global AI push（2025.10）</a></li>
+<li id="ref15"><a href="https://www.ainvest.com/news/softbank-500b-stargate-ai-bet-infrastructure-play-deliver-nav-magic-2604/" target="_blank">AInvest: SoftBank's $500B Stargate AI Bet（2026.04）</a></li>
+<li id="ref16"><a href="http://mp.weixin.qq.com/s?__biz=MzE5MTMyNjkyOQ==&mid=2247483965&idx=1&sn=d5c73e7a78e732c9c417a08b594ef1aa" target="_blank">微信公众号：软银 54 亿并购 ABB，揭开"物理 AI"竞争新范式（2025）</a></li>
+<li id="ref17"><a href="https://group.softbank/en/ir/financials/annual_reports/2025/message/goto" target="_blank">SoftBank Group Report 2025 — CFO Message（Yoshimitsu Goto）</a></li>
+<li id="ref18"><a href="https://www.softbankrobotics.com/brand-strategy/" target="_blank">SoftBank Robotics Group — Brand Strategy 官网</a></li>
 </ol></div>
 </div>
 
@@ -105,15 +230,18 @@ sup a { color: #0645ad; text-decoration: none; font-size: 0.7rem; }
 <div class="infobox-row"><span class="infobox-label">成立时间</span><span class="infobox-value">1981 年</span></div>
 <div class="infobox-row"><span class="infobox-label">总部</span><span class="infobox-value">日本东京</span></div>
 <div class="infobox-row"><span class="infobox-label">CEO</span><span class="infobox-value">孙正义 (Masayoshi Son)</span></div>
+<div class="infobox-row"><span class="infobox-label">CFO</span><span class="infobox-value">后藤芳光 (Yoshimitsu Goto)</span></div>
 <div class="infobox-section-title">具身业务概况</div>
-<div class="infobox-row"><span class="infobox-label">生态定位</span><span class="infobox-value"><span class="tag" style="background:#fff3e0;color:#e65100;">资本/资产整合者</span></span></div>
-<div class="infobox-row"><span class="infobox-label">核心资产</span><span class="infobox-value">ABB Robotics · Roze AI · Berkshire Grey · AutoStore · Skild AI</span></div>
-<div class="infobox-row"><span class="infobox-label">具身投入规模</span><span class="infobox-value">ABB 收购 $54 亿 + Roze AI + Skild AI 等投资</span></div>
+<div class="infobox-row"><span class="infobox-label">生态定位</span><span class="infobox-value"><span class="tag" style="background:#fff3e0;color:#e65100;">资本/资产整合者</span><span class="tag" style="background:#e8f0fe;color:#1a5096;">Physical AI</span></span></div>
+<div class="infobox-row"><span class="infobox-label">核心资产</span><span class="infobox-value">ABB Robotics · Roze AI · SoftBank Robotics Group · Berkshire Grey · AutoStore(40%) · Agile Robots · Skild AI · Ampere</span></div>
+<div class="infobox-row"><span class="infobox-label">关键合作</span><span class="infobox-value">OpenAI(11%) · Oracle(MGY) · NVIDIA(投资合作) · Foxconn(合资)</span></div>
+<div class="infobox-row"><span class="infobox-label">具身投入规模</span><span class="infobox-value">ABB $54 亿 + Roze AI + Skild AI $5 亿+ + AutoStore $28 亿 + Ampere $65 亿 + Stargate 承诺数百亿</span></div>
 <div class="infobox-section-title">母公司规模</div>
 <div class="infobox-row"><span class="infobox-label">市值</span><span class="infobox-value">约 ¥15 万亿（~$1,000 亿）</span></div>
+<div class="infobox-row"><span class="infobox-label">9 个月利润</span><span class="infobox-value">$207 亿（2025.04-12）</span></div>
 </aside>
 </div>
-<div class="page-footer"><p>此页面最后更新于 2026-05-27 · 来源以 Reuters、TechCrunch、Constellation Research 为主 · <a href="../index.html">返回主索引</a></p></div>
+<div class="page-footer"><p>此页面最后更新于 2026-05-28 · 来源涵盖 Bloomberg、TechCrunch、Reuters、MarketWatch、SoftBank 官方公告等 18 个参考源 · <a href="../index.html">返回主索引</a></p></div>
 </div>
 </body>
 </html>
