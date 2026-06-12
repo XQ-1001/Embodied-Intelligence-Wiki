@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>具身智能公司模型路线研究报告 v1.0（2026-06-11）</title>
+<style>
+:root{
+  --bg:#f7f8fa; --card:#ffffff; --ink:#1a2233; --sub:#5a6478; --line:#e3e7ee;
+  --accent:#1f5eff; --accent2:#0ea5a0; --warn:#c2410c; --gold:#92700c;
+  --tag-e2e:#1f5eff; --tag-layer:#0ea5a0; --tag-wm:#9333ea; --tag-hw:#c2410c; --tag-plat:#92700c;
+  --d-real:#1f5eff; --d-sim:#9333ea; --d-video:#0ea5a0; --d-mix:#64748b;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--ink);line-height:1.75;font-size:15.5px}
+nav{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.96);backdrop-filter:blur(6px);border-bottom:1px solid var(--line);padding:0 16px;display:flex;gap:2px;overflow-x:auto;white-space:nowrap}
+nav a{display:inline-block;padding:12px 11px;color:var(--sub);text-decoration:none;font-size:13.5px;border-bottom:2.5px solid transparent}
+nav a:hover,nav a.on{color:var(--accent);border-bottom-color:var(--accent)}
+.wrap{max-width:1080px;margin:0 auto;padding:24px 20px 80px}
+header.hero{padding:54px 20px 26px;text-align:center}
+header.hero h1{font-size:30px;margin:0 0 10px}
+header.hero p{color:var(--sub);margin:4px 0}
+h2{font-size:23px;margin:54px 0 6px;padding-top:18px;border-top:3px solid var(--ink)}
+h2 .no{color:var(--accent);margin-right:8px}
+h3{font-size:18px;margin:30px 0 8px}
+h4{font-size:15.5px;margin:20px 0 6px}
+p{margin:9px 0}
+.lead{color:var(--sub);font-size:14.5px;margin-bottom:18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 22px;margin:14px 0}
+.note{background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:12px 16px;font-size:14px;margin:12px 0}
+.verify{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:12px 16px;font-size:14px;margin:12px 0}
+.risk{background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:12px 16px;font-size:14px;margin:12px 0}
+table{width:100%;border-collapse:collapse;font-size:13.5px;margin:14px 0;background:var(--card)}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+th{background:#eef2f8;font-weight:600}
+tr:nth-child(even) td{background:#fafbfd}
+.tag{display:inline-block;padding:1px 9px;border-radius:99px;font-size:12px;color:#fff;margin:1px 3px 1px 0;white-space:nowrap}
+.t-e2e{background:var(--tag-e2e)}.t-layer{background:var(--tag-layer)}.t-wm{background:var(--tag-wm)}.t-hw{background:var(--tag-hw)}.t-plat{background:var(--tag-plat)}
+.kpi{display:flex;flex-wrap:wrap;gap:12px;margin:16px 0}
+.kpi>div{flex:1;min-width:200px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.kpi b{display:block;font-size:21px;color:var(--accent)}
+.kpi span{font-size:13px;color:var(--sub)}
+details.co{background:var(--card);border:1px solid var(--line);border-radius:12px;margin:10px 0;overflow:hidden}
+details.co>summary{cursor:pointer;padding:14px 18px;font-weight:600;font-size:16px;list-style:none;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+details.co>summary::-webkit-details-marker{display:none}
+details.co>summary:after{content:"展开 ▾";margin-left:auto;font-size:12px;color:var(--sub);font-weight:400}
+details.co[open]>summary:after{content:"收起 ▴"}
+details.co>div{padding:2px 20px 16px;border-top:1px solid var(--line)}
+details.co h5{margin:14px 0 4px;font-size:14px;color:var(--accent)}
+details.co p,details.co li{font-size:14px}
+.score{display:grid;grid-template-columns:110px 1fr;gap:4px 10px;font-size:13.5px;margin:8px 0}
+.score>span:nth-child(odd){color:var(--sub)}
+.src{font-size:12.5px;color:var(--sub)}
+.src a{color:#3b6fd4;text-decoration:none}
+ul,ol{padding-left:22px}
+li{margin:5px 0}
+.timeline{border-left:3px solid var(--accent);margin:18px 0 18px 8px;padding-left:20px}
+.timeline>div{margin:14px 0;position:relative}
+.timeline>div:before{content:"";position:absolute;left:-26.5px;top:7px;width:10px;height:10px;border-radius:50%;background:var(--accent)}
+.timeline b.dt{color:var(--accent);margin-right:8px}
+#mapbox{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px}
+#tooltip{position:fixed;display:none;background:#101828;color:#fff;border-radius:8px;padding:10px 13px;font-size:12.5px;max-width:300px;z-index:99;pointer-events:none;line-height:1.55}
+.filters{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;margin:6px 4px 10px}
+.filters label{cursor:pointer;user-select:none}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:4px}
+.conclusion{background:#101828;color:#e8edf7;border-radius:14px;padding:24px 28px;margin:20px 0}
+.conclusion h3{color:#fff;margin-top:18px}
+.conclusion .q{color:#93b4ff;font-weight:600}
+footer{color:var(--sub);font-size:12.5px;text-align:center;padding:30px 0;border-top:1px solid var(--line)}
+@media(max-width:720px){.score{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<nav id="topnav">
+<a href="#ch1">1 序章</a><a href="#ch2">2 六维度框架</a><a href="#ch3">3 格局与路线地图</a><a href="#ch4">4 横向比较</a><a href="#ch5">5 估值与资本</a><a href="#ch6">6 专题</a><a href="#ch7">7 核心判断</a><a href="#ch8">8 附录·公司档案</a>
+</nav>
+<div id="tooltip"></div>
+<header class="hero">
+<h1>具身智能公司模型路线研究报告</h1>
+<p>一级市场视角下的技术路线、可行性与资本映射 · v1.0</p>
+<p class="lead">编制日期 2026-06-11 ｜ 依据《具身智能模型路线研究框架 v1.1》｜ 关键事实已逐项回溯原始公告与权威媒体，未能核验处以【待核验】明示</p>
+</header>
+<div class="wrap">
+
+<!-- ================= CH1 ================= -->
+<h2 id="ch1"><span class="no">01</span>序章：模型为何重要</h2>
+<p class="lead">在"量产元年"的叙事下，重新审视一个第一性问题：模型自研能力到底是不是具身智能公司的核心变量？</p>
+
+<h3>1.1 正方论证一：泛化能力决定商业化天花板</h3>
+<div class="card">
+<p>具身智能的商业模式天花板由一条边际成本曲线决定：<b>每进入一个新场景/新任务，需要付出多少额外的工程与数据成本</b>。传统机器人（包括早期协作臂方案）的部署逻辑是"场景定制"——每个工位需要数周到数月的集成调试，本质上是项目制生意，毛利与扩张速度均受限。而基座模型路线承诺的是"通用智能"：一次预训练 + 少量后训练即可迁移到新任务。</p>
+<p>2026 年上半年出现了两个标志性的证据点，使这一承诺从叙事变为可检验命题：其一，Physical Intelligence 于 4 月发布的 π0.7 展示了<b>组合泛化（compositional generalization）</b>——在从未采集过叠衣数据的双臂 UR5e 上完成叠衣（成功率约 80%），把已有技能重组用于全新任务，被部分观察者类比为机器人操作的"GPT-3 时刻"；其二，宇树开源的 UnifoLM-VLA-0 在 LIBERO 基准取得 98.7 的平均分，说明即使"硬件优先"的公司也无法回避模型竞赛。若组合泛化继续兑现，边际部署成本将趋近于"提示词成本"，掌握模型者掌握定价权。</p>
+</div>
+
+<h3>1.2 正方论证二：能力瓶颈正从硬件向智能转移</h3>
+<div class="card">
+<p>供应链证据显示硬件正在快速"商品化"：宇树 G1 售价降至 8.5 万元、核心零部件国产化率超 80%；其招股书披露 2025 年营收 17.08 亿元（+335%）、扣非净利 6 亿元，证明整机制造已能盈利且降价空间充足。当本体可以外采、价格逐年下探，硬件不再构成持久壁垒；行业稀缺品转为"大脑/小脑"——这正是 2026 年资本向模型层集中的底层逻辑（Skild、PI 两家纯模型公司估值合计超 250 亿美元，国内"百亿俱乐部"新成员几乎全部以模型能力为核心叙事）。</p>
+</div>
+
+<h3>1.3 反方论证：现阶段的真壁垒可能在别处</h3>
+<div class="card">
+<p>反例同样有力。<b>宇树以"硬件先行、模型跟进"率先实现全年盈利并于 2026 年 6 月 1 日科创板过会（拟募资 42 亿元、发行市值不低于 420 亿元）</b>，其研发费率仅约 7.7%，却成为行业内财务表现最好的公司——这说明在当前时间窗口，<b>量产能力、成本控制、渠道与场景卡位</b>对营收的解释力远高于模型领先性。同期拥有"最强叙事"的模型公司（如 Figure、PI）收入规模与其估值严重不成比例。此外，数据获取渠道本身（客户现场、数采工厂、穿戴设备网络）是模型能力的上游，"渠道壁垒先于模型壁垒"的论点在一级市场尽调中不应被忽略。</p>
+</div>
+
+<h3>1.4 条件化判断框架（本报告立场）</h3>
+<div class="card">
+<p>"模型是否重要"不是真假命题，而是<b>条件命题</b>。本报告采用如下框架，并在后续公司分析中反复套用：</p>
+<table>
+<tr><th>条件维度</th><th>模型权重高的情形</th><th>模型权重低的情形</th></tr>
+<tr><td>任务开放度</td><td>开放环境、长程任务、物体/指令多变（家庭、商超、柔性制造）</td><td>封闭工位、重复动作（搬运、上下料、巡检）</td></tr>
+<tr><td>时间窗口</td><td>2027 年以后：若组合泛化被复现并工程化，模型成为定价权来源</td><td>2025-2026 量产元年：交付与成本决定生死，模型是期权而非现金流</td></tr>
+<tr><td>商业模式</td><td>卖"能力"（模型 API、按任务收费、RaaS）</td><td>卖"本体"（科研、教育、表演、二次开发市场）</td></tr>
+<tr><td>竞争格局</td><td>开源模型不可用或差距大时，自研模型构成壁垒</td><td>开源（GR00T、openpi、WALL-OSS、UnifoLM）够用时，自研溢价被压缩</td></tr>
+</table>
+<p><b>推论</b>：对投资人而言，正确的问题不是"这家公司模型强不强"，而是"<b>这家公司所选场景在多大程度上需要它宣称的模型能力，以及该能力相对开源基线的超额部分能否守住 18 个月</b>"。这一推论将贯穿第 4、5、7 章。</p>
+</div>
+
+<!-- ================= CH2 ================= -->
+<h2 id="ch2"><span class="no">02</span>核心分析框架：模型路线六维度</h2>
+<p class="lead">所有公司统一按六个维度拆解，维度间存在强耦合：场景决定数据，数据决定训练范式，训练范式反过来约束架构选择。</p>
+
+<div class="card">
+<table>
+<tr><th style="width:120px">维度</th><th>光谱/选项</th><th>2026 年中的关键观察</th></tr>
+<tr><td><b>① 架构路线</b></td><td>端到端 VLA ↔ 分层（大脑+小脑）↔ 世界模型驱动 ↔ RL+仿真为主 ↔ 混合</td><td>"世界模型提供仿真/预测环境 + VLA 提供动作策略"的融合闭环正从叙事走向事实标准：英伟达 GR00T N2 基于 DreamZero 世界-动作模型架构、智元 GO-3 计划融合 ViLLA 与世界模型、自变量发布"世界统一模型"、1X 以视频世界模型驱动 NEO。纯粹的路线之争正在收敛为"融合配比之争"。</td></tr>
+<tr><td><b>② 数据策略</b></td><td>真机遥操作 ↔ 仿真合成 ↔ 互联网视频/人类示范 ↔ 穿戴设备采集</td><td>光谱两端均有重注样本：Sunday（零机器人数据，$200 采集手套）、苏度/银河通用（仿真合成为主）vs 星海图/智元（真机数据为王）。GR00T N1.7 预训练加入 2 万小时人类第一视角视频，"人类视频数据"权重普遍上调。</td></tr>
+<tr><td><b>③ 训练范式</b></td><td>预训练-后训练划分；模仿学习 vs RL 配比；是否依托现成 VLM 底座</td><td>π*0.6 的"RL from experience"与 π0.7 的可引导（steerable）后训练是当前最受关注的范式实验；依托现成 VLM 骨干已成主流（GR-3 用 Qwen2.5-VL，GR00T N1.7 用 Cosmos-Reason2/Qwen3-VL，π 系列用 Gemma）。</td></tr>
+<tr><td><b>④ 本体策略</b></td><td>垂直整合（特斯拉、Figure、1X）↔ 跨本体平台（PI、Skild、GR00T）</td><td>跨本体阵营以"数据多样性带来泛化"为论据；垂直整合阵营以"软硬协同上限更高 + 数据一致性"为论据。国内主流是"全栈自研"，但轮式（星海图、银河通用）与双足（星动、它石）的分化体现数据采集经济性的不同判断。</td></tr>
+<tr><td><b>⑤ 自研深度</b></td><td>完全自研 ↔ 开源微调（openpi/GR00T/WALL-OSS/RDT/UnifoLM）↔ 接入第三方大脑</td><td>估值分析的核心自变量。开源供给在 12 个月内显著加密，闭源自研的"超额能力窗口期"正被压缩（详见第 6.3 节）。</td></tr>
+<tr><td><b>⑥ 场景与数据飞轮</b></td><td>工业 ↔ 物流 ↔ 商超零售 ↔ 家庭</td><td>场景决定回流速度与容错率：工业容错低但数据同质；家庭数据多样但隐私/安全约束强。1X 用"遥操作专家模式"在家庭场景兜底换数据，银河通用用便利店/药房换标准化回流，是两种飞轮设计的代表。</td></tr>
+</table>
+</div>
+
+<h3>2.2 各维度路线释义（定义速查）</h3>
+<div class="card">
+<h4>① 架构路线——模型系统怎么组织</h4>
+<ul>
+<li><b>端到端 VLA</b>：一个模型直接从"视觉+语言"输入映射到动作输出，中间不设人工模块边界。上限高、误差不层层累积；代价是黑盒、数据需求大。</li>
+<li><b>分层（大脑+小脑）</b>：大模型负责任务理解与规划（大脑），专门的控制模型/算法负责动作执行（小脑）。可解释、可分别迭代；层间接口是性能瓶颈。</li>
+<li><b>世界模型驱动</b>：先训练能"预测世界接下来会发生什么"的模型（多基于视频生成），让机器人在预测/想象中规划，或用它生成训练数据。</li>
+<li><b>RL+仿真为主</b>：在物理仿真器中用强化学习大规模试错训练策略再迁移真机。运动控制上已验证；操作任务受 sim-to-real gap 制约。</li>
+<li><b>混合体</b>：上述要素的组合。2026 年收敛方向即"世界模型管环境预测 + VLA 管动作策略 + RL 管后训练提升"三件套。</li>
+</ul>
+<h4>② 数据策略——相信什么数据能 scale</h4>
+<ul>
+<li><b>真机遥操作</b>：人远程操控机器人做任务并记录传感与动作数据。质量最高、与本体完全匹配；贵且慢（人时换数据）。</li>
+<li><b>仿真合成</b>：仿真器中程序化生成海量数据。近零边际成本、可无限扩展；与真实世界存在 gap。</li>
+<li><b>互联网视频/人类示范</b>：从人类操作视频学习任务知识与动作先验。量最大、最便宜；无动作标签，需跨形态迁移。</li>
+<li><b>穿戴设备采集</b>：人戴手套/动捕设备做任务直接记录人手轨迹（如 Sunday 的 $200 手套）。绕过机器人本体，成本介于视频与真机之间。</li>
+</ul>
+<h4>③ 训练范式——模型怎么练出来</h4>
+<ul>
+<li><b>预训练+后训练</b>：先以海量混合数据练通用能力，再以少量高质量数据做任务/本体微调。当前主流分工。</li>
+<li><b>模仿学习为主</b>：复刻示范数据中的行为。简单稳定；上限被示范质量封死，纠错能力差。</li>
+<li><b>RL 配比</b>：以强化学习从成败反馈中自我改进（如 π*0.6 的 RL from experience）。突破模仿上限的关键，工程难度高。</li>
+<li><b>VLM 底座 vs 从零训练</b>：前者借用 Qwen/Gemma 等现成多模态大模型的视觉语言能力、只训动作部分（绝对主流）；后者完全自训（如 Generalist AI），赌专用架构上限更高。</li>
+</ul>
+<h4>④ 本体策略——模型和硬件绑多紧</h4>
+<ul>
+<li><b>垂直整合</b>：模型只为自家硬件训练、软硬协同优化（特斯拉、Figure、1X）。性能上限高、数据一致；模型价值锁死在自家本体。</li>
+<li><b>跨本体平台</b>：一个模型适配人形/四足/机械臂等多种硬件（PI、Skild、GR00T）。数据可跨本体汇聚、市场更大；单一本体难做到极致。</li>
+<li><b>形态子选择</b>：人形（环境零改造但最难）／轮式底盘+双臂（采数与落地经济性最优）／机械臂（最成熟、场景最窄）。</li>
+</ul>
+<h4>⑤ 自研深度——模型从哪来</h4>
+<ul>
+<li><b>完全自研</b>：架构、训练、数据全自做。壁垒与成本最高，估值溢价的主要来源。</li>
+<li><b>开源微调</b>：基于 GR00T、openpi、WALL-OSS 等开源模型用自有数据微调。起点高、成本低；能力基线人人可得，无超额壁垒。</li>
+<li><b>接入第三方大脑</b>：本体公司直接用别家模型 API/授权（如波士顿动力接 Gemini Robotics）。最轻；智能命脉在别人手里。</li>
+</ul>
+<h4>⑥ 落地场景与数据飞轮——在哪挣钱、数据怎么回流</h4>
+<ul>
+<li><b>工业制造</b>：订单明确、容错要求极低；数据同质化，练不出泛化。</li>
+<li><b>物流仓储</b>：半结构化、节拍快，数据回流量大，当前商业化主力。</li>
+<li><b>商超零售</b>：半开放环境、任务标准化（如银河通用便利店/药房），是"可控的泛化训练场"。</li>
+<li><b>家庭</b>：数据最多样最稀缺、想象力最大；容错与隐私约束最严，需遥操作兜底（1X 模式）。</li>
+</ul>
+<p><b>使用提示</b>：六维度不是并列选项而是一条决策链——场景决定本体，本体决定能采什么数据，数据决定训练范式，范式约束架构，最后才轮到"自研多深"这个估值问题。</p>
+</div>
+
+<h3>2.3 维度间的因果链（分析时的默认顺序）</h3>
+<div class="card">
+<p><b>场景（⑥）→ 本体（④）→ 数据（②）→ 训练范式（③）→ 架构（①）→ 自研深度（⑤）→ 估值含义</b>。例如：选择家庭场景（⑥）迫使 1X 采用安全柔顺本体（④），家庭数据无法预先采集迫使其依赖遥操作兜底 + 视频世界模型（②③），从而押注"视频生成式世界模型"架构（①），并必须全栈自研（⑤）。反向校验：当一家公司的六维选择出现自相矛盾（如宣称纯仿真数据却押注高精力控任务），即构成尽调红旗。</p>
+</div>
+<!-- ================= CH3 ================= -->
+<h2 id="ch3"><span class="no">03</span>行业格局与路线地图</h2>
+<p class="lead">2026 年年中校准：行业从"技术验证"进入"量产元年 + 模型军备竞赛"双主线。</p>
+
+<h3>3.1 量化校准点（均已核验来源）</h3>
+<div class="kpi">
+<div><b>5 万台+</b><span>TrendForce 预测 2026 全球人形机器人出货量（同比增长逾 7 倍）；2025 年实际出货约 1.8 万台。注：底稿将此口径误记为 IDC，已校正</span></div>
+<div><b>420 亿元</b><span>宇树科创板 IPO 发行市值下限（2026.06.01 过会，73 天过会创纪录；2025 营收 17.08 亿、扣非净利 6 亿）</span></div>
+<div><b>$14B / $11B</b><span>Skild AI C 轮投后估值（软银领投 $1.4B，2026.01）/ PI 传闻中 C 轮估值（谈判中，2026.03 TechCrunch）</span></div>
+<div><b>80%</b><span>Omdia 预计 2026 年宇树+智元合计占国内人形机器人出货量比例；智元 2026.03 累计下线破万台</span></div>
+</div>
+
+<h3>3.2 资本格局三层结构</h3>
+<div class="card">
+<p><b>第一层（海外纯模型/软硬一体巨头）</b>：Figure $39B（C 轮超 $1B，Parkway 领投+英伟达/英特尔/LG/高通等）、Skild $14B+、PI $5.6B（B 轮，CapitalG 领投；C 轮传 $11B+）。美元体系为"模型期权"支付的溢价显著高于人民币体系。</p>
+<p><b>第二层（国内百亿俱乐部，2026 上半年密集成形）</b>：银河通用（投后约 30 亿美元/200 亿+，累计融资近 70 亿元，国家 AI 产业基金/中石化/中信入场）、星海图（200 亿+，B+ 轮 20 亿）、智元（市场普遍引述 270 亿【待核验】）、千寻（3 个月 4 轮累计近 50 亿元，估值破百亿）、它石智航（Pre-A 4.55 亿美元创纪录，投后 130 亿——底稿"超 200 亿"系误传，已校正）、星动纪元（战略轮 10 亿，三星/新加坡电信参投，估值破百亿）、自变量（B 轮近 20 亿，小米+红杉联领）、极佳视界（一个月融 25 亿，破百亿）、智平方（一年 12 轮，破百亿）、帕西尼（B 轮超 10 亿，破百亿）、灵初（累计 20 亿+国投先导新轮）。<b>共同特征：估值锚定"模型叙事 + 国家队背书"，而非收入。</b></p>
+<p><b>第三层（上市参照系）</b>：优必选市值约 300 亿港元下方（2025 亏损 7.9 亿元）、越疆约 220 亿港元。一级百亿俱乐部 vs 二级盈利性拷问，构成"估值倒挂"张力（详见 5.4）。</p>
+</div>
+
+<h3>3.3 模型层 2026 上半年关键动向</h3>
+<div class="timeline">
+<div><b class="dt">2026.01</b>CES：Google DeepMind × 波士顿动力宣布 Gemini Robotics 驱动新一代电动 Atlas，2026 年产能全部内定（Metaplant + DeepMind），基座模型正式"接管"最强本体；同月 Skild C 轮 $14B、宇树开源 UnifoLM-VLA-0（LIBERO 98.7 登顶）、Figure 发布 Helix 02（全身功能自主）。</div>
+<div><b class="dt">2026.03</b>英伟达 GTC：GR00T N1.7 开源商用（3B，Cosmos-Reason2/Qwen3-VL 骨干 + 2 万小时人类视频）；预览 GR00T N2（DreamZero 世界-动作模型架构，宣称新任务成功率为主流 VLA 两倍以上，MolmoSpaces/RoboArena 双榜第一，年底可用）——"用算力换数据"宣言。同月：它石发布 AWE 3.0 并创吉尼斯线束装配纪录；OpenAI 与 Figure 决裂细节公开。</div>
+<div><b class="dt">2026.04</b>PI 发布 π0.7（5B，可引导+组合泛化，"GPT-3 时刻"争论开启）；智元发布 GO-2 + GE-2 动作世界模型 + Genie Sim 3.0，宣布 Q3 推出融合 ViLLA 与世界模型的 GO-3；自变量发布"世界统一模型"并宣布 35 天后机器人入驻真实家庭（非人形、非灵巧手路线）。</div>
+<div><b class="dt">2026.05-06</b>Meta 收购 ARI（全身控制，并入 Superintelligence Labs）；OpenAI 确认重启机器人硬件自研（Aditya Ramesh 任 VP）；宇树 IPO 过会、募资中超 20 亿元投向模型研发；千寻 Spirit v1.6 登顶 RoboArena（超英伟达 Cosmos3 与 π0.5），中国模型首次夺冠。</div>
+</div>
+<div class="note"><b>解读</b>：六个月内，"世界模型 + VLA 融合"从少数派实验（极佳、1X）升级为英伟达、智元、自变量、它石的公开主路线；同时三大评测榜（LIBERO、RoboArena、WorldArena）首次出现中国模型登顶——闭源美元巨头的模型代差正在收窄，这是估值分析（第 5 章）最重要的背景变量。</div>
+
+<h3>3.4 路线地图（交互：悬停看详情，勾选筛选数据策略）</h3>
+<div id="mapbox">
+<div class="filters" id="mapfilter">
+<label><input type="checkbox" value="real" checked><span class="dot" style="background:var(--d-real)"></span>真机数据为主</label>
+<label><input type="checkbox" value="sim" checked><span class="dot" style="background:var(--d-sim)"></span>仿真/世界模型生成为主</label>
+<label><input type="checkbox" value="video" checked><span class="dot" style="background:var(--d-video)"></span>人类视频/穿戴为主</label>
+<label><input type="checkbox" value="mix" checked><span class="dot" style="background:var(--d-mix)"></span>混合配比</label>
+</div>
+<svg id="routemap" viewBox="0 0 980 620" style="width:100%;height:auto"></svg>
+<p class="src">横轴：架构光谱（左=端到端统一模型，右=分层/模块化）；纵轴：商业形态（上=模型平台/跨本体，下=垂直整合软硬一体）；气泡=最新估值（美元口径换算，人民币按 7.1 折算；上市公司用市值）；虚线圈=估值【待核验】。</p>
+</div>
+<!-- ================= CH4 ================= -->
+<h2 id="ch4"><span class="no">04</span>头部公司横向比较</h2>
+<p class="lead">17 家深研对象的数据-算法-工程三维水位对比。评级为本报告基于公开证据的半定量判断（★~★★★★★），证据级别：A=技术报告/招股书/官方公告，B=权威媒体交叉，C=单一来源或公司宣称。</p>
+
+<h3>4.1 三维对比矩阵</h3>
+<table>
+<tr><th>公司</th><th>架构主押注</th><th>数据资产与策略</th><th>算法/模型水位</th><th>工程与商业化</th><th>证据级</th></tr>
+<tr><td><b>Physical Intelligence</b></td><td><span class="tag t-e2e">端到端VLA</span><span class="tag t-wm">+RL经验流</span></td><td>★★★★☆ 多本体真机+合作伙伴回流；openpi 生态外溢</td><td>★★★★★ π0.7 组合泛化为当前公开 SOTA 叙事；RL from experience 范式领先</td><td>★★☆ 商业产品未定（最早 2026/最晚 2028），收入极小</td><td>A</td></tr>
+<tr><td><b>Figure AI</b></td><td><span class="tag t-e2e">端到端VLA</span><span class="tag t-hw">垂直整合</span></td><td>★★★★☆ 自有车队+BMW/物流客户现场回流</td><td>★★★★☆ Helix 02 全身自主；披露选择性强，第三方验证少</td><td>★★★★☆ BotQ 月产 240 台（2026.04）、90 分钟/台；宣称 4 年 10 万台</td><td>B</td></tr>
+<tr><td><b>特斯拉 Optimus</b></td><td><span class="tag t-e2e">端到端</span><span class="tag t-hw">垂直整合</span><span class="tag t-video">FSD视频迁移</span></td><td>★★★★☆ FSD 视觉数据栈+工厂自采（迁移有效性存疑）</td><td>★★★☆ 公开技术披露最少的头部玩家</td><td>★★☆ Gen3 跳票至 2026 年中；Fremont 产线 7-8 月投产；2025 年万台目标归零，Musk 称今年产量"无法预测"；2026 CapEx $20B 押注</td><td>B</td></tr>
+<tr><td><b>1X</b></td><td><span class="tag t-wm">视频世界模型</span><span class="tag t-hw">垂直整合·家庭</span></td><td>★★★★☆ 独家家庭真实数据 + 遥操作专家模式兜底（隐私争议）</td><td>★★★☆ 2026.03 发布世界模型；宣称初期 60-70% 自主率→2028 95%（口径自报）</td><td>★★★☆ NEO 预订 $20,000 或 $499/月，2026 年内美国交付</td><td>B</td></tr>
+<tr><td><b>英伟达 GR00T</b></td><td><span class="tag t-plat">平台</span><span class="tag t-wm">世界-动作模型(N2)</span></td><td>★★★★★ Cosmos+Isaac 合成管线 + 2 万小时 EgoScale 人类视频 + 客户生态回流</td><td>★★★★★ N1.7 开源商用即基线抬升；N2 双榜第一（待第三方复验）</td><td>★★★★★ "卖铲人"现金流与模型供给双角色，投资 Figure/Skild/Agility 织网</td><td>A</td></tr>
+<tr><td><b>Skild AI</b></td><td><span class="tag t-e2e">跨本体大脑</span></td><td>★★★★☆ 跨本体（人形/四足/臂）数据混训；制造业客户部署</td><td>★★★☆ Skild Brain 披露有限，学术系（CMU Pathak）信誉强</td><td>★★★ 软银生态卡位（ABB 收购后协同），LG/施耐德等战投落地通道</td><td>B</td></tr>
+<tr><td><b>智元</b></td><td><span class="tag t-e2e">ViLLA</span><span class="tag t-wm">GE世界模型</span><span class="tag t-plat">开源生态</span></td><td>★★★★★ AGIBOT World 开源数据集 + 万台本体回流 + Genie Sim 3.0</td><td>★★★★☆ GO-2（2026.04）；GO-3（Q3，ViLLA×世界模型融合）；开源攻势最猛</td><td>★★★★★ 2026.03 累计下线 1 万台，Omdia 口径出货 5168 台居前</td><td>A/B</td></tr>
+<tr><td><b>银河通用</b></td><td><span class="tag t-layer">分层大脑-小脑</span><span class="tag t-sim">仿真合成为主</span></td><td>★★★★☆ 千万级仿真合成抓取数据方法论（GraspVLA）；门店/药房标准化回流</td><td>★★★★ 仿真→真机路线最成体系的国内样本</td><td>★★★★ 太空舱便利店/智慧药房百台级运营；累计融资近 70 亿元</td><td>B</td></tr>
+<tr><td><b>宇树</b></td><td><span class="tag t-hw">硬件优先</span><span class="tag t-e2e">UnifoLM补位</span></td><td>★★★☆ 全球最大本体保有量=潜在数据网络（尚未充分激活）</td><td>★★★☆ UnifoLM-WMA-0（2025.09 开源）+ UnifoLM-VLA-0（2026.01，LIBERO 98.7 第一）——"无模型"印象已过时，但落地验证少于榜单表现</td><td>★★★★★ 2025 营收 17.08 亿、扣非净利 6 亿、IPO 过会；2026Q1 增速回落（营收 +68%，扣非净利 -53%）值得跟踪</td><td>A</td></tr>
+<tr><td><b>星动纪元</b></td><td><span class="tag t-e2e">原生端到端 ERA-42</span><span class="tag t-hw">全栈自研</span></td><td>★★★☆ 物流/制造现场回流；五城物流集散地布局</td><td>★★★☆ 全尺寸双足全身+五指灵巧手一体驱动（宣称国内唯一）</td><td>★★★☆ 订单超 5 亿、物流单笔 5000 万；16 家产投生态</td><td>B</td></tr>
+<tr><td><b>自变量</b></td><td><span class="tag t-e2e">统一模型</span><span class="tag t-wm">世界统一模型</span></td><td>★★★☆ 真机+家庭场景实测回流（5.25 起 Wall-B 机器人入户）</td><td>★★★★ WALL-A→WALL-OSS（开源）→世界统一模型；"非人形非灵巧手进家庭"是路线宣言</td><td>★★★ 家庭交付刚启动，商业验证早期</td><td>B</td></tr>
+<tr><td><b>星海图</b></td><td><span class="tag t-e2e">G0 双系统VLA</span><span class="tag t-hw">轮式优先</span></td><td>★★★★☆ GOD 开放场景真机数据集（500+小时，全球下载 60 万+）；轮式双臂采数经济性最优论</td><td>★★★★ G0→G0 Plus（开箱即用）→G0 Tiny（端侧）；开源节奏快</td><td>★★★☆ 宣称 2026 开启万台级放量【待核验】</td><td>A/B</td></tr>
+<tr><td><b>千寻智能</b></td><td><span class="tag t-e2e">Spirit VLA</span>+力控融合</td><td>★★★ 力控数据差异化（26 自由度一体化力控关节）</td><td>★★★★ Spirit v1.6 登顶 RoboArena（超 Cosmos3/π0.5）——中国模型首冠，含金量高但为单榜</td><td>★★★ 融资速度（3 个月 50 亿）显著快于交付证据</td><td>B</td></tr>
+<tr><td><b>它石智航</b></td><td><span class="tag t-wm">AWE 具身世界模型</span></td><td>★★★ 数据引擎自建；精密装配场景纵深</td><td>★★★☆ AWE 3.0；A1 创吉尼斯纪录（1 小时亚毫米线束装配次数）——展示型证据强，泛化证据待补</td><td>★★★ 成立约 1 年估值 130 亿：团队溢价（华为/自驾系）为主</td><td>B</td></tr>
+<tr><td><b>极佳视界</b></td><td><span class="tag t-wm">世界模型四位一体</span></td><td>★★★★ 驾驶+具身双域数据（30+ 主机厂模拟器业务反哺）</td><td>★★★★ GigaWorld-1 登顶 WorldArena（胜谷歌/英伟达/阿里）；GigaBrain/WAM 落地一汽/阿里云工业方案</td><td>★★★ 世界模型变现路径仍以 ToB 仿真服务为主</td><td>B</td></tr>
+<tr><td><b>字节 Seed</b></td><td><span class="tag t-e2e">GR-3 VLA</span>（Qwen2.5-VL+DiT）</td><td>★★★★ 三合一数据法（遥操作真机+VR 人类轨迹+图文）；10 条人类轨迹将新物体成功率 60%→80%+</td><td>★★★☆ GR-3（2025.07）后未见 GR-4 公开发布（截至检索日）——迭代节奏慢于创业公司是关键疑问</td><td>★★★ ByteMini 自用为主 + 投资布局（星尘、自变量）</td><td>A</td></tr>
+<tr><td><b>华为（半深度）</b></td><td><span class="tag t-plat">CloudRobo平台</span><span class="tag t-layer">三模型分层</span></td><td>★★★☆ "20% 实采 + 80% 合成"数字宇宙工坊方法论；乐聚等伙伴训练场供数</td><td>★★★ 具身规划/执行/生成三大模型，宣称 10 步任务拆解、毫米级装配 90%+ 成功率（自报）</td><td>★★★☆ 生态位=GR00T 中国对位：不做本体，让"联网本体皆具身"</td><td>B</td></tr>
+</table>
+
+<h3>4.2 路线迁移时间线（2023→2026 的共识收敛）</h3>
+<div class="card">
+<div class="timeline">
+<div><b class="dt">2023</b>路线大分裂期：RT-2 证明 VLM 可迁移到动作 → 端到端 VLA 兴起；同期分层派（大模型做任务规划 + 传统控制执行）与强化学习派并立；世界模型还是学术词汇。</div>
+<div><b class="dt">2024</b>VLA 成为事实主流（π0、GR00T N1 立项、国内创业潮全面转向 VLA）；Figure 与 OpenAI 合作代表"外接大脑"模式的高光。</div>
+<div><b class="dt">2025</b>两个转折：① Figure 弃用 OpenAI 改自研 Helix——"外接大脑"模式信誉受挫；② π*0.6 引入 RL from experience、1X/极佳/自变量押注世界模型——纯模仿学习的数据天花板被公开承认。宇树从"无模型"转向开源 UnifoLM，硬件派被迫入场。</div>
+<div><b class="dt">2026</b>融合收敛期："世界模型（环境/预测）+ VLA（策略）+ RL（后训练）"三件套成为 GR00T N2、GO-3、AWE 3.0、世界统一模型的公约数。路线之争降维为三件套内部的配比与工程化能力之争。<b>对投资的含义：纯单一路线叙事（纯仿真、纯模仿、纯端到端）的差异化溢价正在消失。</b></div>
+</div>
+</div>
+
+<h3>4.3 中美路线对比</h3>
+<div class="card">
+<table>
+<tr><th></th><th>海外</th><th>国内</th></tr>
+<tr><td>主流形态</td><td>分化清晰：纯大脑（PI/Skild）vs 软硬一体（Figure/特斯拉/1X）vs 平台（英伟达/谷歌）</td><td>高度同质："全栈自研 + 软硬一体"为绝对主流叙事，纯模型层公司几乎不存在</td></tr>
+<tr><td>成因</td><td>风险资本支持"只做最难的 20%"的分工逻辑；本体可向第三方采购（供应链在中国）</td><td>①供应链近水楼台，硬件毛利可养研发；②国资/产业资本偏好可落地、可统计（出货量、产值）的标的；③对"卡脖子"的防御性偏好</td></tr>
+<tr><td>数据策略</td><td>视频/仿真权重高（GR00T 人类视频、1X 世界模型、Sunday 手套）</td><td>真机数据为王仍是主流信仰（智元/星海图），银河通用仿真派是显著例外</td></tr>
+<tr><td>风险点</td><td>模型期权定价过高：PI/Skild 合计 250 亿美元估值对应的收入近乎为零</td><td>同质化内卷 + 出货量军备竞赛的"含金量"问题（科研/表演类订单占比）；港股 IPO 窗口拥挤</td></tr>
+<tr><td>相对优势</td><td>范式原创性（RL from experience、组合泛化、世界-动作模型均为海外首发）</td><td>工程化追赶速度（三大榜单 2026 年均现中国模型登顶）+ 量产与场景落地碾压级领先</td></tr>
+</table>
+<p><b>判断</b>：中美差距的形态已从"代差"转为"相位差"——海外领先半个范式（约 6-12 个月），国内领先一个量产周期（约 12-24 个月）。两者交汇点（2027-2028 量产化的通用操作）才是终局竞争开始的地方。</p>
+</div>
+<!-- ================= CH5 ================= -->
+<h2 id="ch5"><span class="no">05</span>估值与资本分析（一级市场视角）</h2>
+<p class="lead">核心问题：资本到底在为什么定价——模型能力、出货量，还是团队与稀缺性？以下估值均回溯至原始公告或两家以上权威媒体；人民币/美元按 7.1 换算仅作可比化处理。</p>
+
+<h3>5.1 已核验估值总表（2026.06 快照）</h3>
+<table>
+<tr><th>公司</th><th>最新估值</th><th>轮次/时间</th><th>领投/关键资方</th><th>估值锚点（本报告归因）</th></tr>
+<tr><td>Figure AI</td><td>$39B（投后）</td><td>C 轮 &gt;$1B，2025.09</td><td>Parkway；英伟达/英特尔/LG/高通/Salesforce</td><td>软硬一体全要素期权：Helix+BotQ 量产+家庭叙事</td></tr>
+<tr><td>Skild AI</td><td>&gt;$14B</td><td>C 轮 $1.4B，2026.01</td><td>软银领投；英伟达、Bezos Expeditions、LG、施耐德</td><td>跨本体大脑 + 软银 Physical AI 体系卡位（7 个月估值 3 倍）</td></tr>
+<tr><td>Physical Intelligence</td><td>$5.6B（确定）；C 轮传 &gt;$11B</td><td>B 轮 $600M，2025.11；C 轮谈判中</td><td>CapitalG 领投；OpenAI、Bezos 参投</td><td>纯模型范式领先性（π0.7）；开源生态影响力</td></tr>
+<tr><td>1X</td><td>未公开（上轮后未更新）</td><td>—</td><td>OpenAI 基金（早期）、EQT 等</td><td>家庭场景独占数据飞轮</td></tr>
+<tr><td>银河通用</td><td>≈$3B / 200 亿+</td><td>25 亿元轮，2026.03</td><td>国家 AI 基金、中石化、中信、上汽、中芯聚源</td><td>仿真数据方法论 + 标准化零售场景 + 最强国家队背书</td></tr>
+<tr><td>智元</td><td>市场引述约 270 亿【待核验】</td><td>—</td><td>高瓴、比亚迪、腾讯、京东、上海国资等（历史轮）</td><td>万台量产 + 开源生态 + 全产品线（最接近"中国 Figure+GR00T 复合体"）</td></tr>
+<tr><td>星海图</td><td>200 亿+</td><td>B+ 轮 20 亿元，2026.04</td><td>（两个月内连续两轮）</td><td>真机数据资产（GOD）+ 开源声量 + 清华系团队</td></tr>
+<tr><td>它石智航</td><td>130 亿（投后）</td><td>Pre-A $455M（中国具身单笔纪录），2026.04</td><td>高瓴、红杉、美团联合领投</td><td>团队溢价（华为/自驾系）+ 世界模型叙事；成立约 1 年</td></tr>
+<tr><td>千寻智能</td><td>100 亿+</td><td>3 个月 4 轮近 50 亿元，2026 上半年</td><td>云锋、红杉、TCL、360、京东、顺为</td><td>RoboArena 登顶的模型证据 + 力控差异化</td></tr>
+<tr><td>星动纪元</td><td>100 亿+</td><td>战略轮 10 亿元，2026.03</td><td>三星、新加坡电信、友利、中金保时捷等（16 家产投）</td><td>原生端到端 + 国际产业资本通道（出海 50%）</td></tr>
+<tr><td>自变量</td><td>未披露（B 轮近 20 亿元）</td><td>B 轮，2026.04</td><td>小米战投+红杉联领；字节/美团/阿里/小米四厂齐投</td><td>统一模型/世界模型原创性 + 四大厂战略稀缺性</td></tr>
+<tr><td>极佳视界 / 智平方 / 帕西尼 / 灵初</td><td>均 100 亿±</td><td>2026.02-04 密集完成</td><td>华为关联生态/百度中车/黄浦江资本/国投先导</td><td>世界模型榜单第一 / "最像特斯拉"叙事 / 触觉数据稀缺性 / 灵巧操作+数据成本</td></tr>
+<tr><td>宇树（IPO 定价参照）</td><td>≥420 亿（发行市值下限）</td><td>科创板 2026.06.01 过会</td><td>腾讯、阿里、美团（早期轮次）</td><td><b>唯一以利润定价的标的</b>：约 70 倍 2025 扣非 PE</td></tr>
+</table>
+
+<h3>5.2 案例对比：三组"控制变量"实验</h3>
+<div class="card">
+<p><b>对照一：PI vs Skild（同为纯大脑，估值差 2.5 倍）</b>。PI 范式领先（π0.7）但商业化克制；Skild 范式披露少但深度绑定软银 Physical AI 收购体系（ABB 协同）与制造业战投网络。市场给"生态卡位+收入通道"的定价高于"范式领先"——这对国内纯技术叙事公司是清晰的警示。</p>
+<p><b>对照二：宇树 vs 银河通用（盈利硬件 vs 模型叙事，估值均为 200-420 亿区间）</b>。宇树以 6 亿扣非利润换 420 亿发行市值（约 70x PE）；银河通用以近零利润换 200 亿+（纯叙事+场景验证）。两者市值/估值仅差约 2 倍，意味着一级市场实际上给"模型叙事"支付了相对于利润流约 30-40 倍的隐含溢价。<b>该溢价能否兑现，取决于 2027 年模型驱动收入是否出现。</b></p>
+<p><b>对照三：它石（130 亿/成立 1 年）vs 星动纪元（100 亿+/订单 5 亿+交付 600 台）</b>。前者纯团队+叙事定价，后者已有订单流。两者估值接近，说明当前人民币市场对"华为系/自驾系明星团队"的定价已接近"5 亿元订单簿"——团队溢价处于历史高位，是回调时最脆弱的部分。</p>
+</div>
+
+<h3>5.3 "模型溢价"测算框架</h3>
+<div class="card">
+<p>把公司估值拆为：<b>估值 ≈ 硬件业务可比价值 + 场景/订单价值 + 模型期权价值 + 稀缺性/背书溢价</b>。用宇树（模型期权占比低）和优必选/越疆（二级市场，无叙事溢价）作锚：</p>
+<ul>
+<li>百亿俱乐部成员中，<b>模型期权+背书溢价普遍占估值的 60-80%</b>（银河通用、千寻、它石、极佳为典型）；星动、智平方因有订单流，约 40-60%；智元因万台出货，约 30-50%。</li>
+<li>美元体系更极端：PI/Skild 接近 100% 为模型期权定价。</li>
+<li><b>压力测试</b>：若开源模型（GR00T N1.7 商用、UnifoLM、WALL-OSS、G0 系列）在 18 个月内将"可用操作模型"变为公共品，模型期权部分将面临 50%+ 的重估风险；对冲变量是数据资产与场景独占（不随开源贬值）。</li>
+</ul>
+</div>
+
+<h3>5.4 退出路径与估值倒挂</h3>
+<div class="card">
+<p><b>IPO 窗口</b>：宇树过会为"A 股人形第一股"立标杆（利润定价 70x PE）；港股已上市参照系（优必选约 300 亿港元以下且持续亏损、越疆约 220 亿港元）+ 优艾智合/仙工等递表排队。<b>倒挂事实已经存在</b>：银河通用一级估值 200 亿+ ≈ 优必选二级市值（后者年收入 20 亿元）。除非 IPO 前出现收入跃迁，百亿俱乐部后排成员上市即破发的概率高。</p>
+<p><b>并购买方图谱（详见 6.2）</b>：Meta（已购 ARI）、软银（ABB+Skild 体系仍缺操作模型资产）、亚马逊（仓储场景吸纳）、三星/LG（已是 Skild/Figure/星动股东）。<b>对中国标的，跨境并购通道基本关闭，退出依赖 A股/港股 IPO——这使国内估值对 IPO 窗口政策的敏感性远高于海外。</b></p>
+<p><b>区间判断（明示叙事成分）</b>：① 2026 下半年-2027 上半年，国内具身一级融资将出现分层踩踏：前 5 名继续融资畅通，6-20 名估值滞涨或 flat 轮；② 海外若 PI C 轮以 $11B+ 落地，将再抬升国内头部对标空间约 20-30%，但属叙事传导而非基本面；③ 宇树上市后 6 个月的二级表现，是整个板块一级估值的"现实检验"事件。</p>
+</div>
+<!-- ================= CH6 ================= -->
+<h2 id="ch6"><span class="no">06</span>四个专题</h2>
+
+<h3>6.1 专题一：基座模型渗透——LLM 巨头入侵具身层</h3>
+<div class="card">
+<p><b>Google DeepMind</b>：渗透最成功者。Gemini Robotics（ER 推理 + VLA 动作双系统）于 CES 2026（1 月 5 日）官宣接管波士顿动力新电动 Atlas，联合研究 2026 年启动，首批面向汽车制造（现代 Metaplant）；2026 年 Atlas 产能已全部内定给 Metaplant 与 DeepMind 自用。<b>含义：基座模型厂商无需造本体即可"征用"最强本体——对所有自研大脑的本体公司构成路线压力。</b></p>
+<p><b>OpenAI</b>：与 Figure 公开决裂（2026.03 Adcock 详述分手过程，称 OpenAI 难以保持对硬件的"日级"投入）后，于 2026.05 确认重启内部机器人部门并自研硬件：DALL-E/Sora 出身的 Aditya Ramesh 任机器人 VP，正招聘执行器设计工程师；原负责人 Kalinowski 因国防合作担忧离职（2026.03）。短期主攻基建场景辅助技工，长期愿景为个人机器人。<b>从"借壳 Figure"到"亲自下场"，验证了垂直整合论的胜利，也意味着 2027 年后多一个全栈巨头对手。</b></p>
+<p><b>阿里 Qwen 生态</b>：事实上的"VLA 骨干标准"——字节 GR-3（Qwen2.5-VL）、英伟达 GR00T N1.7（可选 Qwen3-VL）等均以 Qwen 为底座；这是中国在具身基础层最被低估的影响力资产。蚂蚁灵波（LingBot-VA 世界模型 + LingBot-VLA）为集团第二落点【初筛级别】。</p>
+</div>
+
+<h3>6.2 专题二：科技巨头布局图谱（潜在买方/战投方）</h3>
+<div class="card">
+<table>
+<tr><th>巨头</th><th>2025-26 动作（核验状态）</th><th>战略意图与买方画像</th></tr>
+<tr><td>Meta</td><td>2026.05 收购 ARI（Assured Robot Intelligence，全身控制+自学习，创始人 Lerrel Pinto/Xiaolong Wang），并入 Superintelligence Labs 与 Robotics Studio ✅已核验</td><td>缺本体、买大脑；天价 CapEx 下倾向继续收购模型/控制团队——美元标的最现实买家</td></tr>
+<tr><td>软银</td><td>$5.4B 收购 ABB 机器人业务（2025.10 官宣，2026 年中-下半年交割）✅；Skild 领投方✅；体系含 AutoStore、Agile Robots、Berkshire Grey</td><td>"Physical AI"全栈拼图：本体（ABB）+大脑（Skild）已齐，后续并购重点是数据/场景资产</td></tr>
+<tr><td>亚马逊</td><td>仓储百万机器人保有 + Covariant 人才/技术吸纳 + DeepFleet【初筛】</td><td>场景自用型买家：收购对象为提升自有仓配效率的操作模型团队</td></tr>
+<tr><td>英伟达</td><td>GR00T 平台 + 同时投资 Figure、Skild、Agility 等⚠（多家确认在其 C 轮名单）</td><td>不收购整机，以投资+平台锁定生态；其开源节奏本身是行业定价变量</td></tr>
+<tr><td>三星 / LG</td><td>三星：Rainbow Robotics 控股 + 星动纪元战略轮✅；LG：Figure、Skild 两轮均现身✅</td><td>韩系制造场景 + 消费电子渠道，是中国公司少数可触达的国际战投</td></tr>
+<tr><td>丰田 TRI / 微软</td><td>TRI：Diffusion Policy/LBM 学术源头，与波士顿动力联合研究【初筛】；微软：投资 Figure✅ + Azure 物理 AI 工具链【初筛】</td><td>研究型/云基础设施型，并购意愿弱于 Meta/软银</td></tr>
+</table>
+<p class="src">✅=已回溯原始公告或两家以上权威媒体；【初筛】=沿用底稿聚合信息，未单独核验。</p>
+</div>
+
+<h3>6.3 专题三：开源模型与数据生态——闭源溢价的侵蚀速度</h3>
+<div class="card">
+<p>2025.06-2026.06 的开源供给密度前所未有：<b>openpi（π0/π0.5 权重）、GR00T N1.6/N1.7（开放商用许可）、WALL-OSS、RDT 系列、宇树 UnifoLM-WMA-0/VLA-0、星海图 G0 Plus/G0 Tiny、智元 AGIBOT World 2026 + Genie Sim 3.0、灵初 1000 小时人手数据【初筛】、星海图 GOD 数据集（60 万+下载）</b>。</p>
+<p>三个结构性判断：① <b>"可用基线"已开源化</b>——LIBERO 等标准任务上开源模型（UnifoLM-VLA-0 98.7）与闭源差距消失，闭源溢价退缩到"开放世界泛化 + RL 后训练 + 工程化部署"三个尚未开源的环节；② <b>开源是数据换流量的生意</b>——智元/星海图/宇树以开源换生态位与数采标准话语权，本质是平台竞争而非慈善；③ <b>对标 LLM 史</b>：LLM 领域开源将闭源 API 毛利压缩用了约 24 个月；具身领域因数据回流闭环更难复制，预计侵蚀更慢（30-36 个月），但方向相同。<b>投资含义：购买"自研 VLA"标的时，应按"相对 GR00T N2/π 开源版的超额能力"估值，而非按模型绝对能力。</b></p>
+</div>
+
+<h3>6.4 专题四：数据基础设施（兼可投标的池）</h3>
+<div class="card">
+<p><b>帕西尼</b>（触觉传感器→数据→模型全链：超极数采工厂 + OmniVTLA 全模态模型 + HyperCosmos 世界模型；B 轮超 10 亿、估值破百亿，黄浦江资本等领投✅）是"数据基建公司模型化"的标杆——估值逻辑已从传感器件切换为稀缺模态数据资产。其余标的：<b>诺亦腾</b>（动捕/遥操作）、<b>灵御智能</b>（TeleAvatar 遥操作数采）、<b>桥介数物</b>（Sim2Real 引擎）、<b>具身数据</b>（数采服务）【均为初筛级别】。</p>
+<p><b>投资逻辑</b>：数据基建是路线之争的"军火商"——无论端到端还是世界模型胜出，触觉/遥操作/仿真引擎均受益；且单笔估值（数亿-百亿）低于整机/模型公司，风险收益比在 2026 年下半年的分层踩踏中相对占优。<b>风险</b>：若"人类视频+世界模型生成"路线彻底胜出（英伟达 N2 方向），真机数采设备需求将被结构性压缩。</p>
+</div>
+
+<!-- ================= CH7 ================= -->
+<h2 id="ch7"><span class="no">07</span>关键争议问题与核心判断（一页结论）</h2>
+<div class="conclusion">
+<h3 style="margin-top:0">十问十答（判断均为概率性表述，标注置信度）</h3>
+<p><span class="q">1. 端到端与分层会收敛吗？π0.7 是"GPT-3 时刻"吗？</span><br>会收敛，且已在收敛——收敛形态是"世界模型+VLA+RL 三件套"而非任一方获胜。π0.7 的组合泛化是真实里程碑，但单一公司单一演示，距"GPT-3 时刻"还差可复现性与第三方验证（成功率 80% 仍远低于产品级）。置信度：收敛判断 高；GPT-3 类比 低。</p>
+<p><span class="q">2. 世界模型+VLA 融合是真共识还是阶段性叙事？</span><br>真共识，证据是行为而非言论：英伟达（N2/DreamZero）、智元（GO-3）、自变量、它石、1X、极佳六家以上用真金白银重组了技术栈。但"共识正确"≠"共识兑现"，sim-to-real 与算力成本仍可能让其晚于预期 1-2 年。置信度：高。</p>
+<p><span class="q">3. 数据飞轮临界点：多少真机数据才够？Sunday 式零机器人数据能成立吗？</span><br>无人知道确切数字——这正是各家数据策略分歧的根源。已知边界：10 条人类轨迹可将 GR-3 新物体成功率提至 80%+（小样本适配已解决）；但开放世界长程任务的预训练需求仍未见顶。Sunday（$1.15B 估值，手套数据）证明"非机器人数据启动"可融到资，尚未证明可交付产品（首批自主交付目标 2026 感恩节）。置信度：中。</p>
+<p><span class="q">4. 仿真 sim-to-real gap 能被工程填平吗？</span><br>在抓取/移动等中容错任务上已基本填平（银河通用百台级运营、华为 80% 合成配比是商用证据）；在高精力控/柔性物体上未填平（千寻力控、帕西尼触觉的存在本身即反证）。结论：gap 是任务函数，不是常数。置信度：高。</p>
+<p><span class="q">5. 开源会压缩闭源自研溢价吗？</span><br>会，且已开始（标准任务基线已开源化），但比 LLM 慢——数据回流闭环与硬件耦合是天然摩擦。预计 2027 年底前"通用操作基线模型"成为公共品，闭源溢价收缩至后训练与部署工程。置信度：高。</p>
+<p><span class="q">6. 模型壁垒和数据壁垒哪个更持久？</span><br>数据壁垒更持久，但要加定语：<b>独占场景的持续回流数据</b>（1X 家庭、银河门店、亚马逊仓）才是壁垒；一次性采集的静态数据集会随开源贬值。模型架构本身的壁垒半衰期已缩短至 6-12 个月。置信度：高。</p>
+<p><span class="q">7. 人形是数据采集与商业化的最优形态吗？</span><br>不是唯一最优。2026 年的实证：星海图/银河用轮式底盘+双臂拿到了最好的数据经济性；自变量明确"非人形非灵巧手"进家庭；它石/星动在双足上做出展示级差异。人形的真正论据是"人类环境零改造"+资本叙事，前者在 2030 前的商业场景中多数可绕过。置信度：中高。</p>
+<p><span class="q">8. 国内"全栈自研"是真壁垒还是融资话术？宇树为何率先盈利？</span><br>对前 3-5 名是真能力（智元/宇树的量产+模型双线有实据），对长尾是话术（同质化全栈=全都不深）。宇树盈利的本质是<b>选择了模型要求最低的市场（科研/教育/表演/二开）+ 极致供应链</b>，这不是"无模型也能赢"的证据，而是"先用硬件现金流买模型门票"的策略——其 IPO 募资 20 亿投模型已自我说明。置信度：高。</p>
+<p><span class="q">9. 量产元年的交付数字含金量如何鉴别？</span><br>三个鉴别器：①买方结构（产业客户 vs 科研/国企关系单）；②复购率与单台稼动率（鲜有公司披露——本身即信号）；③毛利方向。特斯拉跳票（2025 年万台目标归零）与 2026Q1 宇树扣非净利 -53% 提示：行业层面"出货量"指标已开始注水/承压，2026 下半年应改用"在役自主工时"类指标做尽调。置信度：高。</p>
+<p><span class="q">10. 估值倒挂何时释放？</span><br>触发器已排定：宇树上市后 6 个月二级表现（2026H2-2027H1）+ 港股递表队列的破发率。基准情形：2027 年出现一级估值分层踩踏，头部 5 家继续上行、腰部 flat/down round；悲观情形：若宇树破发 + 美元市场转向，百亿俱乐部整体重估 30-50%。置信度：中。</p>
+<h3>给一级市场投资人的三句话</h3>
+<p>① 买"模型公司"时，按相对开源基线的超额能力与 18 个月守住期定价，而非绝对能力；② 买"数据飞轮"时，验证回流的独占性与持续性，静态数据集不值钱；③ 2026 下半年最高性价比的暴露是数据基建（军火商）+ 有利润锚的整机（宇树类），最贵的暴露是无订单流的纯团队溢价标的。</p>
+</div>
+<!-- ================= CH8 附录 ================= -->
+<h2 id="ch8"><span class="no">08</span>附录：公司档案库</h2>
+<p class="lead">深研 17 家按统一模板建档（点击展开）；其后为轻量画像库与上市参照系。标注规则同前：✅核验 /【待核验】/【初筛】。</p>
+
+<h3>8.1 海外深研（6 家）</h3>
+
+<details class="co"><summary>① Physical Intelligence（PI / π）<span class="tag t-e2e">端到端VLA</span><span class="tag t-plat">跨本体纯大脑</span></summary><div>
+<h5>基本面</h5><p>2024 年成立，旧金山。团队：Sergey Levine、Karol Hausman、Chelsea Finn 等——伯克利/斯坦福 RL 与机器人学习最强学术谱系，方法论天然偏好"数据多样性+后训练"。融资：种子 $70M → A 轮 $400M（$2.4B，OpenAI/Bezos 参投）→ B 轮 $600M（$5.6B，CapitalG 领投，2025.11）✅；C 轮谈判约 $1B @ $11B+【进行中，2026.03 TechCrunch】。</p>
+<h5>六维度打分卡</h5><div class="score">
+<span>架构</span><span>端到端 VLA + flow matching；π0.6 起骨干 Gemma3-4B + 860M action expert，双输出头（flow matching+离散 token）；π0.7 增加视频历史编码器与"可引导"上下文（子任务指令/示范元数据/子目标图像）</span>
+<span>数据</span><span>多本体真机为主 + 合作伙伴回流；不自建大规模数采工厂，靠生态杠杆</span>
+<span>训练范式</span><span>行业风向标：π*0.6 的 RL from experience（用真实部署经验做强化后训练）→ π0.7 组合泛化。预训练-后训练划分最清晰的玩家</span>
+<span>本体策略</span><span>坚决不做硬件，跨本体（UR5e、移动双臂、多家人形）</span>
+<span>自研深度</span><span>完全自研 + 主动开源旧版本（openpi）</span>
+<span>场景飞轮</span><span>暂不绑定场景，靠合作伙伴部署（2026.02 公布合作落地案例）</span></div>
+<h5>能力进展评估</h5><p>π0.7：未见过叠衣数据的 UR5e 叠 T 恤成功率 ~80%；能重组技能应对新厨电等新任务✅（官方博客+TechCrunch/the-decoder 交叉）。注意：演示由官方筛选，the-decoder 同时报道了失败案例（"flaws included"）——可信度高于行业平均但仍非第三方基准。</p>
+<h5>商业模式与风险</h5><p>模型 API/授权，首个商业产品时间口径为"最早 2026、最晚 2028"。风险：收入真空期长；开源自家旧模型加速了对自己的追赶；估值已计入"机器人界 OpenAI"的终局假设。</p>
+<p class="src">来源：<a href="https://www.pi.website/blog/pi07">pi.website/blog/pi07</a> · <a href="https://techcrunch.com/2026/04/16/physical-intelligence-a-hot-robotics-startup-says-its-new-robot-brain-can-figure-out-tasks-it-was-never-taught/">TechCrunch 2026.04</a> · <a href="https://techcrunch.com/2026/03/27/physical-intelligence-is-reportedly-in-talks-to-raise-1-billion-again/">TechCrunch 2026.03（C 轮传闻）</a></p>
+</div></details>
+
+<details class="co"><summary>② Figure AI<span class="tag t-e2e">Helix VLA</span><span class="tag t-hw">垂直整合</span></summary><div>
+<h5>基本面</h5><p>2022 年成立。创始人 Brett Adcock（连续创业者，非学术系——风格：工程冲刺+激进传播）。C 轮 &gt;$1B @ $39B 投后（Parkway 领投；英伟达/英特尔/LG/高通/Salesforce/T-Mobile 等）✅。</p>
+<h5>六维度打分卡</h5><div class="score">
+<span>架构</span><span>Helix：双系统 VLA（S2 慢思考 VLM + S1 快速视觉运动策略）；Helix 02（2026.01）扩展至全身 loco-manipulation✅；RL 步态</span>
+<span>数据</span><span>自有机队 + BMW/物流客户现场 + 家庭试点；与 OpenAI 分手后全栈自研数据闭环</span>
+<span>训练范式</span><span>模仿为主 + RL 运动控制；披露粒度低</span>
+<span>本体策略</span><span>极致垂直整合（F.03 为 Helix 与量产重新设计）</span>
+<span>自研深度</span><span>完全自研（2024 年弃 OpenAI 外脑——路线迁移标志事件）</span>
+<span>场景飞轮</span><span>工业（BMW）→物流→家庭三级跳，家庭时间表激进</span></div>
+<h5>能力与工程</h5><p>BotQ：2025 年月产数台 → 2026.02 约 60 台 → 2026.04 约 240 台、"90 分钟一台"✅（Adcock 自报，方向可信、绝对值待审计）；规划年产 1.2 万台、4 年 10 万台。2026.03 第一夫人与 Figure 03 同台——政治传播能力是其独特资产。</p>
+<h5>风险与争议</h5><p>行业最大的"披露选择性"争议：Helix 演示自主比例无第三方验证；Adcock 公开称内部 AI 团队"run circles around" OpenAI——传播风格放大了证伪难度。$39B 估值已超优必选+越疆+宇树市值总和，倒挂标杆。</p>
+<p class="src">来源：<a href="https://www.figure.ai/news/series-c">figure.ai/news/series-c</a> · <a href="https://www.humanoidsdaily.com/news/finishing-touches-tesla-misses-self-imposed-q1-deadline-for-optimus-gen-3-reveal">Humanoids Daily</a> · <a href="https://mikekalil.com/blog/figure-openai-breakup/">OpenAI 决裂报道</a></p>
+</div></details>
+
+<details class="co"><summary>③ 特斯拉 Optimus<span class="tag t-e2e">端到端</span><span class="tag t-video">FSD数据迁移</span><span class="tag t-hw">垂直整合</span></summary><div>
+<h5>六维度速记</h5><div class="score">
+<span>架构/数据</span><span>自动驾驶视觉栈迁移（纯视觉端到端信仰的延伸）+ 工厂自采 + 人类视频。FSD→操作任务迁移的有效性始终未被独立验证</span>
+<span>本体/自研</span><span>极致垂直整合，10,000 个独特零件全自研——也是延期的直接原因</span></div>
+<h5>现状（量产叙事 vs 现实的标杆案例）✅</h5><p>2025 年"万台"目标实际交付为零（Musk 2026.01 承认无 Optimus 在做"有用工作"）；Gen 3 发布跳票出 Q1；Fremont 的 Model S/X 产线 2026.05 停产改造，Optimus 产线 7-8 月投产，Musk 称今年产量"字面意义上无法预测"；2026 CapEx $20B（翻倍）主要投向 Optimus 基建。</p>
+<h5>投资视角</h5><p>特斯拉是行业 beta 的放大器：其跳票直接给国内"出货量竞赛"叙事让出窗口，但其供应链拉动（执行器、丝杠、灵巧手）仍是 A 股链条的最大定价变量。模型层面公开证据最少，宜按"高方差期权"处理。</p>
+<p class="src">来源：<a href="https://electrek.co/2026/04/22/tesla-optimus-production-fremont-model-sx-line/">Electrek 2026.04</a> · <a href="https://www.humanoidsdaily.com/news/finishing-touches-tesla-misses-self-imposed-q1-deadline-for-optimus-gen-3-reveal">Humanoids Daily</a></p>
+</div></details>
+
+<details class="co"><summary>④ 1X Technologies<span class="tag t-wm">视频世界模型</span><span class="tag t-hw">家庭垂直整合</span></summary><div>
+<h5>基本面与路线</h5><p>挪威/美国。家庭场景唯一深耕者。NEO：$20,000 买断或 $499/月订阅（含"专家模式"遥操作），$200 定金，2026 年内美国交付、2027 年扩展市场✅。2026.03 发布世界模型（从视频学习）；自报自主率初期 60-70%，目标 2027 80-90%、2028 95%+。</p>
+<h5>数据飞轮设计（全行业最激进）</h5><p>遥操作兜底=客户付费的同时为 1X 生产标注数据。伦理与商业争议并存：隐私（卧室级数据）、操作员经济性（呼叫中心模式毛利）、以及"自主率自报口径"。1X 提供"禁入区+人脸模糊"作为隐私对冲。底稿"2028 年 10 万台产能"未获 2026 年新表述支持【待核验】。</p>
+<h5>投资视角</h5><p>若家庭数据独占性成立，1X 拥有全行业最稀缺的数据资产；若世界模型进展不及预期，其本质是一家毛利为负的遥操作服务公司。二元性极强。</p>
+<p class="src">来源：<a href="https://www.1x.tech/order">1x.tech/order</a> · <a href="https://www.eweek.com/news/1x-neo-humanoid-home-robot-2026/">eWeek</a> · <a href="https://blog.robozaps.com/b/1x-neo-review">Robozaps 评测</a></p>
+</div></details>
+
+<details class="co"><summary>⑤ 英伟达 GR00T 体系<span class="tag t-plat">平台</span><span class="tag t-wm">世界-动作模型</span></summary><div>
+<h5>体系结构</h5><p>GR00T 基础模型 + Isaac Sim/Lab（仿真）+ Cosmos（世界模型/合成数据）+ Jetson Thor（端侧算力）+ 投资网络（Figure、Skild、Agility 等）。"卖铲人+模型供给方+LP"三重角色。</p>
+<h5>模型时间线✅</h5><p>N1（2025.03，首个开源人形基座，2.2B）→ N1.5 → N1.6（2026.01 前后，真机验证含智元 Genie-1 与宇树 G1）→ <b>N1.7（GTC 2026.03 开源商用：3B，Cosmos-Reason2-2B/Qwen3-VL 骨干，预训练加入 2 万小时 EgoScale 人类视频）</b>→ <b>N2 预览（DreamZero 世界-动作模型架构，宣称新任务成功率为主流 VLA 两倍以上，MolmoSpaces/RoboArena 第一，年底交付）</b>。GTC 2026 主题被媒体概括为"把机器人的数据问题换成算力问题"。</p>
+<h5>对行业的真正影响</h5><p>① 每次 GR00T 开源升级=全行业自研 VLA 的"基线重置"，直接压缩创业公司模型溢价；② N2 若兑现，将把竞争焦点从"谁有数据"改写为"谁买得起算力"——利好英伟达自身与算力充裕大厂，利空数据故事型创业公司。<b>分析任何"自研模型"标的时，GR00T 最新版即为折现基准。</b></p>
+<p class="src">来源：<a href="https://huggingface.co/blog/nvidia/gr00t-n1-7">HF: GR00T N1.7</a> · <a href="https://the-decoder.com/gtc-2026-nvidia-wants-to-swap-robotics-data-problem-for-a-compute-problem/">the-decoder GTC 2026</a> · <a href="https://research.nvidia.com/labs/gear/gr00t-n1_6/">N1.6 页面</a></p>
+</div></details>
+
+<details class="co"><summary>⑥ Skild AI<span class="tag t-e2e">跨本体大脑</span></summary><div>
+<h5>基本面✅</h5><p>2023 年成立（CMU Deepak Pathak/Abhinav Gupta），匹兹堡。C 轮 $1.4B @ &gt;$14B（软银领投；英伟达、Macquarie、1789、Bezos Expeditions；战投 LG/施耐德/CommonSpirit/Salesforce），7 个月估值从 $4.5B 三倍至 $14B，累计融资 $2B+（2026.01.14，Bloomberg/TechCrunch/官方）。底稿"约 140 亿美元【待核验】"已核验为属实。</p>
+<h5>路线与对照</h5><p>Skild Brain（2025.07）：全载体通用大脑（人形/四足/机械臂），主打制造业部署、可"加装"到存量机器人。与 PI 同为纯大脑，但分歧在：PI 赌范式（RL/泛化），Skild 赌部署密度与生态（软银 ABB 体系的"默认大脑"席位）。技术披露远少于 PI——其 $14B 估值中生态卡位占比高于技术证据。</p>
+<h5>风险</h5><p>跨本体泛化的公开 benchmark 缺失；估值增速（7 个月 3 倍）远超任何可观察进展指标，软银单一买方依赖。</p>
+<p class="src">来源：<a href="https://www.skild.ai/blogs/series-c">skild.ai Series C</a> · <a href="https://techcrunch.com/2026/01/14/robotic-software-maker-skild-ai-hits-14b-valuation/">TechCrunch</a> · <a href="https://www.bloomberg.com/news/articles/2026-01-14/robotics-startup-skild-valued-above-14-billion-after-softbank-led-funding-round">Bloomberg</a></p>
+</div></details>
+<h3>8.2 国内创业深研（9 家）</h3>
+
+<details class="co"><summary>⑦ 智元机器人（AgiBot）<span class="tag t-e2e">ViLLA</span><span class="tag t-wm">GE世界模型</span><span class="tag t-plat">开源生态</span></summary><div>
+<h5>基本面</h5><p>2023 年成立（稚晖君彭志辉 + 邓泰华）。估值市场普遍引述约 270 亿元【待核验——未回溯到原始公告】；股东含高瓴、比亚迪、腾讯、京东、上海国资等。</p>
+<h5>模型与生态（2026 密集发布）✅</h5><p>GO-2（2026.04.09，融合大小脑的 VLA 基座，ViLLA 架构演进）+ GE-2 动作世界模型 + AGIBOT World 2026 开源数据集 + Genie Sim 3.0 / Genie Studio 2.0；<b>GO-3 计划 Q3 发布，明确"ViLLA×世界模型"融合</b>；定位口径已升级为"具身智能基础模型公司"；五年投入不低于 20 亿元建生态。</p>
+<h5>工程与商业化✅</h5><p>2025.01 千台 → 2025.12 五千台 → 2026.03 累计下线破万台；Omdia 口径出货 5168 台；与宇树合计预计占 2026 国内人形出货约 80%。远征/灵犀/精灵全产品线。"G2 产线 310 件/小时"仍【待核验】。</p>
+<h5>研判</h5><p>国内唯一同时具备"量产规模+模型纵深+开源平台"三要素的公司，最接近"中国版 Figure+GR00T 复合体"。风险：产品线过宽的资源摊薄；开源生态的商业闭环尚未自证；估值口径混乱本身是尽调风险点。</p>
+<p class="src">来源：<a href="https://finance.sina.com.cn/tech/digi/2026-04-09/doc-inhtwtex8815734.shtml">新浪科技 GO-2</a> · <a href="https://www.chnfund.com/article/AR810f2b2b-53ed-10da-2f1b-3a20b1b8eb0c">中国基金报</a></p>
+</div></details>
+
+<details class="co"><summary>⑧ 银河通用（Galbot）<span class="tag t-layer">分层大脑-小脑</span><span class="tag t-sim">仿真合成为主</span></summary><div>
+<h5>基本面✅</h5><p>2023 年成立（王鹤，北大具身感知与交互实验室）。2025 年末轮投后约 30 亿美元；2026.03.02 再融 25 亿元（国家 AI 产业基金、中石化、中信投资控股、中银资产、上汽金控、中芯聚源、亦庄国投等），累计融资近 70 亿元，居国内具身首位。</p>
+<h5>六维度要点</h5><div class="score">
+<span>架构</span><span>分层"大脑-小脑-本体"+ 银河星脑；GraspVLA 等以仿真合成数据预训练的专项模型</span>
+<span>数据</span><span>国内仿真合成路线旗手：千万级合成抓取数据；门店/药房标准化场景做真机校准与回流</span>
+<span>场景飞轮</span><span>太空舱便利店、智慧药房进入百台级运营——用半结构化零售换取高频、标准化回流</span></div>
+<h5>研判</h5><p>"仿真为主+窄场景商用"是资本效率最高的国内路线（每元融资对应的运营台数领先）。核心检验：从便利店/药房向开放场景迁移时，合成数据方法论是否仍然成立。国家队资本结构（能源/金融/制造央企）暗示其下一阶段场景为工业巡检与能源——估值中含相应订单预期。</p>
+<p class="src">来源：<a href="https://news.pedaily.cn/202603/561274.shtml">投资界</a> · <a href="https://www.21jingji.com/article/20260309/herald/45360c46c1a07f4173551f89455b69ea.html">21 经济网</a></p>
+</div></details>
+
+<details class="co"><summary>⑨ 宇树科技（Unitree）<span class="tag t-hw">硬件优先</span><span class="tag t-e2e">UnifoLM 补位</span></summary><div>
+<h5>基本面（IPO 招股书口径，证据级 A）✅</h5><p>2016 年成立（王兴兴，持股 23.82%、控制近七成表决权）。2025 营收 17.08 亿元（+335%）、扣非净利 6.00 亿元（+674%）；2026Q1 营收 4.23 亿（+68%）、扣非净利 4025 万（-53%）。科创板 2026.06.01 过会（受理到过会 73 天），拟募资 42.02 亿元、发行市值 ≥420 亿元，其中超 20 亿元投向智能机器人模型研发。研发费率约 7.7%（行业争议点）。</p>
+<h5>模型路线再评估（底稿矛盾点的裁定）</h5><p>底稿疑问"硬件优先 vs 自研 VLA>95% 标注的矛盾"已可裁定：宇树确已双线开源——UnifoLM-WMA-0（世界模型-动作架构，2025.09）+ UnifoLM-VLA-0（2026.01，LIBERO 平均 98.7 分、公开测试中排名第一）✅。即"硬件优先"描述的是商业策略，而非模型缺位；但其模型尚缺真实场景部署证据，榜单分数≠落地能力。</p>
+<h5>研判</h5><p>行业唯一的"利润定价"标的，是整个板块估值体系的现实锚。两大跟踪点：① 2026Q1 增速骤降是季节性还是 G1 降价后的需求透支；② IPO 后 20 亿模型投入能否把"本体保有量"激活为数据网络——若能，宇树将从对照组变为最危险的竞争者。</p>
+<p class="src">来源：<a href="https://www.stcn.com/article/detail/3735182.html">证券时报</a> · <a href="http://www.eeo.com.cn/2026/0320/813654.shtml">经济观察网招股书拆解</a> · <a href="https://finance.sina.cn/stock/ggyj/2026-06-01/detail-inhzwyqi8408970.d.html?vt=4&wm=1184%3Fp">过会报道</a></p>
+</div></details>
+
+<details class="co"><summary>⑩ 星动纪元（Robot Era）<span class="tag t-e2e">原生端到端 ERA-42</span><span class="tag t-hw">全栈自研</span></summary><div>
+<h5>基本面✅</h5><p>2023 年成立（清华叉院陈建宇）。2025.11 A+ 轮近 10 亿（吉利资本领投、北汽产投入场）→ 2026.03 战略轮 10 亿元（三星、高成、新加坡电信、友利资本、中金保时捷、中芯聚源等），估值破百亿；累计 16 家产业投资方为行业之最（阿里、联想、海尔、北汽、世纪金源…）。</p>
+<h5>路线与进展</h5><p>ERA-42：宣称国内唯一可同时驱动全尺寸双足全身动作+五指灵巧手的端到端 VLA；部分落地场景效率达人类 70%。订单累计超 5 亿元、物流单笔超 5000 万元，北深湖杭合五城物流集散地布局✅。"与全球 Top10 科技公司中 9 家合作"口径未获独立核验【待核验——疑为"投资方+客户"合并口径】。创始人对"量产"的公开表述为"小批量"（财新）——比同行诚实，也说明交付仍早期。</p>
+<h5>研判</h5><p>"国际产业资本通道"是其独特资产（三星/新电信→海外订单占比 50%）。检验点：双足+灵巧手的端到端控制在物流场景是否真的优于轮式方案的单位经济性。</p>
+<p class="src">来源：<a href="https://finance.sina.com.cn/tech/shenji/2026-03-05/doc-inhpwviv9929805.shtml">新浪科技</a> · <a href="https://m.caixin.com/m/2026-03-05/102419654.html">财新</a> · <a href="https://www.qbitai.com/2025/11/354404.html">量子位</a></p>
+</div></details>
+
+<details class="co"><summary>⑪ 自变量机器人<span class="tag t-e2e">统一模型</span><span class="tag t-wm">世界统一模型</span></summary><div>
+<h5>基本面✅</h5><p>深圳。B 轮近 20 亿元（小米战投+红杉中国联合领投，2026.04）；国内唯一集齐字节、美团、阿里、小米四家战投——四厂买的是"统一模型"原创性与家庭/本地生活场景适配权。</p>
+<h5>模型谱系</h5><p>WALL-A（统一 VLA）→ WALL-OSS 开源（2025.09，轻量版）→ <b>"世界统一模型"（2026.04.22 发布，自称全球首个）+ WALL-B 家用机型，35 天后（5.25 起）入驻真实家庭</b>✅。路线宣言独树一帜：<b>非人形、非灵巧手进家庭</b>——把"形态最简化、模型扛复杂度"推到极致，与 1X（人形+遥操作兜底）构成镜像实验。</p>
+<h5>研判</h5><p>若家庭实测跑通，将同时证伪"人形必要论"与"灵巧手必要论"两大行业前提，杠杆极大；反之其差异化叙事将快速贬值。属于"高信息量标的"——无论成败都将重定价整个家庭赛道。</p>
+<p class="src">来源：<a href="https://finance.sina.com.cn/stock/t/2026-04-20/doc-inhvayqc9880865.shtml">新浪财经 B 轮</a> · <a href="https://www.ne-time.cn/web/article/38507">NE 时代（Wall-B 入户）</a></p>
+</div></details>
+
+<details class="co"><summary>⑫ 星海图（Galaxea）<span class="tag t-e2e">G0 双系统 VLA</span><span class="tag t-hw">轮式优先全栈</span></summary><div>
+<h5>基本面✅</h5><p>清华系（赵行、许华哲等）。2026.04 B+ 轮 20 亿元（距上轮不到 2 个月），投后估值突破 200 亿——底稿【待核验】项已核验属实。</p>
+<h5>数据与模型（开源攻势仅次于智元）✅</h5><p>GOD：全球首个开放场景具身真机数据集，500+ 小时移动操作数据（住宅/厨房/零售/办公，统一本体+子任务级语言标注），上线一月登顶全球下载榜、累计 60 万+ 次下载；模型线 G0（2025.08，双系统 VLA，arXiv 2509.00576）→ G0 Plus（2026.01，"开箱即用"零样本）→ G0 Tiny（端侧）。R1 系轮式双臂 + DEXO 灵巧手。</p>
+<h5>研判</h5><p>"轮式优先采数"的务实路线 + 最规范的学术披露（论文/数据/代码全开），可信度溢价应给足。检验点：宣称的 2026"万台级放量"【待核验】与 200 亿估值要求的收入兑现度。</p>
+<p class="src">来源：<a href="https://www.stcn.com/article/detail/3722732.html">证券时报</a> · <a href="https://arxiv.org/abs/2509.00576">G0 论文</a> · <a href="https://www.qbitai.com/2026/04/394626.html">量子位</a></p>
+</div></details>
+<details class="co"><summary>⑬ 千寻智能（Spirit AI）<span class="tag t-e2e">Spirit VLA</span>＋力控融合</summary><div>
+<h5>基本面✅</h5><p>2024 年成立（韩峰涛，珞石机器人前 CTO + 高阳，清华）。融资速度行业第一：2026 年内 3 个月 4 轮、累计近 50 亿元（云锋、红杉、TCL、360、京东、顺为等），估值破百亿。</p>
+<h5>路线与证据</h5><p>端到端 Spirit VLA + 全身力控（Moz1：26 自由度一体化力控关节，负载自重比 1:1）。<b>Spirit v1.6 登顶 RoboArena，综合得分超英伟达 Cosmos3 与 π0.5——中国具身模型首次在该榜夺冠</b>✅（2026.06 报道）。"±0.1N 力控精度"仍为公司宣称【待核验】。</p>
+<h5>研判</h5><p>力控融合是差异化真命题（高精装配/柔性物体是 VLA 公认短板），且已有榜单证据。风险：融资节奏远快于交付证据（公开订单信息稀少），典型的"叙事先行"结构；RoboArena 单榜登顶的可持续性待 N2 发布后复验。</p>
+<p class="src">来源：<a href="https://finance.sina.com.cn/wm/2026-06-03/doc-iniacxkk4007887.shtml">新浪财经</a> · <a href="https://www.ofweek.com/ai/2026-06/ART-201721-12005-30689466.html">OFweek</a></p>
+</div></details>
+
+<details class="co"><summary>⑭ 它石智航（TARS AI）<span class="tag t-wm">AWE 具身世界模型</span></summary><div>
+<h5>基本面（底稿估值已校正）✅</h5><p>2025 年初成立（陈亦伦——华为车 BU 前首席科学家/清华，李震宇等自驾系明星阵容）。Pre-A 轮 4.55 亿美元（高瓴、红杉、美团联合领投，2026.04.16）创中国具身智能单笔纪录，<b>投后估值 130 亿元</b>——底稿"超 200 亿"系聚合站点误传，已据 MIT TR China/证券时报校正。成立约一年累计融资超 17 亿元+4.55 亿美元。</p>
+<h5>路线与证据</h5><p>AWE 3.0 通用具身大模型（2026.03.17 发布，世界模型路线，与百度智能云签约）；A1 双足人形创吉尼斯纪录："一小时内亚毫米级线束装配最多次数"✅。切入精密线束装配（汽车/3C）——选择了"容错最低"的场景做世界模型验证，与多数公司先易后难相反。</p>
+<h5>研判</h5><p>纯团队定价的极限样本（1 年/130 亿/无规模收入）。吉尼斯纪录是精心设计的"单点深度"证据，回答了"能不能做精"，未回答"能不能泛化"。下轮融资前的关键观察：线束场景的付费客户名单。</p>
+<p class="src">来源：<a href="https://www.mittrchina.com/news/detail/16247">MIT TR China</a> · <a href="https://finance.sina.com.cn/roll/2026-03-17/doc-inhrieik2013384.shtml">新浪财经 AWE3.0</a></p>
+</div></details>
+
+<details class="co"><summary>⑮ 极佳视界（GigaAI）<span class="tag t-wm">世界模型四位一体</span></summary><div>
+<h5>基本面✅</h5><p>创始人黄冠（90 后清华博士，地平线/鉴智系）。2026.03 Pre-B 近 10 亿 + 2026.04 B1 近 15 亿——一个月融 25 亿，估值破百亿，"国内首个世界模型百亿独角兽"；投资界报道提示华为关联生态入局。</p>
+<h5>路线与证据</h5><p>GigaWorld（驾驶+具身双版本世界模型平台）+ GigaBrain 具身基模 + WAM 世界-动作模型 + Maker 本体，"四位一体"。<b>GigaWorld-1 登顶 WorldArena，胜谷歌/英伟达/阿里</b>✅。商业面：驾驶模拟器服务 30+ 主机厂/自驾公司；2026.04 与一汽模具、阿里云合作工业全流程方案。</p>
+<h5>研判</h5><p>世界模型赛道的国内头牌，且有驾驶业务现金流反哺——比纯具身世界模型公司（它石）多一条腿。风险：世界模型变现以 ToB 仿真服务为主，距"驱动机器人作业"的具身闭环仍有距离；"物理世界的 OpenAI"自我定位与百亿估值需以 WAM 真机落地兑现。</p>
+<p class="src">来源：<a href="https://stcn.com/article/detail/3754115.html">证券时报 B1 轮</a> · <a href="https://news.pedaily.cn/202604/562806.shtml">投资界</a></p>
+</div></details>
+
+<h3>8.3 大厂深研（2 家）</h3>
+
+<details class="co"><summary>⑯ 字节跳动 Seed<span class="tag t-e2e">GR-3 VLA</span>＋投资双线</summary><div>
+<h5>模型与数据（证据级 A：技术报告公开）✅</h5><p>GR-3（2025.07.22）：4B VLA，Qwen2.5-VL 骨干 + DiT 流匹配动作头；三合一数据法（遥操作真机 + VR 人类轨迹 + 图文数据）；新物体抓取较基线 +17.8%，10 条人类轨迹即可将新物体成功率 60%→80%+。配套 ByteMini 双臂移动本体（22 自由度，腕部球关节）。</p>
+<h5>关键疑问（待核验清单 #9 的裁定）</h5><p>截至 2026.06 检索，<b>未见 GR-4 或后继版本公开发布</b>——在创业公司 6 个月一迭代的节奏下，字节模型线沉寂近一年。两种解释：转入内部不发布（配合本地生活/物流自用），或资源向 LLM 主线收缩。投资线持续活跃（星尘智能、自变量等）。</p>
+<h5>研判</h5><p>大厂"模型+投资"双线打法中，投资线信号已强于自研线。对被投公司（自变量、星尘）而言，字节战投意味着场景输送预期，但也存在"大厂自研替代"的远期风险。</p>
+<p class="src">来源：<a href="https://seed.bytedance.com/en/blog/seed-research-%E9%80%9A%E7%94%A8%E6%9C%BA%E5%99%A8%E4%BA%BA%E6%A8%A1%E5%9E%8B-gr-3-%E5%8F%91%E5%B8%83-%E6%94%AF%E6%8C%81%E9%AB%98%E6%B3%9B%E5%8C%96-%E9%95%BF%E7%A8%8B%E4%BB%BB%E5%8A%A1-%E6%9F%94%E6%80%A7%E7%89%A9%E4%BD%93%E5%8F%8C%E8%87%82%E6%93%8D%E4%BD%9C">Seed 官方博客</a> · <a href="https://www.ithome.com/0/869/840.htm">IT 之家</a></p>
+</div></details>
+
+<details class="co"><summary>⑰ 华为（半深度）<span class="tag t-plat">CloudRobo 平台</span><span class="tag t-layer">三模型分层</span></summary><div>
+<h5>体系（HDC 2025.06 发布）✅</h5><p>CloudRobo 具身智能平台 = 盘古多模态底座上的三大模型：具身规划大模型（大脑：10 步以上任务拆解与动态调整）+ 具身执行大模型（小脑：毫米级装配宣称 90%+ 成功率）+ 具身多模态生成模型（数字宇宙工坊：20% 实采 + 80% 合成的训练空间），外加数据合成/标注、仿真验证、云边协同部署与安全监管的端到端工具链。</p>
+<h5>生态打法</h5><p>不做本体，口号"让一切联网本体成为具身智能机器人"——GR00T 的中国对位，但更云化（绑定华为云收入）。合作网络：乐聚（夸父，全国具身训练场供数 + 5G-A 人形联合发布）、赛力斯凤凰等。"华为极目机器"实体仍【待核验】。</p>
+<h5>研判</h5><p>对创业公司是"第二个基线抬升源"（GR00T 之外）；对投资人的筛查问题：标的所谓自研大脑相对 CloudRobo 三件套的超额能力在哪。华为的真实意图更接近"具身时代的安卓+云"，其成败取决于乐聚等头部本体厂是否愿意把数据闭环交给平台。</p>
+<p class="src">来源：<a href="https://www.icloudnews.net/a/100493.html">爱云资讯</a> · <a href="https://www.csdn.net/article/2025-06-20/148797490">CSDN</a> · <a href="https://m.guokr.com/article/465253">果壳</a></p>
+</div></details>
+<h3>8.4 轻量画像库（按路线独特性归类，约 25 家）</h3>
+<table>
+<tr><th style="width:110px">公司</th><th>一句话路线画像</th><th>关键事实与核验状态</th></tr>
+<tr><td colspan="3" style="background:#eef2f8"><b>数据策略极端样本</b></td></tr>
+<tr><td>Sunday Robotics</td><td>零机器人数据：$200 Skill Capture 手套众包人类示范 → ACT-1 基座模型 → Memo 家务机器人</td><td>B 轮 $165M @ <b>$1.15B 估值</b>（Coatue 领投，Tiger/Benchmark/Bain，2026.03）✅——底稿"B 轮 11.5 亿美元"系金额/估值混淆，已校正。宣称感恩节前首批自主交付</td></tr>
+<tr><td>苏度科技</td><td>纯仿真合成 Sim2Real</td><td>估值 136.5 亿元【待核验，仅聚合源】</td></tr>
+<tr><td colspan="3" style="background:#eef2f8"><b>感知模态差异化</b></td></tr>
+<tr><td>帕西尼 PaXini</td><td>触觉传感 → 超极数采工厂 → OmniVTLA 全模态模型 + HyperCosmos 世界模型</td><td>B 轮超 10 亿元、估值破百亿（黄浦江资本/凯泰/信安领投，2026.03）✅；"百亿级实采全模态数据"为宣称</td></tr>
+<tr><td>穹彻智能</td><td>力为中心（Force-Centric）操作智能，卢策吾团队</td><td>【初筛】</td></tr>
+<tr><td>戴盟机器人</td><td>视触觉灵巧手</td><td>【初筛】</td></tr>
+<tr><td colspan="3" style="background:#eef2f8"><b>反共识训练路线</b></td></tr>
+<tr><td>Generalist AI</td><td>Harmonic Reasoning，从零训练不依赖 VLM 底座</td><td>【初筛】</td></tr>
+<tr><td>Dyna Robotics</td><td>DYNA-1：单任务起步 + 任务奖励模型，主打 24 小时连续运行的可靠性而非泛化</td><td>【初筛】</td></tr>
+<tr><td colspan="3" style="background:#eef2f8"><b>物理优先 / 仿真基础设施</b></td></tr>
+<tr><td>FieldAI</td><td>"物理优先"基础模型 FFMs，野外/工地场景</td><td>估值 $2B【初筛】</td></tr>
+<tr><td>Genesis AI</td><td>自研物理引擎（宣称 43 万倍加速）+ 生成式仿真</td><td>【初筛】</td></tr>
+<tr><td colspan="3" style="background:#eef2f8"><b>国内百亿级补充</b></td></tr>
+<tr><td>智平方</td><td>全域全身 VLA（AlphaBot），"最像特斯拉"叙事</td><td>B 轮系列超 10 亿、估值破百亿、一年 12 轮（百度/中车/特斯拉链企业，2026.02）✅</td></tr>
+<tr><td>灵初智能</td><td>Psi 系列 + 开源 1000 小时人手操作数据；CEO 主张"先把数据成本打下来"</td><td>天使+Pre-A 累计 20 亿元（国开金融等国家队）+ 2026.04 国投先导新轮✅</td></tr>
+<tr><td>魔法原子</td><td>Magic-Mix 双引擎（世界模型中腰部样本）</td><td>【初筛】</td></tr>
+<tr><td colspan="3" style="background:#eef2f8"><b>运动控制 / 本体强势型</b></td></tr>
+<tr><td>优必选</td><td>Walker S2 工业人形：2025.11 量产交付、月产能宣称破千、2026 目标产能万台</td><td>港股 9880：2025 营收 20 亿、亏 7.9 亿，市值约 300 亿港元下方✅</td></tr>
+<tr><td>波士顿动力</td><td>MPC 正统 → 学习化转身：新电动 Atlas 2026 量产，AI 由 Gemini Robotics 供给</td><td>CES 2026 官宣，2026 产能全部内定✅</td></tr>
+<tr><td>Apptronik / Agility</td><td>工业人形美系双雄（Apollo/Digit），均偏分层+保守工程</td><td>英伟达投资 Agility【初筛】</td></tr>
+<tr><td>北京人形</td><td>天工 3.0（全尺寸开源本体）+ 慧思开物平台（国资平台型）</td><td>【初筛】</td></tr>
+<tr><td>逐际动力 / 众擎 / 加速进化</td><td>运控见长的本体三杰，模型层均跟随开源生态</td><td>【初筛】</td></tr>
+<tr><td>傅利叶</td><td>GR 系列转向医疗康复/陪伴垂类</td><td>【初筛】</td></tr>
+<tr><td>星尘智能</td><td>绳驱本体 Astribot，字节投资</td><td>【初筛】</td></tr>
+<tr><td colspan="3" style="background:#eef2f8"><b>基座专题关联（轻量）</b></td></tr>
+<tr><td>蚂蚁灵波</td><td>LingBot-VA 世界模型 + LingBot-VLA 闭环</td><td>【初筛】</td></tr>
+<tr><td>高德 ABot</td><td>阿里系具身业务部，依托 Qwen 生态</td><td>【初筛】</td></tr>
+</table>
+
+<h3>8.5 上市参照系（估值锚，2026.04-06 区间快照）</h3>
+<table>
+<tr><th>公司</th><th>市场</th><th>市值/状态</th><th>对一级市场的锚定意义</th></tr>
+<tr><td>宇树科技</td><td>科创板（过会待发行）</td><td>发行市值 ≥420 亿元，约 70x 2025 扣非 PE✅</td><td>板块"利润定价"上限锚；上市后表现=百亿俱乐部现实检验</td></tr>
+<tr><td>优必选 9880.HK</td><td>港股</td><td>约 300 亿港元下方；2025 营收 20 亿、亏损 7.9 亿✅</td><td>"有收入无利润"人形公司的二级定价；多数一级百亿标的的隐含上限</td></tr>
+<tr><td>越疆 2432.HK</td><td>港股</td><td>约 220 亿港元✅（2025.03 快照）</td><td>协作臂转人形的二级估值参照</td></tr>
+<tr><td>优艾智合 / 仙工智能</td><td>港股递表</td><td>排队中【初筛】</td><td>IPO 窗口拥挤度指标</td></tr>
+<tr><td>新松 / 埃斯顿 / 海康机器人 / 极智嘉</td><td>A股/港股/拟IPO</td><td>200-300 亿元区间【初筛，建仓前应更新】</td><td>传统机器人业务的市值天花板，反衬"具身溢价"幅度</td></tr>
+</table>
+
+<h3>8.6 核验台账（底稿 12 项待核验的处理结果）</h3>
+<div class="verify">
+<ol>
+<li><b>Skild $14B</b>：✅属实（C 轮 $1.4B，软银领投，2026.01.14，Bloomberg/官方）。</li>
+<li><b>PI C 轮 $11B</b>：⏳仍为谈判传闻（2026.03 TechCrunch），未官宣，报告中按"确定 $5.6B + 传闻 $11B"双口径处理。</li>
+<li><b>它石/星海图 200 亿</b>：它石实为 130 亿（❌底稿有误，已校正）；星海图 200 亿+✅属实。</li>
+<li><b>宇树模型矛盾</b>：✅已裁定——UnifoLM 双线开源属实（WMA-0 2025.09 / VLA-0 2026.01，LIBERO 98.7），"硬件优先"指商业策略而非模型缺位。</li>
+<li><b>智元估值 270 亿 / G2 310 件每小时</b>：⏳两项均未回溯到原始来源，维持【待核验】；出货量已用 Omdia 口径（5168 台）替代。</li>
+<li><b>星动"Top10 中 9 家合作"</b>：⏳未获独立核验，疑为投资方+客户合并口径；融资与订单数据✅已核验。</li>
+<li><b>1X 2028 十万台</b>：⏳2026 年公开表述中未见该口径，维持【待核验】；现行口径为"2026 美国交付、2027 扩市场"。</li>
+<li><b>GR00T N2 成功率翻倍</b>：✅确为英伟达 GTC 2026 官方口径（"more than twice as often"），但属厂商宣称，尚无第三方复验。</li>
+<li><b>字节 GR-4</b>：✅已补检索——截至 2026.06 未见后继版本公开发布。</li>
+<li><b>OpenAI 机器人动态</b>：✅已补——2026.05 确认重启自研（Ramesh 任 VP，自研执行器），详见 6.1。</li>
+<li><b>华为极目机器实体</b>：⏳未核验；CloudRobo/盘古三模型体系✅已核验（HDC 2025）。</li>
+<li><b>上市参照系市值</b>：✅主要标的已更新（宇树/优必选/越疆），长尾标的标注快照时间。</li>
+</ol>
+</div>
+<div class="note"><b>信息质量声明</b>：本报告执行"原始公告优先、双源交叉、聚合站点仅作初筛"的信源纪律；所有融资数字回溯至公司官方或两家以上权威财经媒体（Bloomberg、TechCrunch、财新、证券时报、投资界等）；演示类能力区分"官方宣称/榜单成绩/第三方验证"三级。仍带【待核验】【初筛】标注的内容不应作为投资决策依据。</div>
+
+<footer>具身智能公司模型路线研究报告 v1.0 ｜ 编制 2026-06-11 ｜ 配套文档：研究框架 v1.1、公司清单与初步检索发现、进度交接文档 ｜ 本报告不构成投资建议</footer>
+<script>
+/* ====== 路线地图 ====== */
+const CO=[
+ {n:"Physical Intelligence",x:14,y:10,v:5.6,vd:"$5.6B（B轮确定；C轮传$11B）",d:"mix",unv:false,note:"端到端VLA+RL经验流；π0.7组合泛化；跨本体纯大脑"},
+ {n:"Skild AI",x:20,y:14,v:14,vd:"$14B+（C轮，软银领投）",d:"mix",unv:false,note:"跨本体大脑；软银Physical AI体系卡位"},
+ {n:"英伟达 GR00T",x:50,y:5,v:8,vd:"平台业务（不适用独立估值）",d:"sim",unv:true,note:"GR00T N1.7开源商用+N2世界-动作模型；行业基线抬升源"},
+ {n:"华为 CloudRobo",x:80,y:8,v:6,vd:"平台业务（不适用独立估值）",d:"sim",unv:true,note:"盘古三模型（规划/执行/生成）；GR00T中国对位，云化打法"},
+ {n:"极佳视界",x:55,y:30,v:1.4,vd:"100亿+人民币",d:"sim",unv:false,note:"GigaWorld世界模型四位一体；WorldArena登顶；驾驶业务反哺"},
+ {n:"字节 Seed",x:30,y:40,v:4,vd:"大厂业务（不适用独立估值）",d:"video",unv:true,note:"GR-3（Qwen2.5-VL+DiT）；GR-4未见发布；投资线活跃"},
+ {n:"智元",x:35,y:55,v:3.8,vd:"约270亿人民币【待核验】",d:"real",unv:true,note:"GO-2/GE-2/Genie Sim开源生态；累计下线万台"},
+ {n:"银河通用",x:70,y:60,v:3.0,vd:"约$3B / 200亿+（已核验）",d:"sim",unv:false,note:"分层大脑-小脑；仿真合成数据旗手；便利店/药房百台运营"},
+ {n:"星海图",x:15,y:68,v:2.8,vd:"200亿+人民币（已核验）",d:"real",unv:false,note:"G0双系统VLA；GOD真机数据集60万下载；轮式优先"},
+ {n:"自变量",x:8,y:72,v:1.5,vd:"未披露（B轮近20亿元）",d:"real",unv:true,note:"世界统一模型；非人形非灵巧手进家庭；四大厂战投"},
+ {n:"千寻智能",x:18,y:74,v:1.4,vd:"100亿+人民币（已核验）",d:"real",unv:false,note:"Spirit VLA+力控；v1.6登顶RoboArena（超Cosmos3/π0.5）"},
+ {n:"它石智航",x:40,y:74,v:1.8,vd:"130亿人民币（投后，已核验）",d:"mix",unv:false,note:"AWE 3.0具身世界模型；精密线束装配吉尼斯纪录；团队溢价样本"},
+ {n:"星动纪元",x:10,y:78,v:1.4,vd:"100亿+人民币（已核验）",d:"real",unv:false,note:"原生端到端ERA-42；双足+灵巧手一体；订单5亿+出海50%"},
+ {n:"1X",x:30,y:82,v:3,vd:"未公开新轮",d:"video",unv:true,note:"视频世界模型+遥操作兜底；NEO $20k已开订；家庭数据独占"},
+ {n:"Figure AI",x:25,y:86,v:39,vd:"$39B（C轮投后，已核验）",d:"real",unv:false,note:"Helix 02全身自主；BotQ月产240台；披露选择性争议"},
+ {n:"宇树",x:45,y:92,v:5.9,vd:"发行市值≥420亿元（IPO过会）",d:"mix",unv:false,note:"硬件现金流+UnifoLM开源补位；行业唯一利润定价锚"},
+ {n:"特斯拉 Optimus",x:20,y:96,v:8,vd:"母公司业务（不适用独立估值）",d:"video",unv:true,note:"FSD数据迁移信仰；Gen3跳票至2026年中；量产现实检验标杆"}
+];
+const DC={real:"var(--d-real)",sim:"var(--d-sim)",video:"var(--d-video)",mix:"var(--d-mix)"};
+const svg=document.getElementById('routemap'),tip=document.getElementById('tooltip');
+function drawMap(){
+ const on=[...document.querySelectorAll('#mapfilter input')].filter(i=>i.checked).map(i=>i.value);
+ const X=v=>80+v/100*840, Y=v=>60+v/100*480;
+ let h=`<defs></defs>
+ <line x1="80" y1="300" x2="920" y2="300" stroke="#cbd5e1" stroke-dasharray="4 4"/>
+ <line x1="500" y1="60" x2="500" y2="540" stroke="#cbd5e1" stroke-dasharray="4 4"/>
+ <rect x="80" y="60" width="840" height="480" fill="none" stroke="#e3e7ee"/>
+ <text x="84" y="52" font-size="13" fill="#5a6478">▲ 模型平台 / 跨本体</text>
+ <text x="84" y="560" font-size="13" fill="#5a6478">▼ 垂直整合 / 软硬一体</text>
+ <text x="86" y="316" font-size="13" fill="#5a6478">◀ 端到端统一模型</text>
+ <text x="836" y="316" font-size="13" fill="#5a6478">分层/模块化 ▶</text>`;
+ CO.filter(c=>on.includes(c.d)).forEach((c,i)=>{
+  const r=Math.max(13,Math.sqrt(c.v)*7.5);
+  h+=`<circle cx="${X(c.x)}" cy="${Y(c.y)}" r="${r}" fill="${DC[c.d]}" fill-opacity=".55" stroke="${DC[c.d]}" stroke-width="2" ${c.unv?'stroke-dasharray="5 4"':''} data-i="${CO.indexOf(c)}" style="cursor:pointer"/>
+  <text x="${X(c.x)}" y="${Y(c.y)-r-5}" font-size="12" font-weight="600" text-anchor="middle" fill="#1a2233">${c.n}</text>`;
+ });
+ svg.innerHTML=h;
+ svg.querySelectorAll('circle').forEach(el=>{
+  el.addEventListener('mousemove',e=>{const c=CO[+el.dataset.i];
+   tip.innerHTML=`<b>${c.n}</b><br>估值：${c.vd}<br>${c.note}`;
+   tip.style.display='block';tip.style.left=(e.clientX+14)+'px';tip.style.top=(e.clientY+10)+'px';});
+  el.addEventListener('mouseleave',()=>tip.style.display='none');
+ });
+}
+document.querySelectorAll('#mapfilter input').forEach(i=>i.addEventListener('change',drawMap));
+drawMap();
+</script>
+</div>
+<script>
+/* nav highlight */
+const links=[...document.querySelectorAll('#topnav a')];
+addEventListener('scroll',()=>{let cur=links[0];links.forEach(a=>{const el=document.querySelector(a.hash);if(el&&el.getBoundingClientRect().top<90)cur=a});links.forEach(a=>a.classList.toggle('on',a===cur))});
+</script>
+</body>
+</html>

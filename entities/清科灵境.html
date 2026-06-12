@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>清科灵境 — 具身智能Wiki</title><style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style></head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> › <span>清科灵境</span></div>
+  <div class="wiki-header"><h1>清科灵境</h1><div class="subtitle">清科灵境（安徽）科技有限公司 · 私募 · 2023 · 具身智能底座系统 · 世界动作模型WAM + Dora操作系统</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#founders">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financial">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#a1">2.1 团队与技术定位</a></li>
+        <li class="toc-lvl4"><a href="#a2">2.2 技术路线的差异化价值</a></li>
+        <li class="toc-lvl4"><a href="#a3">2.3 资本与战略路径</a></li>
+        <li class="toc-lvl4"><a href="#a4">2.4 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#a5">2.5 潜在风险与挑战</a></li>
+        <li class="toc-lvl4"><a href="#a6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#references">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">清科灵境</div>
+        <div class="ib-section">基本信息</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">清科灵境（安徽）科技有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2023年</div></div>
+        <div class="ib-row"><div class="ib-label">总部</div><div class="ib-value">安徽合肥</div></div>
+        <div class="ib-row"><div class="ib-label">创始人</div><div class="ib-value">未公开披露</div></div>
+        <div class="ib-row"><div class="ib-label">关联方</div><div class="ib-value">安徽启迪（场景合作企业）</div></div>
+        <div class="ib-row"><div class="ib-label">注册地址</div><div class="ib-value">合肥市高新区中安创谷科技园二期F6栋401室</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">核心产品</div><div class="ib-value">灵境WAM、Dora OS、Oasis数据平台</div></div>
+        <div class="ib-row"><div class="ib-label">融资状态</div><div class="ib-value">未公开披露融资轮次</div></div>
+        <div class="ib-row"><div class="ib-label">公开合同</div><div class="ib-value">南京大学自动驾驶平台 104万元（2026.05）</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">领域</div><div class="ib-value"><span class="tag tag-info">具身智能底座</span><span class="tag tag-info">世界模型</span><span class="tag tag-info">机器人OS</span><span class="tag tag-info">自动驾驶</span><span class="tag tag-info">AI4S</span></div></div>
+        <div class="ib-row"><div class="ib-label">上市状态</div><div class="ib-value"><span class="tag tag-warn">私募未上市</span></div></div>
+        <div class="ib-section">官网</div>
+        <div class="ib-row"><div class="ib-label">网址</div><div class="ib-value">未公开发现</div></div>
+      </aside>
+      <p class="article-intro">清科灵境（全称清科灵境（安徽）科技有限公司）是一家总部位于安徽合肥的具身智能底座系统研发企业，成立于2023年。公司聚焦于基于世界模型（World Model）的机器人大脑研发，以及在AI4S（科学具身智能）领域的落地应用。其三大核心产品为灵境世界动作模型（WAM）、Dora操作系统和Oasis数据采集及合成数据平台。2023年斩获"创响中国"安徽省创新创业大赛一等奖，入选安徽省重点科技招商项目。2026年5月与星海图达成战略合作，形成"具身大脑 + 机器人本体"组合方案。清科灵境是目前国内较少专注于机器人原生操作系统和世界动作模型方向的公司之一。</p>
+      <h2 id="facts">1 事实层</h2>
+      <p style="font-size:0.82rem;color:#54595d;margin-bottom:10px;">来源可靠性标注：<span class="tag tag-info">媒体报道</span> = 第三方独立报道 · <span class="tag tag-info">官网/公司自述</span> = 公司官方披露 · <span class="tag tag-info">政府采购</span> = 政府公开招标文件 · <span class="tag tag-info">标准组织</span> = 行业标准化机构</p>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper">
+        <table class="wikitable infotable">
+          <tr><th>项目</th><th>内容</th></tr>
+          <tr><td>公司全称</td><td>清科灵境（安徽）科技有限公司<sup><a href="#ref3">[3]</a></sup></td></tr>
+          <tr><td>成立时间</td><td>2023年<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>注册地</td><td>安徽省合肥市高新区城西桥社区服务中心中安创谷科技园二期F6栋401室<sup><a href="#ref3">[3]</a></sup></td></tr>
+          <tr><td>关联方</td><td>安徽启迪场景合作企业<sup><a href="#ref2">[2]</a></sup></td></tr>
+          <tr><td>上市状态</td><td>私募未上市</td></tr>
+          <tr><td>官方网站</td><td>未公开发现（截至2026年6月）</td></tr>
+          <tr><td>核心方向</td><td>具身智能底座系统：世界动作模型（WAM）、机器人操作系统（Dora）、合成数据平台（Oasis）</td></tr>
+        </table>
+      </div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>时间</th><th>事件</th></tr>
+          <tr><td>2023年</td><td>公司成立；斩获"创响中国"安徽省创新创业大赛一等奖；入选安徽省重点科技招商项目，科研基地落地合肥<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>2026年5月11日</td><td>与星海图正式签署战略合作协议，形成"具身大脑 + 机器人本体"的完整解决方案，聚焦AI4S科学具身智能方案联合研发<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref2">[2]</a></sup></td></tr>
+          <tr><td>2026年5月13日</td><td>被正式委任为全国信息技术标准化技术委员会人工智能分委会长三角区域工作组副组长单位（任期至2028年5月12日）<sup><a href="#ref4">[4]</a></sup></td></tr>
+          <tr><td>2026年5月29日</td><td>中标南京大学自动驾驶系统软件乘用车平台项目，金额104万元<sup><a href="#ref3">[3]</a></sup></td></tr>
+        </table>
+      </div>
+
+      <h3 id="founders">1.2 创始人及核心团队</h3>
+      <p>清科灵境的创始人及核心团队成员未在公开信息中披露。公司为安徽启迪的场景合作企业，其科研基地落地于合肥高新区中安创谷科技园，属于安徽省重点科技招商项目。<sup><a href="#ref2">[2]</a></sup></p>
+      <div class="callout"><div class="callout-title">⚠️ 信息缺口</div>截至目前（2026年6月），清科灵境创始人背景、团队规模、核心技术人员等信息均未公开披露。这与公司目前处于早期阶段且未进行公开市场融资有关。</div>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <p>截至2026年6月，清科灵境未公开披露任何外部融资轮次。公司目前可能仍处于自筹资金或政府扶持阶段。已知关联方为安徽启迪。<sup><a href="#ref2">[2]</a></sup></p>
+      <div class="callout"><div class="callout-title">⚠️ 信息缺口</div>公司融资历史、股权结构、估值等信息均未公开。创业者可能需要持续关注该公司在投资界的后续动态。</div>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>维度</th><th>内容</th></tr>
+          <tr><td>AI技术路线</td><td>以世界动作模型（WAM）为核心，采用动作-状态联合建模，融合VLM（视觉-语言模型）教练反馈，实现"理解人、会操作、实时闭环"三位一体能力<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>操作系统</td><td>自研Dora操作系统，专为世界模型设计。采用零拷贝通信（避免ROS序列化开销）+事件驱动轻量级调度，实测时延较ROS降低近20倍，内存占用减少90%。定位为行业标准化中间件基础设施<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>数据方案</td><td>物理仿真引擎 + 世界模型联合驱动合成数据生成（虚实结合数据飞轮），突破真实数据稀缺性瓶颈，覆盖边缘场景（Corner Cases）与极端安全场景<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>跨域融合</td><td>以一套WAM技术栈同时覆盖具身智能和自动驾驶两个业务领域，已实现两域的业务闭环<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>标准化参与</td><td>信标委人工智能分委会长三角区域工作组副组长单位，牵头/参与长三角区域AI重点标准项目<sup><a href="#ref4">[4]</a></sup></td></tr>
+          <tr><td>全栈/专用选择</td><td>定位为基础软件层：不做机器人本体，专注操作系统、世界模型、数据平台三类底座技术，与本体厂商形成互补生态</td></tr>
+        </table>
+      </div>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>产品</th><th>定位/描述</th><th>关键特性</th><th>成熟度</th></tr>
+          <tr><td>灵境世界动作模型（WAM）</td><td>World Action Model，国内进展较快的世界动作模型</td><td>"理解人、会操作、实时闭环"三位一体；动作-状态联合建模；VLM教练反馈；语言指令理解、记忆管理、主动协作<sup><a href="#ref1">[1]</a></sup></td><td>已实现具身智能及自动驾驶业务闭环</td></tr>
+          <tr><td>Dora操作系统</td><td>专为世界模型设计的机器人原生操作系统</td><td>零拷贝通信；事件驱动调度；时延降低近20倍 vs ROS；内存占用减少90%；多模态任务支持；模块化设计<sup><a href="#ref1">[1]</a></sup></td><td>已部署于自动驾驶和医疗检测场景</td></tr>
+          <tr><td>Oasis数据采集及合成数据平台</td><td>虚实结合数据飞轮</td><td>物理仿真引擎 + 世界模型联合驱动；覆盖边缘场景与极端安全场景；生成数据视觉真实度（FID）接近真实数据分布<sup><a href="#ref1">[1]</a></sup></td><td>配套WAM和Dora使用</td></tr>
+          <tr><td>自动驾驶系统软件平台</td><td>面向高校/科研机构的乘用车自动驾驶平台</td><td>中标南京大学自动驾驶系统软件乘用车平台项目，金额104万元<sup><a href="#ref3">[3]</a></sup></td><td>已交付（2026.05）</td></tr>
+        </table>
+      </div>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>场景分类</th><th>具体应用</th><th>合作方/部署实例</th></tr>
+          <tr><td>自动驾驶</td><td>智能驾驶软件平台、仿真测试</td><td>吉利、长安、北汽、奇瑞、大众、潍柴等主机厂<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>自动驾驶-教育</td><td>高校自动驾驶科研平台</td><td>南京大学（中标104万元，2026年5月）<sup><a href="#ref3">[3]</a></sup></td></tr>
+          <tr><td>医疗检测</td><td>血液样本自动化检测</td><td>医院及第三方检测机构<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>AI4S科学实验</td><td>化学、生物、材料、医药领域的智能化实验方案（联合研发阶段）</td><td>与星海图合作，清科灵境负责AI4S技术实施与系统集成，星海图提供R1本体与EDP开发平台<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref2">[2]</a></sup></td></tr>
+        </table>
+      </div>
+      <p>清科灵境的应用场景横跨<strong>自动驾驶</strong>和<strong>具身智能</strong>两大领域，这在同类公司中较少见。公司以WAM世界动作模型作为两个领域的统一技术底座。在自动驾驶方面已服务于多家主流主机厂；在具身智能方面，医疗检测已落地，AI4S科学实验处于联合研发阶段。</p>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>指标</th><th>数据</th><th>说明</th></tr>
+          <tr><td>公开合同</td><td>南京大学自动驾驶平台 104万元</td><td>2026年5月中标，评审得分97.80分<sup><a href="#ref3">[3]</a></sup></td></tr>
+          <tr><td>自动驾驶客户</td><td>6+家主机厂</td><td>吉利、长安、北汽、奇瑞、大众、潍柴<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>医疗客户</td><td>医院及第三方检测机构</td><td>具体机构名称未披露<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>生态合作</td><td>星海图战略合作</td><td>2026年5月签署，聚焦AI4S联合研发<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>标准化地位</td><td>信标委AI分委会长三角副组长</td><td>2026年5月获任，任期两年<sup><a href="#ref4">[4]</a></sup></td></tr>
+        </table>
+      </div>
+      <p>公司目前处于早期商业化阶段，主要收入来源为自动驾驶领域的技术服务合同。具身智能方向的商业化仍在联合研发和场景验证阶段。</p>
+
+      <h3 id="financial">1.8 财务数据</h3>
+      <p>清科灵境为私募公司，未公开披露财务数据。以下是基于公开信息的整理：</p>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>指标</th><th>数据</th></tr>
+          <tr><td>融资状态</td><td>未公开披露任何外部融资轮次</td></tr>
+          <tr><td>公开收入</td><td>南京大学项目104万元（2026年5月）</td></tr>
+          <tr><td>员工人数</td><td>未公开披露</td></tr>
+          <tr><td>估值</td><td>未公开披露</td></tr>
+        </table>
+      </div>
+      <div class="callout"><div class="callout-title">⚠️ 信息缺口</div>公司营收、利润、人员规模、资金储备等核心财务数据均未公开。以上信息均来自公开招标记录和媒体报道，尚不构成完整的财务状况画像。</div>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>清科灵境在2026年5月同步获得了南京大学自动驾驶平台中标（104万元，评审得分97.80分）和信标委AI分委会长三角工作组副组长单位两项重要进展，显示公司同时在商业落地和行业标准化两个维度发力<sup><a href="#ref3">[3]</a></sup><sup><a href="#ref4">[4]</a></sup></li>
+        <li>公司与安徽启迪存在场景合作关系，被合肥在线称为"安徽启迪场景合作企业"，暗示公司可能与启迪控股在产业落地方面有某种形式的合作<sup><a href="#ref2">[2]</a></sup></li>
+        <li>公司注册地位于合肥高新区中安创谷科技园二期，该园区是合肥高新区重点打造的科技创新产业集聚区<sup><a href="#ref3">[3]</a></sup></li>
+        <li>清科灵境的Dora操作系统对标ROS，但在性能指标上强调了对ROS的全面超越（时延20x、内存90%），定位为"行业标准化中间件基础设施"——这是一个有雄心的目标，但能否获得行业广泛采用仍取决于生态建设<sup><a href="#ref1">[1]</a></sup></li>
+        <li>同期获得信标委AI分委会长三角区域工作组组长/副组长单位的机构还包括：上海仪电、思必驰、具身智能中试基地、科大讯飞、库帕思、智元、天创、海康威视、阿里云等，清科灵境是与这些知名企业同列的最不知名的一家<sup><a href="#ref4">[4]</a></sup></li>
+        <li>公司的WAM世界动作模型声称"已实现具身智能及自动驾驶业务闭环"，但具体的技术指标、基准测试结果、与竞品的对比数据均未公开<sup><a href="#ref1">[1]</a></sup></li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+      <p style="font-size:0.82rem;color:#54595d;margin-bottom:10px;">分析层基于公开信息推理，仅供参考。公司数据极为有限，分析结论具有较高不确定性。</p>
+
+      <div class="analysis-block" id="a1">
+        <h4>2.1 团队与技术定位</h4>
+        <p>清科灵境最显著的特点是信息不透明。创始人、核心团队、技术背景等关键信息均未公开，这在2023年就已成立并获得了省级创新大赛一等奖的公司中相对少见。公司同时具备自动驾驶（服务6+家主机厂）和具身智能（WAM+Dora OS+AI4S）两个业务方向的技术积累，暗示团队可能具有汽车行业和AI研究的复合背景。公司作为安徽启迪的场景合作企业落户合肥中安创谷，说明其与启迪系存在某种产业协同关系，而启迪在合肥布局与中科大的地理邻近性可能意味着团队中存在中科大背景的技术人才。</p>
+      </div>
+
+      <div class="analysis-block" id="a2">
+        <h4>2.2 技术路线的差异化价值</h4>
+        <p>清科灵境的技术路线有三个差异化特征。第一，不做机器人本体，专做"大脑"和"操作系统"——这是一个与行业主流（本体+大脑一体化）不同的选择，其逻辑类似于手机行业的Android模式：做操作系统而非做手机。第二，以WAM世界动作模型作为自动驾驶和具身智能的统一技术底座——这一"一脑两用"的策略如果成立，意味着公司的技术栈具有跨域的泛化能力，但也可能分散资源。第三，Dora操作系统对标ROS，强调性能碾压（20x时延降低）——这种"性能优先"的策略在学术上合理，但操作系统的成败更多取决于生态而非性能。ROS最大的护城河不是技术而是全球数百万开发者的生态惯性。Dora要成为"行业标准"还需要回答：开发者为什么要迁移？迁移成本谁承担？</p>
+      </div>
+
+      <div class="analysis-block" id="a3">
+        <h4>2.3 资本与战略路径</h4>
+        <p>清科灵境至今未公开任何融资，这在具身智能赛道中较为罕见——同类公司多在成立半年到一年内即完成天使轮或Pre-A轮。可能的原因包括：公司通过自动驾驶业务有自我造血能力；依托安徽启迪等产业资本进行了非公开融资；或者公司仍在产品打磨阶段尚未启动正式融资。从商业进展看，公司选择了"先拿合同再建叙事"的务实路径——南京大学104万中标项目和6家主机厂客户是实实在在的商业验证，比单纯的融资新闻更有说服力。但缺乏融资也可能意味着公司扩张速度受限，在人才争夺战中处于劣势。</p>
+      </div>
+
+      <div class="analysis-block" id="a4">
+        <h4>2.4 竞争定位与取舍</h4>
+        <p>清科灵境做了几个明确的取舍。选择"不做本体做OS"使公司避开了与宇树、智元、星海图等本体厂商的直接竞争，但也意味着其商业化路径受限于生态合作——Dora OS只有在被足够多的本体厂商采用时才能实现平台价值。与星海图的战略合作是生态建设的第一步，但"独家合作"和"开放平台"之间存在天然矛盾。选择同时做自动驾驶和具身智能，一方面提供了多元化的收入来源（自动驾驶可能已是主要收入），另一方面也带来了定位模糊的问题——公司究竟是一家自动驾驶软件公司还是一家具身智能公司？这一模糊性可能影响融资叙事。</p>
+      </div>
+
+      <div class="analysis-block" id="a5">
+        <h4>2.5 潜在风险与挑战</h4>
+        <p>清科灵境面临几个结构性风险。信息不透明风险：在需要建立行业信任的B2B市场中，创始人信息缺失是不利的信号。生态冷启动风险：Dora OS作为ROS的替代品，需要说服开发者和硬件厂商迁移，这在没有强大资本推力的情况下极为困难。技术验证不足风险：WAM世界动作模型的"业务闭环"声明缺乏可验证的第三方基准测试或公开演示。资源分散风险：自动驾驶和具身智能是两个资源密集型方向，小团队同时布局两个方向可能导致两个都做不深。标准化双刃剑风险：信标委副组长单位的身份提升了行业话语权，但也可能使公司过早卷入标准制定而分散产品研发精力。</p>
+      </div>
+
+      <div class="analysis-block" id="a6">
+        <h4>2.6 其他重要观察</h4>
+        <p>清科灵境是具身智能赛道中一个有趣的"异类"——它选择了最难但潜在回报最高的道路（做操作系统/中间件平台），却在信息透明度和生态建设方面表现得极为低调。公司的真正价值可能在两到三年后才会显现——如果Dora OS被行业广泛采用，清科灵境将成为具身智能时代的基础设施级公司；如果生态建设失败，公司可能退化为一家自动驾驶技术服务商。当前所有关于公司的分析都受限于信息的极度匮乏，建议持续关注其后续融资动态、Dora OS的开源策略以及与星海图合作的具体进展。</p>
+      </div>
+
+      <h2 id="references">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li id="ref1"><a href="https://news.pedaily.cn/20260512/129574.shtml" target="_blank">投资界 — 清科灵境与星海图达成战略合作 共筑具身智能新生态 (2026-05-12)</a></li>
+          <li id="ref2"><a href="https://www.hf365.com/hfzx/system/2026/05/11/030060426.shtml" target="_blank">合肥在线/合肥日报 — 清科灵境与星海图达成战略合作 共筑具身智能新生态 (2026-05-11)</a></li>
+          <li id="ref3"><a href="http://www.ccgp.gov.cn/cggg/zygg/zbgg/202605/t20260529_26655840.htm" target="_blank">中国政府采购网 — 南京大学自动驾驶系统软件乘用车平台项目中标公告 (2026-05-29)</a></li>
+          <li id="ref4"><a href="https://www.auto-testing.net/news/show-127661.html" target="_blank">汽车测试网 — 清科灵境获全国信标委人工智能分委会长三角区域工作组副组长单位 (2026-05-15)</a></li>
+        </ol>
+      </div>
+    </article>
+  </div>
+</div>
+<div class="page-footer">具身智能Wiki · 页面创建于 2026-06-12 · <a href="../index.html">返回主索引</a></div>
+</body>
+</html>

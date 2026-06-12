@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>千里科技 — 具身智能Wiki</title><style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style></head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> › <span>千里科技</span></div>
+  <div class="wiki-header"><h1>千里科技</h1><div class="subtitle">重庆千里科技股份有限公司 · A股上市（601777） · AI+车战略 · 吉利系</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#team">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financials">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#misc">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#a1">2.1 团队背景与战略选择</a></li>
+        <li class="toc-lvl4"><a href="#a2">2.2 吉利生态中的定位</a></li>
+        <li class="toc-lvl4"><a href="#a3">2.3 与一星科技的关系</a></li>
+        <li class="toc-lvl4"><a href="#a4">2.4 具身智能的间接关联</a></li>
+        <li class="toc-lvl4"><a href="#a5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#a6">2.6 其他观察与分析</a></li>
+        <li class="toc-lvl2"><a href="#references">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">千里科技</div>
+        <div class="ib-section">基本信息</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">重庆千里科技股份有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">英文名</div><div class="ib-value">Qianli Technology (AFARI)</div></div>
+        <div class="ib-row"><div class="ib-label">前身</div><div class="ib-value">力帆股份（2025年2月更名）</div></div>
+        <div class="ib-row"><div class="ib-label">注册地</div><div class="ib-value">重庆市两江新区</div></div>
+        <div class="ib-row"><div class="ib-label">上市信息</div><div class="ib-value">上交所主板：601777；已递表港交所</div></div>
+        <div class="ib-row"><div class="ib-label">董事长</div><div class="ib-value">印奇（旷视科技创始人）</div></div>
+        <div class="ib-row"><div class="ib-label">联席董事长</div><div class="ib-value">赵明（前荣耀总裁）</div></div>
+        <div class="ib-row"><div class="ib-label">A股市值</div><div class="ib-value">约500-520亿元</div></div>
+        <div class="ib-section">业务定位</div>
+        <div class="ib-row"><div class="ib-label">核心战略</div><div class="ib-value">"AI+车"，聚焦智能驾驶、智能座舱、Robotaxi</div></div>
+        <div class="ib-row"><div class="ib-label">具身智能业务</div><div class="ib-value">官方多次声明"暂未涉及机器人业务"<sup><a href="#ref5">[5]</a></sup></div></div>
+        <div class="ib-section">2025年财务（年报）</div>
+        <div class="ib-row"><div class="ib-label">营收</div><div class="ib-value">约99.99亿元（+42.13%）</div></div>
+        <div class="ib-row"><div class="ib-label">智能驾驶收入</div><div class="ib-value">约3.5亿元（占总收入3.5%）</div></div>
+        <div class="ib-row"><div class="ib-label">归母净利润</div><div class="ib-value">约0.84亿元（+110.93%）</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">赛道</div><div class="ib-value">AI+智能驾驶 / 具身智能生态关联方</div></div>
+        <div class="ib-row"><div class="ib-label">出身</div><div class="ib-value">吉利系 · 旷视系</div></div>
+        <div class="ib-row"><div class="ib-label">阶段</div><div class="ib-value">上市公司 / 港股IPO筹备中</div></div>
+      </aside>
+
+      <p class="article-intro">千里科技（重庆千里科技股份有限公司，A股代码：601777）前身为力帆股份，2020年破产重整后由吉利系资本与重庆国资接手，2025年2月正式更名。公司由旷视科技创始人印奇（清华姚班毕业）出任董事长，定位从传统汽车制造全面转向"AI+车"战略，核心业务涵盖智能驾驶、智能座舱和Robotaxi<sup><a href="#ref1">[1]</a></sup>。公司2025年营收逼近百亿，A股市值约500亿元，正在推进"<strong>A+H</strong>"双资本平台布局<sup><a href="#ref2">[2]</a></sup>。</p>
+      <div class="callout">
+        <div class="callout-title">⚠ 纳入本Wiki的说明</div>
+        <p>千里科技并非直接的具身智能企业——公司多次在投资者互动平台声明"聚焦AI+车核心战略，暂未涉及机器人业务"<sup><a href="#ref5">[5]</a></sup><sup><a href="#ref6">[6]</a></sup>。但因其（1）董事长印奇兼任阶跃星辰董事长，而阶跃星辰将具身机器人列为核心应用场景之一<sup><a href="#ref7">[7]</a></sup>；（2）作为吉利系核心AI平台，曾与吉利系旗下的一星机器人（具身智能创业公司）存在战略层面的资源整合关系<sup><a href="#ref8">[8]</a></sup>，故作为"具身智能生态关联方"纳入本Wiki。</p>
+      </div>
+
+      <h2 id="facts">1 事实层</h2>
+      <p style="font-size:0.82rem;color:#54595d;margin-bottom:10px;">来源可靠性标注：<span class="tag tag-info">年报/公告</span> = 上市公司披露文件 · <span class="tag tag-info">媒体报道</span> = 第三方独立报道 · <span class="tag tag-info">官网/公司自述</span> = 公司官方披露 · <span class="tag tag-info">工商登记</span> = 企业信用信息系统 · <span class="tag tag-info">行业机构</span> = 第三方行业报告</p>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper"><table class="wikitable infotable">
+        <tr><th>项目</th><th>内容</th></tr>
+        <tr><td>公司全称</td><td>重庆千里科技股份有限公司</td></tr>
+        <tr><td>股票代码</td><td>601777.SH（上交所主板）</td></tr>
+        <tr><td>前身</td><td>力帆科技（集团）股份有限公司（力帆股份），2025年2月更名<sup><a href="#ref9">[9]</a></sup></td></tr>
+        <tr><td>成立/上市时间</td><td>力帆成立于1992年，2010年A股上市；2020年破产重整</td></tr>
+        <tr><td>注册地</td><td>重庆市两江新区蔡家岗镇凤栖路16号</td></tr>
+        <tr><td>董事长</td><td>印奇（曾任旷视科技CEO，清华姚班毕业）</td></tr>
+        <tr><td>联席董事长</td><td>赵明（前荣耀总裁，2026年4月首次公开亮相）<sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>核心战略</td><td>"AI+车"：智能驾驶 + 智能座舱 + Robotaxi</td></tr>
+        <tr><td>品牌</td><td>AFARI；新汽车品牌"游心"（Pallade，20-40万元中高端）</td></tr>
+      </table></div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>时间</th><th>事件</th></tr>
+        <tr><td>1992年</td><td>力帆股份前身成立</td></tr>
+        <tr><td>2010年</td><td>A股上市</td></tr>
+        <tr><td>2020年</td><td>破产重整，吉利系资本与重庆国资接手<sup><a href="#ref8">[8]</a></sup></td></tr>
+        <tr><td>2025年2月</td><td>正式更名为"千里科技"，印奇出任董事长<sup><a href="#ref9">[9]</a></sup></td></tr>
+        <tr><td>2025年6月</td><td>发布"千里智驾1.0" L2+级智能辅助驾驶方案<sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>2025年9月</td><td>品牌发布会，李书福亲自为印奇站台；奔驰以13.39亿元受让3%股份<sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>2025年10月</td><td>首次向港交所递表，拟实现A+H双资本平台布局<sup><a href="#ref2">[2]</a></sup></td></tr>
+        <tr><td>2025年全年</td><td>营收约99.99亿元（+42.13%），归母净利润约0.84亿元<sup><a href="#ref3">[3]</a></sup></td></tr>
+        <tr><td>2026年1月</td><td>"千里浩瀚"高阶智驾系统亮相CES；印奇兼任阶跃星辰董事长<sup><a href="#ref7">[7]</a></sup></td></tr>
+        <tr><td>2026年4月</td><td>北京车展AI战略发布会，赵明首次亮相；二次递表港交所<sup><a href="#ref1">[1]</a></sup></td></tr>
+      </table></div>
+
+      <h3 id="team">1.2 创始人及核心团队</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+        <tr><td>董事长</td><td>印奇</td><td>清华大学姚期智班毕业，人工智能领域知名创业者。2011年创立旷视科技（Megvii），曾为"AI四小龙"之一。2025年出任千里科技董事长，主导公司从传统车企向AI公司转型。2026年1月起同时担任阶跃星辰董事长<sup><a href="#ref7">[7]</a></sup><sup><a href="#ref9">[9]</a></sup></td></tr>
+        <tr><td>联席董事长</td><td>赵明</td><td>前荣耀（Honor）总裁，2026年4月北京车展期间首次以联席董事长身份公开亮相，负责公司战略与品牌<sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>控股股东</td><td>满江红基金</td><td>重庆国资与吉利控股共同出资设立，持股29.85%；实际控制人为重庆两江新区管委会<sup><a href="#ref3">[3]</a></sup></td></tr>
+      </table></div>
+      <p>团队体现"AI创业明星+产业老兵"的复合结构。印奇将旷视科技在计算机视觉和深度学习领域的技术积累注入千里科技，赵明则带来消费电子品牌运营和渠道管理经验。公司董事会由9人扩充至11人（增加1名职工董事和1名独立董事），2025年已取消监事会<sup><a href="#ref3">[3]</a></sup>。</p>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <p>公司为A股上市公司，持续通过资本市场融资。2025年10月首次向港交所递表（2026年4月二次递表），拟实现"A+H"双平台布局，中金公司为独家保荐人。港股IPO募资计划用于AI驱动战略实施、研发能力增强、产品与解决方案开发、上游产业链整合<sup><a href="#ref2">[2]</a></sup>。</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>股东</th><th>持股比例</th><th>背景</th></tr>
+        <tr><td>满江红基金</td><td>29.85%</td><td>重庆两江新区管委会实际控制，重庆国资+吉利共同出资<sup><a href="#ref3">[3]</a></sup></td></tr>
+        <tr><td>印奇</td><td>约19.91%</td><td>董事长，通过持股平台间接持有<sup><a href="#ref4">[4]</a></sup></td></tr>
+        <tr><td>重庆江河汇（吉利系）</td><td>17.91%</td><td>吉利控股关联方<sup><a href="#ref4">[4]</a></sup></td></tr>
+        <tr><td>梅赛德斯-奔驰</td><td>3%</td><td>2025年9月以13.39亿元受让，第五大股东<sup><a href="#ref1">[1]</a></sup></td></tr>
+      </table></div>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <p>公司以AI技术创新为核心驱动力，技术路线聚焦"AI+车"场景，核心架构为<strong>RLM（强化学习-多模态）模型</strong>，公司自称是"首家在智能驾驶场景中实现端到端RLM大规模部署的企业"<sup><a href="#ref1">[1]</a></sup>。</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>维度</th><th>描述</th></tr>
+        <tr><td>总体AI技术路线</td><td>以RLM端到端模型为核心底座，融合强化学习、世界模型与大语言模型，正从端到端范式向VLA（视觉语言动作）范式迭代升级；搭载吉利星睿智算中心2.0（23.5 EFLOPS算力）<sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>智能驾驶</td><td>覆盖L2至L4全栈式方案；"千里浩瀚"高阶智驾系统已亮相2026年CES；L3级方案已形成车型商用方案并配合工信部准入认证<sup><a href="#ref3">[3]</a></sup></td></tr>
+        <tr><td>智能座舱</td><td>以AI Agent为核心，打造"千里座舱"架构；业界首个AGI L3智能体级别座舱系统（据灼识咨询）；已完成ASC100智能座舱平台研发<sup><a href="#ref3">[3]</a></sup></td></tr>
+        <tr><td>Robotaxi</td><td>深度整合高阶自动驾驶、智能座舱及智慧运营平台，构建"车-驾-舱-云-图"协同一体化方案；计划2026年H2推出L4级方案<sup><a href="#ref3">[3]</a></sup></td></tr>
+        <tr><td>大模型合作</td><td>与阶跃星辰联合研发"原生智驾基座大模型"（2026年4月达成全面战略合作）；印奇同时担任两家公司董事长<sup><a href="#ref7">[7]</a></sup></td></tr>
+      </table></div>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>产品</th><th>类别</th><th>核心能力</th></tr>
+        <tr><td>千里智驾 1.0</td><td>L2+级智能辅助驾驶</td><td>2025年6月发布，支持城市NOA功能，已规模化落地<sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>千里浩瀚（G-ASD）</td><td>高阶智能驾驶系统</td><td>2026年1月CES亮相，覆盖极氪、银河、领克等品牌<sup><a href="#ref3">[3]</a></sup></td></tr>
+        <tr><td>ASC100 智能座舱</td><td>AI座舱平台</td><td>以AI Agent为核心，多模态交互（模糊语义理解、情绪识别等）<sup><a href="#ref3">[3]</a></sup></td></tr>
+        <tr><td>游心（Pallade）</td><td>新汽车品牌</td><td>定位20-40万元中高端市场，作为AI技术展示窗口<sup><a href="#ref1">[1]</a></sup></td></tr>
+      </table></div>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>场景领域</th><th>具体应用</th><th>典型落地</th></tr>
+        <tr><td>智能驾驶（乘用车）</td><td>L2+/L3智驾辅助、城市NOA</td><td>覆盖17款车型，累计装车近50万辆（截至2026年4月）<sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>Robotaxi</td><td>L4级自动驾驶出行</td><td>成都等城市道路测试与准入申报中；目标2027年推出专用车辆，2030年全球30万辆<sup><a href="#ref3">[3]</a></sup></td></tr>
+        <tr><td>智能座舱</td><td>AI原生交互座舱</td><td>ASC100平台研发完成，ASC200升级研发中<sup><a href="#ref3">[3]</a></sup></td></tr>
+        <tr><td>汽车制造</td><td>乘用车、摩托车制造与销售</td><td>国内+海外80余国，2025年汽车收入64.4亿、摩托车收入28.8亿<sup><a href="#ref3">[3]</a></sup></td></tr>
+        <tr><td>具身智能（间接）</td><td>通过阶跃星辰的具身机器人应用场景</td><td>阶跃星辰将"具身机器人"列为核心应用场景之一<sup><a href="#ref7">[7]</a></sup></td></tr>
+      </table></div>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <p>智能驾驶方面，截至2026年4月智驾方案累计装车近50万辆，覆盖17款车型，辅助驾驶激活率92%<sup><a href="#ref1">[1]</a></sup>。2026年目标智驾装车100-130万辆，2028年累计目标800万辆。已与北汽等洽谈合资（据21世纪经济报道），智能驾驶业务2025年实现收入约3.5亿元（占总收入约3.5%）。智能座舱方面，ASC100平台已完成研发，正推进ASC200升级和规模化量产。Robotaxi方面，计划2026年H2推出L4方案，18个月内在全球10座城市规模化运营<sup><a href="#ref3">[3]</a></sup>。终端业务方面，汽车出口至意大利、西班牙、泰国、柬埔寨等，摩托车覆盖全球80余个国家和地区。</p>
+
+      <h3 id="financials">1.8 财务数据</h3>
+      <p>以下数据来自公司2025年年度报告（2026年4月7日披露，天职国际审计，标准无保留意见）<sup><a href="#ref3">[3]</a></sup>：</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>指标</th><th>2025年</th><th>同比</th></tr>
+        <tr><td>营业收入</td><td>约99.99亿元</td><td>+42.13%</td></tr>
+        <tr><td>其中：汽车业务收入</td><td>约64.40亿元</td><td>—</td></tr>
+        <tr><td>其中：摩托车和通机收入</td><td>约28.79亿元</td><td>—</td></tr>
+        <tr><td>其中：智能驾驶业务收入</td><td>约3.50亿元</td><td>—</td></tr>
+        <tr><td>归母净利润</td><td>约0.84亿元</td><td>+110.93%</td></tr>
+        <tr><td>扣非净利润</td><td>仍为负值</td><td>（主要因研发投入增加）</td></tr>
+        <tr><td>母公司未分配利润</td><td>-9.48亿元</td><td>不具备分红条件</td></tr>
+        <tr><td>A股市值（2026年）</td><td>约500-520亿元</td><td>—</td></tr>
+      </table></div>
+      <p>注：公司2025年度计提各项资产减值及确认公允价值变动损失合计约4.78亿元<sup><a href="#ref3">[3]</a></sup>。传统汽车业务毛利率约2.8%，技术解决方案毛利率约30.4%<sup><a href="#ref1">[1]</a></sup>。公司连续三年净亏损（累计约9.12亿元），研发投入高速增长且超50%被资本化处理<sup><a href="#ref4">[4]</a></sup>。</p>
+
+      <h3 id="misc">1.9 其他信息</h3>
+      <ul>
+        <li>公司品牌AFARI，源自阿拉伯语"旅程"；旗下新汽车品牌"游心"（Pallade），定位20-40万元中高端市场<sup><a href="#ref1">[1]</a></sup></li>
+        <li>李书福2025年9月在品牌发布会上公开为印奇站台，称"未来是属于印奇的"<sup><a href="#ref8">[8]</a></sup></li>
+        <li>公司存在对吉利的深度依赖：吉利同时是第一大客户（收入占比约30%）和第一大供应商（采购占比约30%-50%）<sup><a href="#ref4">[4]</a></sup></li>
+        <li>印奇同时担任阶跃星辰董事长（2026年1月起），阶跃星辰将"具身机器人"列为核心应用场景之一，千里科技因此与具身智能赛道存在间接关联<sup><a href="#ref7">[7]</a></sup></li>
+        <li>公司多次在投资者互动平台澄清"暂未涉及机器人业务"，2025年5月和6月连续两次做出相同表态<sup><a href="#ref5">[5]</a></sup><sup><a href="#ref6">[6]</a></sup></li>
+        <li>2026年目标：智驾装车100-130万辆，Robotaxi 2027年推出专用车辆，2030年全球30万辆<sup><a href="#ref1">[1]</a></sup></li>
+      </ul>
+
+            <h2 id="analysis">2 分析层</h2>
+      <p style="font-size:0.82rem;color:#54595d;margin-bottom:10px;">分析层数据综合来自 <span class="tag tag-info">媒体报道</span>（第三方独立报道）、<span class="tag tag-info">年报/公告</span>（上市公司披露文件）、<span class="tag tag-info">行业机构</span>（第三方行业报告）。公司自述数据与独立验证数据已在事实层标注区分，分析层观点仅供参考。</p>
+
+      <div class="analysis-block" id="a1">
+        <h4>2.1 团队背景与战略选择</h4>
+        <p>印奇的履历是理解千里科技战略的关键——清华姚班、旷视科技创始人、"AI四小龙"代表人物。他并非传统汽车行业出身，而是纯粹的AI技术创业者。这一背景决定了千里科技与传统车企转型（如比亚迪的电动化转型）本质不同：千里科技是以AI技术为锚点重新定义汽车，而非在汽车框架内添加AI功能。赵明的加入（前荣耀总裁）补充了消费电子级的品牌运营和渠道能力，使团队形成"AI技术+消费品牌"的复合结构。但团队缺乏具身智能/机器人领域的核心人才，这可能是公司迄今未实质推进机器人业务的原因之一。</p>
+      </div>
+
+      <div class="analysis-block" id="a2">
+        <h4>2.2 吉利生态中的定位</h4>
+        <p>千里科技不是一家独立的AI公司，而是吉利"一个吉利"大战略中的关键棋子。《台州宣言》（2024年底）明确了吉利集中资源、避免内部竞争的战略方向。在此框架下，千里科技被设定为"大脑"角色——负责算法和软件；吉利本体负责"身体"——整车制造和硬件。这一分工让千里科技享有吉利体系内的技术和场景资源（星睿智算中心、车型平台、出行数据），但也意味着其命运深度绑定了吉利的战略意志。对吉利高达30%-50%的采购依赖既是护城河也是风险点。</p>
+      </div>
+
+      <div class="analysis-block" id="a3">
+        <h4>2.3 与一星科技的关系</h4>
+        <p>一星科技（苏州一星机器人有限公司，OneStar）是吉利创始人李书福之子李星星于2025年5月创立的具身智能公司，定位通用人形机器人，发布过"星轮1号"轮式双臂机器人。成立4个月内完成两轮融资（亲友轮+种子轮数亿元，投资方包括BV百度风投、银河通用等），研发团队来自斯坦福、伯克利、清华等名校<sup><a href="#ref8">[8]</a></sup><sup><a href="#ref10">[10]</a></sup>。</p>
+        <p>2025年10月，一星机器人在获得数亿元种子轮融资仅一个月后突然解散。直接原因有两个层面：其一，千里科技在2025年9月的品牌发布会上宣布了新定位"AI+车+机器人"，与一星的业务方向直接重叠；其二，吉利在《台州宣言》框架下推进"一个吉利"战略整合，决定将资源集中于千里科技作为唯一的"AI+机器人"承载平台<sup><a href="#ref8">[8]</a></sup>。</p>
+        <p>这起事件的深层含义是：在吉利的新版图中，即便是创始人之子创立的公司，如果与集团核心战略平台形成竞争，也将被果断舍弃。李书福选择站台印奇而非自己的儿子，说明吉利的AI战略已完全围绕千里科技展开<sup><a href="#ref8">[8]</a></sup>。然而值得注意的是，一星解散后，千里科技并未实质推进机器人业务，反而多次声明"暂未涉及机器人"——市场曾猜测千里科技将接收一星的机器人资产和团队，但至今（2026年6月）尚未发生<sup><a href="#ref5">[5]</a></sup><sup><a href="#ref6">[6]</a></sup>。</p>
+        <p>两者的关系可总结为：一星机器人是吉利在具身智能赛道的第一次尝试，而千里科技是吉利最终选择的承载方——但千里科技目前仍将资源集中于智能驾驶，具身智能的实质性推进尚未开始。</p>
+      </div>
+
+      <div class="analysis-block" id="a4">
+        <h4>2.4 具身智能的间接关联路径</h4>
+        <p>千里科技与具身智能之间的联系目前主要通过两条间接路径存在。第一条路径是印奇兼任阶跃星辰董事长：阶跃星辰明确将"具身机器人"列为核心应用场景之一，这意味着千里科技的决策层对具身智能赛道有直接的认知和资源触点<sup><a href="#ref7">[7]</a></sup>。第二条路径是吉利生态的协同潜力：千里科技的智驾算法（感知、规划、决策）与具身智能的通用能力（环境理解、任务规划、动作执行）在技术栈上具有可迁移性——例如VLA模型（视觉-语言-动作）既是高阶智驾的核心范式，也是具身智能机器人的核心技术路线<sup><a href="#ref1">[1]</a></sup>。</p>
+        <p>但必须指出的是，这两条路径目前都是"可能性的连接"而非"已发生的业务"。千里科技在2025年年报中的"未来发展规划"部分并未提及机器人或具身智能，所有技术描述均围绕智驾、智舱、Robotaxi展开<sup><a href="#ref3">[3]</a></sup>。将其纳入具身智能Wiki更多是基于战略关联性的前瞻判断，而非现有业务的直接覆盖。</p>
+      </div>
+
+      <div class="analysis-block" id="a5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>千里科技的核心取舍很清晰：放弃作为独立汽车品牌的大规模硬件制造（毛利率仅2.8%的传统汽车业务正在被边缘化），转向以AI软件为核心的解决方案供应商角色（技术解决方案毛利率30.4%）。智能驾驶收入占比目前仅3.5%，但增长空间和利润率远高于传统业务。从具身智能的视角看，千里科技选择了"先做好车上的AI，再考虑车外的AI"——这一路径与特斯拉（先做车、后做人形机器人Optimus）有相似之处。Robotaxi是其中最关键的"过渡产品"：它既是智驾技术的终极应用场景，又是从"轮式机器人"走向"通用机器人"的认知跳板。如果千里科技未来真正进入具身智能领域，Robotaxi的运营经验（调度、安全、人机交互）将提供重要的迁移基础。</p>
+      </div>
+
+      <div class="analysis-block" id="a6">
+        <h4>2.6 其他重要观察与分析</h4>
+        <p>几点值得关注。其一，千里科技的估值逻辑目前完全基于智驾和Robotaxi叙事（A股市值约500亿，市盈率超1100倍），具身智能尚未纳入估值框架。如果公司未来正式切入具身智能赛道，可能触发显著的估值重估。其二，奔驰以13.39亿元入股3%，意味着国际豪华车品牌认可了千里科技的AI技术能力，这可能为未来的技术出海和具身智能海外合作打开通道。其三，千里科技对吉利的高度依赖（收入+采购双30%+）是一个结构性风险——如果吉利自身智驾能力提升或引入其他供应商，千里科技将面临重大挑战。其四，一星机器人解散后其核心团队（如CTO丁琰等从吉利AI Lab挖来的研究员）的去向尚未公开，如果这些人才被千里科技吸纳，将补足其具身智能人才短板；如果流失到竞争对手，则吉利的"一个吉利"整合可能得不偿失。</p>
+      </div>
+
+      <h2 id="references">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li id="ref1"><a href="https://www.tmtpost.com/7736362.html" target="_blank">从破产边缘到智驾新星，千里科技赴港求索新估值 — 钛媒体</a> <span class="tag tag-info">媒体报道</span></li>
+          <li id="ref2"><a href="https://fund.eastmoney.com/a/202510233542121472.html" target="_blank">千里科技赴港IPO，上下游对吉利皆存明显依赖 — 东方财富</a> <span class="tag tag-info">媒体报道</span></li>
+          <li id="ref3"><a href="https://paper.cnstock.com/html/2026-04/07/content_2196813.htm" target="_blank">重庆千里科技股份有限公司2025年年度报告摘要 — 上海证券报，2026.04.07</a> <span class="tag tag-info">年报/公告</span></li>
+          <li id="ref4"><a href="https://wap.eastmoney.com/a/202510203538749762.html" target="_blank">千里科技拟赴港IPO，构建"A+H"双资本布局 — 东方财富</a> <span class="tag tag-info">媒体报道</span></li>
+          <li id="ref5"><a href="http://yuanchuang.10jqka.com.cn/20250630/c669271003.shtml" target="_blank">千里科技：公司聚焦"AI+车"核心战略，暂未涉及机器人业务 — 同花顺，2025.06.30</a> <span class="tag tag-info">官网/公司自述</span></li>
+          <li id="ref6"><a href="http://yuanchuang.10jqka.com.cn/20250530/c668563039.shtml" target="_blank">千里科技：公司暂未涉及机器人业务 — 同花顺，2025.05.30</a> <span class="tag tag-info">官网/公司自述</span></li>
+          <li id="ref7"><a href="https://finance.cnr.cn/ycbd/20260126/t20260126_527506326.shtml" target="_blank">千里科技董事长印奇出任阶跃星辰董事长 负责整体战略节奏与技术方向制定 — 央广网，2026.01.26</a> <span class="tag tag-info">媒体报道</span></li>
+          <li id="ref8"><a href="https://36kr.com/p/3513208527690117" target="_blank">吉利战略收缩，李书福的儿子也不能例外 — 36氪</a> <span class="tag tag-info">媒体报道</span></li>
+          <li id="ref9"><a href="https://36kr.com/p/3521556606262408" target="_blank">印奇转型千里科技 — 36氪</a> <span class="tag tag-info">媒体报道</span></li>
+          <li id="ref10"><a href="https://m.jiemian.com/article/13477932_sina.html" target="_blank">李书福儿子创立的一星机器人被曝解散，一个月前才获数亿融资 — 界面新闻，2025.10</a> <span class="tag tag-info">媒体报道</span></li>
+          <li id="ref11"><a href="https://finance.eastmoney.com/a/202510183537942663.html" target="_blank">明星团队+数亿元融资 具身智能"新星"被曝"闪电解散" — 东方财富</a> <span class="tag tag-info">媒体报道</span></li>
+          <li id="ref12"><a href="https://www.thepaper.cn/newsDetail_forward_31798942" target="_blank">吉利战略收缩，李书福的儿子也不能例外 — 澎湃新闻</a> <span class="tag tag-info">媒体报道</span></li>
+          <li id="ref13"><a href="https://wap.stockstar.com/detail/RB2026040700013937" target="_blank">千里科技（601777）2025年度管理层讨论与分析 — 证券之星</a> <span class="tag tag-info">年报/公告</span></li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">此页面基于公开信息整理，数据截至2026年6月。千里科技官方声明暂未涉及机器人业务，本页作为具身智能生态关联方收录。重庆千里科技股份有限公司 · 具身智能Wiki</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>
