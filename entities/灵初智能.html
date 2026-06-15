@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>灵初智能 — 具身智能Wiki</title><style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style></head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> <span class="breadcrumb-sep">›</span> <span>灵初智能</span></div>
+  <div class="wiki-header"><h1>灵初智能</h1><div class="subtitle">Proto-Sentient Intelligence（PSI Bot） · 2024年9月成立 · 北大联合实验室 · 具身智能数据入口/灵巧操作</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#team">1.2 核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financial">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl3"><a href="#a21">2.1 团队背景与场景匹配度</a></li>
+        <li class="toc-lvl3"><a href="#a22">2.2 技术路线与场景适配性</a></li>
+        <li class="toc-lvl3"><a href="#a23">2.3 股东/资本结构对战略的影响</a></li>
+        <li class="toc-lvl3"><a href="#a24">2.4 试错过程与路径调整</a></li>
+        <li class="toc-lvl3"><a href="#a25">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl3"><a href="#a26">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#refs">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">灵初智能</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">上海灵初智能科技有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">英文名</div><div class="ib-value">Proto-Sentient Intelligence（PSI Bot）</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2024年9月<sup><a href="#ref1">[1]</a></sup></div></div>
+        <div class="ib-row"><div class="ib-label">总部地点</div><div class="ib-value">中国上海市徐汇区（2026年3月迁入）</div></div>
+        <div class="ib-row"><div class="ib-label">法定代表人</div><div class="ib-value">王启斌<sup><a href="#ref1">[1]</a></sup></div></div>
+        <div class="ib-row"><div class="ib-label">创始人/CEO</div><div class="ib-value">王启斌（博士）</div></div>
+        <div class="ib-row"><div class="ib-label">联合创始人（硬件）</div><div class="ib-value">陈源培（00后）</div></div>
+        <div class="ib-row"><div class="ib-label">联合创始人（算法）</div><div class="ib-value">柴晓杰（博士）</div></div>
+        <div class="ib-row"><div class="ib-label">首席科学家</div><div class="ib-value">杨耀东（北大助理教授/博雅学者）</div></div>
+        <div class="ib-section">融资数据</div>
+        <div class="ib-row"><div class="ib-label">累计融资</div><div class="ib-value">超20亿元人民币<sup><a href="#ref1">[1]</a></sup></div></div>
+        <div class="ib-row"><div class="ib-label">天使+Pre-A</div><div class="ib-value">约20亿元（2026年3月）</div></div>
+        <div class="ib-row"><div class="ib-label">领投方</div><div class="ib-value">国开金融、国中资本、央视融媒体产业投资基金、徐汇资本</div></div>
+        <div class="ib-row"><div class="ib-label">种子轮方</div><div class="ib-value">高瓴创投、蓝驰创投、智元机器人</div></div>
+        <div class="ib-row"><div class="ib-label">估值参考</div><div class="ib-value">近独角兽水平（一年增长约6-7倍）<sup><a href="#ref9">[9]</a></sup></div></div>
+        <div class="ib-section">网站</div>
+        <div class="ib-row"><div class="ib-label">官网</div><div class="ib-value"><a href="https://www.psibot.ai">psibot.ai</a></div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">业务类型</div><div class="ib-value"><span class="tag tag-info">具身智能数据基础设施</span><span class="tag">灵巧操作</span><span class="tag">北大系</span><span class="tag">VLA+RL</span></div></div>
+      </aside>
+
+      <p class="article-intro"><strong>灵初智能</strong>（Proto-Sentient Intelligence，简称 PSI Bot）是一家成立于2024年9月的具身智能公司，总部位于上海市徐汇区（原北京灵初智能，2026年3月迁沪更名）。公司由前京东机器人/云迹科技负责人王启斌博士创立，联合创始人包括斯坦福访问学者（00后）陈源培、前腾讯/阿里/京东算法专家柴晓杰，首席科学家为北京大学人工智能研究院助理教授杨耀东。灵初智能定位为具身智能时代的<strong>"卖铲人"</strong>——以<strong>"数据+模型"双轮驱动</strong>，通过自研低成本数据采集引擎（Psi-SynEngine）和大规模人类手部操作数据积累，构建端到端VLA强化学习模型，解决具身智能的<strong>灵巧操作和数据瓶颈</strong>。截至2026年，公司累计融资超20亿元人民币，投资方包括国开金融、国中资本、央视融媒体基金、徐汇资本等"国家队"及地方国资。<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref2">[2]</a></sup></p>
+
+      <h2 id="facts">1 事实层</h2>
+      <p style="font-size:0.82rem;color:#54595d;margin-bottom:10px;">来源可靠性标注：<span class="tag tag-info">公司自述</span> = 公司官网/官方发布 · <span class="tag tag-info">媒体报道</span> = 第三方独立报道 · <span class="tag tag-info">投资方确认</span> = 投资机构公开发言 · <span class="tag tag-info">北大官方</span> = 北京大学相关公告</p>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper">
+      <table class="wikitable infotable">
+        <tr><th>项目</th><th>内容</th></tr>
+        <tr><td>公司全称</td><td>上海灵初智能科技有限公司<sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>成立时间</td><td>2024年9月11日<sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>总部地点</td><td>上海市徐汇区（2026年3月由北京迁入）<sup><a href="#ref2">[2]</a></sup></td></tr>
+        <tr><td>法定代表人</td><td>王启斌<sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>创始人/CEO</td><td>王启斌（博士）<sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>联合创始人</td><td>陈源培（硬件）、柴晓杰（算法）<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref3">[3]</a></sup></td></tr>
+        <tr><td>首席科学家</td><td>杨耀东（北京大学人工智能研究院助理教授/博雅学者）<sup><a href="#ref3">[3]</a></sup></td></tr>
+        <tr><td>上市状态</td><td>未上市</td></tr>
+        <tr><td>官网</td><td><a href="https://www.psibot.ai">psibot.ai</a></td></tr>
+      </table>
+      </div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>时间</th><th>事件</th><th>来源</th></tr>
+        <tr><td>2024年9月</td><td>灵初智能正式成立（原名北京灵初智能）<sup><a href="#ref1">[1]</a></sup></td><td>媒体报道</td></tr>
+        <tr><td>2024年11月</td><td>完成种子轮融资（高瓴创投、蓝驰创投、智元机器人）<sup><a href="#ref4">[4]</a></sup></td><td>媒体报道</td></tr>
+        <tr><td>2025年</td><td>发布行业首个端到端强化学习具身模型Psi R0/R0.5/R1，率先实现长程任务<sup><a href="#ref1">[1]</a></sup></td><td>公司自述</td></tr>
+        <tr><td>2025年9月</td><td>工博会联合西门子展示智能拣货打包机器人系统<sup><a href="#ref5">[5]</a></sup></td><td>媒体报道</td></tr>
+        <tr><td>2025年服贸会</td><td>联合美团展示灵巧手技术<sup><a href="#ref5">[5]</a></sup></td><td>媒体报道</td></tr>
+        <tr><td>2026年1月</td><td>与HashKey CaaS达成战略合作，共建AI自主支付基础设施<sup><a href="#ref6">[6]</a></sup></td><td>媒体报道</td></tr>
+        <tr><td>2026年3月</td><td>完成天使轮及Pre-A轮合计约20亿元融资，"国家队"及多地国资入场<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref2">[2]</a></sup></td><td>媒体报道</td></tr>
+        <tr><td>2026年3月</td><td>正式落地上海市徐汇区<sup><a href="#ref2">[2]</a></sup></td><td>媒体报道</td></tr>
+        <tr><td>2026年4月10日</td><td>发布Psi-R2和Psi-W0双模型，Psi-R2在MolmoSpaces斩获全球第一；开源首批1000小时人类手部操作全模态数据集<sup><a href="#ref7">[7]</a></sup></td><td>媒体报道</td></tr>
+        <tr><td>2026年4月</td><td>发布自研整机ψ-SynRobot、灵巧手Ψ-SynHand；获国投先导、京西瑞瓴新一轮投资<sup><a href="#ref8">[8]</a></sup></td><td>媒体报道</td></tr>
+        <tr><td>2026年4月</td><td>与清雁科技、星海图联袂入驻秦皇岛小岛空间智能机器人产业基地<sup><a href="#ref5">[5]</a></sup></td><td>媒体报道</td></tr>
+      </table>
+      </div>
+
+      <h3 id="team">1.2 核心团队</h3>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>角色</th><th>姓名</th><th>背景/履历</th><th>来源</th></tr>
+        <tr>
+          <td>创始人/CEO</td>
+          <td>王启斌</td>
+          <td>博士学历，拥有<strong>20余年</strong>机器人与消费电子领域从业经验。曾任职于<strong>京东机器人</strong>、<strong>云迹科技</strong>、<strong>灵动科技</strong>、<strong>黑莓（BlackBerry）</strong>及<strong>Sonos</strong>。在手机、智能音箱、机器人领域多次实现产品从定义、开发、上市到全球化的<strong>0-1-N产业闭环</strong>。深谙机器人商业化落地，被称为行业"老兵"。<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref3">[3]</a></sup></td>
+          <td>媒体报道</td>
+        </tr>
+        <tr>
+          <td>联合创始人（硬件）</td>
+          <td>陈源培</td>
+          <td><strong>2001年出生</strong>（00后），北京大学人工智能研究院硕士（师从杨耀东），<strong>斯坦福大学访问学者</strong>（师从李飞飞、Karen Liu）。曾获华为<strong>"天才少年"计划邀请</strong>但拒绝高薪选择创业。全球首次实现利用强化学习在真实世界<strong>同时控制双臂双手多技能操作</strong>。研究方向：强化学习驱动灵巧手完成复杂长程任务与类人操作，人类数据迁移到机器人系统。<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref3">[3]</a></sup></td>
+          <td>媒体报道</td>
+        </tr>
+        <tr>
+          <td>联合创始人（算法）</td>
+          <td>柴晓杰</td>
+          <td>博士学历，拥有<strong>15年以上</strong>机器人及无人驾驶领域从业经验。曾任职于<strong>腾讯、阿里巴巴、京东</strong>等头部企业核心技术岗位。擅长算法、仿真、工程全栈技术，拥有L4产品落地的数据闭环经验。<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref3">[3]</a></sup></td>
+          <td>媒体报道</td>
+        </tr>
+        <tr>
+          <td>首席科学家</td>
+          <td>杨耀东</td>
+          <td><strong>北京大学</strong>人工智能研究院<strong>助理教授（博雅学者）</strong>。博士毕业于<strong>UCL（伦敦大学学院）</strong>——现代深度强化学习的发源地。带领华人团队研发多体强化学习算法首登<strong>Nature机器智能子刊</strong>，获<strong>NeurIPS 2022具身灵巧操作冠军</strong>。公司与北京大学共建"<strong>北大-灵初智能具身灵巧操作联合实验室</strong>"，杨耀东担任首席科学家。技术团队还包括上海交大人工智能学院温颖副教授等。<sup><a href="#ref3">[3]</a></sup></td>
+          <td>媒体报道/北大官方</td>
+        </tr>
+      </table>
+      </div>
+      <p>团队被称为"<strong>科学家密度最高</strong>"的具身智能公司之一，跨越70、80、90、00后，形成"<strong>7890六边形战队</strong>"——兼具学术深度、产品经验与商业化落地能力。<sup><a href="#ref3">[3]</a></sup></p>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>轮次</th><th>时间</th><th>金额</th><th>主要投资方</th><th>来源</th></tr>
+        <tr>
+          <td>种子轮</td><td>2024年11月</td><td>未披露</td>
+          <td><strong>高瓴创投</strong>（GL Ventures）、<strong>蓝驰创投</strong>（BlueRun Ventures）、<strong>智元机器人</strong></td>
+          <td><a href="#ref4">[4]</a></td>
+        </tr>
+        <tr>
+          <td>天使轮</td><td rowspan="2">2026年3月</td>
+          <td rowspan="2">合计约<strong>20亿元人民币</strong></td>
+          <td>
+            <strong>领投</strong>：国开金融、国中资本、央视融媒体产业投资基金<br>
+            <strong>跟投</strong>：某千亿上市公司旗下战投、长飞光纤旗下基金、沃德尔、元生创投、珠海科技产业集团、钧山投资、燕缘创投、大米资本、沃赋资本、彬复资本、泰合资本等
+          </td>
+          <td><a href="#ref1">[1]</a><a href="#ref2">[2]</a></td>
+        </tr>
+        <tr>
+          <td>Pre-A轮</td>
+          <td>
+            <strong>领投</strong>：上海徐汇资本<br>
+            <strong>跟投</strong>：梁溪科创产业二期母基金（博华资本管理）、锡创投、普丰资本、钛铭资本<br>
+            多家老股东超额跟投；华兴资本担任长期财务顾问
+          </td>
+          <td><a href="#ref1">[1]</a><a href="#ref2">[2]</a></td>
+        </tr>
+        <tr>
+          <td>Pre-A+ / A轮</td><td>2026年4月</td><td>未披露</td>
+          <td><strong>国投先导</strong>（国家开发投资集团旗下）、<strong>京西瑞瓴</strong>（北京国资+高瓴联合发起）</td>
+          <td><a href="#ref8">[8]</a></td>
+        </tr>
+      </table>
+      </div>
+      <p>累计融资超20亿元人民币。估值一年内增长约<strong>6-7倍</strong>，接近独角兽水平（约70亿人民币量级）。融资方呈现<strong>"国家队+地方国资+顶级VC+产业资本"</strong>的多层次结构，国开金融、国中资本、央视融媒体基金等国家级资本的入场，以及上海、北京、无锡多地国资的集体加持，较为罕见。<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref9">[9]</a></sup></p>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <p>灵初智能采用<strong>"小全栈"</strong>战略——不做完整的全栈机器人整机公司（如银河通用），而是聚焦以<strong>端到端VLA模型为核心</strong>的软件与工具链体系，并与"数据"形成双轮驱动。<sup><a href="#ref1">[1]</a></sup></p>
+
+      <h4>模型体系</h4>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>模型</th><th>发布时间</th><th>定位</th><th>关键指标/特征</th></tr>
+        <tr>
+          <td><strong>Psi R0/R0.5/R1</strong></td>
+          <td>2025年</td>
+          <td>行业首个端到端强化学习具身模型</td>
+          <td>率先实现长程任务；以offline-to-online强化学习为核心，摈弃模仿学习阶段</td>
+        </tr>
+        <tr>
+          <td><strong>Psi-R2</strong>（策略模型）</td>
+          <td>2026年4月</td>
+          <td>新一代具身策略大模型</td>
+          <td><strong>MolmoSpaces全球排名第一</strong>，超越PI、DreamZero等；预训练使用5,417小时真机数据 + 95,472小时人类数据；仅需不到100条真机轨迹微调即可完成精细操作</td>
+        </tr>
+        <tr>
+          <td><strong>Psi-W0</strong>（世界模型）</td>
+          <td>2026年4月</td>
+          <td>具身世界模型</td>
+          <td>加入约30%失败样本训练，使模型理解失败如何发生及如何调整；通过RL将人类经验迁移至机器人本体</td>
+        </tr>
+      </table>
+      </div>
+
+      <h4>数据体系：Psi-SynEngine</h4>
+      <p>灵初智能自研的<strong>全球首个具身原生人类数据采集引擎</strong>，包括：<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref7">[7]</a></sup></p>
+      <ul>
+        <li><strong>数据手套</strong>：21自由度，<strong>亚毫米级定位精度</strong>，可采集手部/手臂全部自由度及全手触觉信息，同步记录头戴与手部视角视觉数据</li>
+        <li><strong>大规模in-the-wild数据管线</strong> + <strong>跨本体数据迁移模型</strong></li>
+        <li>采集成本仅为<strong>真机遥操作方案的1/10</strong></li>
+        <li>计划推出便携式众包版本：用户购买/租赁数据手套，在家完成简单操作，<strong>3分钟获1-1.5美元</strong>报酬</li>
+      </ul>
+
+      <h4>数据规模</h4>
+      <p>截至2026年4月：<sup><a href="#ref7">[7]</a></sup></p>
+      <ul>
+        <li>人类操作数据：<strong>95,472小时</strong>（储备10万小时，行业最大规模）</li>
+        <li>覆盖<strong>294种场景</strong>、<strong>4,821种任务</strong>、<strong>1,382种物体</strong></li>
+        <li>已开源首批<strong>1,000小时</strong>高质量人类操作全模态数据集</li>
+        <li>2026年目标：突破<strong>100万小时</strong>量级</li>
+      </ul>
+
+      <h4>硬件</h4>
+      <ul>
+        <li><strong>ψ-SynRobot</strong>（2026年4月发布）：自研整机机器人，集数据采集与智能执行为一体，采用双臂+五指灵巧手+轮式底盘组合<sup><a href="#ref8">[8]</a></sup></li>
+        <li><strong>Ψ-SynHand</strong>：自研高自由度灵巧手<sup><a href="#ref3">[3]</a></sup></li>
+      </ul>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>产品/平台</th><th>发布时间</th><th>形态</th><th>关键参数/能力</th><th>状态</th></tr>
+        <tr>
+          <td><strong>Psi-SynEngine</strong></td>
+          <td>2025年</td>
+          <td>数据采集引擎+工具链</td>
+          <td>含数据手套（21DOF、亚毫米精度）、跨本体数据迁移模型、in-the-wild数据管线；采集成本为真机遥操作1/10</td>
+          <td>已部署100套（石景山基地）</td>
+        </tr>
+        <tr>
+          <td><strong>Psi-R2 + Psi-W0</strong></td>
+          <td>2026年4月</td>
+          <td>软件模型（策略+世界模型）</td>
+          <td>Psi-R2 MolmoSpaces全球第一；Psi-W0含30%失败样本训练；＜100条真机微调；形成数据飞轮</td>
+          <td>已发布，已开源部分数据集</td>
+        </tr>
+        <tr>
+          <td><strong>ψ-SynRobot</strong></td>
+          <td>2026年4月</td>
+          <td>轮式双臂+灵巧手整机</td>
+          <td>自研整机机器人，集数据采集与智能执行为一体</td>
+          <td>已发布</td>
+        </tr>
+        <tr>
+          <td><strong>Ψ-SynHand</strong></td>
+          <td>2026年4月</td>
+          <td>高自由度灵巧手</td>
+          <td>自研灵巧手，用于精细操作和数据采集</td>
+          <td>已发布</td>
+        </tr>
+        <tr>
+          <td><strong>Psi-SynNet-v0</strong></td>
+          <td>2026年4月</td>
+          <td>开源数据集</td>
+          <td>首批开源1,000小时人类手部操作全模态数据（视觉+语言+触觉+动作）；3D轨迹精度亚毫米级</td>
+          <td>已开源</td>
+        </tr>
+      </table>
+      </div>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper">
+      <table class="wikitable">
+        <tr><th>领域</th><th>场景类别</th><th>具体任务</th><th>关键指标/进展</th><th>状态</th><th>来源</th></tr>
+        <tr>
+          <td rowspan="2">物流仓储</td>
+          <td>服装仓储分拣</td>
+          <td>扫码核检、订单分拣</td>
+          <td>扫码核检准确率超99%；衣服供包节拍达800 UPH（国内最高水平）</td>
+          <td>已进入客户现场陪产阶段</td>
+          <td><a href="#ref1">[1]</a><a href="#ref5">[5]</a></td>
+        </tr>
+        <tr>
+          <td>智能拣货打包</td>
+          <td>西门子联合展示拣货打包机器人系统</td>
+          <td>工博会联合展示</td>
+          <td>合作验证中</td>
+          <td><a href="#ref5">[5]</a></td>
+        </tr>
+        <tr>
+          <td rowspan="2">工业装配</td>
+          <td>精密装配</td>
+          <td>手机装配、工业包装、叠纸盒</td>
+          <td>＜100条真机微调即可完成</td>
+          <td>实验室验证完成</td>
+          <td><a href="#ref7">[7]</a></td>
+        </tr>
+        <tr>
+          <td>工厂灵巧操作</td>
+          <td>人形机器人进入工厂场景</td>
+          <td>—</td>
+          <td>2026年目标推进</td>
+          <td><a href="#ref1">[1]</a></td>
+        </tr>
+        <tr>
+          <td>新零售</td>
+          <td>配送机器人灵巧抓取</td>
+          <td>美团联合展示灵巧手优化配送抓取能力</td>
+          <td>服贸会展示</td>
+          <td>合作探索中</td>
+          <td><a href="#ref5">[5]</a></td>
+        </tr>
+      </table>
+      </div>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <ul>
+        <li>定位为具身智能时代的<strong>"卖铲人"</strong>——做数据基础设施和模型工具，而非整机OEM出货<sup><a href="#ref5">[5]</a></sup></li>
+        <li>核心商业模式："<strong>数据+模型</strong>"双轮驱动：数据手套采集→模型训练→场景落地→数据回流<sup><a href="#ref1">[1]</a></sup></li>
+        <li>物流仓储已有<strong>小规模场景验证</strong>完成，进入客户陪产阶段<sup><a href="#ref1">[1]</a></sup></li>
+        <li>生态合作：腾讯云（深度合作）、觅蜂科技、智域基石（数据服务商）<sup><a href="#ref7">[7]</a></sup></li>
+        <li>产业基地：北京石景山数采基地（已部署100套数据手套）、秦皇岛小岛空间智能机器人产业基地（2026年4月入驻）<sup><a href="#ref5">[5]</a></sup></li>
+        <li>与HashKey CaaS共建AI自主支付基础设施：部署10台双臂机器人接入HP2支付协议，机器人可成为"数字经济主体"进行链上自主交易<sup><a href="#ref6">[6]</a></sup></li>
+        <li>数据众包生态：计划通过Web3.0微支付模式构建<strong>去中心化分布式数据采集网络</strong><sup><a href="#ref1">[1]</a></sup></li>
+      </ul>
+
+      <h3 id="financial">1.8 财务数据</h3>
+      <p>公司处于早期创业阶段，无公开营收/利润数据。累计融资超20亿元人民币。2026年目标：建成全国最大灵巧手数据集（突破100万小时量级）、推动物流场景规模化交付。<sup><a href="#ref1">[1]</a></sup></p>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>公司名称曾经历从"北京灵初智能"到"上海灵初智能"的变更（2026年3月迁址）<sup><a href="#ref2">[2]</a></sup></li>
+        <li>入选<strong>"2026大模型创新Top100"</strong>榜单<sup><a href="#ref5">[5]</a></sup></li>
+        <li>获评<strong>国家级科技型中小企业</strong>、省级创新型中小企业</li>
+        <li>获得"机械臂训练数据生成方法""机器人仿真任务生成方法"等发明专利授权<sup><a href="#ref5">[5]</a></sup></li>
+        <li>2025年WAIC展示麻将机器人、外卖机器人<sup><a href="#ref5">[5]</a></sup></li>
+        <li>与清雁科技、星海图在秦皇岛构成"<strong>大脑—数据—感知</strong>"黄金三角（星海图做大脑/本体、灵初智能做数据、清雁科技做感知与合规）<sup><a href="#ref5">[5]</a></sup></li>
+        <li>创始人认为："花一年把数据成本打下来，比抢着做人形机器人更重要"<sup><a href="#ref5">[5]</a></sup></li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+      <p style="font-size:0.82rem;color:#54595d;margin-bottom:10px;">分析层观点基于公开信息的多方交叉比对形成，仅供参考。不构成投资建议。</p>
+
+      <div class="analysis-block" id="a21">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>灵初智能的创始团队配置极为特殊——CEO王启斌有20余年消费电子与机器人产品化经验（京东/云迹/灵动/黑莓/Sonos），具备0→1→N的产品闭环能力；联合创始人陈源培是00后斯坦福访问学者，师从李飞飞和Karen Liu（全球灵巧操作顶级学者），技术天赋极高（拒绝华为天才少年选择创业）；柴晓杰有15年+腾讯/阿里/京东全栈技术经验；首席科学家杨耀东是北大最具影响力的RL青年学者之一。</p>
+        <p>这种"70后产业老兵 + 00后技术天才 + 90后算法工程 + 80后学术权威"的跨代组合极为罕见。CEO的供应链和产品化经验对于"卖铲人"定位尤为关键——数据手套的量产、成本控制、众包网络建设本质上是一个<strong>消费电子级供应链管理问题</strong>，王启斌在黑莓/Sonos的经验直接对位。同时，杨耀东的RL学术权威为端到端强化学习路线提供学术护城河。</p>
+      </div>
+
+      <div class="analysis-block" id="a22">
+        <h4>2.2 技术路线与场景适配性</h4>
+        <p>灵初智能选择以<strong>数据采集</strong>为切入点、"<strong>卖铲人</strong>"为商业模式，在具身智能赛道中具有显著的差异化优势：</p>
+        <ul>
+          <li><strong>数据瓶颈真实存在</strong>：具身智能的Scaling Law依赖真实物理交互数据，互联网上不存在此类数据。谁掌握了低成本、大规模的数据采集能力，谁就卡住了行业入口。</li>
+          <li><strong>1/10成本优势</strong>：数据手套采集成本仅为真机遥操作的1/10，这一成本差异如果持续保持并进一步降低，将对依赖真机遥操作采集数据的竞品形成结构性优势。</li>
+          <li><strong>众包网络的壁垒</strong>：如果便携式众包数据手套模式成功规模化（"3分钟1-1.5美元"），将形成网络效应——数据越多→模型越好→更多用户参与→数据更多。</li>
+          <li><strong>核心风险</strong>：人类手部数据到机器人本体的迁移（embodiment gap）是根本挑战。Psi-R2在MolmoSpaces排名第一是正面信号，但排行榜表现与实际工业场景表现之间仍有距离。物流服装分拣（800 UPH）的实际验证比榜单排名更有说服力。</li>
+          <li><strong>世界模型（Psi-W0）加入失败样本训练</strong>的策略在方法论上值得关注——让模型从失败中学习而非仅模仿成功轨迹，更接近RL的本质优势。</li>
+        </ul>
+      </div>
+
+      <div class="analysis-block" id="a23">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>灵初智能的资本结构在行业内较为独特：<strong>"国家队+地方国资+顶级VC+产业资本"</strong>的四层结构。</p>
+        <ul>
+          <li><strong>国开金融/国中资本/央视融媒体基金</strong>的入场代表了国家级战略认可，可能与"数据要素"国家战略（灵初智能做的是数据基础设施，正符合数据作为生产要素的政策方向）相关。</li>
+          <li><strong>上海徐汇资本领投Pre-A</strong>直接促成了公司迁址上海——这是典型的"地方国资+落地"模式。上海在AI/具身智能领域的集群效应（徐汇西岸AI产业集群）为灵初智能提供了产业环境。</li>
+          <li><strong>智元机器人</strong>在种子轮的投资值得关注——智元本身是全栈整机公司，投资一家"卖铲人"数据公司，暗示产业链上下游协同关系的建立。但也需关注独立性风险。</li>
+          <li><strong>高瓴+蓝驰</strong>的种子轮参与提供了早期验证背书，两家均为顶级VC。</li>
+          <li><strong>估值6-7倍年增长</strong>反映了资本市场对"数据基础设施"定位的高度认可——在市场对人形机器人整机赛道日趋谨慎的2026年，数据/工具的估值逻辑可能更具防御性。</li>
+        </ul>
+      </div>
+
+      <div class="analysis-block" id="a24">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>灵初智能的路径调整有两个显著节点：</p>
+        <ul>
+          <li><strong>从北京到上海</strong>（2026年3月）：配合上海徐汇资本的Pre-A轮领投。上海在具身智能产业政策、人才集聚和国际化方面有优势。这一搬迁伴随着从"数据公司"到"数据+模型+小硬件"的小全栈定位升级。</li>
+          <li><strong>从纯数据到数据+模型发布</strong>（2026年4月）：Psi-R2和Psi-W0双模型的发布标志着公司从"数据采集商"向"数据+AI模型"双轮驱动的转型。MolmoSpaces全球第一的排名为公司模型能力提供了独立第三方的技术验证。</li>
+          <li><strong>从纯软到软硬一体</strong>：ψ-SynRobot和Ψ-SynHand的发布（2026年4月）表明公司在硬件方面的投入——但CEO反复强调"不是做整机公司"，硬件是服务于数据采集和模型验证的闭环工具。</li>
+        </ul>
+        <p>整体来看，灵初智能的演化路径是：<strong>数据手套（入口）→ 数据集（资产）→ 模型（增值）→ 轻量硬件（闭环）</strong>，每一步都在上一阶段验证后自然延伸，逻辑较为清晰。</p>
+      </div>
+
+      <div class="analysis-block" id="a25">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>灵初智能的定位在具身智能赛道中独树一帜，通过多个"不做"来定义自己：</p>
+        <ul>
+          <li><strong>不做全栈整机</strong>：不与人形机器人整机公司（智元、银河通用、宇树等）直接竞争，而是做他们的"上游供应商"——提供数据和模型工具。这种定位避免了与资本雄厚的整机公司正面冲突。</li>
+          <li><strong>不做模仿学习</strong>：坚持<strong>纯端到端强化学习</strong>路线，从第一个模型Psi R0开始就摈弃模仿学习阶段。这与行业主流（模仿学习+RL微调）形成差异化。</li>
+          <li><strong>不做单一场景</strong>：数据覆盖294种场景、4,821种任务——追求数据的广谱性而非深度绑定单一行业。</li>
+        </ul>
+        <p>核心取舍：<strong>放弃整机出货的高天花板（但高资本消耗），换取数据基础设施的入口卡位（更轻资产、更高杠杆）。</strong>这种路径如果成功，灵初智能可能成为具身智能时代的"数据版NVIDIA"——不造机器人，但所有机器人公司都可能需要它的数据和模型。风险在于：如果数据采集的技术门槛被突破（例如仿真技术大幅进步使得人类数据不再必需），公司的核心壁垒将被削弱。</p>
+      </div>
+
+      <div class="analysis-block" id="a26">
+        <h4>2.6 其他重要观察</h4>
+        <ul>
+          <li><strong>Web3.0+具身智能的交叉实验</strong>：与HashKey的合作为机器人引入链上自主支付，这是一个极具前瞻性的交叉实验——机器人作为"数字经济主体"进行自主交易。目前看更多是概念验证，但为数据众包的微支付结算提供了技术基础设施。</li>
+          <li><strong>开源策略</strong>：首批开源1,000小时数据集——在行业普遍"闭源"的趋势下选择开放，有利于建立行业标准地位和吸引开发者生态，但核心变现模式仍需验证。</li>
+          <li><strong>关键验证指标</strong>：①物流场景陪产→正式交付的时间线和规模化速度；②2026年100万小时数据目标是否达成；③众包网络的用户增长曲线；④数据→模型的飞轮效应是否真实存在（数据量增长是否带来模型能力的非线性提升）。</li>
+          <li><strong>竞争风险</strong>：如果其他公司（尤其是智元、银河通用等全栈公司）自建数据采集体系并形成封闭生态，灵初智能的"第三方数据平台"定位可能受到挤压。</li>
+          <li><strong>政策协同</strong>：公司定位与"数据要素"国家战略高度契合，国家级资本的入场可能不仅是财务投资，也代表了政策方向的认同。这意味着公司可能在数据标准制定、公共数据授权等方面享有先发优势。</li>
+        </ul>
+      </div>
+
+      <h2 id="refs">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li id="ref1">36氪（2026-06-15/2026-03-10），<a href="https://www.36kr.com/p/3716918109730432">"这个广东00后，已经融资20亿"</a> — 类型：媒体报道。核心内容：融资详情、创始团队故事（00后陈源培）、商业模式分析。</li>
+          <li id="ref2">澎湃新闻/投中网（2026-03-10），<a href="https://m.chinaventure.com.cn/news/80-20260310-390410.html">"独家 | 上海国资出手，这家机器人公司又融20亿"</a> — 类型：媒体报道。核心内容：上海徐汇资本领投Pre-A轮、公司迁址上海、融资结构详解。</li>
+          <li id="ref3">高瓴创投/网易（2026-03-10），<a href="https://m.163.com/dy/article/KNLNT0LQ05568W0A.html">"高瓴种子 | 灵初智能完成20亿元融资，构建具身智能数据飞轮"</a> — 类型：投资方确认。核心内容：创始团队详细履历（王启斌/陈源培/柴晓杰/杨耀东）、公司定位。</li>
+          <li id="ref4">东方财富网（2024-11-13），<a href="https://finance.eastmoney.com/a/202411133238265449.html">"高瓴、蓝驰领投，灵初智能完成天使轮融资，联合创始人是位00后"</a> — 类型：媒体报道。核心内容：种子轮融资详情、00后联合创始人背景。</li>
+          <li id="ref5">钛媒体（2026），<a href="https://www.tmtpost.com/7967270.html">"灵初智能想做具身智能时代的'卖铲人'"</a> — 类型：媒体报道。核心内容：商业模式定位、生态合作详情（西门子/美团/腾讯云/星海图/清雁科技）、产业基地布局。</li>
+          <li id="ref6">自动化网（2026-01），<a href="https://www.zidonghua.com.cn/news/brand/81999.html">"灵初智能与HashKey CaaS达成战略合作，共建AI自主支付基础设施"</a> — 类型：媒体报道。核心内容：Web3.0+具身智能交叉合作、HP2支付协议、机器人链上自主交易。</li>
+          <li id="ref7">北京日报/京报网（2026-04-11），<a href="https://news.bjd.com.cn/2026/04/11/11682635.shtml">"灵初智能双模型亮相，开源首批1000小时人类手部操作全模态数据集"</a> — 类型：媒体报道。核心内容：Psi-R2/Psi-W0双模型发布、MolmoSpaces全球第一、开源数据集详情。</li>
+          <li id="ref8">证券之星/自动化网（2026-04-13），<a href="https://www.zidonghua.com.cn/news/Finance/84008.html">"灵初智能获国投先导、京西瑞瓴投资，加码具身智能技术研发与商业化"</a> — 类型：媒体报道。核心内容：Pre-A+/A轮融资方、ψ-SynRobot/Ψ-SynHand硬件发布。</li>
+          <li id="ref9">量子位（2026-03），<a href="https://www.qbitai.com/2026/03/385824.html">"20亿砸向00后创业机器人公司！估值一年暴涨7倍，国家级资本重仓"</a> — 类型：媒体报道。核心内容：估值增长分析、国资入场的战略意义。</li>
+          <li id="ref10">极客公园（2026），<a href="http://www.geekpark.net/news/360880">"成立一年半累计融资超20亿，这个团队想搞定具身智能最难的'数据瓶颈'"</a> — 类型：媒体报道。核心内容：技术路线深度解析、数据瓶颈与公司战略。</li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">此页面最后编辑于2026年6月15日 · 内容遵循知识共享协议 · 数据来源截至编辑当日 · 信息来源为多家科技媒体与公司官方发布，已进行多方交叉验证</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

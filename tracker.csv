@@ -170,12 +170,12 @@
 3,国内#152,灵宝CASBOT,CASBOT,人民日报/蓝思科技公告,completed,wiki-dispatcher-t3-d,wiki/entities/灵宝CASBOT.html
 3,国内#153,新奇机器人,,投资方: 云晖资本、厦门建发、厚雪资本 等1家,completed,wiki-dispatcher-t3-d,wiki/entities/新奇机器人.html
 3,国内#154,穹彻智能,Noematrix,阿里公告/36氪,completed,wiki-dispatcher-t3-d,wiki/entities/穹彻智能.html
-3,国内#155,蚂蚁灵波,,官方公告,completed,wiki-dispatcher-t3-d,wiki/entities/蚂蚁灵波.html
+3,国内#155,蚂蚁灵波,Robbyant,蚂蚁集团公告/36氪/雷锋网/奥比中光公告/SCMP,completed,wiki-dispatcher-t3-d,wiki/entities/蚂蚁灵波.html
 3,国内#156,知跃空间智能,,猎云网/投资界,completed,wiki-dispatcher-t3-d,wiki/entities/知跃空间智能.html
 3,国内#157,荣耀机器人,,新华网/界面新闻,completed,wiki-dispatcher-t3-a,entities/荣耀机器人.html
 3,国内#158,高德具身业务部(阿里),,每日经济新闻,completed,wiki-dispatcher-t3-a,entities/高德具身.html
 3,国内#159,重庆凤凰技术(赛力斯),,东方财富网,completed,wiki-dispatcher-t3-a,entities/赛力斯凤凰.html
-3,国内#160,光向科技,,钛媒体,completed,wiki-dispatcher-t3-a,entities/光向科技.html
+3,国内#160,光象科技,Guangxiang Technology / Phi-Bot,智东西/36氪/财经网/投中网/北京日报/华夏时报,completed,wiki-dispatcher-t3-a,entities/光象科技.html
 3,国内#161,华为极目机器,,工商登记,completed,wiki-dispatcher-t3-a,entities/华为极目机器.html
 3,国内#162,智在无界,,投资方: 考拉基金、灵心巧手、领航新界,completed,wiki-dispatcher-t3-e,wiki/entities/智在无界.html
 3,国内#163,一立方机器人,,投资方: 美御资本,completed,wiki-dispatcher-t3-e,wiki/entities/一立方机器人.html
@@ -228,4 +228,5 @@
 1	国内生态#15	沃德尔	Wodeer Technology	公司官网+2026杭州人形机器人展+江西日报报道+灵犀智涌参访纪要	completed	self	entities/沃德尔.html
 1	国内生态#16	拉格朗日	Lagrange	天眼查+雷峰网独家报道+36氪快讯+百度风投入股公告	completed	self	entities/拉格朗日.html
 1	国内生态#17	千里科技	Qianli (AFARI)	2025年报(上海证券报)+36氪+钛媒体+央广网+东方财富	completed	self	entities/千里科技.html
-1	国内#175	清科灵境	Qingke Lingjing	投资界+合肥在线+中国政府采购网+汽车测试网	completed	self	entities/清科灵境.html
+1	国内#175	清科灵境	Qingke Lingjing (Synkrotron)	投资界+合肥在线+中国政府采购网+汽车测试网+36氪+将门创投	completed	self	entities/清科灵境.html
+1,国内#176,灵初智能,PSI Bot / Proto-Sentient Intelligence,36氪/投中网/钛媒体/北京日报/极客公园/量子位/公司官网,completed,self,entities/灵初智能.html
