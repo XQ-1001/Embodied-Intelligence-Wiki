@@ -41,7 +41,7 @@
 1,国内#23,极佳视界,,华为哈勃/36氪,completed,wiki-jijia-shijie,wiki/entities/极佳视界.html,wiki/entities/极佳视界.html
 1,国内#24,星动纪元,Robot Era,三星/阿里/36氪,completed,wiki-robot-era,wiki/entities/星动纪元.html,wiki/entities/星动纪元.html
 1,国内#25,智平方,,每日经济新闻/上海证券报,completed,wiki-zhipingfang,wiki/entities/智平方.html
-1,国内#26,帕西尼,,亿欧/融资报道,completed,wiki-paxini,wiki/entities/帕西尼.html
+1,国内#26,帕西尼,,亿欧/融资报道,completed,wiki-paxini,entities/帕西尼.html
 1,国内#27,埃夫特,EFORT,上市公司公告,completed,wiki-efort,wiki/entities/埃夫特.html
 1,国内#28,云迹科技,,招股书/港股公告/中证网,completed,wiki-yunji-tech,wiki/entities/云迹科技.html
 1,国内#29,乐聚机器人,,经济参考报,completed,wiki-leju-robot,wiki/entities/乐聚机器人.html
@@ -230,3 +230,4 @@
 1	国内生态#17	千里科技	Qianli (AFARI)	2025年报(上海证券报)+36氪+钛媒体+央广网+东方财富	completed	self	entities/千里科技.html
 1	国内#175	清科灵境	Qingke Lingjing (Synkrotron)	投资界+合肥在线+中国政府采购网+汽车测试网+36氪+将门创投	completed	self	entities/清科灵境.html
 1,国内#176,灵初智能,PSI Bot / Proto-Sentient Intelligence,36氪/投中网/钛媒体/北京日报/极客公园/量子位/公司官网,completed,self,entities/灵初智能.html
+1,海外#13,Covariant,Covariant,GeekWire/Wikipedia/WashingtonPost/PitchBook/CBInsights/Tracxn,completed,self,entities/Covariant.html
