@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>绿洲资本 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  /* 投资机构类型标签 */
+  .t-vc { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .t-cvc { background: #fce4ec; color: #c62828; border-color: #f8bbd0; }
+  .t-gov-fund { background: #fff3e0; color: #e65100; border-color: #ffe0b2; }
+  .t-national-fund { background: #f3e5f5; color: #7b1fa2; border-color: #e1bee7; }
+  .t-overseas-fund { background: #e0f2f1; color: #00695c; border-color: #b2dfdb; }
+  .t-lead-investor { background: #fff8e1; color: #f57f17; border-color: #ffecb3; }
+  .t-follow-investor { background: #f5f5f5; color: #616161; border-color: #e0e0e0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../../index.html">具身智能Wiki</a> <span class="breadcrumb-sep">›</span> <a href="../../index.html#investors">投资机构</a> <span class="breadcrumb-sep">›</span> <span>绿洲资本</span></div>
+  <div class="wiki-header"><h1>绿洲资本</h1><div class="subtitle">Vitalbridge / Oasis Capital · 2019年成立 · 主题驱动的早期VC · AUM超50亿元人民币<sup><a href="#ref1">[1]</a></sup> · "精选重仓"风格</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实与分析</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#team">1.2 核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funds">1.3 基金结构与LP</a></li>
+        <li class="toc-lvl3"><a href="#philosophy">1.4 投资哲学与偏好</a></li>
+        <li class="toc-lvl3"><a href="#tracks">1.5 主要投资赛道</a></li>
+        <li class="toc-lvl3"><a href="#embodied">1.6 具身智能领域布局</a></li>
+        <li class="toc-lvl3"><a href="#cases">1.7 典型投资案例</a></li>
+        <li class="toc-lvl3"><a href="#performance">1.8 基金业绩</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#references">2 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">绿洲资本</div>
+        <div class="ib-row"><div class="ib-label">英文名</div><div class="ib-value">Vitalbridge / Oasis Capital</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2019年</div></div>
+        <div class="ib-row"><div class="ib-label">注册地</div><div class="ib-value">上海市</div></div>
+        <div class="ib-row"><div class="ib-label">机构类型</div><div class="ib-value"><span class="tag t-vc">财务投资机构</span></div></div>
+        <div class="ib-row"><div class="ib-label">管理规模</div><div class="ib-value">超50亿元人民币<sup><a href="#ref1">[1]</a></sup></div></div>
+        <div class="ib-row"><div class="ib-label">投资阶段</div><div class="ib-value">种子轮到A轮（早期为主）</div></div>
+        <div class="ib-row"><div class="ib-label">币种</div><div class="ib-value">美元 + 人民币（双币）</div></div>
+        <div class="ib-section">核心人物</div>
+        <div class="ib-row"><div class="ib-label">创始合伙人</div><div class="ib-value">张津剑</div></div>
+        <div class="ib-section">基金序列</div>
+        <div class="ib-row"><div class="ib-label">美元一期</div><div class="ib-value">2020年，$1.5亿<sup><a href="#ref8">[8]</a></sup></div></div>
+        <div class="ib-row"><div class="ib-label">美元二期</div><div class="ib-value">2021年，$2.75亿<sup><a href="#ref9">[9]</a></sup></div></div>
+        <div class="ib-section">LP构成</div>
+        <div class="ib-row"><div class="ib-label">主要LP类型</div><div class="ib-value">产业龙头企业、互联网企业家、上市公司创始人、国际母基金、家族办公室<sup><a href="#ref1">[1]</a></sup></div></div>
+        <div class="ib-section">官网</div>
+        <div class="ib-row"><div class="ib-label">网址</div><div class="ib-value"><a href="https://www.vitalbridge.com" target="_blank">www.vitalbridge.com</a><sup><a href="#ref0">[0]</a></sup></div></div>
+      </aside>
+
+      <p class="article-intro"><strong>绿洲资本</strong>（Vitalbridge / Oasis Capital）是中国新生代主题驱动的风险投资机构，由前挚信资本投资总监张津剑于2019年创立<sup><a href="#ref2">[2]</a></sup>，总部位于上海。机构以"精选、重仓"为核心投资风格<sup><a href="#ref4">[4]</a></sup>，管理资产规模超过50亿元人民币<sup><a href="#ref1">[1]</a></sup>，聚焦人工智能、具身智能等前沿科技领域。绿洲资本自2022年起系统性布局AI赛道，是具身智能早期投资的重要参与者之一，其投资组合涵盖MiniMax、Boson.ai、无问芯穹、逐际动力等中国AI/具身智能领域的代表性公司<sup><a href="#ref4">[4]</a></sup>。</p>
+
+      <h2 id="facts">1 事实与分析</h2>
+      <p style="font-size:0.82rem;color:#54595d;margin-bottom:10px;">来源可靠性标注：<span class="tag tag-info">AMAC登记</span> = 基金业协会法定公示信息 · <span class="tag tag-info">机构自述</span> = 机构官网/官方披露 · <span class="tag tag-info">媒体报道</span> = 第三方独立报道 · <span class="tag tag-info">工商登记</span> = 企业信用信息公示系统</p>
+
+      <h3 id="basic">1.1 基本信息</h3>
+
+      <div class="table-wrapper">
+        <table class="wikitable infotable">
+          <tr><th>项目</th><th>内容</th></tr>
+          <tr><td>机构全称</td><td>上海象启咨询管理有限公司<sup><a href="#ref5">[5]</a></sup></td></tr>
+          <tr><td>品牌名称</td><td>绿洲资本（Vitalbridge / Oasis Capital）</td></tr>
+          <tr><td>成立时间</td><td>2019年</td></tr>
+          <tr><td>注册地址</td><td>上海市</td></tr>
+          <tr><td>机构类型</td><td>财务投资机构（VC），主题驱动型</td></tr>
+          <tr><td>管理规模（AUM）</td><td>超50亿元人民币（截至2025年）<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>投资阶段</td><td>以种子轮至A轮早期投资为主</td></tr>
+          <tr><td>币种</td><td>美元 + 人民币（双币种运作）</td></tr>
+          <tr><td>AMAC登记</td><td>公开渠道未检索到以"绿洲资本"为名的私募管理人登记信息，其境内运营实体可能以其他名称备案，或主要通过美元基金境外结构运作</td></tr>
+          <tr><td>官网</td><td><a href="https://www.vitalbridge.com" target="_blank">www.vitalbridge.com</a><sup><a href="#ref0">[0]</a></sup></td></tr>
+        </table>
+      </div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>时间</th><th>事件</th></tr>
+          <tr><td>2019年</td><td>张津剑离开挚信资本，创立绿洲资本<sup><a href="#ref2">[2]</a></sup></td></tr>
+          <tr><td>2020年7月</td><td>完成美元一期基金募集，规模1.5亿美元，获超额认购；截至当时已交割6个项目<sup><a href="#ref8">[8]</a></sup></td></tr>
+          <tr><td>2021年8月</td><td>美元二期基金首轮关帐，规模超2亿美元<sup><a href="#ref9">[9]</a></sup></td></tr>
+          <tr><td>2021年10月</td><td>美元二期基金完成超募，总规模2.75亿美元<sup><a href="#ref10">[10]</a></sup></td></tr>
+          <tr><td>2022年起</td><td>开始系统性布局AI和具身智能赛道<sup><a href="#ref3">[3]</a></sup></td></tr>
+          <tr><td>2023年3月</td><td>完成对MiniMax的投资<sup><a href="#ref3">[3]</a></sup></td></tr>
+          <tr><td>2023年10月</td><td>领投逐际动力Pre-A轮，首次进入具身智能机器人赛道<sup><a href="#ref6">[6]</a></sup></td></tr>
+          <tr><td>2024年</td><td>张津剑入选《财富》中国40位40岁以下商界精英<sup><a href="#ref4">[4]</a></sup></td></tr>
+          <tr><td>2024-2025年</td><td>在AI和具身智能方向出手减少，张津剑公开解释为"估值上涨过快"及"未看到本质上的全新创新形态"<sup><a href="#ref3">[3]</a></sup></td></tr>
+        </table>
+      </div>
+
+      <h3 id="team">1.2 核心团队</h3>
+
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+          <tr><td>创始合伙人</td><td>张津剑</td><td>1988年生，电子科技大学电气工程专业学士，复旦大学图像与智能实验室硕士（研究信号的"注意力选择"算法）。2012年加入挚信资本，任投资总监，擅长自上而下的研究方法，主导多家企业投资，其中朴新教育、流利说2家被投企业于2018年在美国上市，曾任纽交所上市公司最年轻董事。2019年创立绿洲资本。2024年入选《财富》中国40位40岁以下商界精英（36岁）<sup><a href="#ref4">[4]</a></sup>。2026年入选投资界TOP100投资人<sup><a href="#ref15">[15]</a></sup>。</td></tr>
+        </table>
+      </div>
+      <p>张津剑的背景具有"信号处理+投资实践"的复合特征。其硕士研究方向"信号的注意力选择算法"部分影响了他的投资方法论——强调在大量信息噪音中识别关键信号，形成"精选重仓"的投资风格<sup><a href="#ref2">[2]</a></sup>。在挚信资本期间，他覆盖教育、消费、企业服务等领域，积累了从早期到上市的全周期投资经验。绿洲资本其他核心团队的公开信息较少，公开搜索结果显示团队规模精简，与其"精选重仓"的定位相匹配。</p>
+      <div class="callout"><span class="tag tag-info">简评</span> 张津剑的"信号处理+一级市场"复合背景使其对AI技术有基础认知——当大多数VC还在观望大模型时，绿洲已于2023年3月完成对MiniMax的投资，这种先发优势在早期VC中具有价值。团队精简意味着决策快但技术覆盖面有限，在具身智能这类交叉学科赛道，缺乏专职合伙人可能是其仅押注单一标的、2024-2025年主动收手的结构性原因。</div>
+
+      <h3 id="funds">1.3 基金结构与LP</h3>
+
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>基金名称</th><th>设立时间</th><th>规模</th><th>币种</th><th>主要LP构成</th><th>状态</th></tr>
+          <tr><td>绿洲资本美元一期基金</td><td>2020年7月</td><td>1.5亿美元<sup><a href="#ref8">[8]</a></sup></td><td>美元</td><td>产业龙头企业、互联网企业家、境内外上市公司创始人、海外母基金及家族办公室<sup><a href="#ref8">[8]</a></sup></td><td>已完成募集（超额认购），投资期内已交割6个项目</td></tr>
+          <tr><td>绿洲资本美元二期基金</td><td>2021年8月首轮关帐 / 2021年10月最终关闭</td><td>2.75亿美元<sup><a href="#ref10">[10]</a></sup></td><td>美元</td><td>未公开具体LP名单，延续一期基金LP结构<sup><a href="#ref9">[9]</a></sup></td><td>已完成募集（超募），截至2026年8月在投资期内</td></tr>
+          <tr><td>人民币基金（如有）</td><td>未确认</td><td>未公开</td><td>人民币</td><td>—</td><td>未在公开渠道检索到明确的独立人民币基金备案信息</td></tr>
+        </table>
+      </div>
+      <p>绿洲资本以美元基金为主要运作载体，两期美元基金合计规模约4.25亿美元，按成立时汇率折合约30亿元人民币。加上可能的人民币基金和管理账户，公开披露的AUM已超过50亿元人民币<sup><a href="#ref1">[1]</a></sup>。LP结构中"互联网企业家"和"上市公司创始人"占比较高，体现了创始合伙人张津剑的个人LP网络优势。该LP结构意味着基金受地缘政治影响的敏感度相对低于依赖美国大学捐赠基金的中国美元VC。</p>
+      <div class="callout"><span class="tag tag-info">简评</span> "企业家圈子"型LP结构更适合早期硬科技投资——LP自身是成功创业者，对长周期、高风险的容忍度高于机构LP。但绿洲以美元基金为主的募资结构与当前具身智能企业普遍转向人民币融资的趋势形成张力——若未来需要参与被投公司大额后续融资，可能面临结构限制。2021年之后未见新基金募集，需关注下一期基金动态。</div>
+
+      <h3 id="philosophy">1.4 投资哲学与偏好</h3>
+      <p>绿洲资本的投资哲学可以概括为"精选重仓、主题驱动、信号优先"。</p>
+      <p><strong>精选重仓</strong>是绿洲资本最核心的投资标签。与行业主流的"广撒网"策略不同，绿洲资本每期基金的投资组合相对集中，单笔投资金额较大<sup><a href="#ref4">[4]</a></sup>。张津剑曾公开表示，绿洲资本的投资风格是"精选、重仓"，不追求投资数量而追求投资质量。</p>
+      <p><strong>主题驱动</strong>体现在其自上而下的研究方法上。张津剑在挚信资本时期即以"自上而下的研究方法"著称，绿洲资本延续了这一风格——先判断大趋势和主题方向，再在方向内寻找最优秀的团队<sup><a href="#ref2">[2]</a></sup>。2022年起，"AI和具身智能"成为其核心投资主题。</p>
+      <p><strong>信号优先</strong>是张津剑个人学术背景带来的方法论特色。他在复旦的研究方向是"信号的注意力选择"——从噪声中识别关键信号。他多次在公开访谈中使用"信号"这个概念来描述投资判断<sup><a href="#ref2">[2]</a></sup>。在其框架中，估值波动、短期情绪是"噪声"，而技术路线的收敛、成本下降趋势、创业者认知升级才是"信号"。</p>
+      <p>投资偏好方面：投资阶段以种子轮至A轮为主，单笔投资金额估计在数百万至数千万美元级别；偏好领投或联合领投角色；对创始人的"认知深度"和"技术信仰"有较高要求。</p>
+      <div class="callout"><span class="tag tag-info">简评</span> 张津剑的"三条AGI路径"理论框架赋予了绿洲独特的品牌辨识度——在多数VC对具身智能的投资逻辑止于"大模型+机器人=巨大市场"时，一个学术根基清晰的框架更容易赢得创业者和LP的信任。"精选重仓"策略若成功（如逐际动力IPO），单项目回报贡献将远超分散策略；但集中风险同样明显——若逐际动力被竞争对手超越，绿洲在具身智能领域的整个布局将受影响。</div>
+
+      <h3 id="tracks">1.5 主要投资赛道</h3>
+
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>赛道</th><th>代表性被投公司</th><th>赛道投资逻辑</th><th>布局时间</th></tr>
+          <tr><td>AI大模型/基础层</td><td>MiniMax、Boson.ai</td><td>大模型是新一轮AI浪潮的基础设施，中国需要自己的基础模型公司<sup><a href="#ref3">[3]</a></sup></td><td>2022-2023</td></tr>
+          <tr><td>AI算力/基础设施</td><td>无问芯穹</td><td>算力优化是AI应用大规模落地的关键瓶颈<sup><a href="#ref4">[4]</a></sup></td><td>2023</td></tr>
+          <tr><td>具身智能/机器人</td><td>逐际动力</td><td>具身智能是通往AGI的独立路径（物理交互路径），不是"机器人赛道"而是"智能赛道"<sup><a href="#ref3">[3]</a></sup></td><td>2023至今</td></tr>
+          <tr><td>企业服务（早期）</td><td>秒优科技、中寓集团、尘锋、售后宝</td><td>中国企业数字化仍处于早期阶段，SaaS和服务类公司长期有价值<sup><a href="#ref8">[8]</a></sup></td><td>2020-2021</td></tr>
+        </table>
+      </div>
+      <p>注：以上赛道分类基于公开投资案例归纳。绿洲资本在2020-2021年美元一期基金期间有较多企业服务投资，2022年之后重心明显转向AI和具身智能，张津剑将其概括为"All in AI"策略<sup><a href="#ref3">[3]</a></sup>。</p>
+
+      <h3 id="embodied">1.6 具身智能领域布局【重点】</h3>
+
+      <h4>A. 布局概览</h4>
+      <p>绿洲资本在具身智能领域的公开布局目前以<strong>逐际动力（LimX Dynamics）</strong>为核心标的，于2023年10月领投其Pre-A轮融资（天使轮+Pre-A轮合计近2亿元人民币），是该赛道较早入局的VC之一<sup><a href="#ref6">[6]</a></sup>。</p>
+      <p>不同于多家VC在具身智能赛道的"广撒网"策略，绿洲资本采取的是<strong>精准单一押注</strong>策略——在具身智能人形机器人赛道仅投资了逐际动力一家公司（截至2026年8月公开信息）。这与其"精选重仓"的整体投资哲学一致<sup><a href="#ref4">[4]</a></sup>。值得注意的是，张津剑在2025年底的访谈中明确表示，2024-2025年在AI和具身智能方向的出手"反而变少了"，原因是估值上涨过快且未看到本质上全新的创新形态<sup><a href="#ref3">[3]</a></sup>——这一表态本身揭示了其对具身智能赛道投资纪律的坚持。</p>
+
+      <div class="callout">
+        <div class="callout-title">具身智能投资概况</div>
+        <p>已投具身智能项目：<strong>1</strong>个（公开确认） | 累计投资金额：约<strong>数千万元人民币</strong>（Pre-A轮领投） | 最早进入时间：<strong>2023年10月</strong> | 投资角色：<strong>领投方</strong></p>
+      </div>
+
+      <h4>B. 具身智能投资组合</h4>
+
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>被投公司</th><th>投资时间</th><th>投资轮次</th><th>投资金额</th><th>角色</th><th>后续轮次参与</th><th>被投公司核心方向</th></tr>
+          <tr><td>逐际动力（LimX Dynamics）</td><td>2023年10月</td><td>天使轮 + Pre-A轮<sup><a href="#ref6">[6]</a></sup></td><td>近2亿元（两轮合计总融资额，绿洲资本领投Pre-A轮）<sup><a href="#ref6">[6]</a></sup></td><td><span class="tag t-lead-investor">领投方</span>（Pre-A轮）</td><td>未明确公开。逐际动力后续于2024年完成A轮（阿里、招商局创投等领投）<sup><a href="#ref14">[14]</a></sup>，2025-2026年完成多轮融资（估值达150亿元，海外资本占比近七成）<sup><a href="#ref11">[11]</a></sup>，绿洲资本是否参与后续轮次未在公开信息中确认</td><td>通用足式机器人（四轮足+人形双足），覆盖工业巡检、物流和商业服务场景<sup><a href="#ref6">[6]</a></sup></td></tr>
+        </table>
+      </div>
+      <p>注：以上仅列出公开可确认的投资记录。绿洲资本作为早期VC，可能在未公开披露的轮次中投资了其他具身智能公司。绿洲资本美元二期基金（2021年设立）目前仍在投资期内，理论上仍有投资新具身智能项目的空间。</p>
+
+      <h4>C. 投资逻辑与观点</h4>
+      <p>张津剑在2025年底界面新闻的访谈中系统阐述了对具身智能的投资逻辑，是行业内对"为什么投资具身智能"给出最清晰理论框架的投资人之一<sup><a href="#ref3">[3]</a></sup>。</p>
+      <p><strong>核心框架——具身智能是通往AGI的三条路径之一。</strong>张津剑提出，目前行业中大致存在三条通向AGI的探索路线：</p>
+      <ol>
+        <li>以大语言模型为核心的路径（OpenAI、Ilya为代表）</li>
+        <li>以先验知识+世界模型为核心的路径（Yann LeCun为代表）</li>
+        <li>以真实世界交互为核心的路径——通过物理交互和环境反馈来构建智能（与李飞飞的研究方向高度相关）</li>
+      </ol>
+      <p>张津剑明确表示："我们所投资的具身智能公司，本质上是第三条路径的实践者。我们关注的不是'机器人本身'，而是这些公司是否能够通过真实世界的交互，不断构建和泛化自己的智能能力，最终走向更通用的智能系统。"<sup><a href="#ref3">[3]</a></sup>这表明其投资逻辑的核心不是"机器人硬件"，而是"通过物理交互构建智能"这一范式。</p>
+      <p><strong>对泡沫的看法。</strong>在2025年4月的一次访谈中，张津剑直接回应了具身智能泡沫论："如果你认为AI和具身的机会是星辰大海，那就没有泡沫。"他认为当前市场讨论的"泡沫"更多是短期的估值波动，如果将视角放到十年以上的维度，具身智能的长期价值远未被充分认知<sup><a href="#ref13">[13]</a></sup>。</p>
+      <p><strong>投资纪律。</strong>尽管看好长期趋势，张津剑在2024-2025年主动减少了在该方向的出手。他解释了两点原因：一是"估值上涨过快"（举例：宇树估值一年内从30亿跃升至近千亿），二是"没有看到本质上全新的、颠覆性的创新形态出现"。他认为："今天被广泛讨论的创新，更多是两三年前已经发生的事情，只是现在才被市场充分认知。"这表明其投资纪律不仅体现在"何时进入"，也体现在"何时不进入"<sup><a href="#ref3">[3]</a></sup>。</p>
+
+      <h4>D. 布局特征分析</h4>
+      <p>绿洲资本的具身智能布局呈现以下鲜明特征：</p>
+      <ul>
+        <li><strong>精准单一押注而非广撒网。</strong>与经纬、蓝驰、红杉等在具身智能赛道投资5-10+项目的"全覆盖"策略不同，绿洲资本目前仅公开投资了逐际动力一家。这与其"精选重仓"标签高度一致。</li>
+        <li><strong>偏好"第三条路径"。</strong>绿洲选择的逐际动力，其技术方向是通过物理交互学习智能，而非纯大模型（第一条路径）或纯世界模型（第二条路径）路线。这一选择建立了其具身智能投资的辨识度。</li>
+        <li><strong>理论先行，投资跟进。</strong>张津剑对具身智能的投资逻辑建立在清晰的理论框架之上（三条AGI路径），而非跟随市场共识。这在VC行业相对罕见，使得其具身智能投资具有更强的"信仰驱动"特征。</li>
+        <li><strong>纪律严明的节奏控制。</strong>在2024-2025年具身智能融资最热的两年，绿洲反而收手，选择观察而非追高。这种"逆向节奏感"是对其投资哲学的实践检验——如果后续逐际动力能成功IPO，将验证其投资纪律的有效性；反之，如果错过了赛道爆发期，则可能体现为"过于保守"。</li>
+      </ul>
+      <div class="callout"><span class="tag tag-info">简评</span> 绿洲2023年10月进入逐际动力，比2024-2025年具身智能融资高峰期早约6-12个月，时机选择精准，可能带来显著估值优势（逐际动力当前估值150亿元 vs 2023年Pre-A轮估值）。但其2024-2025年的"收手"决策是否正确需要时间验证：如果估值泡沫不出清，绿洲可能错过了构建具身智能多元投资组合的窗口。张津剑提出的两个核心观察变量——"成本"和"模型智力上限"——是判断赛道拐点的有效指标，体现了其投资逻辑的可验证性。</div>
+
+      <h3 id="cases">1.7 典型投资案例</h3>
+
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>被投公司</th><th>所属赛道</th><th>投资时间</th><th>投资轮次</th><th>退出方式/状态</th><th>备注</th></tr>
+          <tr><td>MiniMax</td><td>AI大模型</td><td>2023年3月</td><td>早期轮次</td><td>即将上市（截至2025年底），港股为潜在选项<sup><a href="#ref3">[3]</a></sup></td><td>—</td></tr>
+          <tr><td>Boson.ai</td><td>AI</td><td>未公开</td><td>早期轮次</td><td>未退出</td><td>信息有限</td></tr>
+          <tr><td>无问芯穹</td><td>AI算力/基础设施</td><td>未公开</td><td>早期轮次</td><td>未退出</td><td>—</td></tr>
+          <tr><td>逐际动力</td><td>具身智能</td><td>2023年10月</td><td>Pre-A轮（领投）</td><td>后续估值达150亿元（2026年7月）<sup><a href="#ref11">[11]</a></sup>，正推进IPO</td><td>投资至今约3年，账面回报倍数可期但尚未退出</td></tr>
+          <tr><td colspan="6" style="text-align:center;font-weight:600;">张津剑在挚信资本时期的代表性退出（非绿洲资本直接业绩）</td></tr>
+          <tr><td>朴新教育</td><td>教育</td><td>—</td><td>—</td><td>2018年纽交所上市<sup><a href="#ref8">[8]</a></sup></td><td>张津剑在挚信资本时期主导</td></tr>
+          <tr><td>流利说</td><td>教育</td><td>—</td><td>—</td><td>2018年纽交所上市<sup><a href="#ref8">[8]</a></sup></td><td>张津剑在挚信资本时期主导</td></tr>
+        </table>
+      </div>
+      <p>注：绿洲资本成立于2019年，首期基金2020年关闭，至今仅约5-6年。对于早期VC而言，典型的退出周期为7-10年，因此目前公开可确认的退出案例有限。MiniMax的IPO将是绿洲资本的首个重大退出测试。</p>
+      <div class="callout"><span class="tag tag-info">简评</span> 绿洲首期基金（2020年）已运行约6年，进入退出关键期。被投公司MiniMax和逐际动力均以港股为潜在上市地，与张津剑"港股恢复是关键"的判断一致。但港股的流动性和估值水平与美股仍有差距，且目前全球尚无纯粹具身智能上市公司作为估值参照，退出时机的选择将显著影响最终回报。美元基金通过港股退出路径相对顺畅，规避了A股退出所需的ODI复杂度。</div>
+
+      <h3 id="performance">1.8 基金业绩</h3>
+      <p>该机构未公开披露基金业绩数据。作为私募投资机构，IRR/DPI/TVPI等业绩指标通常仅向LP报告，不对外公开。绿洲资本首期基金（2020年）目前处于投资期尾声或刚进入退出期，尚未到常规的业绩披露时点。</p>
+      <p>以下为基于公开信息的间接业绩线索：</p>
+      <ul>
+        <li>MiniMax：绿洲资本2023年3月投资，截至2025年底即将IPO<sup><a href="#ref3">[3]</a></sup>。若顺利上市，将为基金带来可观回报。</li>
+        <li>逐际动力：2023年10月Pre-A轮投资，2026年7月估值已达150亿元<sup><a href="#ref11">[11]</a></sup>，账面估值增长显著，但尚未退出。</li>
+        <li>张津剑个人投资业绩：在挚信资本时期主导的朴新教育、流利说均于2018年在纽交所上市<sup><a href="#ref8">[8]</a></sup>，但该业绩不属于绿洲资本。</li>
+      </ul>
+      <p>以上仅为基于公开新闻的间接推论，不能作为绿洲资本基金业绩的正式参考。</p>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>绿洲资本的品牌名"Vitalbridge"（vital + bridge）体现了其"连接生命力"的投资理念——桥接创新企业与资本、桥接技术与商业<sup><a href="#ref0">[0]</a></sup>。</li>
+        <li>张津剑是业内少有的明确阐述AGI三条路径理论框架的投资人，其2025年底的界面新闻访谈被广泛引用和讨论<sup><a href="#ref12">[12]</a></sup>。</li>
+        <li>绿洲资本的投资方法论受到张津剑学术背景的深刻影响。他曾表示："投资和信号处理有很多共通之处——你需要在大量的市场噪声中，识别出真正的信号。"<sup><a href="#ref2">[2]</a></sup></li>
+        <li>在2025年底的访谈中，张津剑判断"全球对中国科技创新的信心正在发生实质性回升"，认为这一变化具有极大的外溢价值，直接带来了更多国际资本重新关注中国<sup><a href="#ref3">[3]</a></sup>。</li>
+        <li>绿洲资本成立以来获得百余项权威奖项（据36氪机构介绍页）<sup><a href="#ref1">[1]</a></sup>，张津剑2026年入选投资界TOP100投资人<sup><a href="#ref15">[15]</a></sup>。</li>
+      </ul>
+
+
+      <h2 id="references">2 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li id="ref0">绿洲资本官网 — <a href="https://www.vitalbridge.com" target="_blank">www.vitalbridge.com</a>（2026-08-04访问验证，HTTP 200）</li>
+          <li id="ref1"><a href="https://pitchhub.36kr.com/organization/1695055478443527" target="_blank">36氪PitchHub — 绿洲资本机构信息</a>（含meta description：AUM超50亿元，LP构成等）</li>
+          <li id="ref2"><a href="https://www.36kr.com/p/1725138927617" target="_blank">36氪 — 原挚信资本张津剑成立绿洲资本，首批交割超1亿美元，85后GP正式登场</a>（2019年）</li>
+          <li id="ref3"><a href="https://m.jiemian.com/article/13827260.html" target="_blank">界面新闻 — 投资人把脉2026：AI、具身智能、生物制造，或出现百亿美金超级独角兽 | 界面预言家⑥</a>（2025-12-30发布；张津剑访谈部分：三条AGI路径框架、具身智能投资逻辑、MiniMax即将上市、"2024-2025出手变少"、对中国科技创新信心的判断）</li>
+          <li id="ref4"><a href="https://www.fortunechina.com/detail/people/4040/2024/23/zhangjinjian.htm" target="_blank">财富中文网 — 2024年《财富》中国40位40岁以下的商界精英：张津剑</a>（含张津剑履历、绿洲资本"精选重仓"标签、投资案例列表）</li>
+          <li id="ref5">BOSS直聘 — 上海象启咨询管理有限公司企业主页（绿洲资本境内运营实体），来源：<a href="https://www.zhipin.com/companys/fb86a20c28a39c881Xd_29q5EVM~.html" target="_blank">zhipin.com</a></li>
+          <li id="ref6"><a href="https://www.tmtpost.com/6747322.html" target="_blank">钛媒体 — 逐际动力LimX Dynamics完成Pre-A轮融资，由绿洲资本领投</a>（2023-10-17）</li>
+          <li id="ref7"><a href="https://www.chinaventure.com.cn/news/114-20231017-377739.html" target="_blank">投中网 — 逐际动力完成近2亿元天使轮和Pre-A轮融资</a>（2023-10-17）</li>
+          <li id="ref8"><a href="https://startup.aliyun.com/info/1037985.html" target="_blank">阿里云创新中心 — 绿洲资本完成1.5亿美元一期基金募资</a>（2020-07-23；含已交割6个项目详情及张津剑在挚信资本时期的投资案例）</li>
+          <li id="ref9"><a href="https://startup.aliyun.com/info/1037986.html" target="_blank">阿里云创新中心 — 绿洲资本美元二期基金首轮关帐，规模超2亿美元</a>（2021-08）</li>
+          <li id="ref10"><a href="https://news.pedaily.cn/202110/479458.shtml" target="_blank">投资界 — 绿洲资本美元二期基金超募募集2.75亿</a>（2021-10-20）</li>
+          <li id="ref11"><a href="https://finance.sina.com.cn/jjxw/2026-07-17/doc-iniianxe7441848.shtml" target="_blank">新浪财经 — 半年融资4亿美金、估值150亿，逐际动力冲刺IPO</a>（2026-07-17）</li>
+          <li id="ref12"><a href="https://www.listennotes.com/zh-hans/podcasts/42%E7%AB%A0%E7%BB%8F/%E6%8A%95-ai-%E6%9C%80%E7%8C%9B%E7%9A%84%E4%BA%BA-%E5%AF%B9%E8%B0%88%E7%BB%BF%E6%B4%B2%E8%B5%84%E6%9C%AC%E5%90%88%E4%BC%99%E4%BA%BA%E5%BC%A0%E6%B4%A5%E5%89%91-XM1LF2mTxqH/" target="_blank">42章经播客 — 投AI最猛的人 | 对谈绿洲资本合伙人张津剑</a>（All in AI的第一个三年）</li>
+          <li id="ref13"><a href="https://www.163.com/dy/article/JTJGT3SU05199LET.html" target="_blank">网易 — 绿洲资本张津剑：如果你认为AI和具身的机会是星辰大海，那就没有泡沫</a>（2025-04-20）</li>
+          <li id="ref14"><a href="https://www.36kr.com/p/2860538964462467" target="_blank">36氪 — 人形机器人公司「逐际动力」完成数亿元A轮融资，多巨头领投</a>（2024-07-15）</li>
+          <li id="ref15"><a href="https://www.pedaily.cn/2026investor/4861.shtml" target="_blank">投资界 — 2026投资界TOP100投资人：张津剑</a></li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">最新更新于 2026-08-04 · 数据来源见「2 参考资料」 · 部分数据来自机构自述口径，请审慎参考</div>
+</div>
+</body>
+</html>

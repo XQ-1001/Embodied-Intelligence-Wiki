@@ -62,13 +62,22 @@
   .page-footer { border-top: 1px solid #a2a9b1; padding: 14px 0 24px; margin: 30px 32px 0; font-size: 0.78rem; color: #54595d; text-align: center; }
   .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; }
   .top-nav a { color: var(--link); text-decoration: none; }
+  /* 投资机构类型标签 */
+  .t-vc { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .t-cvc { background: #fce4ec; color: #c62828; border-color: #f8bbd0; }
+  .t-gov-fund { background: #fff3e0; color: #e65100; border-color: #ffe0b2; }
+  .t-overseas-fund { background: #e0f2f1; color: #00695c; border-color: #b2dfdb; }
+  .t-national-fund { background: #f3e5f5; color: #7b1fa2; border-color: #e1bee7; }
+  .t-academic-fund { background: #e8f5e9; color: #2e7d32; border-color: #c5e1a5; }
+  .investor-name { font-weight: 600; }
+  .investor-en { color: #888; font-size: 0.74rem; }
 </style>
 </head>
 <body>
 <div class="page-container">
 <div class="top-nav"><a href="index.html">具身智能Wiki</a> <span>› 主索引</span></div>
 <div class="wiki-header"><h1>具身智能Wiki</h1><div class="subtitle">Embodied AI Wiki — 全球具身智能公司百科</div></div>
-<div class="stats-bar"><div>科技巨头 <strong>8</strong></div><div>海外公司 <strong>25</strong></div><div>国内公司 <strong>176</strong></div><div>海外生态 <strong>5</strong></div><div>国内生态 <strong>15</strong></div><div>总计 <strong>229</strong></div><div>更新于 <strong>2026-06-15</strong></div></div>
+<div class="stats-bar"><div>科技巨头 <strong>8</strong></div><div>海外公司 <strong>25</strong></div><div>国内公司 <strong>176</strong></div><div>海外生态 <strong>5</strong></div><div>国内生态 <strong>18</strong></div><div>投资机构 <strong>1</strong></div><div>总计 <strong>233</strong></div><div>更新于 <strong>2026-08-04</strong></div></div>
 <div class="content">
 
 	<h2 id="tech-giants">科技巨头具身布局</h2>
@@ -315,25 +324,35 @@
 <p class="section-desc">属于具身智能生态链但不直接构成完整具身系统的公司——含零部件/组件供应商、软件/算法/数据平台、芯片/算力供应商、非地面具身形态等。</p>
 <table class="wikitable">
 <tr><th>#</th><th>公司</th><th>技术路线</th><th>产品类型</th><th>应用场景 / 细分定位</th><th>最新估值</th></tr>
-	<tr><td>1</td><td><a href="entities/千里科技.html" class="co-name">千里科技</a> <span class="co-en">Qianli (AFARI)</span> <span class="co-code">(601777.SH)</span></td><td><span class="tag">RLM端到端智驾</span><span class="tag">VLA范式</span></td><td><span class="tag">AI+车解决方案</span><span class="tag">智驾/智舱/Robotaxi</span></td><td><span class="tag">具身智能生态关联方</span><span class="tag">阶跃星辰董事长</span></td><td class="val-cell">A股市值约500亿元</td></tr>
+			<tr><td>1</td><td><a href="entities/汇川技术.html" class="co-name">汇川技术</a> <span class="co-en">Inovance</span> <span class="co-code">(300124.SZ)</span></td><td><span class="tag">自研伺服/变频/PLC</span><span class="tag">工业机器人整机</span><span class="tag">人形零部件</span></td><td><span class="tag">SCARA/六轴/协作机器人</span><span class="tag">伺服电机/关节模组/丝杠</span></td><td><span class="t-industry">通用伺服/变频/SCARA国内第一</span><span class="tag">人形零部件获头部定点</span></td><td class="val-cell">A股市值约1,600亿元</td></tr>
+<tr><td>2</td><td><a href="entities/千里科技.html" class="co-name">千里科技</a> <span class="co-en">Qianli (AFARI)</span> <span class="co-code">(601777.SH)</span></td><td><span class="tag">RLM端到端智驾</span><span class="tag">VLA范式</span></td><td><span class="tag">AI+车解决方案</span><span class="tag">智驾/智舱/Robotaxi</span></td><td><span class="tag">具身智能生态关联方</span><span class="tag">阶跃星辰董事长</span></td><td class="val-cell">A股市值约500亿元</td></tr>
 
 
-<tr><td>2</td><td><a href="entities/天机智能.html" class="co-name">天机智能</a> <span class="co-en">Tianji Intelligence</span></td><td><span class="tag">MEMS传感器</span><span class="tag">力控操作本体</span></td><td><span class="tag">Marvin力控人形双臂</span><span class="tag">一体化关节</span></td><td><span class="t-industry">工业自动化</span><span class="tag">人形双臂出货量全球第一</span></td><td class="val-cell">近百亿元（B轮后）</td></tr>
-	<tr><td>3</td><td><a href="entities/诺仕机器人.html" class="co-name">诺仕机器人</a></td><td><span class="tag">微型行星滚柱丝杠</span></td><td><span class="tag">行星滚柱丝杠</span></td><td><span class="tag">灵巧手驱动</span><span class="tag t-dead">零部件/组件供应商</span></td><td class="val-cell">15亿人民币</td></tr>
-<tr><td>4</td><td><a href="entities/诺亦腾机器人.html" class="co-name">诺亦腾机器人</a></td><td><span class="tag">惯性IMU动捕</span></td><td><span class="tag">具身智能数据基础设施</span></td><td><span class="tag">遥操作</span><span class="tag t-dead">软件/数据/算法平台</span></td><td class="val-cell">15亿人民币</td></tr>
-<tr><td>5</td><td><a href="entities/璇玑动力.html" class="co-name">璇玑动力</a></td><td><span class="tag">轴向磁通电机</span></td><td><span class="tag">机器人动力系统</span></td><td><span class="t-industry">电力巡检</span><span class="tag t-dead">零部件/组件供应商</span></td><td class="val-cell">15亿人民币</td></tr>
-<tr><td>6</td><td><a href="entities/飞阔科技.html" class="co-name">飞阔科技</a></td><td><span class="tag">FLY天枢/天璇/天巡三大系统</span></td><td><span class="tag">FLY天枢系统</span></td><td><span class="tag">商业演出</span><span class="tag t-dead">软件/数据/算法平台</span></td><td class="val-cell">5亿人民币</td></tr>
-<tr><td>7</td><td><a href="entities/贝塔无限.html" class="co-name">贝塔无限</a></td><td><span class="tag">高情商</span></td><td><span class="tag">消费级具身智能机器人</span></td><td><span class="tag">消费级机器人</span><span class="tag t-dead">研发阶段/未量产</span></td><td class="val-cell">5亿人民币</td></tr>
-<tr><td>8</td><td><a href="entities/双良睿能机器人.html" class="co-name">双良睿能机器人</a></td><td><span class="tag">具身智能</span></td><td><span class="tag">具身智能技术研发商</span></td><td><span class="t-industry">供热巡检查</span><span class="tag t-dead">研发阶段/未量产</span></td><td class="val-cell">5亿人民币</td></tr>
-<tr><td>9</td><td><a href="entities/具身数据.html" class="co-name">具身数据</a></td><td><span class="tag">具身数据平台</span></td><td><span class="tag">数据基础设施</span></td><td><span class="tag">通用</span><span class="tag t-dead">软件/数据/算法平台</span></td><td class="val-cell">5亿元</td></tr>
-<tr><td>10</td><td><a href="entities/德塔智能.html" class="co-name">德塔智能</a></td><td><span class="tag">D-Bot协作机器人</span></td><td><span class="t-humanoid">原生人形基础模型</span></td><td><span class="tag">BIGAI孵化,3个月3轮…</span><span class="tag t-dead">软件/数据/算法平台</span></td><td class="val-cell">3亿人民币</td></tr>
-<tr><td>11</td><td><a href="entities/境智具身.html" class="co-name">境智具身</a></td><td><span class="tag">智元机器人等联合成立</span></td><td><span class="tag">机器狗</span></td><td><span class="tag">能源</span><span class="tag t-dead">产品定位模糊</span></td><td class="val-cell">2.22亿人民币</td></tr>
-<tr><td>12</td><td><a href="entities/具脑磐石.html" class="co-name">具脑磐石</a></td><td><span class="tag">脑认知启发范式Neural AI</span></td><td><span class="tag">具身智能芯片/算力</span></td><td><span class="tag">文旅</span><span class="tag t-dead">芯片/算力供应商</span></td><td class="val-cell">2亿人民币</td></tr>
-<tr><td>13</td><td><a href="entities/万勋科技.html" class="co-name">万勋科技</a></td><td><span class="tag">柔韧臂技术</span></td><td><span class="tag">空中清洗机器人AP3-P3</span></td><td><span class="tag">高空清洗</span><span class="tag t-dead">无人机/空中平台</span></td><td class="val-cell">1.5亿人民币</td></tr>
-<tr><td>14</td><td><a href="entities/灵启万物.html" class="co-name">灵启万物</a></td><td><span class="tag">光学动捕</span></td><td><span class="t-humanoid">人形AI算法</span></td><td><span class="t-service">家庭服务</span><span class="tag t-dead">软件/数据/算法平台</span></td><td class="val-cell">1.5亿人民币</td></tr>
-<tr><td>15</td><td><a href="entities/桥介数物.html" class="co-name">桥介数物</a> <span class="co-en">BridgeDP</span></td><td><span class="tag">RL运动控制</span><span class="tag">Sim2Real</span><span class="tag">桥介引擎</span></td><td><span class="tag">通用机器人动作开发平台</span></td><td><span class="t-humanoid">人形</span><span class="tag t-dead">软件/数据/算法平台</span></td><td class="val-cell">累计融资近1亿元</td></tr>
-	<tr><td>16</td><td><a href="entities/沃德尔.html" class="co-name">沃德尔</a> <span class="co-en">Wodeer Technology</span></td><td><span class="tag">多品类机器人零部件</span><span class="tag">协作机器人整机</span></td><td><span class="tag">汽车传感器/执行器</span><span class="tag">机器人电机/丝杠/力传感器</span><span class="tag">协作机器人</span></td><td><span class="t-industry">汽车电子/具身零部件</span><span class="tag">精密制造</span></td><td class="val-cell">-</td></tr>
-	<tr><td>17</td><td><a href="entities/拉格朗日.html" class="co-name">拉格朗日</a> <span class="co-en">Lagrange</span></td><td><span class="tag">Agentic OS具身操作系统</span></td><td><span class="tag">具身智能软件中枢/系统工程框架</span></td><td><span class="t-industry">工业具身智能</span><span class="tag">软件/算法/数据平台</span></td><td class="val-cell">-</td></tr>
+<tr><td>3</td><td><a href="entities/天机智能.html" class="co-name">天机智能</a> <span class="co-en">Tianji Intelligence</span></td><td><span class="tag">MEMS传感器</span><span class="tag">力控操作本体</span></td><td><span class="tag">Marvin力控人形双臂</span><span class="tag">一体化关节</span></td><td><span class="t-industry">工业自动化</span><span class="tag">人形双臂出货量全球第一</span></td><td class="val-cell">近百亿元（B轮后）</td></tr>
+	<tr><td>4</td><td><a href="entities/诺仕机器人.html" class="co-name">诺仕机器人</a></td><td><span class="tag">微型行星滚柱丝杠</span></td><td><span class="tag">行星滚柱丝杠</span></td><td><span class="tag">灵巧手驱动</span><span class="tag t-dead">零部件/组件供应商</span></td><td class="val-cell">15亿人民币</td></tr>
+<tr><td>5</td><td><a href="entities/诺亦腾机器人.html" class="co-name">诺亦腾机器人</a></td><td><span class="tag">惯性IMU动捕</span></td><td><span class="tag">具身智能数据基础设施</span></td><td><span class="tag">遥操作</span><span class="tag t-dead">软件/数据/算法平台</span></td><td class="val-cell">15亿人民币</td></tr>
+<tr><td>6</td><td><a href="entities/璇玑动力.html" class="co-name">璇玑动力</a></td><td><span class="tag">轴向磁通电机</span></td><td><span class="tag">机器人动力系统</span></td><td><span class="t-industry">电力巡检</span><span class="tag t-dead">零部件/组件供应商</span></td><td class="val-cell">15亿人民币</td></tr>
+<tr><td>7</td><td><a href="entities/飞阔科技.html" class="co-name">飞阔科技</a></td><td><span class="tag">FLY天枢/天璇/天巡三大系统</span></td><td><span class="tag">FLY天枢系统</span></td><td><span class="tag">商业演出</span><span class="tag t-dead">软件/数据/算法平台</span></td><td class="val-cell">5亿人民币</td></tr>
+<tr><td>8</td><td><a href="entities/贝塔无限.html" class="co-name">贝塔无限</a></td><td><span class="tag">高情商</span></td><td><span class="tag">消费级具身智能机器人</span></td><td><span class="tag">消费级机器人</span><span class="tag t-dead">研发阶段/未量产</span></td><td class="val-cell">5亿人民币</td></tr>
+<tr><td>9</td><td><a href="entities/双良睿能机器人.html" class="co-name">双良睿能机器人</a></td><td><span class="tag">具身智能</span></td><td><span class="tag">具身智能技术研发商</span></td><td><span class="t-industry">供热巡检查</span><span class="tag t-dead">研发阶段/未量产</span></td><td class="val-cell">5亿人民币</td></tr>
+<tr><td>10</td><td><a href="entities/具身数据.html" class="co-name">具身数据</a></td><td><span class="tag">具身数据平台</span></td><td><span class="tag">数据基础设施</span></td><td><span class="tag">通用</span><span class="tag t-dead">软件/数据/算法平台</span></td><td class="val-cell">5亿元</td></tr>
+<tr><td>11</td><td><a href="entities/德塔智能.html" class="co-name">德塔智能</a></td><td><span class="tag">D-Bot协作机器人</span></td><td><span class="t-humanoid">原生人形基础模型</span></td><td><span class="tag">BIGAI孵化,3个月3轮…</span><span class="tag t-dead">软件/数据/算法平台</span></td><td class="val-cell">3亿人民币</td></tr>
+<tr><td>12</td><td><a href="entities/境智具身.html" class="co-name">境智具身</a></td><td><span class="tag">智元机器人等联合成立</span></td><td><span class="tag">机器狗</span></td><td><span class="tag">能源</span><span class="tag t-dead">产品定位模糊</span></td><td class="val-cell">2.22亿人民币</td></tr>
+<tr><td>13</td><td><a href="entities/具脑磐石.html" class="co-name">具脑磐石</a></td><td><span class="tag">脑认知启发范式Neural AI</span></td><td><span class="tag">具身智能芯片/算力</span></td><td><span class="tag">文旅</span><span class="tag t-dead">芯片/算力供应商</span></td><td class="val-cell">2亿人民币</td></tr>
+<tr><td>14</td><td><a href="entities/万勋科技.html" class="co-name">万勋科技</a></td><td><span class="tag">柔韧臂技术</span></td><td><span class="tag">空中清洗机器人AP3-P3</span></td><td><span class="tag">高空清洗</span><span class="tag t-dead">无人机/空中平台</span></td><td class="val-cell">1.5亿人民币</td></tr>
+<tr><td>15</td><td><a href="entities/灵启万物.html" class="co-name">灵启万物</a></td><td><span class="tag">光学动捕</span></td><td><span class="t-humanoid">人形AI算法</span></td><td><span class="t-service">家庭服务</span><span class="tag t-dead">软件/数据/算法平台</span></td><td class="val-cell">1.5亿人民币</td></tr>
+<tr><td>16</td><td><a href="entities/桥介数物.html" class="co-name">桥介数物</a> <span class="co-en">BridgeDP</span></td><td><span class="tag">RL运动控制</span><span class="tag">Sim2Real</span><span class="tag">桥介引擎</span></td><td><span class="tag">通用机器人动作开发平台</span></td><td><span class="t-humanoid">人形</span><span class="tag t-dead">软件/数据/算法平台</span></td><td class="val-cell">累计融资近1亿元</td></tr>
+	<tr><td>17</td><td><a href="entities/沃德尔.html" class="co-name">沃德尔</a> <span class="co-en">Wodeer Technology</span></td><td><span class="tag">多品类机器人零部件</span><span class="tag">协作机器人整机</span></td><td><span class="tag">汽车传感器/执行器</span><span class="tag">机器人电机/丝杠/力传感器</span><span class="tag">协作机器人</span></td><td><span class="t-industry">汽车电子/具身零部件</span><span class="tag">精密制造</span></td><td class="val-cell">-</td></tr>
+	<tr><td>18</td><td><a href="entities/拉格朗日.html" class="co-name">拉格朗日</a> <span class="co-en">Lagrange</span></td><td><span class="tag">Agentic OS具身操作系统</span></td><td><span class="tag">具身智能软件中枢/系统工程框架</span></td><td><span class="t-industry">工业具身智能</span><span class="tag">软件/算法/数据平台</span></td><td class="val-cell">-</td></tr>
+</table>
+
+<h2 id="investors">投资机构</h2>
+<p class="section-desc">收录在具身智能领域有实际投资布局的各类投资机构，含财务VC、产业资本/CVC、地方政府基金、国家级基金及海外投资机构。</p>
+
+<h3 id="investors-vc">财务投资机构</h3>
+<table class="wikitable">
+<tr><th>#</th><th>机构</th><th>管理规模</th><th>投资阶段</th><th>具身智能投资组合</th><th>代表性案例</th></tr>
+<tr><td>1</td><td><a href="entities/investors/绿洲资本.html" class="investor-name">绿洲资本</a> <span class="investor-en">Vitalbridge / Oasis Capital</span></td><td>超50亿人民币</td><td><span class="tag">种子-A轮</span><span class="t-vc">精选重仓</span></td><td><a href="entities/investors/绿洲资本.html">逐际动力</a>（2023 Pre-A轮领投）</td><td><span class="tag">MiniMax</span><span class="tag">Boson.ai</span><span class="tag">无问芯穹</span></td></tr>
 </table>
 
 <h2 id="research-reports">研究报告</h2>
@@ -344,7 +363,7 @@
 </table>
 
 </div>
-<div class="page-footer"><p>具身智能Wiki · 科技巨头8 + 海外25 + 国内176 + 海外生态5 + 国内生态17 · 最后更新 2026-06-15</p></div>
+<div class="page-footer"><p>具身智能Wiki · 科技巨头8 + 海外25 + 国内176 + 海外生态5 + 国内生态18 + 投资机构1 · 最后更新 2026-08-04</p></div>
 </div>
 </body>
 </html>
