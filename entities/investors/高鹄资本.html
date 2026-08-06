@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>高鹄资本 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .t-vc { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .t-cvc { background: #fce4ec; color: #c62828; border-color: #f8bbd0; }
+  .t-gov-fund { background: #fff3e0; color: #e65100; border-color: #ffe0b2; }
+  .t-national-fund { background: #f3e5f5; color: #7b1fa2; border-color: #e1bee7; }
+  .t-overseas-fund { background: #e0f2f1; color: #00695c; border-color: #b2dfdb; }
+  .t-fa { background: #f3e5f5; color: #7b1fa2; border-color: #e1bee7; }
+  .t-lead-investor { background: #fff8e1; color: #f57f17; border-color: #ffecb3; }
+  .t-follow-investor { background: #f5f5f5; color: #616161; border-color: #e0e0e0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../../index.html">具身智能Wiki</a> <span class="breadcrumb-sep">›</span> <a href="../../index.html#investors">投资机构</a> <span class="breadcrumb-sep">›</span> <span>高鹄资本</span></div>
+  <div class="wiki-header"><h1>高鹄资本</h1><div class="subtitle">Cygnus Equity · 精品投行 · 2015年成立 · 由PE投资人创立的FA · 累计完成100+项交易<sup><a href="#ref1">[1]</a></sup> · 具身智能赛道最活跃的独家财务顾问之一</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实与分析</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#team">1.2 核心团队</a></li>
+        <li class="toc-lvl3"><a href="#model">1.3 业务模式与定位</a></li>
+        <li class="toc-lvl3"><a href="#tracks">1.4 主要服务赛道</a></li>
+        <li class="toc-lvl3"><a href="#embodied">1.5 具身智能领域布局</a></li>
+        <li class="toc-lvl3"><a href="#cases">1.6 代表性交易案例</a></li>
+        <li class="toc-lvl3"><a href="#other">1.7 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#references">2 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">高鹄资本</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">上海高鹄企业管理有限公司 / 上海高鹄资产管理有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">英文名</div><div class="ib-value">Cygnus Equity</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2015年<sup><a href="#ref1">[1]</a></sup></div></div>
+        <div class="ib-row"><div class="ib-label">总部</div><div class="ib-value">上海市黄浦区<sup><a href="#ref1">[1]</a></sup></div></div>
+        <div class="ib-row"><div class="ib-label">机构类型</div><div class="ib-value"><span class="tag t-fa">精品投行（FA）</span></div></div>
+        <div class="ib-row"><div class="ib-label">管理合伙人</div><div class="ib-value">金明<sup><a href="#ref2">[2]</a></sup></div></div>
+        <div class="ib-row"><div class="ib-label">官网</div><div class="ib-value"><a href="https://www.cygnusequity.com" target="_blank">www.cygnusequity.com</a><sup><a href="#ref1">[1]</a></sup></div></div>
+        <div class="ib-section">业务概况</div>
+        <div class="ib-row"><div class="ib-label">核心业务</div><div class="ib-value">私募股权融资顾问（FA）、并购顾问、战略咨询<sup><a href="#ref1">[1]</a></sup></div></div>
+        <div class="ib-row"><div class="ib-label">累计交易</div><div class="ib-value">100+项（自2017年起）<sup><a href="#ref1">[1]</a></sup></div></div>
+        <div class="ib-row"><div class="ib-label">办公室</div><div class="ib-value">上海、北京、深圳<sup><a href="#ref1">[1]</a></sup></div></div>
+        <div class="ib-row"><div class="ib-label">服务币种</div><div class="ib-value">人民币/美元<sup><a href="#ref1">[1]</a></sup></div></div>
+        <div class="ib-row"><div class="ib-label">行业认可</div><div class="ib-value">投中"中国最佳新型投行TOP10"（2018-2019）<sup><a href="#ref3">[3]</a></sup></div></div>
+      </aside>
+
+      <h2 id="facts">1 事实与分析</h2>
+
+      <h3 id="basic">1.1 基本信息</h3>
+      <p class="article-intro">
+        <strong>高鹄资本</strong>（Cygnus Equity）是一家由PE基金投资人创立的精品投行（Boutique Investment Bank），由全球最大私募股权投资基金之一普维投资（Providence Equity Partners）前中国区负责人金明于2015年领衔创立。<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref2">[2]</a></sup>公司定位为"创业家信赖的合伙人"，以私募股权融资顾问（FA）为核心业务，辅以并购顾问和战略咨询服务。自2017年以来已累计完成100余项交易，深度服务了大量新经济领域头部企业。<sup><a href="#ref1">[1]</a></sup>
+      </p>
+      <p><strong>说明</strong>：高鹄资本与传统的VC/PE投资机构不同——它本身不募集和管理投资基金，而是作为<strong>卖方财务顾问（Sell-side FA）</strong>，帮助被投企业在融资轮/并购交易中对接合适的投资方、设计交易结构、谈判条款。在本Wiki的投资机构分类体系中，高鹄资本属于一种特殊的"事实投资参与者"——虽不直接出资，但其作为独家财务顾问在具身智能领域的多笔重大交易中发挥了关键作用。<sup><a href="#ref1">[1]</a></sup></p>
+
+      <table class="wikitable infotable">
+        <tr><th>项目</th><th>内容</th><th>来源</th></tr>
+        <tr><td>公司全称</td><td>上海高鹄企业管理有限公司 / 上海高鹄资产管理有限公司</td><td><sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>品牌名</td><td>高鹄资本（Cygnus Equity）</td><td><sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>成立时间</td><td>2015年（业务开展始于2017年）</td><td><sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>机构定位</td><td>精品投行（FA），"由PE投资人创立的精品投行"</td><td><sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>核心业务</td><td>私募股权融资顾问（FA）、并购顾问、战略咨询</td><td><sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>累计交易量</td><td>100+项（自2017年以来）</td><td><sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>总部/办公室</td><td>上海（总部）、北京、深圳</td><td><sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>核心团队</td><td>金明（管理合伙人）、金涛（合伙人）、洪伟力（投资合伙人）、查轶伦（COO）</td><td><sup><a href="#ref2">[2]</a></sup></td></tr>
+        <tr><td>官网</td><td><a href="https://www.cygnusequity.com" target="_blank">www.cygnusequity.com</a>（已通过WebFetch验证连通性，HTTP 200）</td><td><sup><a href="#ref1">[1]</a></sup></td></tr>
+      </table>
+
+      <h3 id="team">1.2 核心团队</h3>
+
+      <table class="wikitable">
+        <tr><th>姓名</th><th>角色</th><th>核心履历</th><th>来源</th></tr>
+        <tr>
+          <td>金明</td>
+          <td>管理合伙人</td>
+          <td>创立高鹄资本前，担任全球最大私募股权投资基金之一普维投资（Providence Equity Partners）中国区负责人。此前任职于美国华平投资集团（Warburg Pincus）。在私募股权投资、融资顾问、跨境并购、上市资本运作等方面均具有丰富经验。毕业于清华大学，获会计学学士学位。<sup><a href="#ref2">[2]</a></sup></td>
+          <td><sup><a href="#ref2">[2]</a></sup></td>
+        </tr>
+        <tr>
+          <td>金涛</td>
+          <td>合伙人</td>
+          <td>拥有丰富的私募股权、投资银行和资本市场经验。先后任职于毕马威（审计）、中金公司（投行）和摩根大通（投行），具有从审计到投行到PE的全链条经验。毕业于西安交通大学，获金融学学士学位。<sup><a href="#ref2">[2]</a></sup></td>
+          <td><sup><a href="#ref2">[2]</a></sup></td>
+        </tr>
+        <tr>
+          <td>洪伟力</td>
+          <td>投资合伙人</td>
+          <td>博士。曾任华人文化控股集团总裁兼CRO、歌斐资产管理合伙人、KTB投资集团管理合伙人（中国）、ING集团中国高管等职。1992年加入上海证券交易所任总经理秘书等职，是中国国债期货的主要设计者之一，后任中创证券（上海）总经理，是90年代最年轻券商高管之一。兼任复旦大学经济学院客座教授、泛海国际金融学院金融学客座教授。<sup><a href="#ref2">[2]</a></sup></td>
+          <td><sup><a href="#ref2">[2]</a></sup></td>
+        </tr>
+        <tr>
+          <td>查轶伦</td>
+          <td>首席运营官</td>
+          <td>曾任职于普维投资（Providence Equity），负责投资者关系、基金运营、风控合规。也曾任职于全球前5大战略咨询公司摩立特集团（Monitor Group），为财富500强企业及大型央企/民企制定发展战略。毕业于北京大学，获文学硕士和学士学位。<sup><a href="#ref2">[2]</a></sup></td>
+          <td><sup><a href="#ref2">[2]</a></sup></td>
+        </tr>
+      </table>
+
+      <div class="callout"><span class="tag tag-info">简评</span> 高鹄资本的团队结构体现了"PE+投行+咨询"的三位一体背景。金明从PE投资人的视角创立FA，使其与其他从投行/媒体/互联网出身的FA创始人有本质不同——他天然理解VC/PE端的需求和决策逻辑。洪伟力的"政策制定者（国债期货设计）+券商高管+大学客座教授"复合背景在中国FA合伙人中极为罕见。团队整体从大型机构的"买方"视角切入FA这种"卖方服务"，使其在与投资机构沟通时具有独特信任优势。</div>
+
+      <h3 id="model">1.3 业务模式与定位</h3>
+      <p>高鹄资本定位为"由PE投资人创立的精品投行"，其业务模式与传统财务投资机构有本质区别：<sup><a href="#ref1">[1]</a></sup></p>
+
+      <ul>
+        <li><strong>核心业务：私募股权融资顾问（FA）</strong>——作为被投企业的独家财务顾问，负责对接投资方、设计融资方案、协助条款谈判。高鹄资本在大部分公开交易中担任"独家财务顾问"角色。</li>
+        <li><strong>不直接管理基金、不进行股权投资</strong>——与VC/PE的最大区别在于：高鹄资本不募集和管理投资基金，不持有被投企业股权，收入来源为融资顾问费（通常按融资金额的一定百分比收取）。</li>
+        <li><strong>"由PE投资人创立"的独特基因</strong>——金明在普维投资和华平投资的PE背景，使高鹄资本在理解投资方决策逻辑、估值方法、退出路径设计等方面具有天然优势。</li>
+        <li><strong>全行业覆盖</strong>——服务赛道包括科技（AI/具身智能/半导体）、互联网、消费及出海、企业服务四大板块，官网案例页列出了50+家代表性客户。<sup><a href="#ref1">[1]</a></sup></li>
+        <li><strong>行业认可</strong>——2018年和2019年连续入选投中"中国最佳新型投行TOP10"。<sup><a href="#ref3">[3]</a></sup>2025年荣获第一新声"最活跃财务顾问机构"多项TOP大奖。<sup><a href="#ref4">[4]</a></sup></li>
+      </ul>
+
+      <div class="callout"><span class="tag tag-info">简评</span> 在中国FA行业中，高鹄资本的路径与华兴资本（投行→投资→上市）、光源资本（研究驱动FA）等竞品有所不同：它从PE出身的"买方思维"切入FA，在硬科技/具身智能这类需要深度产业理解的赛道中具有差异化优势。其"不直接管理基金"的纯粹FA模式使其不受基金存续期和LP压力的影响，可以更长期地陪伴被投企业——但这个模式的弱点也很明显：FA收入完全依赖于交易成功与否，市场下行时抗周期能力有限。</div>
+
+      <h3 id="tracks">1.4 主要服务赛道</h3>
+
+      <table class="wikitable">
+        <tr><th>赛道</th><th>代表性服务客户</th><th>服务特征</th><th>布局时间</th><th>来源</th></tr>
+        <tr>
+          <td>科技（AI/具身智能/半导体）</td>
+          <td>千寻智能、墨奇智能、天机智能、维他动力、擎羽科技、临界航天、MiniMax、光羿科技、欣旺达动力、Hillbot、Hypershell、PongBot、RoboPoet、知存科技、沈氏科技</td>
+          <td>以独家财务顾问为主，覆盖从天使到Pre-A到B/C轮的全阶段</td>
+          <td>2022-</td>
+          <td><sup><a href="#ref1">[1]</a></sup></td>
+        </tr>
+        <tr>
+          <td>互联网/TMT</td>
+          <td>饿了么、网易云音乐、涂鸦智能（NYSE: TUYA）、叮咚买菜（NYSE: DDL）、小冰、大搜车、马蜂窝、即时设计</td>
+          <td>FA及并购顾问；饿了么等为阿里巴巴收购案</td>
+          <td>2017-</td>
+          <td><sup><a href="#ref1">[1]</a></sup></td>
+        </tr>
+        <tr>
+          <td>消费及出海</td>
+          <td>霸王茶姬、moody、溪木源、简爱、Fiture、AMIRO、野兽派、话梅、iMile、WOOK、TENWAYS、Viture、Cue</td>
+          <td>多轮次FA服务</td>
+          <td>2018-</td>
+          <td><sup><a href="#ref1">[1]</a></sup></td>
+        </tr>
+        <tr>
+          <td>企业服务</td>
+          <td>纷享销客、追一科技、即构科技、慧算账、广联先锋、森浦Sumscope、数位、博华科技</td>
+          <td>SaaS及产业数字化FA</td>
+          <td>2017-</td>
+          <td><sup><a href="#ref1">[1]</a></sup></td>
+        </tr>
+      </table>
+
+      <h3 id="embodied">1.5 具身智能领域布局</h3>
+
+      <h4>A. 布局概览</h4>
+      <p>高鹄资本是<strong>具身智能赛道最活跃的独家财务顾问之一</strong>。截至2026年8月，其已作为独家财务顾问（FA）服务了至少6家具身智能/机器人领域的头部创业公司，累计协助完成融资金额超过<strong>60亿元人民币</strong>。<sup><a href="#ref1">[1]</a></sup>覆盖从天使轮到Pre-A轮的全阶段，服务对象涵盖人形机器人本体（千寻智能）、机器人"大脑"（墨奇智能）、具身智能基础设施（天机智能）、消费级机器人（维他动力）、柔性具身智能（擎羽科技）、太空AI（临界航天）等多个细分方向。<sup><a href="#ref5">[5]</a></sup><sup><a href="#ref6">[6]</a></sup><sup><a href="#ref7">[7]</a></sup></p>
+
+      <div class="callout">
+        <div class="callout-title">具身智能&机器人FA服务概况</div>
+        <p>已服务的具身智能/机器人客户：<strong>6</strong>家 | 累计协助融资金额：约<strong>60亿元人民币</strong> | 服务轮次：<strong>天使轮~Pre-A轮为主</strong> | 角色：<strong>全部为独家财务顾问</strong> | 代表性交易：千寻智能多次融资（30天30亿）<sup><a href="#ref8">[8]</a></sup>、墨奇智能超10亿天使轮<sup><a href="#ref6">[6]</a></sup>、天机智能10亿<sup><a href="#ref7">[7]</a></sup></p>
+      </div>
+
+      <h4>B. 具身智能&机器人FA服务组合</h4>
+
+      <table class="wikitable">
+        <tr><th>客户</th><th>服务时间</th><th>融资轮次</th><th>融资金额</th><th>投资方（部分）</th><th>客户核心方向</th><th>来源</th></tr>
+        <tr>
+          <td><a href="../千寻智能.html" target="_blank">千寻智能（Spirit AI）</a></td>
+          <td>2025-2026年（多次）</td>
+          <td>天使+轮 → Pre-A轮 → 天使+轮（累计多轮）</td>
+          <td>天使+轮~20亿<sup><a href="#ref9">[9]</a></sup>；Pre-A轮5.28亿<sup><a href="#ref10">[10]</a></sup>；后续10亿<sup><a href="#ref8">[8]</a></sup>。30天内连续完成近30亿融资<sup><a href="#ref8">[8]</a></sup></td>
+          <td>阿里、腾讯、阿美P7、招商局、顶级资本天团等</td>
+          <td>通用人形机器人（Moz1全人形），端到端Spirit VLA</td>
+          <td><sup><a href="#ref8">[8]</a></sup><sup><a href="#ref9">[9]</a></sup><sup><a href="#ref10">[10]</a></sup></td>
+        </tr>
+        <tr>
+          <td>墨奇智能</td>
+          <td>2026年7月</td>
+          <td>天使轮系列</td>
+          <td>超10亿元人民币<sup><a href="#ref6">[6]</a></sup></td>
+          <td>阿里、腾讯等<sup><a href="#ref6">[6]</a></sup></td>
+          <td>具身智能"大脑"——前华为智驾大模型负责人黄青虬创办，成立仅半年<sup><a href="#ref6">[6]</a></sup></td>
+          <td><sup><a href="#ref6">[6]</a></sup></td>
+        </tr>
+        <tr>
+          <td>天机智能</td>
+          <td>2026年5月</td>
+          <td>战略融资</td>
+          <td>10亿元人民币，投后估值近百亿<sup><a href="#ref7">[7]</a></sup></td>
+          <td>高瓴、美团（联合领投）<sup><a href="#ref7">[7]</a></sup></td>
+          <td>具身智能基础设施平台<sup><a href="#ref7">[7]</a></sup></td>
+          <td><sup><a href="#ref7">[7]</a></sup></td>
+        </tr>
+        <tr>
+          <td><a href="../维他动力.html" target="_blank">维他动力（Vita Dynamics / Vbot）</a></td>
+          <td>2025年3月-8月（多次）</td>
+          <td>种子轮 → 天使轮</td>
+          <td>种子轮2亿元<sup><a href="#ref5">[5]</a></sup>；天使轮3亿元<sup><a href="#ref11">[11]</a></sup></td>
+          <td>未逐一披露</td>
+          <td>消费级智能伴随机器人<sup><a href="#ref5">[5]</a></sup></td>
+          <td><sup><a href="#ref5">[5]</a></sup><sup><a href="#ref11">[11]</a></sup></td>
+        </tr>
+        <tr>
+          <td>擎羽科技</td>
+          <td>2026年6月</td>
+          <td>Pre-A轮</td>
+          <td>未公开披露具体金额<sup><a href="#ref12">[12]</a></sup></td>
+          <td>顺为资本、五源资本（联合投资）<sup><a href="#ref12">[12]</a></sup></td>
+          <td>柔性具身智能<sup><a href="#ref12">[12]</a></sup></td>
+          <td><sup><a href="#ref12">[12]</a></sup></td>
+        </tr>
+        <tr>
+          <td>临界航天</td>
+          <td>2026年7月</td>
+          <td>天使轮</td>
+          <td>2亿元人民币<sup><a href="#ref13">[13]</a></sup></td>
+          <td>未逐一披露</td>
+          <td>AI4S太空探索（具身智能在极端环境中的应用）<sup><a href="#ref13">[13]</a></sup></td>
+          <td><sup><a href="#ref13">[13]</a></sup></td>
+        </tr>
+      </table>
+
+      <p><strong>补充</strong>：除上述具身智能/机器人核心客户外，高鹄资本官网案例页还列出了Hillbot（通用机器人）、Hypershell（外骨骼）、PongBot（乒乓球机器人）、RoboPoet（机器人创作）等机器人公司的Logo，但未披露这些项目的具体融资细节。本表格仅收录已公开披露融资信息的项目。<sup><a href="#ref1">[1]</a></sup></p>
+
+      <h4>C. 在具身智能赛道的差异化优势</h4>
+      <ul>
+        <li><strong>千寻智能的深度绑定</strong>：高鹄资本自千寻智能天使+轮起即担任独家财务顾问，已连续服务多轮融资，累计协助融资近50亿元。这种"从天使轮开始陪伴"的深度关系，在FA行业中极为罕见——多数FA在Pre-A/B轮以后才介入。<sup><a href="#ref8">[8]</a></sup><sup><a href="#ref9">[9]</a></sup><sup><a href="#ref10">[10]</a></sup></li>
+        <li><strong>顶级投资方网络的调动能力</strong>：高鹄资本在具身智能交易中能调动阿里、腾讯、高瓴、美团、顺为、五源、招商局、阿美P7等中国最顶级的VC/PE/CVC和国家队资本——这种网络覆盖面和撮合能力在FA行业中属于第一梯队。<sup><a href="#ref6">[6]</a></sup><sup><a href="#ref7">[7]</a></sup><sup><a href="#ref8">[8]</a></sup></li>
+        <li><strong>"PE投资人视角"的估值定价能力</strong>：金明在普维投资和华平投资的PE背景，使高鹄在帮助具身智能创业公司定价和设计交易结构时，能够理解投资方的估值逻辑和风险偏好——这对千寻智能30天内完成近30亿融资的高效执行至关重要。<sup><a href="#ref8">[8]</a></sup></li>
+        <li><strong>跨界科技和消费的独特组合</strong>：高鹄资本同时服务了霸王茶姬（消费）和千寻智能（具身智能）等完全不同赛道的头部公司，这种跨行业资源（尤其是消费品牌的市场化经验）在帮助具身智能项目对接非传统投资者时可能产生独特价值。</li>
+      </ul>
+
+      <div class="callout"><span class="tag tag-info">简评</span> 高鹄资本在具身智能FA市场中的定位可以类比为"具身智能的华兴"——在赛道最早期、最不确定的阶段，通过深度绑定头部标的（千寻智能）、调动顶级投资方网络、发挥PE级定价能力，建立了明显的先发优势和品牌效应。但其模式依赖于头部项目的持续融资成功——如果千寻智能等核心客户的后续融资受阻或出现问题，对高鹄的具身智能FA业务线将产生较大影响。此外，作为纯粹FA（无自有基金），高鹄无法像华兴资本的新经济基金那样通过自有资金跟投来进一步绑定客户关系。</div>
+
+      <h3 id="cases">1.6 代表性交易案例</h3>
+
+      <table class="wikitable">
+        <tr><th>客户</th><th>交易类型</th><th>交易金额（约）</th><th>高鹄角色</th><th>交易亮点</th><th>来源</th></tr>
+        <tr>
+          <td>千寻智能</td>
+          <td>多轮私募融资（FA）</td>
+          <td>累计近50亿元</td>
+          <td>独家财务顾问</td>
+          <td>从天使+轮起连续服务，30天内完成近30亿融资，估值破百亿</td>
+          <td><sup><a href="#ref8">[8]</a></sup><sup><a href="#ref9">[9]</a></sup><sup><a href="#ref10">[10]</a></sup></td>
+        </tr>
+        <tr>
+          <td>墨奇智能</td>
+          <td>天使轮系列私募融资（FA）</td>
+          <td>超10亿元</td>
+          <td>独家财务顾问</td>
+          <td>成立仅半年即完成超10亿天使轮，阿里腾讯同台押注，前华为智驾大模型负责人创办</td>
+          <td><sup><a href="#ref6">[6]</a></sup></td>
+        </tr>
+        <tr>
+          <td>天机智能</td>
+          <td>战略融资（FA）</td>
+          <td>10亿元</td>
+          <td>独家财务顾问</td>
+          <td>高瓴、美团联合领投，投后估值近百亿</td>
+          <td><sup><a href="#ref7">[7]</a></sup></td>
+        </tr>
+        <tr>
+          <td>维他动力</td>
+          <td>种子+天使轮融资（FA）</td>
+          <td>累计5亿元</td>
+          <td>独家财务顾问</td>
+          <td>成立三个月即完成2亿种子轮，发布国内首个智能伴随机器人</td>
+          <td><sup><a href="#ref5">[5]</a></sup><sup><a href="#ref11">[11]</a></sup></td>
+        </tr>
+        <tr>
+          <td>MiniMax</td>
+          <td>私募融资（FA）</td>
+          <td>未公开</td>
+          <td>财务顾问</td>
+          <td>中国头部AI大模型公司</td>
+          <td><sup><a href="#ref1">[1]</a></sup></td>
+        </tr>
+        <tr>
+          <td>霸王茶姬</td>
+          <td>私募融资（FA）</td>
+          <td>未公开</td>
+          <td>财务顾问</td>
+          <td>中国头部新茶饮品牌，已递表港交所</td>
+          <td><sup><a href="#ref1">[1]</a></sup></td>
+        </tr>
+        <tr>
+          <td>饿了么</td>
+          <td>并购/战略融资</td>
+          <td>—</td>
+          <td>财务顾问</td>
+          <td>最终被阿里巴巴收购</td>
+          <td><sup><a href="#ref1">[1]</a></sup></td>
+        </tr>
+        <tr>
+          <td>涂鸦智能（NYSE: TUYA）</td>
+          <td>私募融资+IPO（FA）</td>
+          <td>—</td>
+          <td>财务顾问</td>
+          <td>2021年纽交所上市，全球IoT云平台</td>
+          <td><sup><a href="#ref1">[1]</a></sup></td>
+        </tr>
+        <tr>
+          <td>叮咚买菜（NYSE: DDL）</td>
+          <td>私募融资+IPO（FA）</td>
+          <td>—</td>
+          <td>财务顾问</td>
+          <td>2021年纽交所上市</td>
+          <td><sup><a href="#ref1">[1]</a></sup></td>
+        </tr>
+        <tr>
+          <td>Mindverse</td>
+          <td>A轮融资（FA）</td>
+          <td>未公开</td>
+          <td>独家财务顾问</td>
+          <td>2026年6月，美团领投<sup><a href="#ref14">[14]</a></sup></td>
+          <td><sup><a href="#ref14">[14]</a></sup></td>
+        </tr>
+      </table>
+
+      <div class="callout"><span class="tag tag-info">简评</span> 高鹄资本的交易案例列表呈现出一个清晰的转型轨迹：早期（2017-2021）以互联网/消费赛道的头部项目为主（饿了么、涂鸦智能、叮咚买菜、霸王茶姬等），2023年后逐渐转向AI/硬科技（MiniMax、千寻智能、天机智能等），2025-2026年集中发力具身智能。这种转型的驱动力有两个：一是消费互联网赛道的投资热度下降，二是金明的PE背景使团队在硬科技领域的理解力具有可迁移性。但同时也需注意：消费和硬科技在估值逻辑、投资方画像、交易节奏上存在显著差异，同一套FA方法论能否在两个领域都适用，需要持续观察。</div>
+
+      <h3 id="other">1.7 其他信息</h3>
+      <ul>
+        <li><strong>"严正声明"事件</strong>：高鹄资本官网发布"严正声明"，提醒公众警惕不法分子假借"高鹄资本"名义通过APP、网站、微信、QQ等渠道宣传并销售虚假理财、投资产品。<sup><a href="#ref1">[1]</a></sup></li>
+        <li><strong>2026年具身智能集中爆发</strong>：2026年5-7月间，高鹄资本连续完成了天机智能（10亿）、擎羽科技（Pre-A）、墨奇智能（超10亿天使轮）、临界航天（2亿天使轮）四笔具身智能/机器人方向的FA交易，展示出在该领域的头部聚集效应。<sup><a href="#ref6">[6]</a></sup><sup><a href="#ref7">[7]</a></sup><sup><a href="#ref12">[12]</a></sup><sup><a href="#ref13">[13]</a></sup></li>
+        <li><strong>第一新声2025年度大奖</strong>：2025年，高鹄资本荣膺"第一新声"2025年度"最活跃财务顾问机构"及多项细分赛道的TOP大奖。<sup><a href="#ref4">[4]</a></sup></li>
+        <li><strong>《财资》The Asset年度大奖</strong>：高鹄资本荣获《财资》（The Asset）年度最佳私募股权交易大奖。<sup><a href="#ref15">[15]</a></sup></li>
+        <li><strong>官网案例页包含更多机器人公司</strong>：高鹄资本官网案例页面Logo墙中列出了Hillbot（通用机器人）、Hypershell（外骨骼）、PongBot（乒乓球机器人）、RoboPoet（机器人创作）等机器人公司，但这些项目的具体融资细节尚未被公开媒体报道。此处列出以提示读者完整布局的规模可能大于公开可验证的范围。<sup><a href="#ref1">[1]</a></sup></li>
+      </ul>
+
+      <h2 id="references">2 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li id="ref1"><a href="https://www.cygnusequity.com" target="_blank">高鹄资本官网</a> 及 <a href="https://cygnusequity.com/case/" target="_blank">案例页</a>（2026-08-06访问，HTTP 200，含完整客户Logo墙及案例分类）— 机构自述</li>
+          <li id="ref2"><a href="https://cygnusequity.com/team/" target="_blank">高鹄资本官网 — 团队页面</a>（2026-08-06访问）— 机构自述</li>
+          <li id="ref3"><a href="https://cygnusequity.com/news/476.html" target="_blank">高鹄资本官网 — 高鹄资本入选投中2018年度"中国最佳新型投行TOP10"</a>— 行业评选</li>
+          <li id="ref4"><a href="https://cygnusequity.com/news/1169.html" target="_blank">高鹄资本官网 — 高鹄资本荣膺第一新声2025年度「最活跃财务顾问机构」多项TOP大奖</a>— 行业评选</li>
+          <li id="ref5"><a href="https://cygnusequity.com/news/1126.html" target="_blank">高鹄资本官网 — 维他动力完成2亿元种子轮融资，今年底发布首款消费级机器人产品</a>（2025-03）— 机构自述</li>
+          <li id="ref6"><a href="https://cygnusequity.com/news/1193.html" target="_blank">高鹄资本官网 — 前华为智驾大模型负责人黄青虬入局具身，墨奇智能成立仅半年完成超10亿元天使轮系列融资</a>（2026-07）— 机构自述</li>
+          <li id="ref7"><a href="https://finance.eastmoney.com/a/202605253748183497.html" target="_blank">东方财富 — 天机智能完成10亿元融资，投后估值近百亿</a>（2026-05-25）— 媒体报道</li>
+          <li id="ref8"><a href="https://cygnusequity.com/news/1173.html" target="_blank">高鹄资本官网 — 千寻智能再获10亿元融资，30天融资30亿</a>（2026）— 机构自述</li>
+          <li id="ref9"><a href="https://cygnusequity.com/news/1168.html" target="_blank">高鹄资本官网 — 千寻智能完成近20亿元融资，顶级资本天团联合押注，估值强势破百亿</a>（2026）— 机构自述</li>
+          <li id="ref10"><a href="https://www.cygnusequity.com/news/1127.html" target="_blank">高鹄资本官网 — 阿美P7、招商局重磅入局，千寻智能完成5.28亿元Pre-A轮融资</a>（2025）— 机构自述</li>
+          <li id="ref11"><a href="https://cygnusequity.com/news/1145.html" target="_blank">高鹄资本官网 — 维他动力完成天使轮融资并发布国内首个智能伴随机器人</a>（2025-08）— 机构自述</li>
+          <li id="ref12"><a href="https://cygnusequity.com/news/1194.html" target="_blank">高鹄资本官网 — 柔性具身智能「擎羽科技」完成顺为、五源联合投资的Pre-A轮融资</a>（2026-06）— 机构自述</li>
+          <li id="ref13"><a href="https://cygnusequity.com/news/1195.html" target="_blank">高鹄资本官网 — 「临界航天」完成2亿元天使轮融资，AI4S打造太空探索新范式</a>（2026-07）— 机构自述</li>
+          <li id="ref14"><a href="https://finance.sina.cn/2026-06-02/detail-inhzzcpq3178122.d.html" target="_blank">新浪财经 — Mindverse完成A轮融资，美团领投</a>（2026-06-02）— 媒体报道</li>
+          <li id="ref15"><a href="https://cygnusequity.com/news/1175.html" target="_blank">高鹄资本官网 — 高鹄资本荣获《财资》The Asset年度最佳私募股权交易大奖</a>— 行业评选</li>
+        </ol>
+      </div>
+
+      <div class="page-footer">高鹄资本 — 具身智能Wiki · 页面创建于2026年8月6日 · 数据来源：高鹄资本官网(cygnusequity.com)、东方财富、新浪财经等公开信息</div>
+    </article>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>华山资本 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .t-vc { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .t-cvc { background: #fce4ec; color: #c62828; border-color: #f8bbd0; }
+  .t-gov-fund { background: #fff3e0; color: #e65100; border-color: #ffe0b2; }
+  .t-national-fund { background: #f3e5f5; color: #7b1fa2; border-color: #e1bee7; }
+  .t-overseas-fund { background: #e0f2f1; color: #00695c; border-color: #b2dfdb; }
+  .t-lead-investor { background: #fff8e1; color: #f57f17; border-color: #ffecb3; }
+  .t-follow-investor { background: #f5f5f5; color: #616161; border-color: #e0e0e0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../../index.html">具身智能Wiki</a> <span class="breadcrumb-sep">›</span> <a href="../../index.html#investors">投资机构</a> <span class="breadcrumb-sep">›</span> <span>华山资本</span></div>
+  <div class="wiki-header"><h1>华山资本</h1><div class="subtitle">WestSummit Capital · 2010年成立 · 全球主权基金支持的硬科技VC · AUM超6亿美元<sup><a href="#ref1">[1]</a></sup> · "狙击手"式投资 · Twitch/兆易创新/安集/九号公司等标杆退出</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实与分析</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#team">1.2 核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funds">1.3 基金结构与LP</a></li>
+        <li class="toc-lvl3"><a href="#philosophy">1.4 投资哲学与偏好</a></li>
+        <li class="toc-lvl3"><a href="#tracks">1.5 主要投资赛道</a></li>
+        <li class="toc-lvl3"><a href="#embodied">1.6 具身智能领域布局</a></li>
+        <li class="toc-lvl3"><a href="#cases">1.7 典型投资案例</a></li>
+        <li class="toc-lvl3"><a href="#performance">1.8 基金业绩</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#references">2 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">华山资本</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">华山资本投资管理有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">英文名</div><div class="ib-value">WestSummit Capital</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2010年<sup><a href="#ref1">[1]</a></sup></div></div>
+        <div class="ib-row"><div class="ib-label">总部</div><div class="ib-value">北京市<sup><a href="#ref1">[1]</a></sup></div></div>
+        <div class="ib-row"><div class="ib-label">全球办公室</div><div class="ib-value">北京、硅谷、都柏林、香港<sup><a href="#ref1">[1]</a></sup></div></div>
+        <div class="ib-row"><div class="ib-label">机构类型</div><div class="ib-value"><span class="tag t-overseas-fund">海外投资机构</span></div></div>
+        <div class="ib-row"><div class="ib-label">管理规模</div><div class="ib-value">逾6亿美元<sup><a href="#ref1">[1]</a></sup></div></div>
+        <div class="ib-row"><div class="ib-label">创始合伙人</div><div class="ib-value">杨镭（主管合伙人）<br>陈大同、王志伟<sup><a href="#ref1">[1]</a></sup></div></div>
+        <div class="ib-row"><div class="ib-label">投资阶段</div><div class="ib-value">种子期、初创期、扩张期、成熟期<sup><a href="#ref1">[1]</a></sup></div></div>
+        <div class="ib-row"><div class="ib-label">官网</div><div class="ib-value"><a href="https://www.westsummit.cn" target="_blank">www.westsummit.cn</a><sup><a href="#ref1">[1]</a></sup></div></div>
+        <div class="ib-section">基金特征</div>
+        <div class="ib-row"><div class="ib-label">LP类型</div><div class="ib-value">全球多家著名主权基金<sup><a href="#ref1">[1]</a></sup></div></div>
+        <div class="ib-row"><div class="ib-label">币种</div><div class="ib-value">美元为主<sup><a href="#ref1">[1]</a></sup></div></div>
+        <div class="ib-row"><div class="ib-label">年投资数量</div><div class="ib-value">约5笔（"狙击手"模式）<sup><a href="#ref2">[2]</a></sup></div></div>
+        <div class="ib-row"><div class="ib-label">投资角色</div><div class="ib-value">以领投为主<sup><a href="#ref2">[2]</a></sup></div></div>
+        <div class="ib-row"><div class="ib-label">资本类型</div><div class="ib-value">外资<sup><a href="#ref1">[1]</a></sup></div></div>
+      </aside>
+
+      <h2 id="facts">1 事实与分析</h2>
+
+      <h3 id="basic">1.1 基本信息</h3>
+      <p class="article-intro">
+        <strong>华山资本</strong>（WestSummit Capital）是一家由全球多家主权基金出资支持的高科技成长型投资基金，2010年成立，总部位于北京，在硅谷、都柏林、香港设有本地团队。基金总规模逾6亿美元。<sup><a href="#ref1">[1]</a></sup>华山资本是中国最早进行海外高科技投资的本土基金之一，以"狙击手"式的精品投资风格著称——每年仅投约5个项目，且几乎全部领投。<sup><a href="#ref2">[2]</a></sup>基金以跨境投资为核心特色，帮助被投海外公司引入中国市场资源，同时协助中国企业拓展海外市场。
+      </p>
+
+      <table class="wikitable infotable">
+        <tr><th>项目</th><th>内容</th><th>来源</th></tr>
+        <tr><td>公司全称</td><td>华山资本投资管理有限公司</td><td><sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>成立时间</td><td>2010年</td><td><sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>管理规模(AUM)</td><td>逾6亿美元</td><td><sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>总部/办公室</td><td>北京（总部）、硅谷、都柏林、香港</td><td><sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>LP构成</td><td>全球多家著名主权基金</td><td><sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>核心管理团队</td><td>杨镭（创始及主管合伙人）、陈大同（创始合伙人）、王志伟（创始合伙人）、刘明豫（合伙人）、赵凯（执行董事）</td><td><sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>投资阶段</td><td>种子期到成熟期全覆盖</td><td><sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>机构类型</td><td>海外投资机构（美元VC，外资）</td><td><sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>官网</td><td>www.westsummit.cn / www.westsummitcap.com<sup><a href="#ref1">[1]</a></sup></td><td><sup><a href="#ref1">[1]</a></sup></td></tr>
+      </table>
+
+      <h3 id="team">1.2 核心团队</h3>
+      <p>华山资本的核心团队以连续创业者和通信/半导体产业老兵的组合著称，具有深厚的产业运营和跨国投资经验。<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref3">[3]</a></sup></p>
+
+      <table class="wikitable">
+        <tr><th>姓名</th><th>角色</th><th>核心履历</th><th>来源</th></tr>
+        <tr>
+          <td>杨镭</td>
+          <td>创始及主管合伙人（北京/硅谷）</td>
+          <td>中国通信和互联网行业的连续创业者。曾创办领航动力（后更名为掌上灵通，NASDAQ: LTON），担任CEO并带领公司于2004年登陆纳斯达克，成为"中国无线娱乐第一股"。此前曾创办多家科技公司（包括从事语音识别和CTI技术的企业）。后转型做投资，2010年联合创立华山资本。具有从创业者到上市公司CEO再到投资人的完整链路，在跨境科技投资（尤其是中美之间）拥有丰富经验。<sup><a href="#ref2">[2]</a></sup></td>
+          <td><sup><a href="#ref2">[2]</a></sup></td>
+        </tr>
+        <tr>
+          <td>陈大同</td>
+          <td>创始合伙人</td>
+          <td>中国半导体行业的标志性人物。清华大学博士毕业后赴美，2001年联合创办展讯通信（Spreadtrum，NASDAQ: SPRD），后于2013年被紫光集团以17.8亿美元收购。此后创办华山资本和璞华资本（元禾璞华），专注半导体产业链投资。是中国VC圈中罕见的"成功创业+大量投资+产业深耕"三重身份的硬科技投资人。<sup><a href="#ref3">[3]</a></sup></td>
+          <td><sup><a href="#ref3">[3]</a></sup></td>
+        </tr>
+        <tr>
+          <td>王志伟</td>
+          <td>创始合伙人（北京）</td>
+          <td>通信行业资深从业者，曾在中国电信设备企业担任高管，在通信、移动互联网和跨境技术投资领域具有丰富经验。<sup><a href="#ref1">[1]</a></sup></td>
+          <td><sup><a href="#ref1">[1]</a></sup></td>
+        </tr>
+        <tr>
+          <td>刘明豫</td>
+          <td>合伙人（北京）</td>
+          <td>具有科技投资和投后管理背景，主要负责华山资本在中国区的投资组合管理和新项目筛选。<sup><a href="#ref1">[1]</a></sup></td>
+          <td><sup><a href="#ref1">[1]</a></sup></td>
+        </tr>
+        <tr>
+          <td>赵凯</td>
+          <td>执行董事</td>
+          <td>负责投资执行和投后管理。<sup><a href="#ref1">[1]</a></sup></td>
+          <td><sup><a href="#ref1">[1]</a></sup></td>
+        </tr>
+      </table>
+
+      <div class="callout"><span class="tag tag-info">简评</span> 华山资本的GP团队组合在中国VC中非常独特：杨镭（创业者→纳斯达克CEO→投资人）和陈大同（展讯创始人→投资人）代表了"连续成功创业者转型投资"的典型路径，这种经验在判断半导体、通信等硬科技项目时具有天然优势。但团队整体年龄偏大，在AI/具身智能等新兴赛道的认知迭代速度是潜在瓶颈。陈大同同时兼任华山资本和璞华资本（元禾璞华）的管理工作，精力分配也是需要考虑的因素。</div>
+
+      <h3 id="funds">1.3 基金结构与LP</h3>
+
+      <table class="wikitable">
+        <tr><th>基金名称</th><th>设立/募资时间</th><th>规模</th><th>状态</th><th>来源</th></tr>
+        <tr>
+          <td>WestSummit Global Technology Fund（一期）</td>
+          <td>2011年</td>
+          <td>非公开</td>
+          <td>新设立</td>
+          <td><sup><a href="#ref1">[1]</a></sup></td>
+        </tr>
+        <tr>
+          <td>华山二期基金</td>
+          <td>约2013-2014年</td>
+          <td>约3.25亿美元（2014年初累计募资额）<sup><a href="#ref4">[4]</a></sup></td>
+          <td>已募完</td>
+          <td><sup><a href="#ref4">[4]</a></sup></td>
+        </tr>
+        <tr>
+          <td>华山三期基金</td>
+          <td>2016年</td>
+          <td>非公开</td>
+          <td>已募完</td>
+          <td><sup><a href="#ref1">[1]</a></sup></td>
+        </tr>
+        <tr>
+          <td>西桥二期基金</td>
+          <td>2017年</td>
+          <td>非公开</td>
+          <td>已募完</td>
+          <td><sup><a href="#ref1">[1]</a></sup></td>
+        </tr>
+        <tr>
+          <td>Jovial Victory</td>
+          <td>未披露</td>
+          <td>非公开</td>
+          <td>新设立</td>
+          <td><sup><a href="#ref1">[1]</a></sup></td>
+        </tr>
+        <tr>
+          <td>华山投资基金（蔷薇资产管理有限公司旗下）</td>
+          <td>未披露</td>
+          <td>非公开</td>
+          <td>活跃投资中<sup><a href="#ref5">[5]</a></sup></td>
+          <td><sup><a href="#ref5">[5]</a></sup></td>
+        </tr>
+      </table>
+
+      <p>关于LP构成：华山资本明确披露其出资方为"全球多家著名主权基金"，这是其区别于大多数人民币VC的核心特征。<sup><a href="#ref1">[1]</a></sup>主权基金LP结构带来两方面影响：正面上，LP资金实力雄厚、对投资周期容忍度较高、不追求短期回报；但这也意味着GP在投资退出节奏上需要更审慎，且主权基金的具体名单未被公开披露。</p>
+
+      <div class="callout"><span class="tag tag-info">简评</span> 华山资本的LP结构在2010年代初的中国VC中极具独特性——当时绝大多数中国VC的LP以人民币高净值个人和母基金为主，而华山资本以全球主权基金为LP，这使其在跨境投资（如2013年领投Twitch）和美元项目的退出路径上具有天然优势。但从近年投资节奏看，基金规模（逾6亿美元）和年投资笔数（~5笔）的比值意味着单笔投资金额较大，这限制了其在种子/天使等极早期阶段的出手频次。</div>
+
+      <h3 id="philosophy">1.4 投资哲学与偏好</h3>
+      <p>华山资本的投资哲学由其创始及主管合伙人杨镭在多次访谈中系统阐述：<sup><a href="#ref2">[2]</a></sup></p>
+
+      <ul>
+        <li><strong>"狙击手"而非"机关枪"</strong>：每年仅投资约5个项目，每一笔都经过深度尽调和投委会充分讨论。杨镭用"狙击手"（一颗子弹消灭一个敌人）比喻华山资本的投资风格。"我们不是一个机关枪式的打法，我们珍惜每一颗子弹。"<sup><a href="#ref2">[2]</a></sup></li>
+        <li><strong>只做领投、专投精品</strong>：几乎每笔投资都以领投方角色进入，对定价权和条款有主动控制。"我们不会跟投，要投就自己来。"<sup><a href="#ref2">[2]</a></sup></li>
+        <li><strong>不追热门风口，专注硬科技</strong>：杨镭明确表达了对追逐风口的警惕——"当所有人都往一个方向跑的时候，你就要往反方向看。"他强调珍惜"子弹"，挖掘被忽视的硬科技黑马。<sup><a href="#ref2">[2]</a></sup></li>
+        <li><strong>跨境投资的双向赋能</strong>：核心定位是"帮助海外被投公司带入中国战略元素，同时帮助中国企业走向海外"。典型案例是2013年领投美国游戏直播平台Twitch——该项目不到一年被亚马逊以11亿美元收购，是华山资本跨境能力的标志性验证。<sup><a href="#ref1">[1]</a></sup></li>
+        <li><strong>半导体为核心的深度科技</strong>：得益于陈大同在半导体产业的影响力和判断力，华山资本在芯片设计、半导体设备、AI芯片等领域形成了系统性布局——兆易创新、安集微电子、深迪半导体、肇观电子、灵睿智芯等构成了一条从存储芯片到AI推理芯片的完整投资链条。<sup><a href="#ref3">[3]</a></sup></li>
+        <li><strong>通信/IT/TMT的产业延伸</strong>：杨镭和王志伟的通信行业背景，使得华山资本在云计算、物联网、IT服务、工业互联网等领域也形成了较为系统的投资矩阵。<sup><a href="#ref1">[1]</a></sup></li>
+      </ul>
+
+      <div class="callout"><span class="tag tag-info">简评</span> 华山资本"狙击手"风格在硬科技领域具有逻辑自洽性——半导体和芯片设计等硬科技项目投资金额大、判断门槛高、技术路线判断需要长时间的产业积累，不可能像消费互联网那样"广撒网"。"只领投不跟投"在硬科技领域也是加分项：它筛选了GP的判断力，也确保了对被投公司的条款控制力。但这一策略在两个维度上面临挑战：一是"年投5笔"意味着任何单一判断失误的代价都很高；二是当FA（财务顾问）撮合的大额交易需要多家VC联合投资时，华山资本的"不跟投"原则可能导致错失某些由顶级VC领投的优质项目。</div>
+
+      <h3 id="tracks">1.5 主要投资赛道</h3>
+
+      <table class="wikitable">
+        <tr><th>赛道</th><th>代表性被投公司</th><th>细分方向</th><th>布局时间</th><th>来源</th></tr>
+        <tr>
+          <td>半导体/芯片</td>
+          <td>兆易创新（B+轮，603986.SH）、安集微电子（A轮，688019.SH）、深迪半导体（C+轮）、肇观电子（D轮领投）、灵睿智芯（持续跟投）、泽石科技</td>
+          <td>存储芯片、CMP抛光液、MEMS传感器、AI视觉芯片、AI推理芯片、SSD主控芯片</td>
+          <td>2011-2026</td>
+          <td><sup><a href="#ref1">[1]</a></sup><sup><a href="#ref3">[3]</a></sup><sup><a href="#ref5">[5]</a></sup></td>
+        </tr>
+        <tr>
+          <td>AI/软件</td>
+          <td>云智慧（D轮）、众智维科技（A2轮领投）、孪数科技（A+轮）</td>
+          <td>智能运维(AIOps)、AI安全运营、数字孪生</td>
+          <td>2019-2023</td>
+          <td><sup><a href="#ref1">[1]</a></sup></td>
+        </tr>
+        <tr>
+          <td>先进制造/硬件</td>
+          <td>九号公司（A+轮，689009.SH）、联合光电（A+轮，300691.SZ）、工研拓芯（首轮领投）、鲁信新材（B轮）</td>
+          <td>短途交通工具、光学镜头、光通信芯片、金属粉末新材料</td>
+          <td>2012-2023</td>
+          <td><sup><a href="#ref1">[1]</a></sup></td>
+        </tr>
+        <tr>
+          <td>互联网/TMT</td>
+          <td>Twitch（2013年领投，2014年被Amazon以11亿美元收购）、喜马拉雅（B轮）、闪送（C+轮）</td>
+          <td>游戏直播、音频平台、即时配送</td>
+          <td>2013-2017</td>
+          <td><sup><a href="#ref1">[1]</a></sup></td>
+        </tr>
+        <tr>
+          <td>自动驾驶/机器人</td>
+          <td>昇启科技（天使+轮）、不停科技（A+轮领投）</td>
+          <td>自动驾驶仿真测试、AI烹饪机器人</td>
+          <td>2024</td>
+          <td><sup><a href="#ref1">[1]</a></sup></td>
+        </tr>
+      </table>
+
+      <h3 id="embodied">1.6 具身智能领域布局</h3>
+
+      <h4>A. 布局概览</h4>
+      <p>华山资本在具身智能领域的公开布局<strong>极为有限</strong>。截至2026年8月，通过公开信息确认的具身智能相关投资仅有<strong>1笔</strong>——不停科技（AI烹饪机器人，2024年6月A+轮，华山资本领投近亿元）。<sup><a href="#ref1">[1]</a></sup>在具身智能赛道的热门方向（人形机器人、足式机器人、机器人"大脑"/"小脑"、灵巧手、关节模组等），华山资本<strong>未披露任何公开投资案例</strong>。</p>
+
+      <div class="callout">
+        <div class="callout-title">具身智能投资概况</div>
+        <p>已投具身智能/机器人项目：<strong>1</strong>个（不停科技） | 投资轮次：<strong>A+轮领投，近亿元人民币</strong> | 投资时间：<strong>2024年6月</strong> | 对具身智能核心赛道（人形/足式/大脑/零部件）的参与度：<strong>极低</strong></p>
+      </div>
+
+      <h4>B. 具身智能/机器人投资组合</h4>
+
+      <table class="wikitable">
+        <tr><th>被投公司</th><th>投资时间</th><th>投资轮次</th><th>投资金额</th><th>角色</th><th>被投公司核心方向</th><th>与具身智能的关联度</th><th>确认度</th></tr>
+        <tr>
+          <td>不停科技</td>
+          <td>2024年6月</td>
+          <td>A+轮</td>
+          <td>近亿元人民币<sup><a href="#ref1">[1]</a></sup></td>
+          <td><span class="tag t-lead-investor">领投</span></td>
+          <td>AI烹饪机器人——通过AI+机械臂实现中餐自动化炒菜</td>
+          <td>中等（AI+机械臂操作，属于服务机器人范畴，但与通用人形/足式具身智能有本质区别）</td>
+          <td><span class="tag tag-info">独立新闻交叉验证</span></td>
+        </tr>
+      </table>
+
+      <h4>C. 投资逻辑与观点</h4>
+      <p>华山资本创始合伙人杨镭和团队在公开渠道<strong>未系统阐述过对具身智能赛道的投资逻辑</strong>。以下基于投资行为做有限推断：</p>
+      <ul>
+        <li><strong>从AI应用而非机器人本体的角度切入</strong>：不停科技的核心价值主张是"AI+烹饪"而非"通用机器人"，华山资本对这一项目的投资更接近其AI/软件赛道的逻辑延伸，而非对具身智能的系统性布局。</li>
+        <li><strong>硬科技VC的自然延伸有限</strong>：华山资本的核心竞争力在半导体产业链（从设计到设备到材料），这一领域与具身智能存在间接关系（如AI推理芯片可为机器人提供算力、肇观电子的视觉芯片可用于机器人感知），但华山资本尚未公开投过机器人本体/大脑/小脑等具身智能的核心环节。</li>
+        <li><strong>"不追风口"原则的体现</strong>：杨镭在访谈中多次强调"不追热点"——在2023-2026年具身智能融资狂潮中保持克制，是华山资本一贯风格的体现。<sup><a href="#ref2">[2]</a></sup></li>
+      </ul>
+
+      <h4>D. 布局特征分析</h4>
+      <ul>
+        <li><strong>具身智能是华山资本当前几乎空白的赛道</strong>：相比同期VC（如绿洲资本投了10家具身智能公司、蓝驰创投投了银河通用/智元等多笔），华山资本在这个领域的出手几乎为零。这与华山资本"每年只投5笔"的超低频率直接相关——在投资额度有限的情况下，华山资本将"子弹"分配在了其最擅长的半导体赛道。</li>
+        <li><strong>半导体布局与具身智能的潜在协同</strong>：虽然华山资本未直接投具身智能，但其在半导体领域的深度布局（肇观电子的AI视觉芯片、灵睿智芯的推理芯片、深迪半导体的MEMS传感器）为具身智能产业链提供了底层硬件的支撑。如果华山资本未来在具身智能领域出手，其被投半导体公司可能成为被投机器人公司的核心供应商——但目前这只是潜在逻辑而非现实协同。</li>
+        <li><strong>九号公司的机器人延伸</strong>：华山资本在2015年投资了九号公司（A+轮），九号公司后来也推出了配送机器人等产品，但九号公司的核心业务始终是短途交通工具（平衡车、滑板车、电动车），其机器人业务占比极小。</li>
+      </ul>
+
+      <div class="callout"><span class="tag tag-info">简评</span> 华山资本在具身智能领域的投资参与度在本Wiki收录的投资机构中属于最低水平——仅有1笔边缘性的烹饪机器人投资。这并非判断力问题，而是策略选择的结果：华山资本的"狙击手"模式和"半导体为核心"的赛道聚焦，天然决定了其不会在具身智能这种尚处早期、技术路线未收敛的领域分散火力。对于关注具身智能投资版图的读者而言，华山资本在这个领域的价值更在于其半导体被投公司（AI芯片、视觉芯片、传感器）对上游客供链的间接支撑，而非直接的项目投资。</div>
+
+      <h3 id="cases">1.7 典型投资案例</h3>
+
+      <table class="wikitable">
+        <tr><th>被投公司</th><th>所属赛道</th><th>投资时间</th><th>投资轮次</th><th>退出方式</th><th>回报/估值变化</th><th>来源</th></tr>
+        <tr>
+          <td>Twitch</td>
+          <td>互联网/游戏直播</td>
+          <td>2013年</td>
+          <td>领投</td>
+          <td>2014年8月被Amazon以11亿美元收购</td>
+          <td>不到1年实现高额投资回报（具体倍数未公开）<sup><a href="#ref1">[1]</a></sup></td>
+          <td><sup><a href="#ref1">[1]</a></sup></td>
+        </tr>
+        <tr>
+          <td>兆易创新（603986.SH）</td>
+          <td>半导体/存储芯片</td>
+          <td>2011年</td>
+          <td>B+轮</td>
+          <td>2016年上交所主板IPO</td>
+          <td>现为A股存储芯片龙头、"科创50"成分股<sup><a href="#ref3">[3]</a></sup></td>
+          <td><sup><a href="#ref1">[1]</a></sup></td>
+        </tr>
+        <tr>
+          <td>安集微电子（688019.SH）</td>
+          <td>半导体/材料</td>
+          <td>2013年</td>
+          <td>A轮</td>
+          <td>2019年科创板首批上市（688019）</td>
+          <td>"科创50"成分股，国内CMP抛光液龙头<sup><a href="#ref3">[3]</a></sup></td>
+          <td><sup><a href="#ref1">[1]</a></sup></td>
+        </tr>
+        <tr>
+          <td>九号公司（689009.SH）</td>
+          <td>智能硬件/出行</td>
+          <td>2015年</td>
+          <td>A+轮（3000万美元，与红杉中国、顺为资本等联合）</td>
+          <td>2020年科创板IPO（689009）</td>
+          <td>"科创50"成分股<sup><a href="#ref3">[3]</a></sup></td>
+          <td><sup><a href="#ref1">[1]</a></sup></td>
+        </tr>
+        <tr>
+          <td>联合光电（300691.SZ）</td>
+          <td>先进制造/光学</td>
+          <td>2012年</td>
+          <td>A+轮</td>
+          <td>2017年创业板IPO</td>
+          <td>安防/车载光学镜头制造商<sup><a href="#ref1">[1]</a></sup></td>
+          <td><sup><a href="#ref1">[1]</a></sup></td>
+        </tr>
+      </table>
+
+      <p>华山资本的公开退出案例中有2家"科创50"成分股（兆易创新、安集微电子），加上九号公司（亦为"科创50"股），使得华山资本成为投中"科创50"企业数量最多的VC之一。<sup><a href="#ref3">[3]</a></sup></p>
+
+      <div class="callout"><span class="tag tag-info">简评</span> 华山资本的退出案例呈现出"幂律分布"的经典VC特征——Twitch（11亿美元被收购，不到1年回本）、兆易创新（A股存储芯片龙头）、安集微电子（科创板首批）三个标杆案例的质量和回报倍数在2010年代的中国VC中处于顶尖水平。但值得注意的是，这些成功案例多集中在2010-2015年的投资窗口期，2016年后的退出案例尚未充分显现（九号公司2020年IPO后的解禁期表现待观察）。"年投5笔"的精简策略意味着每一笔退出都对整体基金IRR产生较大影响。</div>
+
+      <h3 id="performance">1.8 基金业绩</h3>
+      <p>华山资本未公开披露基金层面的IRR/DPI/TVPI等业绩指标。作为以主权基金为主要LP的私募投资机构，其业绩数据通常仅向LP报告。从可验证的公开退出案例来看，Twitch（不到1年被Amazon 11亿美元收购）、兆易创新和安集微电子（均为"科创50"成分股IPO）三笔投资的退出质量在中国VC中处于第一梯队。<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref3">[3]</a></sup></p>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li><strong>中国首家海外投资的高科技基金</strong>：华山资本在成立初期定位为"中国首家海外投资的高科技基金"，2013年领投Twitch是其跨境投资能力的标志性验证。<sup><a href="#ref1">[1]</a></sup></li>
+        <li><strong>"科创50"投中3家</strong>：据媒体报道，华山资本是被投企业入选"科创50"指数最多的VC之一——兆易创新、安集微电子、九号公司三家被投企业均入选。<sup><a href="#ref3">[3]</a></sup></li>
+        <li><strong>2026年最新投资动态</strong>：
+          <ul>
+            <li>2026年7月，参与灵睿智芯（AI推理芯片公司）数亿元融资，与张江高科、中科创星、东方富海等联合投资。<sup><a href="#ref5">[5]</a></sup></li>
+            <li>2026年5月，泽石科技（SSD主控芯片/固态存储方案商）完成C+++轮融资，蔷薇资产管理有限公司（华山投资基金）和北京分众恒盈联合追投。<sup><a href="#ref5">[5]</a></sup></li>
+          </ul>
+        </li>
+        <li><strong>2025年投资人会议</strong>：据华山资本官方微信，其于2025年举办了投资人年度会议，主题为"共话科技创新与投资新机遇"，但未对外披露会议具体内容。<sup><a href="#ref6">[6]</a></sup></li>
+        <li><strong>陈大同的双重角色</strong>：陈大同同时担任华山资本创始合伙人和璞华资本（元禾璞华，国家大基金子基金）管理合伙人。璞华资本在半导体领域的投资体量和影响力远超华山资本。<sup><a href="#ref3">[3]</a></sup></li>
+      </ul>
+
+      <h2 id="references">2 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li id="ref1"><a href="https://m.pedaily.cn/data/vc/2587" target="_blank">投资界 — 华山资本机构主页（pedaily数据）</a>（2026-08-06访问）— 数据平台</li>
+          <li id="ref2"><a href="https://finance.sina.cn/2023-07-28/detail-imzehfir7560465.d.html" target="_blank">新浪财经 — 对话华山资本创始合伙人杨镭：不追热门风口，珍惜"子弹"挖硬科技黑马</a>（2023-07-28）— 媒体报道（本人专访）</li>
+          <li id="ref3"><a href="https://36kr.com/p/1486308152132740" target="_blank">36氪 — 科创50投中3家，高科技投资的"狙击手"是如何炼成的？</a>（2021）— 媒体报道</li>
+          <li id="ref4"><a href="http://it.people.com.cn/n/2014/0120/c1009-24165540.html" target="_blank">人民网 — 华山资本完成来自全球大型机构合计3.25亿美元募资</a>（2014-01-20）— 媒体报道</li>
+          <li id="ref5"><a href="https://m.pedaily.cn/data/gp/2026/2587/" target="_blank">投资界 — 华山资本2026年度资本事件汇总</a>（2026-08-06访问）— 数据平台</li>
+          <li id="ref6"><a href="https://mp.weixin.qq.com/s/9GRv7iVa6CxrcvAXnzdraQ" target="_blank">华山资本官方微信公众号 — 华山资本成功举办2025年投资人会议</a>（2025-05）— 机构自述</li>
+          <li id="ref7"><a href="https://www.westsummit.cn/?page_id=319" target="_blank">华山资本官网 — 团队页面</a>（2026-08-06访问）— 机构自述</li>
+        </ol>
+      </div>
+
+      <div class="page-footer">华山资本 — 具身智能Wiki · 页面创建于2026年8月6日 · 数据来源：投资界(pedaily)、36氪、新浪财经、人民网等公开信息</div>
+    </article>
+  </div>
+</div>
+</body>
+</html>

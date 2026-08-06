@@ -232,3 +232,7 @@
 1,国内#176,灵初智能,PSI Bot / Proto-Sentient Intelligence,36氪/投中网/钛媒体/北京日报/极客公园/量子位/公司官网,completed,self,entities/灵初智能.html
 1,海外#13,Covariant,Covariant,GeekWire/Wikipedia/WashingtonPost/PitchBook/CBInsights/Tracxn,completed,self,entities/Covariant.html
 3,国内生态#1,汇川技术,Inovance (300124.SZ),A股市值约1,600亿元 工控龙头+人形机器人零部件,completed,,entities/汇川技术.html
+2,investor#1,正轩投资,Zhengxuan Investment,官网(zxholdings.com)+投资界(pedaily)+中国证券报+证券时报+东方财富,completed,self,entities/investors/正轩投资.html
+2,investor#2,上海未来产业基金,Shanghai Future Industry Fund,投资界(pedaily)+科创板日报+央广网+36氪+投中网+界面新闻,completed,self,entities/investors/上海未来产业基金.html
+2,investor#3,华山资本,WestSummit Capital,投资界(pedaily)+36氪+新浪财经+人民网+机构官网(westsummit.cn),completed,self,entities/investors/华山资本.html
+2,investor#4,高鹄资本,Cygnus Equity,高鹄资本官网(cygnusequity.com)+东方财富+新浪财经+36氪,completed,self,entities/investors/高鹄资本.html
