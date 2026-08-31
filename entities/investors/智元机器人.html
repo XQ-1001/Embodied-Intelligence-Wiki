@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>智元机器人（CVC） — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 290px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  /* 投资机构类型标签 */
+  .t-vc { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .t-cvc { background: #fce4ec; color: #c62828; border-color: #f8bbd0; }
+  .t-gov-fund { background: #fff3e0; color: #e65100; border-color: #ffe0b2; }
+  .t-national-fund { background: #f3e5f5; color: #7b1fa2; border-color: #e1bee7; }
+  .t-overseas-fund { background: #e0f2f1; color: #00695c; border-color: #b2dfdb; }
+  .t-lead-investor { background: #fff8e1; color: #f57f17; border-color: #ffecb3; }
+  .t-follow-investor { background: #f5f5f5; color: #616161; border-color: #e0e0e0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../../index.html">具身智能Wiki</a> <span class="breadcrumb-sep">›</span> <a href="../../index.html#investors">投资机构</a> <span class="breadcrumb-sep">›</span> <span>智元机器人（CVC）</span></div>
+  <div class="wiki-header"><h1>智元机器人（产业资本/CVC）</h1><div class="subtitle">AgiBot · 具身智能头部公司反向做CVC · 2024年8月启动对外投资 · 23个月37笔投资 · 26家直投参股企业<sup><a href="#ref2">[2]</a><a href="#ref6">[6]</a></sup></div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实与分析</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#team">1.2 核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funds">1.3 基金结构与LP</a></li>
+        <li class="toc-lvl3"><a href="#philosophy">1.4 投资哲学与偏好</a></li>
+        <li class="toc-lvl3"><a href="#tracks">1.5 主要投资赛道</a></li>
+        <li class="toc-lvl3"><a href="#embodied">1.6 具身智能领域布局</a></li>
+        <li class="toc-lvl4"><a href="#emb-a">A. 布局概览</a></li>
+        <li class="toc-lvl4"><a href="#emb-b">B. 投资组合</a></li>
+        <li class="toc-lvl4"><a href="#emb-c">C. 投资逻辑与观点</a></li>
+        <li class="toc-lvl4"><a href="#emb-d">D. 布局特征分析</a></li>
+        <li class="toc-lvl3"><a href="#cases">1.7 典型投资案例</a></li>
+        <li class="toc-lvl3"><a href="#performance">1.8 基金业绩</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#references">2 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">智元机器人（CVC）</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">智元创新（上海）科技股份有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">英文名</div><div class="ib-value">AgiBot / AGIBOT</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2023年2月（公司）；2024年8月（首笔对外投资）<sup><a href="#ref6">[6]</a></sup></div></div>
+        <div class="ib-row"><div class="ib-label">注册地</div><div class="ib-value">上海市浦东新区</div></div>
+        <div class="ib-row"><div class="ib-label">机构类型</div><div class="ib-value"><span class="tag t-cvc">产业资本(CVC)</span></div></div>
+        <div class="ib-row"><div class="ib-label">母公司</div><div class="ib-value">智元机器人（AgiBot）</div></div>
+        <div class="ib-row"><div class="ib-label">资金来源</div><div class="ib-value">母公司自有资金为主；另作为LP/联合GP参与2支早期基金<sup><a href="#ref8">[8]</a><a href="#ref7">[7]</a></sup></div></div>
+        <div class="ib-row"><div class="ib-label">战略定位</div><div class="ib-value">产业协同为主（生态共建核心战略），非财务投资<sup><a href="#ref4">[4]</a></sup></div></div>
+        <div class="ib-section">CVC投资规模（截至2026年8月）</div>
+        <div class="ib-row"><div class="ib-label">累计出手</div><div class="ib-value">37笔（2024.08-2026.07，IT桔子口径）<sup><a href="#ref6">[6]</a></sup></div></div>
+        <div class="ib-row"><div class="ib-label">直投参股企业</div><div class="ib-value">26家（投中嘉川CVSource口径）<sup><a href="#ref2">[2]</a></sup></div></div>
+        <div class="ib-row"><div class="ib-label">拆分子公司</div><div class="ib-value">5家控股 + 1家合资控股<sup><a href="#ref2">[2]</a></sup></div></div>
+        <div class="ib-row"><div class="ib-label">合资产业公司</div><div class="ib-value">约15-20家（参股为主，占股多低于20%）<sup><a href="#ref2">[2]</a><a href="#ref3">[3]</a></sup></div></div>
+        <div class="ib-row"><div class="ib-label">早期基金</div><div class="ib-value">2支（瓴智新创数亿元 + 慕智合创2.9亿元）<sup><a href="#ref8">[8]</a><a href="#ref7">[7]</a></sup></div></div>
+        <div class="ib-row"><div class="ib-label">上市主体</div><div class="ib-value">2家（智元·赴港IPO中 / 上纬新材688585）<sup><a href="#ref2">[2]</a></sup></div></div>
+        <div class="ib-section">投资负责人</div>
+        <div class="ib-row"><div class="ib-label">投融资负责人</div><div class="ib-value">韩燕莹（企业发展部总经理）<sup><a href="#ref1">[1]</a></sup></div></div>
+        <div class="ib-row"><div class="ib-label">投资阶段</div><div class="ib-value">以早期为主（A轮前，多笔种子轮）+ 孵化拆分 + 合资<sup><a href="#ref2">[2]</a></sup></div></div>
+        <div class="ib-section">官网</div>
+        <div class="ib-row"><div class="ib-label">官方网站</div><div class="ib-value"><a href="https://www.agibot.com" target="_blank">www.agibot.com</a> / <a href="https://www.agibot.com.cn" target="_blank">agibot.com.cn</a></div></div>
+      </aside>
+
+      <p class="article-intro"><strong>智元机器人（AgiBot）</strong>是中国具身智能赛道的头部公司，2023年2月成立于上海，由前华为副总裁邓泰华与"华为天才少年"彭志辉（稚晖君）联合创办<sup><a href="#ref3">[3]</a></sup>。在经营本体业务的同时，智元自2024年8月起以产业资本（CVC）身份大规模对外投资，至2026年7月的23个月内完成37笔投资，被媒体与数据平台视为"具身智能赛道当之无愧的头部CVC"<sup><a href="#ref6">[6]</a></sup>。其资本版图呈"同心圆"结构：圆心为智元与控股上市公司上纬新材两个上市主体，向外依次是5家控股拆分子公司、约15-20家与上市公司/地方国资合资的产业公司、最外围是26家直投参股企业及2支早期基金<sup><a href="#ref2">[2]</a></sup>。智元明确表示投资"并非以财务投资为目标"，而是以"资本+供应/订单+场景"三重绑定构建覆盖"零部件—本体—大脑—场景—数据"的具身智能全产业链生态<sup><a href="#ref3">[3]</a><a href="#ref4">[4]</a></sup>。</p>
+
+      <h2 id="facts">1 事实与分析</h2>
+      <p style="font-size:0.82rem;color:#54595d;margin-bottom:10px;">来源可靠性标注：<span class="tag tag-info">机构自述</span> = 智元官网/公众号/高管公开演讲 · <span class="tag tag-info">媒体报道</span> = 第三方独立报道 · <span class="tag tag-info">工商登记</span> = 企业信用信息系统/上市公司公告 · <span class="tag tag-info">数据平台</span> = IT桔子/投中嘉川CVSource等</p>
+
+      <h3 id="basic">1.1 基本信息</h3>
+      <p>智元机器人（全称智元创新（上海）科技股份有限公司，曾用名上海智元新创技术有限公司）是中国具身智能与人形机器人赛道的头部企业，2025年营收10.5亿元，截至2026年3月累计下线通用具身机器人超10,000台<sup><a href="#ref9">[9]</a></sup>。在CVC层面，智元以母公司自有资金直投为主线，2024年8月开启第一笔对外投资，至2026年7月的23个月内累计完成37笔投资，出手频率接近专业投资机构<sup><a href="#ref6">[6]</a></sup>。投中嘉川CVSource数据显示，智元旗下已有2家上市主体（智元赴港IPO中、上纬新材688585.SH）、5个独立拆分子公司、10余家合资产业公司、26家直投参股企业、2支早期投资基金<sup><a href="#ref2">[2]</a></sup>。</p>
+      <p>智元创始人、董事长兼CEO邓泰华在2025年8月首届合作伙伴大会上披露，过去一年多智元共投资15个早期项目，其中约七成由其主导孵化，其余押注在种子和天使阶段；凭借"投早投小"打法实现了8倍年化投资回报<sup><a href="#ref3">[3]</a><a href="#ref5">[5]</a></sup>。2025年6月起，智元先后与高瓴、慕华科创合作设立两支具身智能早期基金，并启动"智元A计划"创业加速计划，目标三年内孵化50余个早期项目、打造千亿级产业生态<sup><a href="#ref4">[4]</a><a href="#ref5">[5]</a></sup>。智元自身已启动赴港IPO流程，基石投资人给出的目标估值区间为400亿-500亿港元<sup><a href="#ref9">[9]</a></sup>。</p>
+
+      <div class="table-wrapper"><table class="wikitable infotable">
+        <tr><th>项目</th><th>内容</th></tr>
+        <tr><td>母公司</td><td>智元创新（上海）科技股份有限公司（智元机器人 / AgiBot）</td></tr>
+        <tr><td>CVC启动时间</td><td>2024年8月（首笔对外投资）<sup><a href="#ref6">[6]</a></sup></td></tr>
+        <tr><td>CVC投资规模</td><td>37笔投资 / 26家直投参股 / 5家拆分子公司 / 约15-20家合资公司 / 2支基金<sup><a href="#ref2">[2]</a><a href="#ref6">[6]</a></sup></td></tr>
+        <tr><td>上市公司合作</td><td>已与超40家上市公司达成包括资本在内的合作<sup><a href="#ref3">[3]</a></sup></td></tr>
+        <tr><td>投资角色</td><td>产业协同型CVC（战略直投 + 孵化拆分 + 合资共建 + 基金LP）<sup><a href="#ref4">[4]</a></sup></td></tr>
+        <tr><td>行业荣誉</td><td>IT桔子2025"活跃产业资本TOP20"、"机器人行业活跃投资机构TOP20"<sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>官方网站</td><td>www.agibot.com / www.agibot.com.cn（2026-08-26访问验证，均HTTP 200）</td></tr>
+      </table></div>
+
+      <h4>发展沿革（投资维度）</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>时间</th><th>事件</th></tr>
+        <tr><td>2023年2月</td><td>智元机器人成立，总部设于上海<sup><a href="#ref3">[3]</a></sup></td></tr>
+        <tr><td>2024年8月</td><td>开启第一笔对外投资<sup><a href="#ref6">[6]</a></sup></td></tr>
+        <tr><td>2024年12月</td><td>与软通动力设立首家合资公司"江苏软通天擎"，拉开与上市公司合资序幕<sup><a href="#ref2">[2]</a></sup></td></tr>
+        <tr><td>2025年4月</td><td>将商用清洁机器人业务拆分为子公司"智鼎机器人"<sup><a href="#ref2">[2]</a></sup></td></tr>
+        <tr><td>2025年6月</td><td>与高瓴共同投资设立基金管理平台"上海瓴智新创企业管理合伙企业"（智元持股50%）<sup><a href="#ref8">[8]</a></sup></td></tr>
+        <tr><td>2025年7月</td><td>通过"智元恒岳"以约21亿元收购上纬新材（688585.SH）约63.62%股份，邓泰华成为实控人<sup><a href="#ref11">[11]</a><a href="#ref12">[12]</a></sup></td></tr>
+        <tr><td>2025年8月</td><td>邓泰华披露已投资15个早期项目、8倍年化回报；启动"智元A计划"创业加速计划<sup><a href="#ref5">[5]</a></sup></td></tr>
+        <tr><td>2025年9月</td><td>与高瓴联合设立具身智能产业基金"瓴智新创"（数亿元规模）<sup><a href="#ref4">[4]</a></sup></td></tr>
+        <tr><td>2025年11月</td><td>瓴智新创引入龙旗科技、宁波韵升、宁波华翔3家上市公司LP<sup><a href="#ref8">[8]</a></sup></td></tr>
+        <tr><td>2026年2月</td><td>与慕华科创合作设立"慕智合创"创投基金（目标2.9亿元）<sup><a href="#ref7">[7]</a></sup></td></tr>
+        <tr><td>2026年7月24日</td><td>宣布启动赴港IPO流程，目标估值400亿-500亿港元<sup><a href="#ref9">[9]</a></sup></td></tr>
+        <tr><td>2026年8月</td><td>直投具身基座模型公司潜界科技（LatentVerse）种子轮；子公司觅蜂科技完成数亿元新一轮融资<sup><a href="#ref2">[2]</a><a href="#ref10">[10]</a></sup></td></tr>
+      </table></div>
+      <div class="callout"><span class="tag tag-info">简评</span> 智元的CVC与多数由成熟集团发起的产业资本不同——它是"自身仍在融资期的创业公司"反向对外投资，且节奏极快（23个月37笔）。这种"边融资、边投资、边上市"的打法在具身智能赛道几乎独一份，其本质是用股权纽带在行业极早期锁定供应链、场景与数据资源，而非传统CVC的成熟产业协同。</div>
+
+      <h3 id="team">1.2 核心团队</h3>
+      <p>智元CVC板块由公司企业发展部统筹，投融资负责人为2023年加入的韩燕莹；具身智能投资与生态孵化的具体业务深度绑定在姚卯青（具身业务部）、王闯（通用业务部）、姜青松（营销服）三位合伙人各自的业务条线中<sup><a href="#ref1">[1]</a></sup>。创始人邓泰华亲自把控整体资本战略，彭志辉（CTO）对外阐述生态拆分的底层逻辑。</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+        <tr><td>创始人、董事长兼CEO（资本战略总负责）</td><td>邓泰华</td><td>前华为公司副总裁、计算产品线总裁，主导鲲鹏/昇腾AI生态；2025年8月披露智元投资"投早投小"8倍年化回报、发起"智元A计划"<sup><a href="#ref5">[5]</a></sup></td></tr>
+        <tr><td>联合创始人、CTO</td><td>彭志辉（稚晖君）</td><td>"华为天才少年"；2026年5月阐释拆分子公司逻辑"不是分家，是在播种"<sup><a href="#ref2">[2]</a></sup></td></tr>
+        <tr><td>企业发展部总经理、投融资负责人</td><td>韩燕莹</td><td>2023年加入智元，主导操盘10余轮融资，从0-1搭建智元战略投资板块与生态孵化体系；获LP CLUB"她力量"人物TOP30<sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>合伙人、高级副总裁、具身业务部总裁</td><td>姚卯青</td><td>清华博士，前Waymo、蔚来自动驾驶技术总监；强调"人形机器人商业成功中供应链起决定性作用"、"扶着供应商走"<sup><a href="#ref4">[4]</a></sup>；兼任觅蜂科技董事长<sup><a href="#ref2">[2]</a></sup></td></tr>
+        <tr><td>合伙人、高级副总裁、通用业务部总裁</td><td>王闯</td><td>前大疆激光雷达产品线创始团队成员；负责与上市公司合资合作（"共同探索具身智能应用场景"）；任临界点灵巧手公司董事<sup><a href="#ref2">[2]</a><a href="#ref3">[3]</a></sup></td></tr>
+        <tr><td>合伙人、高级副总裁、营销服总裁</td><td>姜青松</td><td>前华为P&amp;S产品管理部部长；任租赁子公司擎天租董事长<sup><a href="#ref2">[2]</a></sup></td></tr>
+      </table></div>
+      <div class="callout"><span class="tag tag-info">简评</span> 智元将投资职能嵌入业务条线而非设立独立投委会，使投资天然服务于"供应链锁定+场景落地"，这是其与财务VC最本质的组织差异。但代价是投资决策高度依赖创始人个人判断，且缺乏独立的风控与投后团队公开信息——在37笔高密度投资下，投后管理的专业性将是其生态体系能否"消化"的潜在变量。</div>
+
+      <h3 id="funds">1.3 基金结构与LP</h3>
+      <p>智元CVC的对外投资以母公司自有资金为主（未设立对外募资的独立基金管理人实体），同时以LP/联合GP身份参与两支具身智能早期基金，引入上市公司与地方国资作为LP，实现生态绑定与资金杠杆的双重目的<sup><a href="#ref8">[8]</a><a href="#ref7">[7]</a></sup>。</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>基金名称</th><th>合作GP</th><th>设立时间</th><th>规模</th><th>智元角色</th><th>主要LP（公开披露）</th><th>投资进展（截至2026年8月）</th></tr>
+        <tr><td>上海瓴智新创创业投资合伙企业（瓴智新创）</td><td>珠海高瓴私募基金管理有限公司</td><td>2025年6月设GP / 9月官宣</td><td>数亿元<sup><a href="#ref4">[4]</a></sup></td><td>联合GP（通过持股50%的"上海瓴智新创企业管理合伙企业"）</td><td>龙旗科技23.08%、李蓓34.62%、宁波韵升15.38%、上海瓴智新创企业管理7.69%、嘉兴沃赋致欣7.69%、智元3.85%、宁波华翔3.85%、武汉高瓴和钧3.08%<sup><a href="#ref8">[8]</a></sup></td><td>已出手13次，投福来数创、今日宜休、临界点等11家公司<sup><a href="#ref2">[2]</a></sup></td></tr>
+        <tr><td>共青城慕智合创创业投资合伙企业（慕智合创）</td><td>上海慕华金誉股权投资管理合伙企业（慕华科创关联）</td><td>2026年2月</td><td>目标2.9亿元，首关7250万元<sup><a href="#ref7">[7]</a></sup></td><td>LP（出资1500万元）</td><td>智元1500万、大洋电机1000万、智明达1000万、同星科技500万、弘景光电300万、宜春金控旗下引导基金等<sup><a href="#ref7">[7]</a></sup></td><td>已出手6次，投将闲科技、觅蜂科技、临界点等6家公司<sup><a href="#ref2">[2]</a></sup></td></tr>
+      </table></div>
+      <p>瓴智新创基金经营期限10年（前5年投资期，可延长），定位"投早、投小"，投资范围覆盖具身智能产业链上游（伺服系统、电机、控制器、减速器、传感器、关键软件与AI算法）、中游（本体制造与集成）与下游（应用解决方案）<sup><a href="#ref8">[8]</a></sup>。慕智合创基金围绕人工智能与具身智能相关产业进行直接或间接股权投资<sup><a href="#ref7">[7]</a></sup>。两支基金的LP结构均呈现"智元生态伙伴+产业上市公司+地方国资"特征，体现智元以基金为纽带进一步绑定产业链资源的目的。</p>
+      <div class="callout"><span class="tag tag-info">简评</span> 智元没有像传统CVC那样建立独立基金实体，而是以"搭伙"方式嵌入高瓴（头部财务VC）和慕华科创（清华系GP）的基金中——这既规避了自身作为初创公司募资的信任门槛，又借外部GP的投研能力放大了生态触角。瓴智新创基金"智元仅3.85%出资、高瓴管理"的结构，说明智元的核心诉求是生态协同而非管理费收益；但这也意味着智元对基金投资方向的实际控制力有限。</div>
+
+      <h3 id="philosophy">1.4 投资哲学与偏好</h3>
+      <p>智元的投资哲学可从公开演讲与投资行为中归纳为以下五点：</p>
+      <ul>
+        <li><strong>产业协同优先于财务回报。</strong>邓泰华明确表示智元"并不是以财务投资为目标"，而是以资本为纽带构建具身智能产业链生态<sup><a href="#ref4">[4]</a></sup>。智元定位为"具身智能的底座"和"生态型企业"，"生态共建"是核心战略之一<sup><a href="#ref3">[3]</a></sup>。</li>
+        <li><strong>"投早投小"，七成主导孵化。</strong>已投15个早期项目中约七成由智元主导孵化，其余押注种子与天使阶段；B轮及以后的投资不到5笔<sup><a href="#ref2">[2]</a><a href="#ref3">[3]</a></sup>。</li>
+        <li><strong>两条投资主线。</strong>一是直投本体与大模型公司（数字华夏、首形科技、灵初智能、星源智等），二是重仓关键零部件企业（千觉机器人、灵猴机器人、富兴电机等）<sup><a href="#ref3">[3]</a></sup>。</li>
+        <li><strong>"三重绑定"的合资策略。</strong>与上市公司合资并非简单代工，而是"资本+供应/订单+场景"三重绑定，利用股权锁定供应商产能、资金与市场增量<sup><a href="#ref2">[2]</a></sup>。</li>
+        <li><strong>"半小时供应圈链"。</strong>智元要求核心供应商在半小时内响应需求，通过投资与辅导"倒逼"供应商快速成长<sup><a href="#ref6">[6]</a></sup>。</li>
+      </ul>
+      <div class="callout"><span class="tag tag-info">简评</span> 智元投资哲学的独特性在于：它把"投资"当作供应链管理与场景扩展的工具，而非独立的利润中心。其投资组合与本体业务深度耦合（如星源智的"具身大脑"直接搭载于精灵G2），这是纯财务VC无法复制的协同深度；但这也使其投资组合缺乏市场化定价与退出独立性，未来若生态内公司成长速度不及预期，早期"8倍年化回报"的口径将面临验证。</div>
+
+      <h3 id="tracks">1.5 主要投资赛道</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>赛道</th><th>代表性被投</th><th>赛道投资逻辑</th><th>布局时间</th></tr>
+        <tr><td>关键零部件（电机/伺服/传感器/关节/灵巧手）</td><td>千觉机器人、富兴电机、希尔机器人、灵猴机器人、智身科技、临界点（拆分）、德塔源创</td><td>"锁定关键部件+联动本体开发"，保障供应链稳定与协同研发<sup><a href="#ref3">[3]</a></sup></td><td>2024-2026</td></tr>
+        <tr><td>具身智能大脑/大模型</td><td>灵初智能、星源智机器人、潜界科技（LatentVerse）</td><td>多样化的模型技术路线探索，但大模型以自研为主<sup><a href="#ref4">[4]</a></sup></td><td>2024-2026</td></tr>
+        <tr><td>机器人本体（仿生/场景型）</td><td>数字华夏、首形科技、炽梦科技、墨甲机器人、无界智慧、玉树智能</td><td>触达不同应用场景的技术缺口与市场痛点，构建横跨消费级与工业级的本体网络<sup><a href="#ref4">[4]</a></sup></td><td>2024-2026</td></tr>
+        <tr><td>应用场景（清洁/文旅/教育/物流等）</td><td>智鼎机器人（拆分）、传智未来（合资）、硅基方舟（合资）、软通天擎（合资）等</td><td>通过合资绑定上市公司场景与订单，加速商业化落地<sup><a href="#ref4">[4]</a></sup></td><td>2024-2026</td></tr>
+        <tr><td>具身数据</td><td>觅蜂科技（拆分控股）</td><td>数据是具身智能"硬通货"，构建数据资产与数据飞轮<sup><a href="#ref2">[2]</a><a href="#ref6">[6]</a></sup></td><td>2026</td></tr>
+      </table></div>
+      <p>注：以上赛道分类基于公开投资案例归纳。智元CVC的赛道选择高度聚焦具身智能产业链，未出现明显的跨行业财务投资。</p>
+
+      <h3 id="embodied">1.6 具身智能领域布局【重点】</h3>
+
+      <h4 id="emb-a">A. 布局概览</h4>
+      <p>智元的具身智能布局与本体业务同步扩张，采用"战略直投+合资共建"双轮驱动，形成覆盖"零部件—本体—大脑—场景—数据"的全产业链价值网络<sup><a href="#ref4">[4]</a></sup>。据IT桔子数据，智元自2024年8月开启第一笔对外投资，此后23个月内完成37笔投资，出手频率接近部分专业投资机构<sup><a href="#ref6">[6]</a></sup>。投中嘉川CVSource统计其资本版图呈"同心圆"结构：圆心是智元与上纬新材两个上市主体，外一层是5家控股拆分子公司（另含与首型科技合资的"智行未来"），再外一层是与上市公司/地方国资合资的产业公司，最外围是26家直投参股企业与2支早期基金<sup><a href="#ref2">[2]</a></sup>。按盖世汽车2025年12月统计，当时智元在具身智能赛道已知投资36家公司，其中16家为直接投资、20家为合资公司<sup><a href="#ref4">[4]</a></sup>。</p>
+      <div class="callout">
+        <div class="callout-title">具身智能投资概况</div>
+        <p>直投参股企业：<strong>26家</strong>（CVSource口径，已披露约17家） | 控股拆分子公司：<strong>5家+</strong> | 合资产业公司：<strong>约15-20家</strong> | 早期基金：<strong>2支</strong> | 最早进入时间：<strong>2024年8月</strong> | 投资角色：<strong>产业协同型（参股+控股孵化+合资三线并进）</strong><sup><a href="#ref2">[2]</a><a href="#ref3">[3]</a></sup></p>
+      </div>
+
+      <h4 id="emb-b">B. 投资组合</h4>
+
+      <h4 style="margin-bottom:2px;">B-1 直投参股企业（已披露部分）</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>被投公司</th><th>投资时间</th><th>轮次</th><th>金额</th><th>角色/协同</th><th>核心方向</th></tr>
+        <tr><th colspan="6" style="background:#1a3a5c;color:#fff;text-align:center;">本体 / 大脑 / 大模型方向</th></tr>
+        <tr><td>数字华夏</td><td>2024年7月</td><td>天使轮<sup><a href="#ref3">[3]</a></sup></td><td>未披露</td><td>参股+联合开发</td><td>高仿生情感交互人形；联合开发仿生机器人"夏澜"<sup><a href="#ref3">[3]</a></sup></td></tr>
+        <tr><td>灵初智能（Psi Bot）</td><td>2024年1月</td><td>天使轮<sup><a href="#ref3">[3]</a></sup></td><td>未披露</td><td>参股</td><td>具身大模型（Psi R1，CoAT自主推理框架）<sup><a href="#ref3">[3]</a></sup></td></tr>
+        <tr><td>星源智机器人</td><td>未披露</td><td>早期（智源研究院孵化）<sup><a href="#ref3">[3]</a></sup></td><td>未披露</td><td>参股+深度协同</td><td>"具身大脑"平台，搭载于智元精灵G2（英伟达Jetson Thor，2070 TOPS）<sup><a href="#ref4">[4]</a></sup></td></tr>
+        <tr><td>首形科技（首型科技）</td><td>2025年</td><td>两轮投资<sup><a href="#ref2">[2]</a></sup></td><td>未披露</td><td>参股+合资（智行未来）</td><td>超高仿生情感交互机器人，CharacterMind情绪基座系统<sup><a href="#ref3">[3]</a></sup></td></tr>
+        <tr><td>炽梦科技（XDream Robotics）</td><td>2025年</td><td>早期（A计划）<sup><a href="#ref1">[1]</a></sup></td><td>未披露</td><td>参股+孵化</td><td>连续创业者李林天创办的陪伴机器人<sup><a href="#ref2">[2]</a></sup></td></tr>
+        <tr><td>墨甲机器人</td><td>2025年</td><td>早期（A计划）<sup><a href="#ref1">[1]</a></sup></td><td>未披露</td><td>参股+孵化</td><td>奇瑞汽车旗下机器人项目<sup><a href="#ref2">[2]</a></sup></td></tr>
+        <tr><td>无界智慧</td><td>未披露</td><td>早期<sup><a href="#ref3">[3]</a></sup></td><td>未披露</td><td>参股</td><td>康养陪护机器人<sup><a href="#ref3">[3]</a></sup></td></tr>
+        <tr><td>玉树智能</td><td>未披露</td><td>早期<sup><a href="#ref3">[3]</a></sup></td><td>未披露</td><td>参股</td><td>环卫机器人（玉禾田集团子公司），无人驾驶清扫车等<sup><a href="#ref3">[3]</a></sup></td></tr>
+        <tr><td>潜界科技（LatentVerse）</td><td>2026年8月</td><td>种子轮<sup><a href="#ref10">[10]</a></sup></td><td>数亿元（联合）</td><td><span class="tag t-lead-investor">联合领投</span></td><td>具身基座模型（UTAM统一触觉动作模型），清华交叉信息研究院团队<sup><a href="#ref10">[10]</a></sup></td></tr>
+        <tr><th colspan="6" style="background:#1a3a5c;color:#fff;text-align:center;">关键零部件方向</th></tr>
+        <tr><td>千觉机器人</td><td>2025年2月</td><td>天使轮<sup><a href="#ref3">[3]</a></sup></td><td>未披露</td><td>参股</td><td>高分辨率多模态触觉传感器<sup><a href="#ref3">[3]</a></sup></td></tr>
+        <tr><td>灵猴机器人</td><td>2024年</td><td>早期（A计划）<sup><a href="#ref1">[1]</a></sup></td><td>未披露</td><td>参股</td><td>直线电机/视觉/AGV（博众精工子公司）；合作"远征"轮式人形项目<sup><a href="#ref3">[3]</a></sup></td></tr>
+        <tr><td>富兴电机</td><td>2024年</td><td>早期（A计划）<sup><a href="#ref1">[1]</a></sup></td><td>未披露</td><td>参股</td><td>伺服电机/直流无刷电机（中瑞德合资）<sup><a href="#ref3">[3]</a></sup></td></tr>
+        <tr><td>希尔机器人</td><td>2024年</td><td>早期<sup><a href="#ref3">[3]</a></sup></td><td>未披露</td><td>参股+合资</td><td>全数字化伺服驱动（卧龙电驱子公司）<sup><a href="#ref3">[3]</a></sup></td></tr>
+        <tr><td>华智天成</td><td>2024年</td><td>早期<sup><a href="#ref3">[3]</a></sup></td><td>未披露</td><td>参股</td><td>封测产线机器人应用（天水华天电子集团控股）<sup><a href="#ref3">[3]</a></sup></td></tr>
+        <tr><td>智身科技</td><td>2024年</td><td>早期（A计划）<sup><a href="#ref1">[1]</a></sup></td><td>未披露</td><td>参股</td><td>零部件/供应链环节<sup><a href="#ref4">[4]</a></sup></td></tr>
+        <tr><td>飞阔科技</td><td>2024年</td><td>早期<sup><a href="#ref3">[3]</a></sup></td><td>未披露</td><td>参股</td><td>FLY·天枢/天璇系统，机器人智慧交互，服务宇树/智元/众擎<sup><a href="#ref3">[3]</a></sup></td></tr>
+        <tr><td>德塔源创</td><td>2025年</td><td>早期（A计划）<sup><a href="#ref1">[1]</a></sup></td><td>未披露</td><td>参股+孵化</td><td>未公开细分方向<sup><a href="#ref1">[1]</a></sup></td></tr>
+      </table></div>
+      <p>注：直投组合共26家（CVSource口径），其中已通过官方A计划名单、媒体报道披露约17家；其余约9家未公开披露。<sup><a href="#ref1">[1]</a><a href="#ref2">[2]</a><a href="#ref3">[3]</a></sup> 多数被投的投资时间/金额未公开，仅标注可确认信息；被投公司核心方向如与智元存在业务协同，已注明。</p>
+
+      <h4 style="margin-bottom:2px;">B-2 控股拆分子公司（内部孵化+外部融资）</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>子公司</th><th>拆分时间</th><th>方向</th><th>融资进展（截至2026年8月）</th><th>智元角色</th></tr>
+        <tr><td>智鼎机器人</td><td>2025年4月</td><td>商用清洁机器人</td><td>3轮融资；A轮引入莱克电气、晋拓股份、旭阳工业、本川智能等产业投资人<sup><a href="#ref2">[2]</a></sup></td><td>控股（拆分母公司业务）</td></tr>
+        <tr><td>临界点（AGILINK）</td><td>2025年</td><td>灵巧手</td><td>3轮融资，最新一轮达10亿元<sup><a href="#ref2">[2]</a></sup></td><td>控股；王闯任董事</td></tr>
+        <tr><td>擎天租</td><td>2025年</td><td>机器人RaaS租赁</td><td>4轮融资，估值70亿元（独角兽）；投资方含高瓴创投、慕华科创、正大集团、蓝思科技<sup><a href="#ref2">[2]</a></sup></td><td>控股；姜青松任董事长</td></tr>
+        <tr><td>酷拓机器人</td><td>2025年</td><td>四足机器人</td><td>尚未对外融资；智元占股80%（深圳智酷合创持20%，实控人为智元监事会主席卫云龙）<sup><a href="#ref2">[2]</a></sup></td><td>控股80%</td></tr>
+        <tr><td>觅蜂科技</td><td>2026年</td><td>具身智能数据</td><td>2026年2月种子+天使轮（红杉、鼎晖、云锋）；6月天使+轮（国方创投、孚腾资本、上海电科基金）；8月新一轮数亿元（中国电信、张江集团、红杉中国、元启创新）<sup><a href="#ref2">[2]</a></sup></td><td>持股70%+；姚卯青任董事长</td></tr>
+        <tr><td>智行未来（与首型科技合资）</td><td>2026年上半年</td><td>陪伴机器人（拟）</td><td>尚未融资<sup><a href="#ref2">[2]</a></sup></td><td>控股75%（首型持股3%）</td></tr>
+      </table></div>
+      <p>彭志辉在2026年5月解释拆分逻辑：一方面让子公司具备自我造血能力与商业化能力，另一方面使其更专注特定场景、实现更快商业化落地——"这不是分家，是在播种"<sup><a href="#ref2">[2]</a></sup>。从IPO角度，拆分重资产/低毛利业务（租赁、数据采集等）亦有利于母公司保留"大模型大脑"的高估值叙事<sup><a href="#ref2">[2]</a></sup>。</p>
+
+      <h4 style="margin-bottom:2px;">B-3 合资产业公司（与上市公司/地方国资）</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>合资公司</th><th>合资方</th><th>方向/进展</th></tr>
+        <tr><td>江苏软通天擎</td><td>软通动力（301236.SZ）</td><td>2024年12月设立；具身智能算法、工业数据采集；发布人形机器人天鹤C1<sup><a href="#ref2">[2]</a><a href="#ref3">[3]</a></sup></td></tr>
+        <tr><td>湖南智启未来</td><td>蓝思科技（300433.SZ）</td><td>人形机器人整机组装、功能模组、灵巧手等关键部件开发，建设精密制造产线<sup><a href="#ref3">[3]</a></sup></td></tr>
+        <tr><td>宁波普智未来</td><td>均普智能（688306.SH）</td><td>通用产品制造认证首家企业，首期产线约2000㎡，规划年产能1000台<sup><a href="#ref3">[3]</a></sup></td></tr>
+        <tr><td>浙江硅基方舟</td><td>大丰实业（603081.SH）</td><td>文娱体旅商场景；大丰承诺首季度提供不低于1500万元意向采购订单<sup><a href="#ref4">[4]</a></sup></td></tr>
+        <tr><td>武汉安努智能</td><td>富临精工（300432.SZ）</td><td>机器人集成部署、场景数据生成与采集、工程化二次开发<sup><a href="#ref3">[3]</a></sup></td></tr>
+        <tr><td>宁波领智创新</td><td>领益智造（002600.SZ）</td><td>机器人本体与零部件开发、具身AI大模型、多场景数据集<sup><a href="#ref3">[3]</a></sup></td></tr>
+        <tr><td>深圳立智感知</td><td>立景创新（立讯精密关联）</td><td>精密光学；立讯精密在3C组装环节对人形机器人有急迫需求<sup><a href="#ref2">[2]</a><a href="#ref3">[3]</a></sup></td></tr>
+        <tr><td>西安智莱特</td><td>法士特</td><td>减速器系列产品，落地清洁/交互机器人、柔性制造场景<sup><a href="#ref3">[3]</a></sup></td></tr>
+        <tr><td>武汉光谷东智</td><td>东阳光科</td><td>光谷建设人形机器人生产线，发布全系列产品与具身模型<sup><a href="#ref3">[3]</a></sup></td></tr>
+        <tr><td>杭绍具身智能</td><td>上虞江科数智产业</td><td>数据采集中心、教育平台、公共体验平台、应用研发<sup><a href="#ref3">[3]</a></sup></td></tr>
+        <tr><td>珠海智汇元启</td><td>珠海科技产业集团</td><td>智元中标其"珠海具身智能应用创新中心数采及展演机器人采购项目"约1274万元<sup><a href="#ref3">[3]</a></sup></td></tr>
+        <tr><td>厦门小鹭智能</td><td>厦门地方合作方</td><td>投资2亿元在厦门海沧建机器人生产基地，达产后年产值约5亿元<sup><a href="#ref3">[3]</a></sup></td></tr>
+        <tr><td>福州具福科技</td><td>福州新区引导基金</td><td>人形机器人核心产业链，研发/制造/租赁<sup><a href="#ref3">[3]</a></sup></td></tr>
+        <tr><td>境智具身智能</td><td>上海桦玉股权</td><td>尚未公布具体产品规划（机器狗方向）<sup><a href="#ref3">[3]</a></sup></td></tr>
+        <tr><td>长具智身</td><td>长飞光纤（长飞基金）</td><td>教育、文旅商业、海洋与农业、工业场景应用<sup><a href="#ref2">[2]</a><a href="#ref3">[3]</a></sup></td></tr>
+        <tr><td>无锡梁元创新科技</td><td>梁溪产发集团、梁溪文旅集团</td><td>承接智元全系列产品区域推广，本地化组装/测试/运维<sup><a href="#ref3">[3]</a></sup></td></tr>
+        <tr><td>传智未来</td><td>传化智联、蚂蚁集团</td><td>获智元授权≥5年非独家使用轮式本体A2W，化工/园区物流/农业场景独家开发权<sup><a href="#ref4">[4]</a></sup></td></tr>
+        <tr><td>智龙未来</td><td>卧龙电驱（600580.SH）</td><td>卧龙参与智元B轮融资后设立<sup><a href="#ref2">[2]</a></sup></td></tr>
+        <tr><td>苏州灵慧智新 / 恒元智启</td><td>未完全披露</td><td>2025年末新设，具体方向待披露<sup><a href="#ref4">[4]</a></sup></td></tr>
+      </table></div>
+      <p>注：智元在多数合资公司中占股20%以下、上市公司占50%以上，属于参股而非控股<sup><a href="#ref2">[2]</a></sup>。合资对象大致分四类：制造代工（蓝思科技、领益智造）、上游零部件（卧龙电驱、法士特）、软件与算法（软通动力）、场景与数据（大丰实业、地铁设计、传化智联等）<sup><a href="#ref2">[2]</a></sup>。据不完全统计，智元前后共计设立约15-20家合资公司<sup><a href="#ref2">[2]</a><a href="#ref3">[3]</a><a href="#ref4">[4]</a></sup>。</p>
+
+      <h4 id="emb-c">C. 投资逻辑与观点</h4>
+      <p>智元核心管理层对具身智能投资逻辑的公开论述，是理解其CVC行为的关键：</p>
+      <ul>
+        <li><strong>"生态共建是产业规模化的核心驱动力"。</strong>邓泰华在2025年8月首届合作伙伴大会明确表示，生态共建是智元核心战略之一，投资目的并非财务回报，而是构建产业链生态<sup><a href="#ref4">[4]</a></sup>。</li>
+        <li><strong>"供应链起决定性作用"。</strong>姚卯青认为人形机器人能否获得商业成功，供应链起决定性作用；行业早期大量零部件需定制化，供应商自己走得慢，智元"扶着"他们走，给予资源、技术、生产及质量辅导，这也会让自己变得更强<sup><a href="#ref4">[4]</a></sup>。</li>
+        <li><strong>"不是分家，是在播种"。</strong>彭志辉（2026年5月）阐释拆分子公司的逻辑：让子公司自我造血、专注特定场景，更快形成商业闭环<sup><a href="#ref2">[2]</a></sup>。</li>
+        <li><strong>对前沿技术的判断。</strong>智元CVC对潜界科技的官方表态凸显其对前瞻架构的重视——"清华胡钰承团队作为WAM、分层架构方向最早的开创团队，国内外多家大厂的模型范式都在沿用他们的架构和模型思路"<sup><a href="#ref2">[2]</a></sup>。</li>
+        <li><strong>规模化交付能力是生态的基础。</strong>智元以"半小时供应圈链"要求核心供应商快速响应，2026年6月第15000台具身智能机器人下线、上半年出货8400台（全球占比约44%），为其生态协同提供量产基础<sup><a href="#ref6">[6]</a></sup>。</li>
+      </ul>
+
+      <h4 id="emb-d">D. 布局特征分析</h4>
+      <ul>
+        <li><strong>"广撒网"与"精准下注"并存。</strong>智元以26家直投+约20家合资实现全产业链广覆盖，但对关键环节（触觉、灵巧手、大脑、数据）明显加重注码，并通过控股拆分（临界点、觅蜂）确保核心能力自主可控，兼具广度与深度。</li>
+        <li><strong>全覆盖产业链，数据成为新重点。</strong>覆盖上游零部件—中游本体—大脑模型—下游场景，2026年进一步向具身数据（觅蜂科技、恺望数据）延伸——数据被认为是具身智能走向真实场景的"硬通货"<sup><a href="#ref6">[6]</a></sup>。</li>
+        <li><strong>与同类企业的差异化：以"生态型CVC"身份做行业基建。</strong>不同于宇树（标准初创科技公司，技术落地后上市兑现），智元更像"基础技术提供平台或产业联盟"——通过资本纽带同时绑定供应商、场景方与地方国资<sup><a href="#ref2">[2]</a></sup>。</li>
+        <li><strong>投资角色高度分化。</strong>对关键零部件与大脑采取"参股+技术协同"（星源智、千觉），对可独立商业化业务采取"控股拆分+外部融资"（临界点、擎天租、觅蜂），对场景落地采取"参股合资+订单绑定"（硅基方舟、传智未来），三种角色并存。</li>
+      </ul>
+      <div class="callout"><span class="tag tag-info">简评</span> 智元CVC的本质是"用资本为量产铺路"：在具身智能供应链仍不成熟的早期，通过投资+辅导+订单把供应商"催熟"，同时以合资换场景、以数据公司锁资源。这套打法的天花板在于——生态规模能否转化为产品力与技术壁垒（如成本优势、数据飞轮），否则当行业进入成熟期、竞争回归产品与技术的硬核比拼时，庞大的资本网络可能从资产变成负担。此外，智元"边融资边投资"的模式高度依赖一级市场对其估值叙事的持续认可，港股IPO（目标估值400-500亿港元）将成为其资本模式的首次大考<sup><a href="#ref9">[9]</a></sup>。</div>
+
+      <h3 id="cases">1.7 典型投资案例</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>标的</th><th>类型</th><th>时间</th><th>角色</th><th>最新状态</th></tr>
+        <tr><td>上纬新材（688585.SH）</td><td>控股上市公司</td><td>2025年7月</td><td>协议转让+主动要约收购63.62%股份（约21亿元）</td><td>邓泰华任实控人；2025年营收17.97亿元（+20.29%），归母净利降53.67%；机器人业务仍处研发阶段<sup><a href="#ref11">[11]</a><a href="#ref12">[12]</a><a href="#ref13">[13]</a></sup></td></tr>
+        <tr><td>潜界科技（LatentVerse）</td><td>直投种子轮</td><td>2026年8月</td><td>联合领投（与高瓴、清流、星动纪元）</td><td>清华叉院团队，具身基座模型UTAM；成立不足3个月获数亿元融资<sup><a href="#ref10">[10]</a></sup></td></tr>
+        <tr><td>临界点（AGILINK）</td><td>控股拆分</td><td>2025年</td><td>控股+外部融资</td><td>灵巧手3轮融资，最新一轮10亿元<sup><a href="#ref2">[2]</a></sup></td></tr>
+        <tr><td>擎天租</td><td>控股拆分</td><td>2025年</td><td>控股+外部融资</td><td>4轮融资，估值70亿元（独角兽）<sup><a href="#ref2">[2]</a></sup></td></tr>
+        <tr><td>觅蜂科技</td><td>控股拆分</td><td>2026年</td><td>控股70%+</td><td>2026年内三轮融资，最新数亿元（中国电信、张江集团、红杉中国等）<sup><a href="#ref2">[2]</a></sup></td></tr>
+        <tr><td>数字华夏</td><td>直投+联合开发</td><td>2024年7月</td><td>参股</td><td>联合开发仿生机器人"夏澜"，智元甄选渠道销售<sup><a href="#ref3">[3]</a></sup></td></tr>
+        <tr><td>星源智机器人</td><td>直投+深度协同</td><td>未披露</td><td>参股</td><td>"具身大脑"批量搭载于精灵G2，进入批量交付阶段<sup><a href="#ref4">[4]</a></sup></td></tr>
+      </table></div>
+      <p>注：智元CVC成立不足两年，尚无公开退出案例（IPO/并购退出）。上纬新材收购属于产业并购而非财务投资退出。</p>
+      <div class="callout"><span class="tag tag-info">简评</span> 智元的"典型案例"更像产业协同样本而非退出样本：上纬新材是A股上市平台的获取，临界点/擎天租/觅蜂是"内部创业+外部融资"的价值重估，潜界科技/星源智是前沿技术卡位。其投资组合的真实回报兑现，将高度依赖智元本体业务（及其港股市值）与生态内公司的协同增长，而非传统IPO退出。</div>
+
+      <h3 id="performance">1.8 基金业绩</h3>
+      <p>智元CVC未公开披露基金业绩数据（IRR/DPI/TVPI）。作为产业资本，其直投以自有资金进行，不设对外披露业绩义务；两支早期基金（瓴智新创、慕智合创）均处于投资期，未到业绩披露时点。</p>
+      <p>以下为公开渠道可获得的间接业绩线索（需审慎对待）：</p>
+      <ul>
+        <li>邓泰华于2025年8月披露：智元投资孵化的15个早期项目，年化收益率达8倍（<strong>机构自述口径</strong>）<sup><a href="#ref3">[3]</a><a href="#ref4">[4]</a></sup>。</li>
+        <li>智元成立两年半累计完成10-11轮融资，估值从成立半年内突破10亿美元到2025年约150亿元；2026年启动港股IPO，基石投资人目标估值400亿-500亿港元，智元方希望提升至约800亿港元<sup><a href="#ref9">[9]</a></sup>。但该估值反映的是智元本体而非其CVC投资组合。</li>
+      </ul>
+      <p>以上仅为基础公开信息的推论，不能作为智元CVC投资组合业绩的正式参考。</p>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>2026年1月获IT桔子"2025年度活跃产业资本TOP20"与"机器人行业活跃投资机构TOP20"<sup><a href="#ref1">[1]</a></sup>。</li>
+        <li>已与超40家上市公司达成包括资本在内的合作（涉及领益智造、上纬新材、博众精工、卧龙电驱、均普智能、大丰实业、比亚迪、上汽集团、龙旗科技、蓝思科技、软通动力、立讯精密、京东科技、腾讯、三花智控、科大讯飞、奥比中光等）<sup><a href="#ref3">[3]</a></sup>。</li>
+        <li>全球拥有400多家商业合作伙伴（投资方、供应链、经销商、渠道方）；机器人主要采购方为政府和国资，直接/间接中标国资背景项目十余个<sup><a href="#ref9">[9]</a></sup>。</li>
+        <li>2026年8月，智元旗下觅蜂科技作为投资方参与AI数据企业恺望数据逾亿元战略投资<sup><a href="#ref6">[6]</a></sup>。</li>
+        <li>智元自身估值与融资：成立以来累计完成10-11轮融资，投资方超50家，2025年估值约150亿元；2026年7月宣布启动赴港IPO<sup><a href="#ref9">[9]</a></sup>。</li>
+        <li>行业地位：Omdia报告称智元2025年通用人形机器人出货量全球第一（宇树科技对此统计口径有异议）；2026年上半年智元出货8400台、全球占比约44%<sup><a href="#ref6">[6]</a><a href="#ref9">[9]</a></sup>。</li>
+      </ul>
+
+      <h2 id="references">2 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li id="ref1"><a href="https://www.agibot.com.cn/article/188/detail/125.html" target="_blank">智元机器人官网 — 智元机器人荣登产业资本、机器人活跃投资机构双TOP20</a>（2026-01-22；含智元A计划投资孵化企业名单、韩燕莹履历）</li>
+          <li id="ref2"><a href="https://m.chinaventure.com.cn/news/80-20260818-392794.html" target="_blank">投中网（投中嘉川）— 一笔最新融资，揭开了智元的资本版图</a>（2026-08-18；CVSource版图数据、拆分子公司明细、直投/基金/合资详情、LatentVerse）</li>
+          <li id="ref3"><a href="https://www.bianews.com/news/details?id=224337" target="_blank">鞭牛士转载36氪（智东西）— 智元机器人的狂飙资本局：一年猛投15家创企、成立17家合资公司</a>（2025-11-02；两条投资主线、零部件5家/本体及大模型7家名单、合资公司17家明细、40+上市公司、8倍年化回报）</li>
+          <li id="ref4"><a href="https://wap.stockstar.com/detail/IG2025121500000175" target="_blank">盖世汽车（证券之星转载）— 智元资本局：150亿估值背后的生态"豪赌"</a>（2025-12-15；36家公司/16家直投/20家合资、星源智/飞阔细节、姚卯青供应链观点、传智未来/大丰订单、瓴智新创LP）</li>
+          <li id="ref5"><a href="https://m.cnstock.com/commonDetail/493103" target="_blank">上海证券报 — 既"联姻"上市公司 又投早投小 解析智元机器人的"生态棋"</a>（2025-08-22；邓泰华8月披露：15个早期项目、8倍年化回报、智元A计划、瓴智基金）</li>
+          <li id="ref6"><a href="https://fund.eastmoney.com/a/202608123839461487.html" target="_blank">大河财立方（东方财富转载）— 具身智能企业扎堆做起CVC，不只为"造富"更为铺路</a>（2026-08-12；IT桔子37笔口径、头部CVC、15000台下线、半小时供应圈链、恺望数据/觅蜂参投）</li>
+          <li id="ref7"><a href="https://stcn.com/article/detail/3630190.html" target="_blank">证券时报 — 智元机器人再设立创投基金 多家上市公司参与</a>（2026-02-05；慕智合创基金目标2.9亿/首关7250万、LP名单）</li>
+          <li id="ref8"><a href="https://news.pedaily.cn/202511/557763.shtml" target="_blank">投资界 — 他们做LP，投了高瓴智元新基金</a>（2025-11-25；瓴智新创基金LP结构、管理人中珠海高瓴、经营期限、投资范围）</li>
+          <li id="ref9"><a href="https://news.caijingmobile.com/article/detail/575283" target="_blank">财经 — 智元机器人启动港股上市，投资人称目标估值400亿至500亿港元</a>（2026-07-25；IPO启动、估值区间、营收、Omdia出货量第一、国资采购）</li>
+          <li id="ref10"><a href="https://finance.eastmoney.com/a/202608113838196636.html" target="_blank">东方财富 — 潜界科技完成数亿元种子轮融资，投资方包括高瓴创投、智元</a>（2026-08-11；潜界科技背景、联合领投结构、UTAM模型）</li>
+          <li id="ref11"><a href="https://m.thepaper.cn/newsDetail_forward_31139515" target="_blank">澎湃新闻 — 智元机器人，21亿拿下一家上市公司</a>（2025-07；上纬新材收购）</li>
+          <li id="ref12"><a href="https://www.nbd.com.cn/articles/2025-09-24/4073098.html" target="_blank">每日经济新闻 — "十倍牛股"上纬新材正式易主！智元机器人团队或将浮盈超200亿元</a>（2025-09-24）</li>
+          <li id="ref13"><a href="https://www.cs.com.cn/ssgs/gsxw/202603/t20260331_6543952.html" target="_blank">中证网 — 上纬新材2025年净利润同比下降53.67% 消费级具身智能机器人业务仍处于研发阶段</a>（2026-03-31）</li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">最新更新于 2026-08-26 · 数据来源见「2 参考资料」 · 智元作为CVC的部分投资金额与轮次未公开披露，已标注确认口径；公司自述数据请审慎参考</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>
