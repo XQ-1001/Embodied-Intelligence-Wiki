@@ -79,7 +79,7 @@
 2,国内#61,具微科技,,界面新闻,completed,,wiki/entities/具微科技.html
 2,国内#62,戴盟机器人,,媒体报道,completed,,wiki/entities/戴盟机器人.html
 2,国内#63,维他动力,,投资界/36氪,completed,,wiki/entities/维他动力.html
-2,国内#64,小雨智造,,媒体报道,completed,wiki-d2-4,entities/小雨智造.html
+2,国内#64,小雨智造,,媒体报道/公司官网/北京经信,completed,wiki-d2-4,entities/小雨智造.html
 2,国内#65,蓝芯科技,,蓝芯官网/经济观察网/高工移动机器人,completed,wiki-d2-4,entities/蓝芯科技.html
 2,国内#66,大界机器人,,媒体报道,completed,,,entities/大界机器人.html
 2,国内#67,柏奥尼克机器人（PNDbotics）,PNDbotics,媒体报道,completed,,,entities/柏奥尼克机器人.html
@@ -237,3 +237,9 @@
 2,investor#3,华山资本,WestSummit Capital,投资界(pedaily)+36氪+新浪财经+人民网+机构官网(westsummit.cn),completed,self,entities/investors/华山资本.html
 2,investor#4,高鹄资本,Cygnus Equity,高鹄资本官网(cygnusequity.com)+东方财富+新浪财经+36氪,completed,self,entities/investors/高鹄资本.html
 2,investor#5,智元机器人,AgiBot,投中网+智东西/36氪+证券时报+上海证券报+大河财立方+盖世汽车+智元官网+澎湃+每经+中证网,completed,self,entities/investors/智元机器人.html
+2,investor#6,原力创投,The Force Capital,原力创投官网(theforcecapital.com)+中基协AMAC公示(P1061648)+投资界(pedaily)机构页/企业页+芥末堆+封面新闻+新浪教育+中国新闻网,completed,self,entities/investors/原力创投.html
+2,investor#7,信熹资本,Sincere VC,信熹资本官网(sincerevc.com)+中基协AMAC公示(P1023240)+投资界(pedaily)机构页/人物页+清科私募通(基金备案)+IPO早知道/六里投资报+36氪暗涌2023大会实录+证券时报+东方财富+证券之星+与光科技官网+乐山创投企业库,completed,self,entities/investors/信熹资本.html
+1,国内#186,视比特机器人,SpeedBot Robotics,湖南省工信厅+湖南日报/新湖南+机器人大讲堂+投中网+科创板日报+财联社+红网+湖南省地方金融管理局+人民网湖南+水滴信用工商登记+泰伯网企业库+钛媒体+公司官网(speedbot.com),completed,self,entities/视比特机器人.html
+1,海外#26,Ambi Robotics,Ambi Robotics,公司官网(ambirobotics.com，含about/approach/ambistack/ambios/ambivision等产品页)+官方新闻稿2021-03至2026-08共20篇+Pitney Bowes/OSM Worldwide合作公告+Discovered in Berkeley(2026-04专访)+TechCrunch(2022/2025)+CB Insights融资页+Owler公司页+Boston Business Journal(Pickle Robot集成报道)
+3,前沿技术#1,递归自我改进（RSI）,Recursive Self-Improvement (RSI),Jürgen Schmidhuber技术备忘(IDSIA-9-26 2026-09)+Lilian Weng Harness Engineering博客(2026-07-04)+IEEE Spectrum(2026-05-07)+arXiv:2607.07663(RSI综述44页)+arXiv:2607.13104(自改进综述97页含Schmidhuber)+arXiv:2609.11873(The Last AI Built by Humans L1-L5)+arXiv:2609.35561(RSI-Master)+arXiv:2606.26294(Red Queen Gödel Machine)+剑桥CST新闻+casp.ac前沿AI工作论文No.2/2026(智能爆炸)+Anthropic"AWhen AI builds itself"+SMH(Pachocki)+The Decoder(OpenAI内部数据)+Simon Willison+Sakana AI官网RSI Lab与Schmidhuber加盟公告(2026-09-24)+recursive.com+inherentlabs.ai+tech.eu(Inherent 5000万美元)+ssi.inc+NVIDIA Newsroom+TechCrunch(Ineffable/Periodic Labs)+Dealroom(AMI Labs)+腾讯云开发者社区(智源AI自进化论坛)+GIGAZINE(Jack Clark 60%预测),completed,self,entities/Recursive-Self-Improvement.html
+3,前沿技术#2,Darwin Gödel Machine,Recursive Superintelligence (RSI),Sakana AI官方博客(sakana.ai/dgm)+arXiv:2505.22954(DGM论文v1 2025-05-29/v3 2026-03-12)+arXiv:2603.19461(Hyperagents 2026-03-19)+Recursive官网(recursive.com)+Recursive技术文章First Steps Toward Automated AI Research(2026-06-11)+AWS官方新闻稿(2026-07-28)+GV领投方官方说明(gv.com/news/recursive-superintelligence-self-improving-ai 2026-05-13)+tech.eu(2026-05-13)+量子位(2026-05-14),completed,self,entities/Darwin-Godel-Machine.html

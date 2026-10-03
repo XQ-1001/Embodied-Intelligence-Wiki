@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>视比特机器人 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> <span class="breadcrumb-sep">›</span> <span>视比特机器人</span></div>
+  <div class="wiki-header"><h1>视比特机器人</h1><div class="subtitle">SpeedBot Robotics · 成立于2018年 · 工业具身智能 · AI+3D视觉 · 工业智能软件 · B++轮</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#founder">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#product">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenario">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financial">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#others">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl3"><a href="#a21">2.1 团队背景与场景选择匹配度</a></li>
+        <li class="toc-lvl3"><a href="#a22">2.2 技术路线与场景适配性</a></li>
+        <li class="toc-lvl3"><a href="#a23">2.3 股东/资本结构对战略的影响</a></li>
+        <li class="toc-lvl3"><a href="#a24">2.4 试错过程与路径调整</a></li>
+        <li class="toc-lvl3"><a href="#a25">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl3"><a href="#a26">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#refs">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">视比特机器人</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">湖南视比特机器人有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">品牌/英文名</div><div class="ib-value">视比特机器人 / SpeedBot Robotics</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2018年8月27日（工商注册）</div></div>
+        <div class="ib-row"><div class="ib-label">注册地</div><div class="ib-value">湖南长沙（湘江新区）</div></div>
+        <div class="ib-row"><div class="ib-label">创始人/董事长兼CEO</div><div class="ib-value">邓文平</div></div>
+        <div class="ib-row"><div class="ib-label">副总经理</div><div class="ib-value">刘婷婷</div></div>
+        <div class="ib-row"><div class="ib-label">法定代表人</div><div class="ib-value">黄金（工商登记）</div></div>
+        <div class="ib-row"><div class="ib-label">员工规模</div><div class="ib-value">近450人（2026年）；2025年初口径340余人、研发占比约60%</div></div>
+        <div class="ib-section">融资信息</div>
+        <div class="ib-row"><div class="ib-label">最新轮次</div><div class="ib-value">B++轮（2026年6月）</div></div>
+        <div class="ib-row"><div class="ib-label">本轮金额</div><div class="ib-value">亿元级</div></div>
+        <div class="ib-row"><div class="ib-label">本轮投资方</div><div class="ib-value">达晨财智（国家中小企业发展基金湖南子基金）· 长沙城发集团</div></div>
+        <div class="ib-row"><div class="ib-label">累计融资</div><div class="ib-value">超6亿元（截至2026年7月披露）</div></div>
+        <div class="ib-row"><div class="ib-label">估值</div><div class="ib-value">未披露（2022年公司自述"二三十亿"）</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">专利软著</div><div class="ib-value">300余项；公开专利申请320余件（发明约91%）</div></div>
+        <div class="ib-row"><div class="ib-label">客户规模</div><div class="ib-value">全球300余家行业龙头客户产线</div></div>
+        <div class="ib-row"><div class="ib-label">细分市占率</div><div class="ib-value">重工钢板智能分拣等细分超50%</div></div>
+        <div class="ib-row"><div class="ib-label">2026年订单</div><div class="ib-value">一季度船舶领域近2亿元</div></div>
+        <div class="ib-section">产品</div>
+        <div class="ib-row"><div class="ib-label">软件平台</div><div class="ib-value">坤吾 · 翔云 · 颖算 · SpeedWeld</div></div>
+        <div class="ib-row"><div class="ib-label">代表产品</div><div class="ib-value">MVM大尺寸测量 · SmartFit · PaintPro</div></div>
+        <div class="ib-row"><div class="ib-label">人形机器人</div><div class="ib-value">工业人形焊接机器人（计划2026年内发布）</div></div>
+        <div class="ib-section">官网</div>
+        <div class="ib-row"><div class="ib-label">官网</div><div class="ib-value"><a href="https://www.speedbot.com" target="_blank">www.speedbot.com</a></div></div>
+      </aside>
+
+      <p class="article-intro">视比特机器人（湖南视比特机器人有限公司，SpeedBot Robotics）是一家总部位于湖南长沙的工业具身智能与工业智能软件企业，成立于2018年8月，以"AI+3D视觉"为技术起点，提出"One Brain, Any Manufacturing"（一个大脑、通用制造）的定位，构建了"工业之眼、工业之手、工业之脑"的协同架构。公司业务覆盖重工、汽车、船舶海工、新能源等行业，在重工钢板智能分拣、大型工件在线高精度测量两个细分领域实现国产替代并反向出口海外。<sup><a href="#ref2">[2]</a></sup>截至2026年，公司为国家级专精特新重点"小巨人"企业、工信部"人工智能产业揭榜挂帅"牵头揭榜单位，业务覆盖全球300余家行业龙头客户产线。<sup><a href="#ref2">[2]</a></sup><sup><a href="#ref4">[4]</a></sup>公司已完成B轮（2022年，3亿元）到B++轮（2026年6月，亿元级）的多轮融资，累计融资超6亿元。<sup><a href="#ref8">[8]</a></sup><sup><a href="#ref5">[5]</a></sup><sup><a href="#ref3">[3]</a></sup>2026年6月，公司在第29届北京·埃森焊接与切割展览会上展出了双机协同焊接工作站与全尺寸人形焊接机器人，人形产品计划于2026年内正式发布。<sup><a href="#ref4">[4]</a></sup></p>
+
+      <h2 id="facts">1 事实层</h2>
+      <p style="font-size:0.82rem;color:#54595d;margin-bottom:10px;">来源可靠性标注：<span class="tag tag-info">媒体/官方报道</span> = 政府或权威媒体公开报道 · <span class="tag tag-info">官网/公司自述</span> = 公司官方披露 · <span class="tag tag-info">工商登记</span> = 企业信用信息系统 · <span class="tag tag-info">行业机构</span> = 第三方评估机构数据</p>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper"><table class="wikitable infotable">
+        <tr><th>项目</th><th>内容</th></tr>
+        <tr><td>公司全称</td><td>湖南视比特机器人有限公司</td></tr>
+        <tr><td>品牌名/英文名</td><td>视比特机器人 / SpeedBot Robotics</td></tr>
+        <tr><td>成立时间</td><td>2018年8月27日（工商注册）<sup><a href="#ref12">[12]</a></sup></td></tr>
+        <tr><td>注册地址</td><td>长沙高新开发区岳麓西大道588号芯城科技园2栋1505室<sup><a href="#ref12">[12]</a></sup></td></tr>
+        <tr><td>统一社会信用代码</td><td>91430100MA4PUQ8J8E<sup><a href="#ref12">[12]</a></sup></td></tr>
+        <tr><td>工商注册号</td><td>430193000245401<sup><a href="#ref12">[12]</a></sup></td></tr>
+        <tr><td>法定代表人</td><td>黄金（工商登记）<sup><a href="#ref12">[12]</a></sup></td></tr>
+        <tr><td>董事长兼CEO</td><td>邓文平<sup><a href="#ref7">[7]</a></sup></td></tr>
+        <tr><td>注册资本</td><td>2604.578万元人民币；实缴资本 2521.0518万元（工商登记口径）<sup><a href="#ref12">[12]</a></sup></td></tr>
+        <tr><td>企业类型</td><td>有限责任公司（外商投资、非独资）<sup><a href="#ref12">[12]</a></sup></td></tr>
+        <tr><td>营业期限</td><td>2018-08-27 至 2068-08-26（最近核准日期 2026-08-03）<sup><a href="#ref12">[12]</a></sup></td></tr>
+        <tr><td>上市状态</td><td>未上市；被长沙列为"拟上市企业"培育对象<sup><a href="#ref10">[10]</a></sup></td></tr>
+        <tr><td>参保人数</td><td>289人（工商登记·社保口径）<sup><a href="#ref12">[12]</a></sup></td></tr>
+        <tr><td>员工规模</td><td>近450人，硕博占比超30%（2026年9月公司受访口径）<sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>核心定位</td><td>工业具身智能 · AI+3D视觉 · 工业智能软件 · 通用智能制造</td></tr>
+        <tr><td>企业资质</td><td>国家级专精特新重点"小巨人"企业；工信部"人工智能产业揭榜挂帅"牵头揭榜单位；科技部"全国颠覆性技术创新大赛"优秀项目；高新技术企业、湖南省省级专精特新中小企业<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref6">[6]</a></sup></td></tr>
+        <tr><td>官网</td><td><a href="https://www.speedbot.com" target="_blank">www.speedbot.com</a>（实测 HTTP 200；www.speedbot.net 跳转至同一站点）</td></tr>
+      </table></div>
+
+      <h4>发展沿革</h4>
+      <p style="font-size:0.8rem;color:#54595d;">下表综合公司官网"发展历程"栏目披露与权威媒体报道整理。官网时间线为人工录入，个别年份标注与媒体口径存在出入，凡有出入处均已标注媒体口径。</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>时间</th><th>事件</th></tr>
+        <tr><td>2018年8月</td><td>公司在长沙成立，团队不到10人，在临时地下车库启动研发<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref13">[13]</a></sup></td></tr>
+        <tr><td>2018年</td><td>推出 ZeroPick 混合拆垛机器人，并落地试用<sup><a href="#ref13">[13]</a></sup></td></tr>
+        <tr><td>2019年7月</td><td>完成天使轮融资，图灵创投、道生资本参投<sup><a href="#ref13">[13]</a></sup></td></tr>
+        <tr><td>2019年</td><td>面向重工制造业推出钢板切割场景的高精度定位寻边视觉产品；同期面向新零售行业推出3D视觉引导的移动拣货/补货机器人<sup><a href="#ref13">[13]</a></sup></td></tr>
+        <tr><td>2019年—2020年</td><td>承接三一集团18号智能工厂"上万种异形钢板切割件自动识别分拣"难题。产线2019年开始研发，团队利用工厂夜间窗口期持续调试十个月；2020年春节首套产线在三一18号灯塔工厂交付，2020年8月首条全自动切割下料分拣产线落地，产能提升3倍。该产线获评工信部智能制造示范项目、入选达沃斯全球灯塔工厂案例。<sup><a href="#ref10">[10]</a></sup><sup><a href="#ref8">[8]</a></sup><sup><a href="#ref2">[2]</a></sup><sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>2020年8月</td><td>完成A轮融资，和玉资本、图灵创投参投<sup><a href="#ref13">[13]</a></sup></td></tr>
+        <tr><td>2020年</td><td>面向智慧物流行业推出快速分拣机器人系统，面向重工制造业推出3D视觉上下料与零件分拣机器人，面向工业与制造业推出高精度3D测量系统；获得重工制造、汽车行业多个千万元级订单<sup><a href="#ref13">[13]</a></sup></td></tr>
+        <tr><td>2020年</td><td>推出用于新能源汽车电池托盘检测的多目视觉高精度测量专机，100秒内完成上千个检测点在线测量（2021年交付十余套，2022年该产品已签订单额达数千万元）；同年带"3D视觉感知智能机器人"参加湖南省创新创业大赛——参赛前公司科创资质为零，此后新增9项核心科创资质<sup><a href="#ref8">[8]</a></sup><sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>2021年</td><td>完成A+轮融资（过亿元），中金资本领投，和玉资本、同威资本参投；多目视觉高精度测量专机批量交付捷克、塞尔维亚汽车厂商<sup><a href="#ref14">[14]</a></sup></td></tr>
+        <tr><td>2021年9月</td><td>视比特（上海）机器人科技有限公司落户上海宝山机器人产业园<sup><a href="#ref13">[13]</a></sup><sup><a href="#ref12">[12]</a></sup></td></tr>
+        <tr><td>2022年3月（官宣7月）</td><td>完成B轮融资3亿元，经纬创投领投，迪策投资（湖南钢铁集团战略投资）、招商兴湘、弘德投资跟投，老股东中金资本、和玉资本、同威资本加码；同年公司称重工分拣领域市场占有率超过70%，多目测量专机复制落地法国、波兰并进军北美<sup><a href="#ref13">[13]</a></sup><sup><a href="#ref8">[8]</a></sup></td></tr>
+        <tr><td>2022年8月</td><td>上海研发中心开业<sup><a href="#ref13">[13]</a></sup></td></tr>
+        <tr><td>2023年3—5月</td><td>面向工程机械、钢构等行业推出智能柔性焊接工作站；面向汽车行业推出车身漆面缺陷在线检测系统<sup><a href="#ref13">[13]</a></sup></td></tr>
+        <tr><td>2023年4月</td><td>海外事业部成立，设欧洲分部（杜塞尔多夫）、东南亚分部（新加坡）、北美分部（多伦多）<sup><a href="#ref13">[13]</a></sup></td></tr>
+        <tr><td>2023年</td><td>为铁建重工打造全自动智能下料分拣产线，攻克厚板切割、坡口切割等难点<sup><a href="#ref2">[2]</a></sup></td></tr>
+        <tr><td>2025年</td><td>面向汽车行业推出 SmartFit 汽车门盖智能装调系统<sup><a href="#ref13">[13]</a></sup></td></tr>
+        <tr><td>2025年8月20日</td><td>宣布完成亿元级B+轮融资，一村资本旗下比特淞灵基金独家投资，用于工业具身智能产品研发及船舶、锂电行业市场开拓<sup><a href="#ref6">[6]</a></sup></td></tr>
+        <tr><td>2025年12月</td><td>正式推出自主研发的智能焊接控制软件 SpeedWeld<sup><a href="#ref4">[4]</a></sup></td></tr>
+        <tr><td>2026年1月20日</td><td>入选《2025胡润未来独角兽：全球瞪羚企业榜》（湖南共3家企业入选）<sup><a href="#ref9">[9]</a></sup></td></tr>
+        <tr><td>2026年一季度</td><td>船舶智能制造领域订单达2亿元，含单笔近亿元的钢板切割下料分拣智能产线项目<sup><a href="#ref3">[3]</a></sup></td></tr>
+        <tr><td>2026年6月29日</td><td>在第29届北京·埃森焊接与切割展览会（深圳）发布双机协同焊接工作站与全尺寸人形焊接机器人，双机协同工作站展机现场达成采购合作；同日宣布完成亿元级B++轮融资，达晨财智管理的国家中小企业发展基金湖南子基金与长沙城发集团联合投资<sup><a href="#ref4">[4]</a></sup><sup><a href="#ref3">[3]</a></sup><sup><a href="#ref5">[5]</a></sup></td></tr>
+        <tr><td>2026年8月</td><td>自主研发的"MVM大尺寸高精度在线测量系统"获第51届日内瓦国际发明展金奖，公司称该技术填补国内大尺寸在线测量空白<sup><a href="#ref2">[2]</a></sup></td></tr>
+      </table></div>
+
+      <h3 id="founder">1.2 创始人及核心团队</h3>
+      <p>视比特的创始团队为技术出身，来自计算机视觉、机器人、计算机系统、3D图形与云计算大数据等领域，初创成员来自普林斯顿、瑞士联邦理工（ETH Zurich）等院校；公司称团队在视觉与图形顶级会议上发表论文数十篇。<sup><a href="#ref10">[10]</a></sup><sup><a href="#ref7">[7]</a></sup>截至2026年，公司员工近450人；2025年初的公开口径为团队成员超340人、研发人员占比约60%、硕博人才占比40%以上，2026年受访口径为硕博占比超30%，研发投入每年超过营收的四分之一。<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref2">[2]</a></sup><sup><a href="#ref10">[10]</a></sup></p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+        <tr><td>创始人、董事长兼CEO</td><td>邓文平</td><td>1981年生。国防科技大学计算机专业学士、硕士，国防科技大学与瑞士联邦理工（ETH Zurich）联合培养博士，计算机系统专家。公开资料中为公司专利数量最多的发明人（91件公开专利申请）。提出工业具身智能"身体先于大脑"的技术路径，主张"走难而正确的道路"；反对"烧投资人的钱打价格战"，强调以技术降本换取降价空间。<sup><a href="#ref7">[7]</a></sup><sup><a href="#ref8">[8]</a></sup><sup><a href="#ref11">[11]</a></sup></td></tr>
+        <tr><td>副总经理</td><td>刘婷婷</td><td>公司副总经理，亦为公司股东（工商登记显示为公司第二大自然人股东）；长期代表公司对外介绍"坤吾"平台与"软件定义工业智能"战略。个别报道称其为"创始人"，公司自述与政府报道均称副总经理。<sup><a href="#ref10">[10]</a></sup><sup><a href="#ref12">[12]</a></sup></td></tr>
+        <tr><td>首席架构师</td><td>冀春锟</td><td>首席架构师，负责钢板切割智能下料分拣产线技术（2020年在三一18号厂房完成交付）。<sup><a href="#ref10">[10]</a></sup></td></tr>
+        <tr><td>董事长助理</td><td>姜涛维</td><td>代表公司介绍"坤吾"平台研发初衷与通用工业软件构想。<sup><a href="#ref3">[3]</a></sup></td></tr>
+        <tr><td>法定代表人</td><td>黄金</td><td>工商登记的法定代表人；同时为全资子公司视比特（长沙）机器人科技有限公司法定代表人。<sup><a href="#ref12">[12]</a></sup></td></tr>
+      </table></div>
+      <p style="font-size:0.8rem;color:#54595d;">注：公司研发团队与湖南大学院士团队开展联合攻关，并承担智能装调国家科技重大专项、工信部人工智能"揭榜挂帅"等项目。<sup><a href="#ref2">[2]</a></sup></p>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>轮次</th><th>时间</th><th>金额</th><th>领投/独家投资方</th><th>跟投/参投方</th></tr>
+        <tr><td>天使轮</td><td>2019年7月</td><td>数千万人民币</td><td>图灵创投</td><td>道生资本、小智投资<sup><a href="#ref14">[14]</a></sup><sup><a href="#ref15">[15]</a></sup></td></tr>
+        <tr><td>战略融资</td><td>2019年9月（登记10月）</td><td>千万级人民币</td><td>同威资本</td><td>道生资本<sup><a href="#ref14">[14]</a></sup><sup><a href="#ref15">[15]</a></sup></td></tr>
+        <tr><td>A轮</td><td>2020年9月</td><td>近亿元人民币</td><td>和玉资本（MSA Capital）</td><td>图灵创投<sup><a href="#ref14">[14]</a></sup><sup><a href="#ref15">[15]</a></sup></td></tr>
+        <tr><td>A+轮</td><td>2021年5月</td><td>过亿元人民币</td><td>中金资本</td><td>和玉资本、同威资本<sup><a href="#ref14">[14]</a></sup></td></tr>
+        <tr><td>B轮</td><td>2022年7月（官网时间线记为3月）</td><td>3亿元</td><td>经纬创投</td><td>迪策投资（湖南钢铁集团战略投资）、招商兴湘、弘德投资；老股东中金资本、和玉资本、同威资本继续加码；官网口径另列一村淞灵<sup><a href="#ref8">[8]</a></sup><sup><a href="#ref14">[14]</a></sup></td></tr>
+        <tr><td>B+轮</td><td>2025年8月20日</td><td>亿元级</td><td>一村资本旗下比特淞灵基金（独家投资）</td><td>—<sup><a href="#ref6">[6]</a></sup></td></tr>
+        <tr><td>B++轮</td><td>2026年6月</td><td>亿元级</td><td>达晨财智管理的国家中小企业发展基金湖南子基金</td><td>长沙城市发展集团有限公司（长沙城发集团）<sup><a href="#ref5">[5]</a></sup></td></tr>
+      </table></div>
+      <p style="font-size:0.8rem;color:#54595d;">注：公司官网"发展历程"栏目未收录2024年及2026年B++轮事件；B轮在官网时间线中记为2022年3月，而媒体普遍于2022年7月报道官宣。截至2026年7月湖南日报报道，公司"累计融资超6亿元"。<sup><a href="#ref3">[3]</a></sup></p>
+
+      <h4>股东结构与资本特征</h4>
+      <p>工商登记的股东信息共18名，其中公开可见的自然人股东为邓文平（持股21.8172%，认缴568.2463万元）与刘婷婷（持股15.272%，认缴397.7724万元），其余16名为机构股东（明细未公开披露）；公司主要人员12名，已知董事包括丘岳峰、何顺群。<sup><a href="#ref12">[12]</a></sup>公司历轮融资的机构投资方包括经纬创投、中金资本、和玉资本、图灵创投、同威资本、道生资本、迪策投资（湖南钢铁集团战略投资）、招商兴湘、弘德投资、小智投资等（各轮对应关系见上表）。<sup><a href="#ref8">[8]</a></sup><sup><a href="#ref14">[14]</a></sup>公司工商登记的企业类型为"有限责任公司（外商投资、非独资）"，表明股东中存在境外主体。<sup><a href="#ref12">[12]</a></sup>公司通过全资子公司布局异地研发与制造：视比特（长沙）机器人科技有限公司（2020年12月成立，注册资本5000万元，法定代表人黄金）与视比特（上海）机器人科技有限公司（2021年9月成立，注册资本2000万元）。<sup><a href="#ref12">[12]</a></sup>从资本结构看，公司呈现"头部市场化VC + 产业资本（湖南钢铁集团）+ 地方国资（招商兴湘）+ 国家级/省市级政府出资基金（国家中小企业发展基金湖南子基金、长沙城发集团）"的多元股东组合；2025—2026年连续两轮融资均由国资背景基金介入，反映出地方"人工智能+先进制造"产业政策对公司的定向支持。<sup><a href="#ref6">[6]</a></sup><sup><a href="#ref5">[5]</a></sup></p>
+      <p>估值方面，公司历轮融资均未公开披露投后估值。2022年10月，邓文平在接受财联社专访时自述"视比特机器人的估值已达二三十亿"，同时称"估值仍处在洼地"；这是目前可查的、公司口径的估值区间表述（2022年时点）。<sup><a href="#ref8">[8]</a></sup>2026年1月，公司入选《2025胡润未来独角兽：全球瞪羚企业榜》，该榜单入选标准为"最有潜力在三年内（截至2028年底）成长为独角兽级十亿美金估值的高成长性企业"，属于潜力认定而非估值披露。<sup><a href="#ref9">[9]</a></sup>本页不采用任何未公开来源的估值数字作为事实陈述。</p>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <p>视比特的技术定位是"通用智能制造"，口号为 <b>One Brain, Any Manufacturing</b>（一个大脑，通用制造），即用一套统一的视觉与机器人智能底座，取代过去"一个工艺场景一套专机"的定制化模式。公司将其技术体系概括为"工业之眼、工业之手、工业之脑"三层协同架构：工业之眼负责高精度3D视觉感知与识别，工业之手负责机器人运动规划与柔性执行，工业之脑负责工艺理解、决策与跨设备调度。公司称三层之间采用全栈自研、统一底层协议，数据互通达毫秒级。<sup><a href="#ref2">[2]</a></sup><sup><a href="#ref3">[3]</a></sup></p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>技术方向</th><th>说明</th></tr>
+        <tr><td>物理AI（Physical AI）与工业世界模型</td><td>邓文平提出"身体先于大脑"的工程路径，主张工业场景中的具身智能应先解决可靠的物理执行与感知精度，再叠加智能决策；公司发布"坤宇"工业世界基座模型，作为产线决策的模型底座。<sup><a href="#ref11">[11]</a></sup><sup><a href="#ref3">[3]</a></sup></td></tr>
+        <tr><td>六项核心技术</td><td>数字孪生、在线学习、柔性交互、空间位姿、精细识别、精准测量。<sup><a href="#ref13">[13]</a></sup></td></tr>
+        <tr><td>"大小脑"协同</td><td>面向具身装备的"大脑—小脑"协同控制：大脑负责工艺级规划与模型推理，小脑负责高频实时运动控制与力/位混合执行。<sup><a href="#ref4">[4]</a></sup></td></tr>
+        <tr><td>数字孪生与产线级仿真</td><td>以"坤吾"平台将 CAD 数据与工艺模板结合，在虚拟环境中完成产线设计、节拍仿真与调试。传统集成商单条产线现场调试周期普遍 3—6 个月以上，公司称用坤吾可压缩至 1 个月以内；另一报道口径为传统半年以上的产线开发周期可压缩至两周以内；具体到千万级智能产线，公司称设计可在一周内完成、硬件安装约 2 个月、软件部署 3—6 天。<sup><a href="#ref2">[2]</a></sup><sup><a href="#ref3">[3]</a></sup><sup><a href="#ref4">[4]</a></sup></td></tr>
+        <tr><td>3D视觉与在线测量</td><td>以多目视觉、点云大模型、3D偏折成像为核心，实现微米—亚毫米级尺寸测量与表面缺陷识别；MVM 系统支持近百台工业相机并行采集，单件检测点位上千个，检测精度 0.15mm，把抽检升级为全检。<sup><a href="#ref2">[2]</a></sup><sup><a href="#ref4">[4]</a></sup></td></tr>
+        <tr><td>大模型与智能体</td><td>软件平台接入 DeepSeek、通义千问等第三方大模型，并自研 CAD-to-3D 大模型、LoCoGen 大模型用于几何重建与工艺编程；"翔云"定位为工业智能体开发与运维平台。<sup><a href="#ref3">[3]</a></sup></td></tr>
+        <tr><td>研发投入</td><td>公司称每年研发投入超过营收的四分之一；研发团队与湖南大学院士团队开展联合攻关，承担智能装调方向国家科技重大专项、工信部人工智能产业"揭榜挂帅"任务。<sup><a href="#ref2">[2]</a></sup></td></tr>
+        <tr><td>知识产权</td><td>公司口径：专利与软件著作权 300 余项；公开专利申请 320 余件，其中发明专利申请占比约 91%，有效专利占比约 32%（有效专利中发明专利占 73%），含 3 件 PCT 国际申请、布局 4 个国家/地区；共 167 位发明人，邓文平以 91 件公开专利申请居首。智慧芽 TFFI 人工智能产业全球科创能力评级 A 级，居同行业前 0.7%。<sup><a href="#ref9">[9]</a></sup><sup><a href="#ref7">[7]</a></sup></td></tr>
+      </table></div>
+
+      <h3 id="product">1.5 产品形态</h3>
+      <h4>软件平台</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>名称</th><th>类型</th><th>说明</th></tr>
+        <tr><td>坤吾（Kunwu）</td><td>智能产线设计与开发平台（数字孪生）</td><td>内置 30 余个行业工艺模板、400 余个工业设备模型、5 类工业预训练大模型，支持 CAD-to-3D 大模型与 LoCoGen 大模型；用于产线虚拟设计、仿真与调试。<sup><a href="#ref3">[3]</a></sup></td></tr>
+        <tr><td>坤宇</td><td>工业世界基座模型</td><td>面向制造现场的工艺与决策模型底座，与坤吾配套形成"设计—决策"链路。<sup><a href="#ref11">[11]</a></sup></td></tr>
+        <tr><td>翔云</td><td>AI 视觉智能体平台／工业质检 AIOps 平台</td><td>承担全行业 3D 视觉检测与识别算法的统一调度与运维，引入多模态大模型构建 AI 智能体；可支撑机械臂扫描工件、三维建模并在数秒内重新规划焊接轨迹。入选 2026"行业级智能体 TOP100"。<sup><a href="#ref3">[3]</a></sup><sup><a href="#ref4">[4]</a></sup><sup><a href="#ref11">[11]</a></sup></td></tr>
+        <tr><td>颖算（YingSuan）</td><td>机器视觉开发平台</td><td>面向工业视觉应用的算法开发与部署平台。<sup><a href="#ref13">[13]</a></sup></td></tr>
+        <tr><td>SpeedWeld</td><td>智能焊接控制软件</td><td>2025年12月发布，支持免示教、3D视觉、AI逆向建模、点云大模型与零代码流程图编程；搭载标准化激光焊缝跟踪传感模块，可在"基于模型"与"逆向建模"两种模式间切换，覆盖有图、无图、图纸偏差等多种来料状态。<sup><a href="#ref4">[4]</a></sup><sup><a href="#ref3">[3]</a></sup></td></tr>
+      </table></div>
+      <h4>硬件产品与工作站</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>产品</th><th>类型</th><th>关键指标/说明</th></tr>
+        <tr><td>MVM 大尺寸高精度在线测量系统</td><td>视觉测量装备</td><td>近百台工业相机并行采集，约 75 秒完成单件上千点位检测，精度 0.15mm；实现大型工件由抽检到全检。2026年8月获第51届日内瓦国际发明展金奖。<sup><a href="#ref2">[2]</a></sup></td></tr>
+        <tr><td>SmartFit 汽车门盖智能装调系统</td><td>汽车装配装备</td><td>单套门盖装调节拍约 76 秒，间隙与面差控制在 0.3mm 以内。<sup><a href="#ref4">[4]</a></sup></td></tr>
+        <tr><td>PaintPro 漆面缺陷检测与抛磨修复系统</td><td>视觉检测装备</td><td>采用 3D 偏折相机，公司称漆面缺陷检出准确率达 98%。<sup><a href="#ref13">[13]</a></sup></td></tr>
+        <tr><td>ShadePro 金属表面细微缺陷检测系统</td><td>视觉检测装备</td><td>面向金属件表面细微缺陷的检测与分级。<sup><a href="#ref13">[13]</a></sup></td></tr>
+        <tr><td>TrackPro 实时焊缝跟踪系统</td><td>焊接配套</td><td>焊缝跟踪精度 0.3mm。<sup><a href="#ref4">[4]</a></sup></td></tr>
+        <tr><td>ZeroPick 混合拆垛机器人</td><td>机器人工作站</td><td>2018年推出，面向物流与制造环节的混合垛型拆垛。<sup><a href="#ref13">[13]</a></sup></td></tr>
+        <tr><td>智能柔性焊接工作站</td><td>机器人工作站</td><td>2023年推出，面向工程机械、钢结构等行业的柔性焊接单元。<sup><a href="#ref13">[13]</a></sup></td></tr>
+        <tr><td>双机协同焊接工作站</td><td>机器人工作站</td><td>2026年6月发布，支持"一机双模式"的双机协同焊接。<sup><a href="#ref4">[4]</a></sup></td></tr>
+        <tr><td>人形焊接机器人</td><td>双足人形机器人</td><td>2026年6月埃森展首次展出，公司称计划于2026年内正式发布。机器人大讲堂报道口径：身高 165cm、自重 60kg、最高负载 30kg，可自主行走、动态调整位姿，核心突破为三维视觉自主决策焊接路径。定位是补齐船舶船舱等狭小空间的可达性短板。<sup><a href="#ref4">[4]</a></sup><sup><a href="#ref3">[3]</a></sup></td></tr>
+      </table></div>
+
+      <h3 id="scenario">1.6 应用场景</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>行业</th><th>典型场景</th><th>代表客户/项目</th></tr>
+        <tr><td>工程机械</td><td>钢板切割件智能分拣、智能下料产线、结构件焊接</td><td>三一重工18号灯塔工厂（2019年开始研发、2020年投入使用的行业首条全自动切割下料分拣线）；中联重科、徐工集团、太原重工、星邦智能<sup><a href="#ref10">[10]</a></sup><sup><a href="#ref2">[2]</a></sup></td></tr>
+        <tr><td>船舶海工</td><td>钢板切割下料分拣智能产线、船舶结构件焊接</td><td>中船系、中远系、招商系船舶企业；2026年一季度船舶领域订单约2亿元，含单笔近亿元的下料分拣产线项目<sup><a href="#ref3">[3]</a></sup></td></tr>
+        <tr><td>汽车与新能源</td><td>门盖智能装调、漆面缺陷检测与修复、电池托盘在线测量、混线焊接</td><td>一汽、重汽、宁德时代；海外含捷克、塞尔维亚、法国、波兰车企；产品已在全球多家主流整车及零部件企业批量应用<sup><a href="#ref11">[11]</a></sup><sup><a href="#ref7">[7]</a></sup><sup><a href="#ref8">[8]</a></sup><sup><a href="#ref6">[6]</a></sup></td></tr>
+        <tr><td>钢结构与轨道交通</td><td>厚板/坡口切割件分拣、智能下料产线、焊接</td><td>铁建重工（2023年全自动智能下料分拣产线，攻克厚板与坡口切割）、中国铁建<sup><a href="#ref2">[2]</a></sup><sup><a href="#ref10">[10]</a></sup></td></tr>
+        <tr><td>商用车辆及装备</td><td>结构件焊接、装配质量检测</td><td>陕汽汽车集团<sup><a href="#ref10">[10]</a></sup></td></tr>
+        <tr><td>物流仓储</td><td>混合垛型拆垛、上下料</td><td>ZeroPick 混合拆垛机器人在制造与物流环节的落地<sup><a href="#ref13">[13]</a></sup></td></tr>
+        <tr><td>海外市场</td><td>整线出口、海外交付与本地化服务；产品输出东南亚、欧洲、北美、拉美</td><td>2021年多目测量专机批量交付捷克、塞尔维亚，2022年复制落地法国、波兰并进军北美；在德国、新加坡、美国、加拿大等地设立海外分支机构（2025年初另有报道提及越南）<sup><a href="#ref8">[8]</a></sup><sup><a href="#ref6">[6]</a></sup><sup><a href="#ref10">[10]</a></sup><sup><a href="#ref1">[1]</a></sup></td></tr>
+      </table></div>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>指标</th><th>数据</th><th>来源与时点</th></tr>
+        <tr><td>客户规模</td><td>业务覆盖全球 300 家行业龙头；截至2026年一季度，各类产品已在全球300余家客户产线上实际运行</td><td>湖南日报、机器人大讲堂，2026年<sup><a href="#ref2">[2]</a></sup><sup><a href="#ref4">[4]</a></sup></td></tr>
+        <tr><td>细分市占率</td><td>重工钢板智能分拣等细分领域市占率超 50%（2022年重工分拣口径曾超 70%）</td><td>政府媒体/公司受访，2022—2026年<sup><a href="#ref2">[2]</a></sup><sup><a href="#ref8">[8]</a></sup></td></tr>
+        <tr><td>2026年一季度订单</td><td>船舶智能制造领域订单约 2 亿元</td><td>湖南日报，2026年7月<sup><a href="#ref3">[3]</a></sup></td></tr>
+        <tr><td>2026年上半年销售额</td><td>核心产线销售额预计突破 3 亿元</td><td>湖南日报，2026年7月<sup><a href="#ref3">[3]</a></sup></td></tr>
+        <tr><td>营收增长</td><td>连续多年保持 50%—100% 的增长；年度营收已突破数亿元</td><td>政府媒体/公司受访，2026年<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref2">[2]</a></sup></td></tr>
+        <tr><td>灯塔工厂案例</td><td>三一重工18号智能工厂：2019年开始研发、2020年投入使用；公司口径为提高产能300%、节约人力80%，产能提升3倍；该工厂逐步实现9大工艺、30多个典型场景全流程智能化，2022年入选世界经济论坛全球"灯塔工厂"</td><td>长沙晚报/湖南日报，2025—2026年<sup><a href="#ref10">[10]</a></sup><sup><a href="#ref2">[2]</a></sup></td></tr>
+        <tr><td>交付形态</td><td>从单机专机（视觉检测、分拣）向整线交付（智能下料分拣产线、焊接产线）升级；2026年埃森展双机协同焊接工作站展机现场达成采购合作</td><td>媒体报道，2023—2026年<sup><a href="#ref2">[2]</a></sup><sup><a href="#ref3">[3]</a></sup></td></tr>
+      </table></div>
+
+      <h3 id="financial">1.8 财务数据</h3>
+      <p>视比特为非上市公司，未公开披露经审计的完整财务报表。以下为可查的公开口径数据：</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>项目</th><th>数据</th><th>来源</th></tr>
+        <tr><td>营业收入</td><td>公司未披露逐年数字；权威媒体报道口径为"年营收突破数亿元"、"连续多年增长 50%—100%"</td><td><sup><a href="#ref1">[1]</a></sup><sup><a href="#ref2">[2]</a></sup></td></tr>
+        <tr><td>核心产线销售额（2026H1）</td><td>预计突破 3 亿元</td><td><sup><a href="#ref3">[3]</a></sup></td></tr>
+        <tr><td>累计融资额</td><td>超 6 亿元（截至2026年7月）</td><td><sup><a href="#ref3">[3]</a></sup></td></tr>
+        <tr><td>B轮单笔融资</td><td>3 亿元（2022年）</td><td><sup><a href="#ref8">[8]</a></sup></td></tr>
+        <tr><td>研发投入</td><td>公司称每年超过营收的四分之一</td><td><sup><a href="#ref2">[2]</a></sup></td></tr>
+        <tr><td>净利润/毛利率</td><td>未披露</td><td>—</td></tr>
+        <tr><td>员工数</td><td>2024年年报参保人数241人；2024/25年公司口径340余人；2026年受访口径近450人；工商登记参保人数289人</td><td><sup><a href="#ref12">[12]</a></sup><sup><a href="#ref1">[1]</a></sup></td></tr>
+      </table></div>
+      <div class="callout"><div class="callout-title">数据口径提示</div>上表中"营收突破数亿元""增长 50%—100%""研发投入超营收四分之一"等均为媒体转述的公司自述数据，未经审计披露，不构成独立验证的财务事实。"近450人"与工商登记参保人数 289 人、2024年年报参保 241 人之间存在差距，可能源于统计时点、统计口径（参保人数不含部分用工形式）及公司对外口径的取整，读者应以区间理解。</div>
+
+      <h3 id="others">1.9 其他信息</h3>
+      <ul>
+        <li><b>资质与荣誉</b>：国家级专精特新重点"小巨人"企业；工信部"人工智能产业揭榜挂帅"牵头揭榜单位；国家高新技术企业；湖南省省级专精特新中小企业；科技部"全国颠覆性技术创新大赛"优秀项目。<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref2">[2]</a></sup><sup><a href="#ref6">[6]</a></sup></li>
+        <li><b>日内瓦国际发明展金奖</b>：2026年8月，公司自主研发的"MVM大尺寸高精度在线测量系统"在第51届日内瓦国际发明展上从 35 个国家和地区的 1000 余项发明中获金奖，公司称该技术填补国内大尺寸在线测量领域空白。<sup><a href="#ref2">[2]</a></sup></li>
+        <li><b>榜单入选</b>：入选《财富》中国最具影响力创业公司榜、胡润全球猎豹企业榜；2026年1月入选《2025胡润未来独角兽：全球瞪羚企业榜》（湖南共 3 家入选）。<sup><a href="#ref2">[2]</a></sup><sup><a href="#ref9">[9]</a></sup></li>
+        <li><b>产业荣誉</b>：船舶智能化产线案例入选 2026 全国"人工智能+"创新案例 TOP100；被长沙纳入"拟上市企业"培育名单（上市军团培育名单）。<sup><a href="#ref10">[10]</a></sup></li>
+        <li><b>行业活动</b>：担任 CCIG 2026（中国图象图形大会）银牌合作单位。<sup><a href="#ref6">[6]</a></sup></li>
+        <li><b>知识产权结构</b>：商标申请约 70 件，覆盖"视比特""SpeedBot""翔云智策"等品牌；公开专利申请 320 余件，邓文平为发明数量最多的发明人；主持制定和起草多项国家标准和行业标准。<sup><a href="#ref12">[12]</a></sup><sup><a href="#ref7">[7]</a></sup><sup><a href="#ref6">[6]</a></sup></li>
+        <li><b>组织架构</b>：总部在长沙湘江新区；上海研发中心于2022年8月正式启用，并设全资子公司视比特（上海）；2023年设立海外事业部，官网披露的分部为欧洲（杜塞尔多夫）、东南亚（新加坡）、北美（多伦多），媒体报道另提及美国、加拿大（2025年初报道另提及越南）。<sup><a href="#ref13">[13]</a></sup><sup><a href="#ref10">[10]</a></sup><sup><a href="#ref6">[6]</a></sup></li>
+        <li><b>业务版图</b>：从单一的工程机械切割下料分拣，扩展至重型装备制造全流程（板材来料→切割下料分拣→智能折弯、坡口、焊接、打磨、零件齐套配盘→整厂MES与数字孪生）；汽车领域覆盖冲压、焊装、涂装、总装四大工艺全流程智造；船舶领域从残材余料切割下料分拣延伸至船舶智能制造全链条。公司自述聚焦智能制造、智能检测、智慧物流三大赛道。<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref7">[7]</a></sup></li>
+        <li><b>其他荣誉</b>：2023创业邦100未来准独角兽企业、中国科协"科创中国"新锐企业奖、恰佩克"人工智能年度价值品牌奖"、中国科技机器人企业TOP50（2025年初报道口径）。<sup><a href="#ref10">[10]</a></sup></li>
+        <li><b>未来方向（公司自述，2026年）</b>：深化工业具身智能大模型与3D AIGC技术的融合，提升产线自主决策与柔性适应能力；在巩固重工与汽车基本盘的同时拓展核工业、有色金属冶炼等新赛道；推动核心产品出海。<sup><a href="#ref1">[1]</a></sup></li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+
+      <div class="analysis-block" id="a21">
+        <h4>2.1 团队背景与场景选择匹配度</h4>
+        <p>视比特的团队基因与其赛道选择高度自洽，但也带有明显的"路径依赖"色彩。邓文平为国防科技大学计算机专业本科、硕士，并在国防科技大学与瑞士联邦理工（ETH Zurich）联合培养取得博士学位，属计算机系统方向；初创团队成员来自普林斯顿、瑞士联邦理工（ETH Zurich）等国内外顶尖院校，覆盖计算机视觉、机器人、计算机系统、3D图形、云计算大数据等方向，公司官网另列出波恩大学、慕尼黑理工、哥伦比亚大学、亚琛工大等院校背景。<sup><a href="#ref10">[10]</a></sup><sup><a href="#ref7">[7]</a></sup><sup><a href="#ref13">[13]</a></sup>这一背景决定了公司从一开始就选择了"3D 视觉 + 工业现场"的高门槛入口——大尺寸、高反光、油污、震动、节拍要求严苛的车间环境，恰恰是纯软件团队难以啃下、而纯机械集成商又缺乏算法能力的空白地带。</p>
+        <p>团队能力与场景难点的匹配体现在三个具体事实：其一，重工钢板切割件的识别分拣是典型的"非标、多品种、无固定摆放"问题，2019 年三一重工18号工厂提出的"上万种异形钢板切割件自动识别分拣"需求长期无人能解，公司用了近十个月在工厂夜间窗口期反复调试才打通。<sup><a href="#ref1">[1]</a></sup>其二，公司成立早期即以"大尺寸高精度在线测量"作为第二条产品线，这是对精度要求最高的工业视觉子领域之一（2020年首推电池托盘多目测量专机，100秒内完成上千个检测点；至2026年做到 0.15mm 精度、近百台相机并行），需要深厚的标定与多相机几何能力。<sup><a href="#ref8">[8]</a></sup><sup><a href="#ref2">[2]</a></sup>其三，公司专利结构显示发明专利占比约 91%，显著高于一般集成型机器人公司，符合"技术驱动型"而非"系统集成型"的组织特征。<sup><a href="#ref2">[2]</a></sup></p>
+        <p>需要审慎看待的是：团队履历中"计算机视觉与图形顶会论文数十篇"的说法来自公司自述，未见第三方逐篇核验；邓文平的"计算机系统专家"定位与公司实际主营的 3D 视觉/工业软件之间的强关联，也主要依据其博士方向与专利分布推断，而非公开的完整学术履历。</p>
+      </div>
+
+      <div class="analysis-block" id="a22">
+        <h4>2.2 技术路线与场景适配性</h4>
+        <p>视比特的技术路线可以概括为"向下扎到物理层，向上收口到统一底座"。</p>
+        <p>向下的一面是它对"难场景"的主动选择。公司早期放弃门槛较低的通用视觉检测，直接切入重工钢板分拣这一当时无成熟方案的场景，用真实产线的极端工况（厚板、坡口、油污、异形件混流）来打磨算法的鲁棒性。<sup><a href="#ref2">[2]</a></sup>这种"先做最难、再向易处复用"的次序，与多数工业视觉公司"先做简单外观检测、再挑战难场景"的路径相反，但一旦跑通，其技术资产在同类重工业场景中的迁移成本很低——公司后续把同一套分拣能力从工程机械复制到钢结构、船舶、轨道交通，正是这一逻辑的体现。<sup><a href="#ref3">[3]</a></sup></p>
+        <p>向上的一面是"统一底座"的收口。"坤吾"平台内置 30 余个行业工艺模板、10 余个工艺包（焊接、打磨、坡口等）、400 余种常见工业设备模型与五类工业预训练大模型，本质上是把每个项目里沉淀的工艺知识产品化，用一份底座服务多个行业，从而摆脱"项目制公司毛利率随规模摊薄"的陷阱。<sup><a href="#ref3">[3]</a></sup>公司"One Brain, Any Manufacturing"的口号、以及副总经理刘婷婷反复强调的"软件定义工业智能"，指向的都是同一目标：把非标交付转化为可复制的标准产品。<sup><a href="#ref11">[11]</a></sup></p>
+        <p>2025—2026年，公司技术叙事明显向"具身智能/物理AI"迁移：从 2025年12月的 SpeedWeld 焊接控制软件，到 2026年6月的双机协同焊接工作站与人形焊接机器人，再到"工业世界基座模型"坤宇与工业智能体平台翔云，形成"感知—决策—执行"的完整链条。<sup><a href="#ref4">[4]</a></sup><sup><a href="#ref11">[11]</a></sup>这一迁移在技术上是连贯的（公司已有工业之眼与工业之手，补上工业之脑），但在叙事上明显契合了 2025—2026 年资本市场对具身智能的偏好。<b>值得注意的是，公司的核心技术资产（3D视觉、在线测量、产线数字化）仍是收入基础；双机协同焊接工作站已在2026年埃森展现场达成采购合作，但人形焊接机器人目前仅有展会展示与"计划年内发布"的时间表，尚无公开的商业交付记录。</b><sup><a href="#ref3">[3]</a></sup><sup><a href="#ref4">[4]</a></sup></p>
+      </div>
+
+      <div class="analysis-block" id="a23">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>视比特的股东结构呈现出清晰的"三段式"特征，且每一段都对公司战略产生了可见影响。</p>
+        <p>第一段是 2019—2021 年的市场化 VC 主导期（图灵创投、道生资本、同威资本、和玉资本、中金资本）。这一时期公司尚在验证产品，融资规模较小、轮次密集（2019年7月至2021年5月间完成天使、战略、A、A+ 四轮），资本的作用主要是支撑研发与首批灯塔客户交付。<sup><a href="#ref14">[14]</a></sup><sup><a href="#ref8">[8]</a></sup></p>
+        <p>第二段是 2022 年的 B 轮，这是公司资本结构的分水岭：3 亿元的单笔融资由经纬创投领投，同时引入湖南钢铁集团旗下迪策投资作为战略投资方。<sup><a href="#ref8">[8]</a></sup>产业资本的进入不是财务性的——湖南钢铁集团本身是钢板切割与钢铁材料的下游需求方，其战略投资意味着公司在重工场景获得了产业侧的入口与背书。这一轮也把公司从"长沙本地创业公司"推向了全国性工业软件供应商的位置。</p>
+        <p>第三段是 2025—2026 年的国资基金主导期。B+ 轮（2025年8月）由一村资本旗下比特淞灵基金独家投资，用于工业具身智能产品研发与船舶、锂电市场开拓；B++ 轮（2026年6月）由国家中小企业发展基金湖南子基金（达晨财智管理）与长沙城发集团联合投资。<sup><a href="#ref6">[6]</a></sup><sup><a href="#ref5">[5]</a></sup>两轮国资基金的介入时点，与公司被长沙列入"拟上市企业"培育名单在时间上吻合。<sup><a href="#ref10">[10]</a></sup>这表明公司已进入地方政府的产业培育视野，融资的功能也从"输血研发"转向"配合区域产业战略与上市准备"。</p>
+        <p>这种结构的影响是双向的。正面看，产业资本与国资的加持使公司在重工、船舶等以国企央企为主的客户群中更容易获得信任，订单获取效率提高；<b>需要审慎看待的是</b>，国资背景基金的进入通常会附带注册地、纳税地、就业规模等方面的隐含约束，可能限制公司未来在股权架构与注册地上的灵活性；同时，公司自 2022 年 B 轮后连续三轮（B+、B++）均未见公开披露投后估值，这与"估值不便披露"或"估值低于预期"两种情形均不矛盾，外部无法据公开信息判断其估值走势。<sup><a href="#ref6">[6]</a></sup><sup><a href="#ref5">[5]</a></sup></p>
+      </div>
+
+      <div class="analysis-block" id="a24">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>公司公开叙事中的"试错"痕迹不多，但从时间线与产品序列可以还原出三次明确的路径调整。</p>
+        <p>第一次是<b>从"通用视觉产品"到"重工垂直场景"的收缩</b>。公司 2018年10月推出的第一款产品 ZeroPick 混合拆垛机器人面向的是相对通用的物流拆垛场景，2019年8月转向重工钢板切割寻边，随后在 2019—2020 年把全部资源押在三一重工18号工厂的分拣难题上。<sup><a href="#ref13">[13]</a></sup><sup><a href="#ref1">[1]</a></sup>团队在工厂夜间窗口期持续调试近十个月，这一投入强度说明当时的项目一度面临无法交付的风险；公司最终在 2020 年建成工程机械行业首条全自动切割下料分拣线，是这一轮"押注"的回报。<sup><a href="#ref1">[1]</a></sup></p>
+        <p>第二次是<b>从"单点专机"到"整线交付"的升级</b>。2020—2022 年公司主要交付视觉检测与分拣这类单机专机（专业设备），2023 年起开始交付整条智能下料分拣产线（铁建重工项目），2026 年一季度的订单结构已变为"钢板切割下料分拣智能产线"这类整线项目，单笔金额接近亿元。<sup><a href="#ref2">[2]</a></sup><sup><a href="#ref3">[3]</a></sup>整线交付单价高、但定制化程度与实施风险也更高。</p>
+        <p>第三次是<b>从"视觉软件公司"到"工业具身智能公司"的定位扩张</b>。2025年12月推出 SpeedWeld，2026年6月同时发布双机协同焊接工作站与人形焊接机器人，并同步完成 B+、B++ 两轮融资。<sup><a href="#ref4">[4]</a></sup><sup><a href="#ref5">[5]</a></sup>这一轮调整的驱动因素中，资本叙事与业务实质的权重难以区分：焊接软件与人形机器人确实延伸了公司的"工业之手"，但公司并未公开披露任何一笔人形机器人或具身智能产品的商业化订单。</p>
+        <p>此外，外部可观察到的一次明确的"失败信号"，是邓文平 2022 年对财联社表示公司<span style="background:#fff8e1">估值"已达二三十亿"但"仍处在洼地"</span>——这实际上是对当时一级市场估值预期的抱怨。<sup><a href="#ref8">[8]</a></sup>此后公司四轮融资（含 2022年B轮之后）均未再公开估值数字，侧面反映出估值披露环境的变化。</p>
+      </div>
+
+      <div class="analysis-block" id="a25">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>视比特的位置可以用一句话概括：<b>在"工业视觉 + 机器人"这个拥挤赛道里，选择了以大尺寸高精度测量与重工分拣两个最难场景作为护城河，并在 2025 年后向工业具身智能扩展叙事。</b></p>
+        <p>与同类公司相比，其取舍特征有三点。其一，不做通用外观缺陷检测的低价竞争。国内大量工业视觉公司集中在 3C、锂电、光伏的外观缺陷检测，价格战激烈；视比特把重心放在重工钢板分拣与大尺寸测量这类"设备重、精度高、竞争少"的场景，公司自述在重工钢板智能分拣等细分市占率超过 50%，虽为公司口径，但与"长期无国产成熟方案"的行业事实一致。<sup><a href="#ref2">[2]</a></sup></p>
+        <p>其二，以整线交付切入而非只卖设备。整线交付意味着公司需要同时具备视觉、机械、控制系统、产线设计（坤吾平台）与现场实施能力，是把设备商角色推向"总包"角色，好处是单笔金额与客户黏性大幅提升，代价是资产与人力占用、交付周期风险同时上升。<sup><a href="#ref3">[3]</a></sup></p>
+        <p>其三，把"具身智能"作为叙事的下一站而非当下的收入来源。公司在 2026 年同时展示双机协同焊接工作站与人形焊接机器人，前者是已有焊接业务的产品化延伸（有现实订单支撑），后者是面向未来的人形产品（无公开订单）。<sup><a href="#ref4">[4]</a></sup>这种"老业务抓现金流、新叙事抓估值"的双轨结构，在当下的一级市场中较为常见，也意味着公司在真正兑现人形产品商业化之前，其估值锚依然是工业软件与产线交付业务。</p>
+        <p>行业层面，据 GGII 数据，2024 年中国机器视觉市场规模约 181.47 亿元（同比微降 1.97%），其中 2D 视觉 153.32 亿元（同比降 5.07%）、3D 视觉 28.15 亿元（同比增 19.18%）；预计 2025 年市场规模有望突破 210 亿元，2028 年超 385 亿元，其中 3D 视觉达 70 亿元。3D 视觉是增速显著高于行业整体的细分方向，这构成视比特所处赛道的结构性支撑。<sup><a href="#ref7">[7]</a></sup></p>
+        <p><b>已识别的风险（科创板日报·企业创新评测实验室的公开分析）</b>：一是国际巨头加速本土化布局，在高端市场以"全栈方案"挤压份额；二是中小客户对成本敏感，而公司的定制化服务模式难以快速渗透长尾市场；三是 AI 算法在小样本、极端工况下的泛化能力仍需优化；四是部分高端 3D 视觉传感器芯片依赖进口，存在成本上升与交付风险。<sup><a href="#ref7">[7]</a></sup></p>
+        <p>需要说明的是，本页未找到可直接对比的公开竞争对手财务数据（如梅卡曼德、微亿智造等在部分场景重叠的公司未披露可比的细分市占率与营收），因此上述竞争定位判断主要基于业务形态与场景选择的差异，而非量化的市场份额比较。</p>
+      </div>
+
+      <div class="analysis-block" id="a26">
+        <h4>2.6 其他重要观察</h4>
+        <h4 style="font-size:0.88rem;font-weight:700;color:#333;margin-top:8px;">（一）数据口径存在多处差异，需以审慎态度阅读</h4>
+        <p>研究过程中发现公司公开数据存在以下不一致之处，本页均按"两种口径并列"处理，不做取舍：</p>
+        <ul>
+          <li><b>人形焊接机器人身高</b>：机器人大讲堂的现场报道口径为身高 165cm、自重 60kg、最高负载 30kg，本页采用该口径；网络上另有约 170cm 的说法，未能追溯到同源的现场报道，故不采用。<sup><a href="#ref4">[4]</a></sup></li>
+          <li><b>客户数量</b>：公司官网与部分政府媒体报道为"全球 300 余家行业龙头"，另有媒体口径为"服务 200 余家国内外龙头企业"。<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref2">[2]</a></sup></li>
+          <li><b>员工规模</b>：工商登记参保人数 289 人（时点不明），2024年年报参保 241 人，公司受访口径 2024/25 年为 340 余人、2026 年为近 450 人。<sup><a href="#ref12">[12]</a></sup><sup><a href="#ref1">[1]</a></sup></li>
+          <li><b>硕博占比</b>：公司不同场合表述为"超 30%"与"超 40%"两种。本页采用 2026 年受访的"超 30%"口径。<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref2">[2]</a></sup></li>
+          <li><b>B轮时间</b>：公司官网"发展历程"记为 2022年3月，媒体普遍于 2022年7月报道官宣。两者可能分别对应协议签署与对外披露时点。<sup><a href="#ref13">[13]</a></sup><sup><a href="#ref8">[8]</a></sup></li>
+        </ul>
+        <h4 style="font-size:0.88rem;font-weight:700;color:#333;margin-top:12px;">（二）法定代表人并非对外披露的创始人</h4>
+        <p>工商登记的法定代表人为"黄金"，而公司对外统一以邓文平作为创始人、董事长兼 CEO 出现。<sup><a href="#ref12">[12]</a></sup><sup><a href="#ref7">[7]</a></sup>这一安排在国内科技公司中并不罕见（法定代表人可由高管或特定主体担任），且不改变邓文平作为实际控制人之一的事实——其个人持股 21.8172%，为第一大机构股东以外的最大自然人股东。<sup><a href="#ref12">[12]</a></sup>但读者在阅读本页时应注意区分"法定代表人"与"实际控制人/CEO"这两个不同概念。</p>
+        <h4 style="font-size:0.88rem;font-weight:700;color:#333;margin-top:12px;">（三）估值信息高度不透明</h4>
+        <p>公司自 B 轮（2022年）之后未再披露任何轮次的投后估值，仅以"亿元级"描述 B+、B++ 两轮金额。<sup><a href="#ref6">[6]</a></sup><sup><a href="#ref5">[5]</a></sup>本页在 index 中因此将该公司的估值列标注为"累计融资超6亿（估值未披露）"。可查的唯一估值口径来自 2022年10月邓文平的受访自述（"二三十亿"），已明确标注时点与来源性质。<sup><a href="#ref8">[8]</a></sup><b>任何高于或低于此区间的估值数字，若无公司官方或权威机构披露，本页不予采用。</b></p>
+        <h4 style="font-size:0.88rem;font-weight:700;color:#333;margin-top:12px;">（四）地域与产业政策绑定较深</h4>
+        <p>公司总部在长沙湘江新区，被长沙市纳入"拟上市企业"培育名单，且近年融资持续引入湖南本地国资与国家级基金在湘子基金。<sup><a href="#ref10">[10]</a></sup><sup><a href="#ref5">[5]</a></sup>这一绑定为公司带来了地方产业资源（如湖南钢铁集团、长沙城发集团），也使其战略自由度在一定程度上与地方"人工智能 + 先进制造"的产业规划相关联。</p>
+      </div>
+
+      <h2 id="refs">3 参考资料</h2>
+      <div class="references"><ol>
+        <li id="ref1"><a href="http://gxt.hunan.gov.cn/gxt/xxgk_71033/gzdt/qyzx/202609/t20260901_34054823.html" target="_blank">视比特：从0到9，一家"小巨人"的资质跃升之路 — 湖南省工业和信息化厅，2026-09-01</a></li>
+        <li id="ref2"><a href="http://society.yunnan.cn/system/2026/08/21/034133173.shtml" target="_blank">湖南造"机器人尖兵"视比特斩获国际金奖 — 湖南日报（云南网转载），2026-08-21</a></li>
+        <li id="ref3"><a href="https://www.hunantoday.cn/news/xhn/202607/33060615.html" target="_blank">硬核新动能⑧丨通用智能制造的领航者，资本重金下注 — 湖南日报·新湖南客户端，2026-07-03</a></li>
+        <li id="ref4"><a href="https://leaderobot.com/news/8207" target="_blank">从双机协同免示教焊接到人形机器人，视比特在BEW展会放出的两张牌 — 机器人大讲堂，2026-07-01</a></li>
+        <li id="ref5"><a href="https://www.chinaventure.com.cn/news/114-20260629-392059.html" target="_blank">视比特机器人完成亿元级B++轮融资 — 投中网，2026-06-29</a></li>
+        <li id="ref6"><a href="https://www.leaderobot.com/news/6145" target="_blank">「视比特机器人」完成B+轮亿元级融资！加速国产工业具身智能落地 — 机器人大讲堂，2025-08-20</a></li>
+        <li id="ref7"><a href="https://www.chinastarmarket.cn/detail/2130276" target="_blank">视比特机器人完成亿元级B+轮融资 3D视觉赛道机遇与挑战并存 — 科创板日报·企业创新评测实验室，2025-08-29</a></li>
+        <li id="ref8"><a href="https://m.cls.cn/detail/1156775" target="_blank">视比特机器人CEO邓文平博士：3D视觉行业拐点已至 — 财联社，2022-10-18</a></li>
+        <li id="ref9"><a href="https://moment.rednet.cn/content/646045/65/15634792.html" target="_blank">瞄准10亿美元估值！湖南3家"瞪羚"企业跃上全球榜！ — 湖南工信（红网时刻号），2026-01-21</a></li>
+        <li id="ref10"><a href="http://dfjrjgj.hunan.gov.cn/dfjrjgj/szyw/202502/t20250220_33592128.html" target="_blank">【长沙】上市军团养成记①丨始于"研值"，久于创新，视比特为产线装上智慧大脑 — 中共湖南省委金融委员会办公室（长沙晚报），2025-02-20</a></li>
+        <li id="ref11"><a href="http://hn.people.com.cn/n2/2026/0702/c356884-41627682.html" target="_blank">麓谷"具"焦：给AI一副"好身体" — 人民网湖南频道，2026-07-02</a></li>
+        <li id="ref12"><a href="https://m.shuidi.cn/company-a7210e57174411806dc5f74249879a01.html" target="_blank">湖南视比特机器人有限公司 工商登记信息 — 水滴信用</a></li>
+        <li id="ref13"><a href="https://www.speedbot.com" target="_blank">湖南视比特机器人有限公司官网 — www.speedbot.com（实测 HTTP 200；备用域名 www.speedbot.net 实测跳转至 speedbot.com）</a></li>
+        <li id="ref14"><a href="https://www.taibo.cn/company/548" target="_blank">湖南视比特机器人有限公司（含融资历史）— 泰伯网企业数据库</a></li>
+        <li id="ref15"><a href="https://www.tmtpost.com/4727680.html" target="_blank">3D视觉与机器人公司视比特完成近亿元A轮融资，和玉资本领投 — 钛媒体，2020-09-10</a></li>
+      </ol></div>
+
+      <div class="page-footer">本页面由具身智能Wiki项目自动生成 | 数据截止至2026年9月20日 | 最后更新：2026-09-20</div>
+    </article>
+  </div>
+</div>
+<script>
+(function(){
+  var tocLinks = document.querySelectorAll('.toc-nav a');
+  var targets = [];
+  tocLinks.forEach(function(a){ var t = document.querySelector(a.getAttribute('href')); if(t) targets.push({link:a, el:t}); });
+  function onScroll(){
+    var pos = window.scrollY + 120, current = null;
+    targets.forEach(function(item){ if(item.el.offsetTop <= pos) current = item; });
+    tocLinks.forEach(function(a){ a.classList.remove('active'); });
+    if(current) current.link.classList.add('active');
+  }
+  window.addEventListener('scroll', onScroll, {passive:true});
+  onScroll();
+})();
+</script>
+</body>
+</html>

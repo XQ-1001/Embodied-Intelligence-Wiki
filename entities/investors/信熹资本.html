@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>信熹资本 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 288px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article ol { padding-left: 1.8em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .t-vc { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .t-cvc { background: #fce4ec; color: #c62828; border-color: #f8bbd0; }
+  .t-gov-fund { background: #fff3e0; color: #e65100; border-color: #ffe0b2; }
+  .t-national-fund { background: #f3e5f5; color: #7b1fa2; border-color: #e1bee7; }
+  .t-overseas-fund { background: #e0f2f1; color: #00695c; border-color: #b2dfdb; }
+  .t-embodied-active { background: #e8f5e9; color: #2e7d32; border-color: #a5d6a7; }
+  .t-lead-investor { background: #fff8e1; color: #f57f17; border-color: #ffecb3; }
+  .t-follow-investor { background: #f5f5f5; color: #616161; border-color: #e0e0e0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../../index.html">具身智能Wiki</a> <span class="breadcrumb-sep">›</span> <a href="../../index.html#investors">投资机构</a> <span class="breadcrumb-sep">›</span> <span>信熹资本</span></div>
+  <div class="wiki-header"><h1>信熹资本</h1><div class="subtitle">Sincere VC · 2015年成立于上海 · "古典派"硬科技VC · 管理规模约50亿元人民币<sup><a href="#ref6">[6]</a></sup> · 具身智能领域为感知层间接参与</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实与分析</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#team">1.2 核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funds">1.3 基金结构与LP</a></li>
+        <li class="toc-lvl3"><a href="#philosophy">1.4 投资哲学与偏好</a></li>
+        <li class="toc-lvl3"><a href="#tracks">1.5 主要投资赛道</a></li>
+        <li class="toc-lvl3"><a href="#embodied">1.6 具身智能领域布局</a></li>
+        <li class="toc-lvl3"><a href="#cases">1.7 典型投资案例</a></li>
+        <li class="toc-lvl3"><a href="#performance">1.8 基金业绩</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#references">2 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">信熹资本</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">上海信熹投资管理有限公司<sup><a href="#ref11">[11]</a></sup></div></div>
+        <div class="ib-row"><div class="ib-label">英文名</div><div class="ib-value">Sincere VC（Crunchbase 记作 Sincere Capital）</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2015年7月30日<sup><a href="#ref11">[11]</a></sup></div></div>
+        <div class="ib-row"><div class="ib-label">注册地</div><div class="ib-value">上海市普陀区（办公于虹口区北外滩）<sup><a href="#ref11">[11]</a></sup></div></div>
+        <div class="ib-row"><div class="ib-label">机构类型</div><div class="ib-value"><span class="tag t-vc">财务投资机构</span> 硬科技VC</div></div>
+        <div class="ib-row"><div class="ib-label">管理规模</div><div class="ib-value">约50亿元人民币（2025年）<sup><a href="#ref6">[6]</a></sup></div></div>
+        <div class="ib-section">核心人物</div>
+        <div class="ib-row"><div class="ib-label">创始合伙人</div><div class="ib-value">兰有金<sup><a href="#ref10">[10]</a></sup></div></div>
+        <div class="ib-section">登记与合规</div>
+        <div class="ib-row"><div class="ib-label">AMAC登记号</div><div class="ib-value">P1023240<sup><a href="#ref11">[11]</a></sup></div></div>
+        <div class="ib-row"><div class="ib-label">分道制名单</div><div class="ib-value">2021年入选<sup><a href="#ref6">[6]</a></sup></div></div>
+        <div class="ib-section">投资偏好</div>
+        <div class="ib-row"><div class="ib-label">投资领域</div><div class="ib-value">智能技术（半导体、传感器、智能感知、光子）+ 生命科技<sup><a href="#ref2">[2]</a></sup></div></div>
+        <div class="ib-row"><div class="ib-label">投资阶段</div><div class="ib-value">早期至Pre-IPO（A/B轮为主，亦参与早期天使）</div></div>
+        <div class="ib-row"><div class="ib-label">币种</div><div class="ib-value">人民币<sup><a href="#ref12">[12]</a></sup></div></div>
+        <div class="ib-section">具身智能</div>
+        <div class="ib-row"><div class="ib-label">暴露程度</div><div class="ib-value"><span class="tag tag-warn">间接参与</span> 无整机/大模型布局</div></div>
+        <div class="ib-row"><div class="ib-label">代表被投</div><div class="ib-value">与光科技（物理AI视觉芯片）<sup><a href="#ref17">[17]</a></sup></div></div>
+        <div class="ib-section">官网</div>
+        <div class="ib-row"><div class="ib-label">网址</div><div class="ib-value"><a href="https://sincerevc.com/" target="_blank">sincerevc.com</a><sup><a href="#ref0">[0]</a></sup></div></div>
+      </aside>
+
+      <p class="article-intro"><strong>信熹资本</strong>（Sincere VC）是注册于上海的人民币硬科技投资机构，由兰有金于2015年7月创立<sup><a href="#ref11">[11]</a></sup>，管理主体为上海信熹投资管理有限公司。机构自我定位为"洞见驱动的硬科技投资狙击手"，聚焦<strong>智能技术</strong>与<strong>生命科技</strong>两大领域，以"树干法则""不为清单""信熹曲线"为方法论标签<sup><a href="#ref6">[6]</a></sup>。截至2025年（成立十周年），管理规模约50亿元人民币，被投企业市场价值总和超过3,000亿元<sup><a href="#ref6">[6]</a></sup>。信熹的具身智能相关性主要体现在<strong>上游感知与算力芯片</strong>环节，未投资人形机器人整机、灵巧手、关节模组或具身大模型。</p>
+
+      <h2 id="facts">1 事实与分析</h2>
+      <p style="font-size:0.82rem;color:#54595d;margin-bottom:10px;">来源可靠性标注：<span class="tag tag-info">AMAC登记</span> = 基金业协会法定公示信息 · <span class="tag tag-info">机构自述</span> = 机构官网/官方披露 · <span class="tag tag-info">媒体报道</span> = 第三方独立报道 · <span class="tag tag-info">工商登记</span> = 企业信用信息公示系统</p>
+
+      <h3 id="basic">1.1 基本信息</h3>
+
+      <div class="table-wrapper">
+        <table class="wikitable infotable">
+          <tr><th>项目</th><th>内容</th></tr>
+          <tr><td>机构全称</td><td>上海信熹投资管理有限公司（Shanghai Sincere VC Co., Ltd.）<sup><a href="#ref11">[11]</a></sup></td></tr>
+          <tr><td>品牌名称</td><td>信熹资本 / Sincere VC</td></tr>
+          <tr><td>成立时间</td><td>2015年7月30日（管理人登记日 2015年9月18日）<sup><a href="#ref11">[11]</a></sup></td></tr>
+          <tr><td>注册地址</td><td>上海市普陀区武南路88号6层616室（登记机关：普陀区市场监督管理局，核准日期2026-03-26）<sup><a href="#ref11">[11]</a></sup><sup><a href="#ref26">[26]</a></sup></td></tr>
+          <tr><td>办公地址</td><td>上海市虹口区东大名路1089号北外滩来福士东塔3503室<sup><a href="#ref11">[11]</a></sup></td></tr>
+          <tr><td>机构类型</td><td>财务投资机构（人民币硬科技VC，无产业母公司、无政府引导职能）</td></tr>
+          <tr><td>AMAC登记</td><td>P1023240，机构类型为"私募股权、创业投资基金管理人"，业务类型涵盖私募股权投资基金、私募股权投资类FOF基金、创业投资基金、创业投资类FOF基金<sup><a href="#ref11">[11]</a></sup></td></tr>
+          <tr><td>注册资本</td><td>12,500万元（实缴5,700万元；2022年7月4日由10,000万元增至12,500万元）<sup><a href="#ref26">[26]</a></sup></td></tr>
+          <tr><td>法定代表人</td><td>兰有金（执行董事、总经理）<sup><a href="#ref11">[11]</a></sup></td></tr>
+          <tr><td>统一社会信用代码</td><td>91310115351052371U<sup><a href="#ref26">[26]</a></sup></td></tr>
+          <tr><td>企业类型</td><td>有限责任公司（自然人投资或控股）；2021年3月由"台港澳与境内合资"变更而来<sup><a href="#ref26">[26]</a></sup></td></tr>
+          <tr><td>管理规模（AUM）</td><td>约50亿元人民币（2025年机构十周年口径）；AMAC登记的管理规模区间为20—50亿元<sup><a href="#ref6">[6]</a></sup><sup><a href="#ref11">[11]</a></sup></td></tr>
+          <tr><td>在管基金数</td><td>24只（AMAC"私募基金管理人公示"披露的基金数量，2026-09-18 查询）<sup><a href="#ref11">[11]</a></sup></td></tr>
+          <tr><td>投资领域</td><td>智能技术（半导体、传感器、智能感知、光子、卫星通信）+ 生命科技（创新药、高端医疗器械）<sup><a href="#ref2">[2]</a></sup></td></tr>
+          <tr><td>官网</td><td><a href="https://sincerevc.com/" target="_blank">sincerevc.com</a>（2026-09-18实测 HTTP 200）<sup><a href="#ref0">[0]</a></sup></td></tr>
+        </table>
+      </div>
+
+      <div class="callout"><span class="tag tag-warn">域名核验</span> 部分第三方数据库（如同花顺）将信熹资本官网标注为 <code>sincere-capital.com</code>。2026-09-18 实测该域名返回 <strong>HTTP 502</strong>（不可访问），而官网页面自身标注的官方网址为 <strong>sincerevc.com</strong>（HTTP 200）。本页面采用经实测验证的 sincerevc.com。</div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>时间</th><th>事件</th></tr>
+          <tr><td>2015年7月</td><td>上海信熹投资管理有限公司成立<sup><a href="#ref11">[11]</a></sup></td></tr>
+          <tr><td>2015年9月18日</td><td>在中国证券投资基金业协会登记为私募股权、创业投资基金管理人（P1023240）<sup><a href="#ref11">[11]</a></sup></td></tr>
+          <tr><td>2016年5月</td><td>信熹资本以800万元投资睿创微纳（其第二轮融资）；此为机构创立后的首个投资项目。IPO辅导材料显示信熹投资持股935.06万股、持股比例2.43%，此后该企业创始人马宏一度担任信熹董事会成员及投委会成员<sup><a href="#ref6">[6]</a></sup><sup><a href="#ref8">[8]</a></sup><sup><a href="#ref24">[24]</a></sup></td></tr>
+          <tr><td>2016年11月</td><td>天使轮投资深圳市微觉未来科技有限公司（激光雷达，面向机器人/无人汽车）<sup><a href="#ref22">[22]</a></sup></td></tr>
+          <tr><td>2019年7月22日</td><td>睿创微纳以"002"编号首批登陆上交所科创板，信熹获数十倍回报<sup><a href="#ref6">[6]</a></sup></td></tr>
+          <tr><td>2020年8月</td><td>领投禾元生物（"稻米造血"植物源重组人血清白蛋白）<sup><a href="#ref6">[6]</a></sup></td></tr>
+          <tr><td>2020年9月30日</td><td>上海信熹新一代半导体投资合伙企业（有限合伙）成立，目标规模5亿元，实际募集5.8亿元<sup><a href="#ref12">[12]</a></sup></td></tr>
+          <tr><td>2021年10月11日</td><td>深圳市信熹聚芯投资合伙企业（有限合伙）成立，规模1.4亿元<sup><a href="#ref13">[13]</a></sup></td></tr>
+          <tr><td>2021年</td><td>被中国基金业协会纳入分道制名单<sup><a href="#ref6">[6]</a></sup></td></tr>
+          <tr><td>2022年9月</td><td>参与象德信息数千万元A轮融资（路侧毫米波雷达/智慧交通）<sup><a href="#ref15">[15]</a></sup></td></tr>
+          <tr><td>2023年11月</td><td>与千乘资本联合领投蓝星光域近亿元A轮（激光通信）<sup><a href="#ref14">[14]</a></sup></td></tr>
+          <tr><td>2025年7月</td><td>成立十周年，公开管理规模约50亿元；所投企业市场价值总和超3,000亿元<sup><a href="#ref6">[6]</a></sup></td></tr>
+          <tr><td>2025年10月28日</td><td>禾元生物登陆上交所科创板（688765）<sup><a href="#ref9">[9]</a></sup></td></tr>
+          <tr><td>2026年4月28日</td><td>迈威生物-B在港交所上市<sup><a href="#ref9">[9]</a></sup></td></tr>
+          <tr><td>2026年6月</td><td>与光科技完成亿元级A轮、A+轮融资，信熹资本以老股东身份加注<sup><a href="#ref17">[17]</a></sup></td></tr>
+          <tr><td>2026年8月</td><td>参与寻界科技（深圳）A轮融资<sup><a href="#ref18">[18]</a></sup></td></tr>
+        </table>
+      </div>
+
+      <h3 id="team">1.2 核心团队</h3>
+
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+          <tr><td>创始合伙人<br>管理合伙人</td><td>兰有金</td><td>清华大学、香港中文大学金融硕士；中国本土最早一批专业风险投资人之一，九十年代末期入行，长期专攻半导体光电子类科技投资。曾任上海慧谷高科技中心/上海创投高级经理、上海荣正投资有限公司合伙人、中国光电投资有限公司总经理、稳润光电有限公司总经理（2009—2015年，领导先进科技制造实体企业）。2015年创立信熹资本，任上海信熹投资管理有限公司执行董事、总经理。兼任上海北外滩金融研究院（NBFI）执行院长<sup><a href="#ref10">[10]</a></sup><sup><a href="#ref7">[7]</a></sup>。</td></tr>
+          <tr><td>执行总经理</td><td>陈熹 博士</td><td>公开以信熹资本执行总经理身份就蓝星光域投资发表评价，称"激光通信具有传输速率高、保密性强等优势"<sup><a href="#ref14">[14]</a></sup></td></tr>
+          <tr><td>投资团队</td><td>马谆 博士</td><td>公开以信熹资本投资团队成员身份就象德信息投资发表评价，分析交通雷达与车载雷达的差异<sup><a href="#ref15">[15]</a></sup></td></tr>
+        </table>
+      </div>
+      <p>据官网介绍，信熹资本投研团队"70%以上是专业技术领域的博士、70%以上具有科技实体产业工作背景"，中后台团队构建了基金运营、风险管理及投后服务体系，并通过数字化管理系统（SMIS）支持投后管理<sup><a href="#ref4">[4]</a></sup>。机构实行<strong>全员持股</strong>，兰有金在公开对谈中称这在早期硬科技投资机构中"非常罕见"，目的是"塑造长期视野"<sup><a href="#ref8">[8]</a></sup>。</p>
+      <div class="callout"><span class="tag tag-info">简评</span> 信熹的团队结构在同类机构中有一个罕见特征：创始人是"投过、也经营过"半导体实体企业的人（稳润光电总经理任内6年），这使其对企业发展节奏的判断不依赖财务模型推演。小团队配24只在管基金的组合意味着单兵负荷高，"只为熟悉领域下注"的能力边界纪律由此不只是理念，也是组织规模的必然约束。需要注意的是，官网与AMAC均未披露从业人员总数，团队规模无法精确核实。</div>
+
+      <h3 id="funds">1.3 基金结构与LP</h3>
+
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>基金名称</th><th>设立时间</th><th>规模</th><th>币种</th><th>主要LP构成</th><th>状态</th></tr>
+          <tr><td>深圳信熹汇瑞投资合伙企业（有限合伙）</td><td>2016年4月22日成立</td><td>未公开</td><td>人民币</td><td>未公开披露</td><td>已备案<sup><a href="#ref11">[11]</a></sup></td></tr>
+          <tr><td>上海信熹新一代半导体投资合伙企业（有限合伙）</td><td>2020年9月30日</td><td>目标5亿元，实际募集5.8亿元<sup><a href="#ref12">[12]</a></sup></td><td>人民币</td><td>未公开披露（清科私募通仅列管理机构与投向）</td><td>已募完；投向半导体、先进制造、人工智能，轮次覆盖A/B/Pre-IPO<sup><a href="#ref12">[12]</a></sup></td></tr>
+          <tr><td>深圳市信熹聚芯投资合伙企业（有限合伙）</td><td>2021年10月11日</td><td>1.4亿元<sup><a href="#ref13">[13]</a></sup></td><td>人民币</td><td>未公开披露</td><td>首期募完，仍在募集<sup><a href="#ref13">[13]</a></sup></td></tr>
+          <tr><td>上海信熹信芯私募投资基金合伙企业（有限合伙）</td><td>未公开</td><td>未公开</td><td>人民币</td><td>未公开披露</td><td>已备案；出现在奇创芯源股东名单中（持股1.76%）<sup><a href="#ref23">[23]</a></sup></td></tr>
+          <tr><td>上海信熹奇芯创业投资合伙企业（有限合伙）</td><td>未公开</td><td>未公开</td><td>人民币</td><td>未公开披露</td><td>已备案<sup><a href="#ref11">[11]</a></sup></td></tr>
+          <tr><td>海南信熹系基金</td><td>未公开</td><td>未公开</td><td>人民币</td><td>未公开披露</td><td>已备案<sup><a href="#ref11">[11]</a></sup></td></tr>
+          <tr><td colspan="6" style="text-align:center;">AMAC"私募基金管理人公示"披露该机构在管基金共<strong>24只</strong>（2026-09-18 查询）<sup><a href="#ref11">[11]</a></sup>；官网未列示完整基金清单，上表为公开渠道可核实的部分基金</td></tr>
+        </table>
+      </div>
+      <p><strong>管理人自身的股权结构</strong>（区别于基金LP）：上海信熹投资管理有限公司共有3名股东，信熹资产管理（上海）有限公司持股48%（认缴6,000万元）、上海信熹投资中心（有限合伙）持股40%（认缴5,000万元）、上海恩熹企业管理有限公司持股12%（认缴1,500万元）；法定代表人兰有金的综合持股比例为69.89%，监事李一君、财务负责人沈昌源分别综合持股4.8%与0.5%。2021年3月9日，原股东弘信资本控股有限公司退出，上海恩熹新增为股东，企业类型同时由"台港澳与境内合资"变更为"有限责任公司（自然人投资或控股）"<sup><a href="#ref26">[26]</a></sup>。</p>
+      <p>信熹资本以人民币基金为唯一运作载体，未发现美元基金或境外架构。公开披露的出资人信息十分有限：AMAC公示与清科私募通均未列示各期基金的LP名单，第三方数据库中亦无以信熹基金LP身份出现的上市公司公告。可确认的间接线索是——信熹系基金在多个被投项目中以有限合伙主体出现，例如<strong>云南云熹股权投资基金合伙企业（有限合伙）</strong>持有国际复材（301526.SZ）股权并列为第二大股东<sup><a href="#ref19">[19]</a></sup>，以及深圳市信熹祥泰投资合伙企业、烟台业达才熹创业投资合伙企业等主体出现在奇创芯源股东名单中<sup><a href="#ref23">[23]</a></sup>。</p>
+      <div class="callout"><span class="tag tag-info">简评</span> 单一人民币币种结构在当前时点反而是资产——具身智能与半导体被投企业普遍转向人民币融资，双币结构的美元VC在后续轮次跟投时常遇到结构摩擦，信熹不面临这一问题。但LP信息完全不透明是这一页面最大的数据缺口：无法判断其资金来源是市场化母基金、产业资本还是地方国资，也就无法评估其后续募资的稳定性。基金序列中2021年10月之后未见新设基金公开披露，与"管理规模约50亿元"的表述之间的时间差值得留意。</div>
+
+      <h3 id="philosophy">1.4 投资哲学与偏好</h3>
+      <p>信熹资本的方法论在公开报道中被概括为"古典派VC"：慢工出细活、精耕细作、不以数量取胜<sup><a href="#ref7">[7]</a></sup>。其自我定位是"洞见驱动的硬科技投资狙击手"，官方网站将其策略表述为严格执行"信熹投资金标准""信熹不为清单""信熹曲线"<sup><a href="#ref5">[5]</a></sup>，并在"信熹之道"中阐述其硬科技投资的判断依据<sup><a href="#ref3">[3]</a></sup>。核心要素可归纳为四点。</p>
+      <p><strong>其一，树干投资策略。</strong>信熹将优秀被投企业定义为"树干"，通过与创业企业家共同经历创业过程、借助其产业资源延伸投资，或把彼此熟悉的创业团队作为树干来拓展能力圈<sup><a href="#ref6">[6]</a></sup>。最典型的"树干"是睿创微纳：信熹创始人早在二十年前即与睿创微纳创始人马宏相熟，共同探讨红外芯片与化合物半导体产业趋势；睿创微纳创业之初信熹即深度参与，马宏后来成为信熹董事会成员及投委会成员，睿创上海团队曾长期在信熹办公室办公<sup><a href="#ref7">[7]</a></sup>。这一关系延伸出了后续投资：蓝星光域的激光通信技术验证借助了睿创微纳<sup><a href="#ref6">[6]</a></sup>，烟台奇创芯源（睿创微纳实际控制人马宏控股）的多轮融资中亦出现信熹系多只基金<sup><a href="#ref23">[23]</a></sup>。</p>
+      <p><strong>其二，"不为清单"（负面清单）。</strong>信熹的排除性规则包括：不投资生命科技与智能技术以外的领域；不做赛道投资；不投资创业动机不合理或兼职创业的团队；不投资没有技术门槛与壁垒的企业；不投资没有商业化价值的项目<sup><a href="#ref6">[6]</a></sup>。兰有金将对"不为清单"的执行与能力边界纪律相连："坚定地恪守能力边界，因为市场上诱惑很多……只要守得住，真正的机会一定会来"，并称信熹内部对硬科技的定义是"Key，Hard，Core Technology"<sup><a href="#ref8">[8]</a></sup>。</p>
+      <p><strong>其三，"信熹曲线"与开枪时机。</strong>信熹将硬科技企业的发展划分为五个阶段，把技术积累曲线与投资的风险收益曲线叠加，形成"信熹曲线"，用以指引投资时点。其结论是把投资锁定在<strong>第II阶段</strong>（概念验证完成、产品雏形已现）和<strong>第IV阶段</strong>（市场放量前夕、商业拐点将至），"既保留足够的赔率，又把胜率控制在可验证范围内"<sup><a href="#ref6">[6]</a></sup>。这一框架同时隐含一个判断：由于技术发展是非线性的，同一技术在不同阶段可以有不止一个投资窗口<sup><a href="#ref7">[7]</a></sup>。</p>
+      <p><strong>其四，"胜率重于赔率"。</strong>信熹承认投资早期企业能带来可观回报（赔率），但认为更重要的是通过投资高壁垒技术和有企业家精神的创业者来提高安全边际（胜率）。在当前国际竞争格局下，符合国家发展战略、有望实现国产替代、自主可控的细分领域被视为"胜率更高"的方向<sup><a href="#ref6">[6]</a></sup>。兰有金进一步把方法论下沉到概念辨别上：投资需要"分清科学、技术、工程、产品"的差异，因为中文把"科技"合在一起表达，而这四者的规律并不相同<sup><a href="#ref8">[8]</a></sup>。</p>
+      <p>投资偏好方面：轮次以A/B轮至Pre-IPO为主，同时保留极早期出手（如2016年天使轮投资微觉未来、2020—2021年成为中昊芯英最早的投资人）；偏好在企业尚未盈利但技术验证已完成的时点进入；对创业者的核心标准是"既志存高远，又脚踏实地"<sup><a href="#ref6">[6]</a></sup>。兰有金对投资人与创业者的关系有一句被广泛引用的表述："创业者是吃肉的，投资机构努努力喝点汤"<sup><a href="#ref8">[8]</a></sup>。</p>
+      <div class="callout"><span class="tag tag-info">简评</span> "信熹曲线"提出的"同一技术可以有不止一个投资窗口"这一判断，与主流早期VC把"第一个窗口"当作唯一机会的默认假设不同，它解释了信熹为什么能在中昊芯英创始人迁址上海后才成为首个投资人——技术成立性是前提，团队到位才是触发条件。但"不为清单"的严格执行也意味着结构性代价：信熹在2023年之后的具身智能与AI热潮中基本缺席本体与模型环节，这与绿洲资本等机构在同期因主动降低出手频率而缺席的情形不同，信熹是被自己的领域边界排除在外的。</div>
+
+      <h3 id="tracks">1.5 主要投资赛道</h3>
+      <p>信熹资本官方仅设两大投资领域：<strong>智能技术</strong>与<strong>生命科技</strong>，并以"让世界有效率""让生命更健康"分别对应二者使命<sup><a href="#ref2">[2]</a></sup>。官网对"智能技术"的定义值得注意：包括支撑层的材料、能源和工艺，中间层的信息感知、传输、计算和执行的硬件实体和软件算法，以及交互层的人机交互和自主决策执行<sup><a href="#ref2">[2]</a></sup>。下表按细分赛道归纳其公开投资案例。</p>
+
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>赛道</th><th>代表性被投公司</th><th>赛道投资逻辑</th><th>布局时间</th></tr>
+          <tr><td>半导体·大芯片<br>（CPU/GPU/TPU）</td><td>兆芯集成电路、格兰菲智能、中昊芯英</td><td>"胜率重于赔率"的集中体现；在国产替代与自主可控前提下，选择技术路线确定性更高、受制裁风险相对较低的企业<sup><a href="#ref6">[6]</a></sup></td><td>2015-</td></tr>
+          <tr><td>智能感知·传感器·光子</td><td>睿创微纳（红外）、与光科技（光谱）、无锡华测（雷达组件）</td><td>"智能技术"中间层的信息感知硬件；传感与光电是信熹最深的产业积累所在<sup><a href="#ref2">[2]</a></sup></td><td>2016-</td></tr>
+          <tr><td>材料与先进制造</td><td>国际复材（玻纤）、赛迈科先进材料（核石墨）、九目化学（OLED材料）、晶芯半导体、芯爱科技</td><td>支撑层的材料与工艺；属于国家战略科技力量范畴<sup><a href="#ref2">[2]</a></sup><sup><a href="#ref7">[7]</a></sup></td><td>2017-</td></tr>
+          <tr><td>商业航天·卫星通信</td><td>长光卫星、蓝星光域、谱域科技</td><td>信息传输层的基础设施，与感知模组形成协同（睿创微纳×蓝星光域的技术验证与产品配套）<sup><a href="#ref6">[6]</a></sup></td><td>2023-</td></tr>
+          <tr><td>云计算与信息服务</td><td>浪潮云</td><td>政务云基础设施</td><td>未公开</td></tr>
+          <tr><td>生命科技·创新药</td><td>禾元生物、君实生物、迈威生物、智翔金泰、明慧医药、睿跃生物、恒瑞源正（媒体报道口径）</td><td>依托中国产业链与临床资源，创新药从Fast-Follow向Best-in-Class/First-in-Class演进<sup><a href="#ref6">[6]</a></sup></td><td>2017-</td></tr>
+          <tr><td>生命科技·医疗器械与诊断</td><td>真迈生物（基因测序）、贝斯生物、士泽生物（iPSC细胞治疗）</td><td>未被满足的临床需求与技术壁垒<sup><a href="#ref2">[2]</a></sup></td><td>未公开</td></tr>
+        </table>
+      </div>
+      <p>注：以上赛道划分为编者按业务属性归纳，信熹官方口径仅区分"智能技术"与"生命科技"两大类<sup><a href="#ref2">[2]</a></sup>。"恒瑞源正"见于媒体报道<sup><a href="#ref6">[6]</a></sup>但未列入官网"投资案例"页，列入时已标注口径。上表已覆盖官网"投资案例"页列示的全部<strong>24</strong>家被投企业（含官网以 CPIC 列示的国际复材，301526.SZ）<sup><a href="#ref1">[1]</a></sup>。</p>
+
+      <h3 id="embodied">1.6 具身智能领域布局【重点】</h3>
+
+      <h4>A. 布局概览</h4>
+      <p>信熹资本官网"投资案例"页共列示<strong>24家</strong>被投企业<sup><a href="#ref1">[1]</a></sup>，其中与具身智能产业链直接相关的仅<strong>1家</strong>——<strong>与光科技</strong>（计算光谱芯片，面向物理AI视觉感知硬件入口）<sup><a href="#ref16">[16]</a></sup>。若把统计口径扩展至"机器人相关的早期投资"与"具身智能上游算力芯片"，相关被投合计约<strong>5家</strong>：与光科技、微觉未来科技、寻界科技、中昊芯英、格兰菲智能。其中微觉未来、寻界科技均<strong>未</strong>出现在官网"投资案例"页，仅见于融资数据库与媒体报道<sup><a href="#ref22">[22]</a></sup><sup><a href="#ref18">[18]</a></sup>。</p>
+      <p>经多轮检索，<strong>未发现信熹资本投资人形机器人整机、灵巧手、关节模组、具身智能大模型/VLA 或机器人本体的任何公开记录</strong>。其在具身智能领域的参与方式是<strong>上游卡位</strong>——提供"感知"（光谱芯片、激光雷达、毫米波雷达）与"计算"（TPU、GPU）两类底层硬件，而非投资具身系统的集成者。这与该机构官网对"智能技术"三层结构的表述一致："信息感知、传输、计算和执行的硬件实体和软件算法，以及交互层的人机交互和自主决策执行"<sup><a href="#ref2">[2]</a></sup>。</p>
+
+      <div class="callout">
+        <div class="callout-title">具身智能及相关投资概况</div>
+        <p>官网"投资案例"页列示：<strong>24</strong>家 | 其中具身智能直接相关：<strong>1</strong>家（与光科技） | 含机器人相关早期投资与上游算力芯片后合计：<strong>5</strong>家 | 最早进入时间：<strong>2016年11月</strong>（微觉未来科技·天使轮） | 投资角色：<strong>以参投/老股东加注为主，未见领投具身智能标的</strong> | 整机与本体布局：<strong>无</strong></p>
+      </div>
+
+      <h4>B. 具身智能及相关投资组合</h4>
+
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>被投公司</th><th>投资时间</th><th>投资轮次</th><th>投资金额</th><th>角色</th><th>后续轮次参与</th><th>被投公司核心方向</th></tr>
+          <tr><th colspan="7" style="background:#1a3a5c;color:#fff;text-align:center;">分组一：具身智能直接相关——物理AI感知硬件</th></tr>
+          <tr><td>与光科技（Seetrum）</td><td>2026年6月（本轮）</td><td>A轮 / A+轮<sup><a href="#ref17">[17]</a></sup></td><td>本轮合计亿元级（舜宇光学科技领衔，信熹为老股东参与）</td><td><span class="tag t-follow-investor">老股东加注</span></td><td>本轮以老股东身份持续参与<sup><a href="#ref17">[17]</a></sup></td><td>计算光谱芯片；正研发物理AI视觉芯片，定位空间智能与世界模型的感知硬件入口，官方文章明确将其与"具身智能（AI不只有大脑，还要有身体与环境交互）"及视觉、触觉等多模态传感技术相联系<sup><a href="#ref16">[16]</a></sup></td></tr>
+          <tr><th colspan="7" style="background:#1a3a5c;color:#fff;text-align:center;">分组二：机器人相关早期投资（未列入官网"投资案例"页）</th></tr>
+          <tr><td>微觉未来科技（MicVision）</td><td>2016年11月</td><td>天使轮<sup><a href="#ref22">[22]</a></sup></td><td>未披露（个别数据库记为500万元）</td><td><span class="tag t-follow-investor">投资方</span></td><td>未公开（后续轮次与当前状态未见公开记录）</td><td>二维/三维激光雷达，主要面向自动行走机器人、无人汽车，提供激光雷达导航的机器人技术研发与生产服务<sup><a href="#ref22">[22]</a></sup></td></tr>
+          <tr><td>寻界科技（深圳）</td><td>2026年（A轮；投资界另记 2026年3月 Pre-A）</td><td>A轮（证券之星口径）/ Pre-A（投资界口径）<sup><a href="#ref18">[18]</a></sup></td><td>未披露</td><td><span class="tag t-follow-investor">参投方</span></td><td>未公开</td><td>"源自具身机器人产业"，核心是将机器人前沿技术应用于消费产品；目前主营电脑与家用游戏机周边外设，主要面向海外市场<sup><a href="#ref18">[18]</a></sup></td></tr>
+          <tr><th colspan="7" style="background:#1a3a5c;color:#fff;text-align:center;">分组三：具身智能上游算力芯片</th></tr>
+          <tr><td>中昊芯英</td><td>2020—2021年（口径不一）</td><td>天使轮 / 种子轮<sup><a href="#ref25">[25]</a></sup></td><td>未披露</td><td><span class="tag t-lead-investor">最早投资人</span></td><td>企业后续获多轮融资，估值较成立时增值超20倍<sup><a href="#ref6">[6]</a></sup></td><td>国产TPU架构AI芯片；国内唯一掌握TPU架构AI芯片核心技术并实现量产的公司之一，也是国内极少数盈利的AI芯片公司<sup><a href="#ref6">[6]</a></sup></td></tr>
+          <tr><td>格兰菲智能</td><td>2021年</td><td>首轮对外融资的投资方之一<sup><a href="#ref6">[6]</a></sup></td><td>未披露</td><td><span class="tag t-follow-investor">参投方</span></td><td>2025年2月完成科创板上市辅导备案<sup><a href="#ref6">[6]</a></sup></td><td>图形显示GPU（2020年底自兆芯集成GPU事业部拆分）；图形GPU出货量持续位列国内厂商第一，2024年达百万片级<sup><a href="#ref6">[6]</a></sup></td></tr>
+          <tr><th colspan="7" style="background:#1a3a5c;color:#fff;text-align:center;">分组四：同源感知器件（属官网"智能技术"领域，无具身智能直接披露关联；其中象德信息未列入官网"投资案例"页）</th></tr>
+          <tr><td>象德信息（西安）</td><td>2022年9月</td><td>A轮<sup><a href="#ref15">[15]</a></sup></td><td>数千万元（本轮合计）</td><td><span class="tag t-follow-investor">参投方</span></td><td>2023年8月完成A+轮，信熹是否参与未获确认<sup><a href="#ref15">[15]</a></sup></td><td>路侧毫米波雷达与智慧交通感知系统；覆盖智能交通、智能安防、车路协同<sup><a href="#ref15">[15]</a></sup></td></tr>
+          <tr><td>无锡华测</td><td>未公开</td><td>未公开</td><td>未公开</td><td>未公开</td><td>未公开</td><td>军工级机载雷达核心组件供应商<sup><a href="#ref1">[1]</a></sup></td></tr>
+        </table>
+      </div>
+      <p><strong>确认度说明</strong>：与光科技有独立融资新闻可交叉验证信熹的"老股东"身份<sup><a href="#ref17">[17]</a></sup>；微觉未来科技、象德信息、寻界科技的融资记录来自投资数据库与媒体，但信熹的具体出资金额与持股比例均未披露<sup><a href="#ref22">[22]</a></sup><sup><a href="#ref15">[15]</a></sup><sup><a href="#ref18">[18]</a></sup>；中昊芯英、格兰菲的资金与轮次细节未公开<sup><a href="#ref6">[6]</a></sup>；无锡华测仅见于官网陈列，无独立来源<sup><a href="#ref1">[1]</a></sup>。</p>
+
+      <h4>C. 投资逻辑与观点</h4>
+      <p><strong>信熹资本未公开阐述过针对"具身智能"赛道的专门投资逻辑。</strong>经多轮检索，兰有金及信熹团队的公开访谈、演讲与官网内容中均未出现对具身智能、人形机器人或机器人本体的系统性观点<sup><a href="#ref6">[6]</a></sup><sup><a href="#ref7">[7]</a></sup><sup><a href="#ref8">[8]</a></sup>。因此本节只能从其对"智能技术"的定义和既有投资行为中做有限推断，并明确标注为推断性质。</p>
+      <p><strong>推断一：以"感知—计算—执行"三层结构作为切入接口。</strong>官网对智能技术的定义明确包含"中间层的信息感知、传输、计算和执行的硬件实体和软件算法"以及"交互层的人机交互和自主决策执行"<sup><a href="#ref2">[2]</a></sup>。这一表述与具身智能"感知—决策—执行"闭环在结构上高度重合，且与光科技的产品定位表述（"感知—认知—决策—执行"闭环<sup><a href="#ref16">[16]</a></sup>）几乎同构。可以说，信熹并不需要一套专门的"具身智能投资逻辑"——其既有的智能技术框架本身就覆盖了具身智能的硬件底座。</p>
+      <p><strong>推断二：用"信熹曲线"解释为什么不下注本体。</strong>按信熹曲线的框架，投资时点应对齐"概念验证完成、产品雏形已现"（第II阶段）或"市场放量前夕、商业拐点将至"（第IV阶段）<sup><a href="#ref6">[6]</a></sup>。人形机器人整机在2023—2026年间大量处于"技术路线未收敛、量产成本未验证"的状态，既不满足第II阶段的技术验证条件，也远离第IV阶段的商业拐点。信熹选择投资与光科技（光谱芯片已有10kk级出货、进入消费电子供应链<sup><a href="#ref16">[16]</a></sup>）而非任何本体公司，在方法论上是自洽的。</p>
+      <p><strong>推断三：能力边界的自我约束。</strong>兰有金明确表示信熹"恪守能力边界"，仅投"熟悉的领域"和"熟悉的团队"<sup><a href="#ref8">[8]</a></sup>。信熹的产业积累集中在半导体、光电子与传感器，具身智能的算法与系统集成并非其能力圈，且"不做赛道投资"被列入不为清单<sup><a href="#ref6">[6]</a></sup>——在"具身智能"作为赛道概念被广泛讨论的环境中，这条规则本身就构成对本体的回避。</p>
+      <p><strong>推断四：对概念的审慎。</strong>兰有金强调需"分清科学、技术、工程、产品"的差异，"尊重技术发展的客观规律"<sup><a href="#ref8">[8]</a></sup>。这一取向与当前具身智能叙事中常见的技术—产品混淆形成对照，也解释了信熹为何在该赛道保持克制。</p>
+      <div class="callout"><span class="tag tag-warn">审慎提示</span> 以上四点均为编者依据公开资料所做的推断，非信熹资本官方表述。截至2026年9月，该机构未就具身智能赛道发布过任何公开观点，其在该领域的实际策略意图存在不确定性。</div>
+
+      <h4>D. 布局特征分析</h4>
+      <ul>
+        <li><strong>上游卡位，不碰本体。</strong>信熹的具身智能相关被投全部位于产业链上游：感知层（与光科技·光谱、微觉未来·激光雷达、象德信息·毫米波雷达、无锡华测·雷达组件）与算力层（中昊芯英·TPU、格兰菲·GPU）。整机、本体、灵巧手、关节模组、具身大模型五个环节均为空白。</li>
+        <li><strong>"树干法则"的跨赛道延伸。</strong>信熹所谓的"树干"睿创微纳（红外/光电子）对具身智能布局有实质影响——蓝星光域的激光通信技术借助睿创微纳完成验证，两家企业还通过信熹平台促成了感知模组×整机产品的配套合作<sup><a href="#ref6">[6]</a></sup>。这种"以既有树干拓展能力圈"的路径，与广撒网式的赛道覆盖是完全不同的扩张逻辑。</li>
+        <li><strong>参与的时点分布两极。</strong>一端是极早期：2016年天使轮投微觉未来、2020—2021年成为中昊芯英最早的投资人；另一端是成熟期加注：2026年以老股东身份参与与光科技A/A+轮。缺少中间层（B/C轮的规模化下注）。</li>
+        <li><strong>角色以参投为主，几乎不领投。</strong>在上述具身智能相关案例中，信熹仅在中昊芯英一例为"首个投资人"（实质意义上的早期主导），其余均为参投或老股东跟随。这与正轩投资、绿洲资本等在该赛道领投为主的机构形成明显差异。</li>
+        <li><strong>信息透明度梯度显著。</strong>与光科技有完整融资新闻链条；微觉未来、象德信息、寻界科技仅有单条融资记录；无锡华测仅有官网陈列。其中微觉未来与寻界科技未出现在官网"投资案例"页，提示官网该页为<strong>代表性案例 curation</strong>而非完整组合清单。由于机构未公开累计投资项目总数，官网24家与真实组合之间的差额无法量化。</li>
+      </ul>
+      <div class="callout"><span class="tag tag-info">简评</span> 在与光科技这个案例上，信熹的"树干法则"和具身智能发生了实质交汇：光谱芯片从消费电子影像（手机色彩还原、AWB优化）向物理AI视觉芯片的第二曲线延伸，恰好落在信熹既有能力圈与具身智能叙事的交集处，因此获得了老股东的持续加注。但更值得注意的反面证据是——信熹在微觉未来（2016年激光雷达）之后，整整十年没有再投任何机器人感知或本体项目，直到2026年才通过寻界科技重新触及机器人团队。这说明具身智能对信熹而言并非一条被持续耕耘的赛道，而是光电子投资组合的自然溢出。对本 wiki 而言，把信熹列为"具身智能活跃投资机构"依据不足，更准确的定位是"感知层供应商的投资人"。</div>
+
+      <h3 id="cases">1.7 典型投资案例</h3>
+
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>被投公司</th><th>所属赛道</th><th>投资时间</th><th>投资轮次</th><th>退出方式/状态</th><th>备注</th></tr>
+          <tr><td>睿创微纳（688002.SH）</td><td>红外芯片/光电子</td><td>2016年5月</td><td>第二轮融资（800万元）<sup><a href="#ref24">[24]</a></sup></td><td>2019年7月22日首批登陆上交所科创板<sup><a href="#ref6">[6]</a></sup></td><td>信熹成立后首个投资项目，回报数十倍；创始人马宏曾任信熹董事会及投委会成员<sup><a href="#ref6">[6]</a></sup></td></tr>
+          <tr><td>君实生物（688180.SH / 1877.HK）</td><td>创新药</td><td>未公开</td><td>未公开</td><td>2020年7月15日科创板上市（募资48.36亿元）<sup><a href="#ref9">[9]</a></sup></td><td>中国首款获批的PD-1抗癌药<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>迈威生物（688062.SH / 港股）</td><td>创新生物药</td><td>未公开</td><td>未公开</td><td>2022年1月18日科创板上市；2026年4月28日港股上市<sup><a href="#ref9">[9]</a></sup></td><td>—</td></tr>
+          <tr><td>智翔金泰（688443.SH）</td><td>生物技术</td><td>未公开</td><td>未公开</td><td>2023年6月20日科创板上市（第五套标准）<sup><a href="#ref9">[9]</a></sup></td><td>科创板第五套标准上市企业<sup><a href="#ref6">[6]</a></sup></td></tr>
+          <tr><td>国际复材（301526.SZ）<br><span style="font-size:0.78rem;color:#54595d;">官网案例页列示为 CPIC</span></td><td>玻纤新材料</td><td>2017年（参与增资）</td><td>定增</td><td>2023年12月26日深交所创业板上市<sup><a href="#ref9">[9]</a></sup></td><td>信熹系"云南云熹"为其第二大股东；媒体报道口径累计浮盈约50.22亿元<sup><a href="#ref19">[19]</a></sup></td></tr>
+          <tr><td>禾元生物（688765.SH）</td><td>植物源重组蛋白/创新药</td><td>2020年8月</td><td>领投<sup><a href="#ref6">[6]</a></sup></td><td>2025年10月28日科创板上市<sup><a href="#ref9">[9]</a></sup></td><td>科创板第五套标准重启后首家过会企业（2025年7月1日过会）<sup><a href="#ref6">[6]</a></sup></td></tr>
+          <tr><td>兆芯集成电路</td><td>国产CPU</td><td>2015年</td><td>首轮市场化融资（数亿元）<sup><a href="#ref6">[6]</a></sup></td><td>2025年6月科创板IPO申请获受理，已进入问询阶段<sup><a href="#ref6">[6]</a></sup></td><td>—</td></tr>
+          <tr><td>格兰菲智能</td><td>图形GPU</td><td>2021年</td><td>首轮对外融资<sup><a href="#ref6">[6]</a></sup></td><td>2025年2月完成科创板上市辅导备案<sup><a href="#ref6">[6]</a></sup></td><td>信熹实质参与并助力其从兆芯GPU事业部分拆<sup><a href="#ref6">[6]</a></sup></td></tr>
+          <tr><td>中昊芯英</td><td>AI芯片（TPU）</td><td>2020—2021年（口径不一）<sup><a href="#ref25">[25]</a></sup></td><td>天使轮/种子轮</td><td>已启动独立IPO并完成股份制改造<sup><a href="#ref21">[21]</a></sup></td><td>公司成立于2020年10月；估值较成立时增值超20倍<sup><a href="#ref6">[6]</a></sup></td></tr>
+          <tr><td>蓝星光域</td><td>激光通信/商业航天</td><td>2023年11月</td><td>A轮（与千乘资本联合领投）<sup><a href="#ref14">[14]</a></sup></td><td>2024年B1轮近1.5亿元由深创投等投资，信熹未在该轮名单中<sup><a href="#ref14">[14]</a></sup></td><td>—</td></tr>
+          <tr><td>睿跃生物（Cullgen）</td><td>靶向蛋白降解剂</td><td>未公开</td><td>未公开</td><td>即将登陆纳斯达克<sup><a href="#ref6">[6]</a></sup></td><td>媒体报道口径</td></tr>
+          <tr><td>九目化学</td><td>OLED前端材料</td><td>未公开</td><td>未公开</td><td>新三板挂牌后申报北交所上市<sup><a href="#ref6">[6]</a></sup></td><td>媒体报道口径</td></tr>
+          <tr><td>赛迈科先进材料 / 浪潮云</td><td>核石墨 / 政务云</td><td>未公开</td><td>未公开</td><td>均已进入科创板上市辅导阶段<sup><a href="#ref6">[6]</a></sup></td><td>媒体报道口径</td></tr>
+          <tr><td>与光科技</td><td>光谱芯片/物理AI感知</td><td>首次进入轮次未公开确认</td><td>老股东（2026年6月A/A+轮加注）<sup><a href="#ref17">[17]</a></sup></td><td>未退出</td><td>具身智能感知层最直接相关案例</td></tr>
+        </table>
+      </div>
+      <p>注：上表"未公开"指公开渠道未能查到确切信息，非无投资。"媒体报道口径"指该退出进度来自第三方报道，未经交易所公开文件直接确认。</p>
+      <div class="callout"><span class="tag tag-info">简评</span> 信熹的退出结构在同期成立的人民币VC中相当独特：7家已上市（睿创微纳、君实生物、迈威生物、智翔金泰、国际复材、禾元生物，含迈威生物A+H两地），另有4—5家处于IPO受理或辅导阶段。这一密度与其"重胜率"策略直接相关，但也隐含一个代价——已上市集中在科创板/创业板医药与半导体板块，退出节奏高度绑定A股IPO审核周期。2023—2024年科创板IPO阶段性收紧期间，信熹的退出通道实际上是被动关闭的，"胜率"策略的平滑收益曲线因此被拉长。</div>
+
+      <h3 id="performance">1.8 基金业绩</h3>
+      <p>该机构未公开披露基金业绩数据。作为私募投资机构，IRR/DPI/TVPI等业绩指标通常仅向LP报告，不对外公开。AMAC公示亦不含业绩信息<sup><a href="#ref11">[11]</a></sup>。</p>
+      <p>以下为基于公开信息的间接业绩线索，<strong>不能作为信熹资本基金业绩的正式参考</strong>：</p>
+      <ul>
+        <li><strong>睿创微纳</strong>：2016年5月投资800万元，2019年7月科创板首批上市，媒体报道称信熹早期投资"实现了数十倍回报"<sup><a href="#ref6">[6]</a></sup><sup><a href="#ref24">[24]</a></sup>。兰有金本人的表述是该项目"看起来退出挺快，实际花了15年左右的慢功夫"（从2005—2006年开始讨论红外技术机会算起）<sup><a href="#ref8">[8]</a></sup>。</li>
+        <li><strong>中昊芯英</strong>：媒体报道称信熹在极早期进入，"估值较成立时增值超20倍"，且"在TPU领域的一笔投资几年就已收获了几十倍增值"<sup><a href="#ref6">[6]</a></sup><sup><a href="#ref7">[7]</a></sup>。该说法为媒体口径，未经审计确认。注：部分媒体曾称中昊芯英"借壳天普股份上市"，经查证为不实——天普股份多次公告明确中昊芯英走独立IPO路径，36个月内无借壳安排<sup><a href="#ref21">[21]</a></sup>。</li>
+        <li><strong>国际复材</strong>：媒体报道口径称信熹累计投入约8.06亿元获得4.62亿股，截至2026年2月仍持股3.31亿股（对应市值约51.64亿元），加上减持金额，总浮盈约50.22亿元、投资收益率逾600%<sup><a href="#ref19">[19]</a></sup>。需注意持股主体为"云南云熹股权投资基金合伙企业（有限合伙）"，属于信熹系基金，与上海信熹投资管理有限公司的法定关系未在公开渠道明确<sup><a href="#ref19">[19]</a></sup>。后续减持记录：2025年7月减持7541.76万股（套现约2.78亿元）、2025年12月减持5656.32万股（套现约3.86亿元）、2026年5月8日—6月24日48天内减持约1.51亿股（套现约32.37亿元）<sup><a href="#ref19">[19]</a></sup><sup><a href="#ref20">[20]</a></sup>。</li>
+        <li><strong>机构整体表述</strong>：机构称"成立至今所有投资项目无一脱靶"，且"目前没有投'坏'的项目"<sup><a href="#ref7">[7]</a></sup><sup><a href="#ref9">[9]</a></sup>，属机构自述口径，不具备独立验证条件。</li>
+      </ul>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li>信熹资本与上海交通大学、上海市政府部门共同发起设立了非营利法人<strong>上海北外滩金融研究院（NBFI）</strong>，开展硬科技行业的买方研究，并定期举办"北外滩科创会客厅"，作为科创企业创始人、工程师与专业投资人的交流平台；兰有金任该院执行院长<sup><a href="#ref9">[9]</a></sup><sup><a href="#ref10">[10]</a></sup>。</li>
+        <li>2021年，信熹资本被中国基金业协会纳入<strong>分道制名单</strong>，机构称其风控和合规水平由此获得认可<sup><a href="#ref6">[6]</a></sup>。</li>
+        <li>机构文化强调"长跑"与"延迟满足"：官网"长期主义"页称"信熹十年如一日的'长跑文化'不仅体现在每周一黄浦江畔的步履不停，更深植于'延迟满足'的投资哲学"<sup><a href="#ref5">[5]</a></sup>；报道亦提及机构每两周举办一次深度学习会<sup><a href="#ref7">[7]</a></sup>。</li>
+        <li>信熹实行<strong>全员持股</strong>。兰有金在2023年36氪暗涌大会的公开对谈中称，"我们目前是全员持股，在早期硬科技投资机构中是非常罕见的，虽然常规来看这是不被理解的，但核心是为了塑造我们的长期视野"<sup><a href="#ref8">[8]</a></sup>。</li>
+        <li>官网发布过<strong>严正声明</strong>，称有不法分子伪造名片、冒用信熹资本名义开展融资、项目介绍、募资等活动，机构声明从未授权任何实体或个人以信熹资本名义开展投资相关活动，并公布官方联系渠道（官网 sincerevc.com、邮箱后缀 @sincerevc.com、微信公众号与雪球账号"信熹资本"）<sup><a href="#ref0">[0]</a></sup>。</li>
+        <li>信熹资本公众号曾发布系统性的<strong>传感器产业链研究</strong>，覆盖传感器分类（位置/运动、力、温度、光学、声音、气体、湿度、生化）、产业链环节（材料、设计仿真软件、生产设备、设计、加工制造、封装、测试）与细分市场，其"投资思考"部分提出从电磁波图谱、MEMS工艺、传感器智能化等角度寻找机会。该文章被传感器行业媒体转载<sup><a href="#ref2">[2]</a></sup>。</li>
+        <li><strong>关联企业线索</strong>：烟台奇创芯源科技有限公司由睿创微纳实际控制人马宏控股（持股59.82%），信熹系多只合伙企业（深圳市信熹祥泰、烟台业达才熹、上海信熹信芯、上海信熹睿源）合计持股约14.06%；该公司2025年度营业收入26,562.89万元、净利润4,952.77万元<sup><a href="#ref23">[23]</a></sup>。此案例可视为"树干法则"的延伸实践。</li>
+        <li><strong>实体名称的细微差异</strong>：媒体报道在国际复材案例中称持股方为"上海信熹资本管理有限公司"，而AMAC登记主体为"上海信熹投资管理有限公司"<sup><a href="#ref19">[19]</a></sup><sup><a href="#ref11">[11]</a></sup>。两者是否为同一或关联主体，公开渠道未见明确说明，引用时需注意区分。</li>
+      </ul>
+
+      <h2 id="references">2 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li id="ref0">信熹资本官网 — <a href="https://sincerevc.com/" target="_blank">sincerevc.com</a>（2026-09-18访问验证，HTTP 200；含官网严正声明页内容）</li>
+          <li id="ref1">信熹资本官网 — <a href="https://sincerevc.com/index.php?m=content&amp;c=index&amp;a=lists&amp;catid=11" target="_blank">投资案例页</a>（2026-09-18访问；共列示24家被投企业及其一句话定位，无分页）</li>
+          <li id="ref2">信熹资本官网 — <a href="https://sincerevc.com/index.php?m=content&amp;c=index&amp;a=lists&amp;catid=9" target="_blank">投资领域页</a>（2026-09-18访问；智能技术三层结构与生命科技定义原文）</li>
+          <li id="ref3">信熹资本官网 — <a href="https://sincerevc.com/index.php?m=content&amp;c=index&amp;a=lists&amp;catid=7" target="_blank">信熹简介</a> / <a href="https://sincerevc.com/index.php?m=content&amp;c=index&amp;a=lists&amp;catid=46" target="_blank">信熹之道</a>（2026-09-18访问）</li>
+          <li id="ref4">信熹资本官网 — <a href="https://sincerevc.com/index.php?m=content&amp;c=index&amp;a=lists&amp;catid=12" target="_blank">团队介绍</a>（2026-09-18访问；含"70%以上博士、70%以上产业背景"表述）</li>
+          <li id="ref5">信熹资本官网 — <a href="https://sincerevc.com/index.php?m=content&amp;c=index&amp;a=lists&amp;catid=47" target="_blank">投资策略页</a> / <a href="https://sincerevc.com/index.php?m=content&amp;c=index&amp;a=lists&amp;catid=48" target="_blank">长期主义页</a>（2026-09-18访问）</li>
+          <li id="ref6"><a href="https://www.sohu.com/a/914927370_100171209" target="_blank">IPO早知道（搜狐号转载）— 信熹资本十年复盘：以树干法则深耕硬科技，用长期主义兑现高胜率</a>（2025-07-17；含禾元生物、兆芯集成、格兰菲、中昊芯英、蓝星光域案例细节，"树干投资策略""不为清单""信熹曲线"原文，管理规模约50亿元与市场价值总和超3,000亿元）</li>
+          <li id="ref7"><a href="https://www.sohu.com/a/914844591_122260497" target="_blank">六里投资报（搜狐号）— 坚持洞见驱动，实业基因光环下的硬科技投资狙击手之路</a>（2025-07-17；含"古典派VC"概念、睿创微纳产业关系、"无一脱靶"表述、兰有金履历）</li>
+          <li id="ref8"><a href="https://www.36kr.com/p/2446782491334533" target="_blank">36氪 — 新时代的新方法，3位产业投资人眼中的当下与未来丨暗涌2023产业未来大会</a>（2023-09-25；兰有金对谈实录，含"Key，Hard，Core Technology"定义、全员持股、恪守能力边界、科学/技术/工程/产品之辨、"创业者是吃肉的，投资机构喝点汤"等直接引述）</li>
+          <li id="ref9"><a href="https://vc.pedaily.cn/vc/107623.html" target="_blank">投资界 — 信熹资本机构页</a>（2026-09-18访问；含机构简介、NBFI信息、投资事件时间线、IPO上市记录与发行价/募资额）</li>
+          <li id="ref10"><a href="https://vc.pedaily.cn/people/73259.html" target="_blank">投资界 — 兰有金（信熹资本管理合伙人）人物页</a>（2026-09-18访问；含清华/港中大金融硕士、上海北外滩金融研究院执行院长、超过17年直接投资经验及历任机构）</li>
+          <li id="ref11">中国证券投资基金业协会 — 私募基金管理人公示信息（登记编号：P1023240；上海信熹投资管理有限公司，成立2015-07-30、登记2015-09-18，法定代表人兰有金，机构类型"私募股权、创业投资基金管理人"，会员类型"非会员机构"，注册地址上海市普陀区武南路88号6层616室，办公地址上海市虹口区东大名路1089号北外滩来福士东塔3503室，在管基金24只。2026-09-18 通过 AMAC 管理人公示接口查询）。注：该接口未返回基金明细，故本页基金清单仅列示可核实的基金名称与设立时间，不列示备案编号</li>
+          <li id="ref12"><a href="https://zdb.pedaily.cn/pe/show60100/" target="_blank">投资界·清科私募通 — 上海信熹新一代半导体投资合伙企业（有限合伙）</a>（成立2020-09-30，目标规模5亿，募集5.8亿元，投向半导体/先进制造/人工智能/互联网，A、B、Pre-IPO轮次）</li>
+          <li id="ref13"><a href="https://m.pedaily.cn/data/pe/60143" target="_blank">投资界·清科私募通 — 深圳市信熹聚芯投资合伙企业（有限合伙）</a>（成立2021-10-11，规模1.4亿元）</li>
+          <li id="ref14"><a href="https://m.pedaily.cn/news/525120" target="_blank">投资界 — 首发｜激光通信厂商「蓝星光域」获近亿元A轮投资，千乘资本、信熹资本联合领投</a>（2023-11-10；含陈熹博士评价；B1轮信息见<a href="https://www.laserfair.com/m/news/202408/07/86644.html" target="_blank">激光制造网</a>2024-08-07报道）</li>
+          <li id="ref15"><a href="https://news.pedaily.cn/202210/501725.shtml" target="_blank">投资界 — 象德信息完成数千万元的A轮融资，哇牛资本、信熹资本等参投</a>（2022-10-09；含马谆博士评价）；公司业务信息见<a href="http://www.sondit.net/html/company/99.html" target="_blank">象德信息官网</a></li>
+          <li id="ref16"><a href="https://www.seetrum.com/news/429.html" target="_blank">与光科技官网 — 与光科技完成亿元级A轮融资，开辟物理AI视觉芯片新方向</a>（2026-06；含SCNN方案、物谱芯片、10kk级出货、感知—认知—决策—执行闭环与具身智能定位）</li>
+          <li id="ref17"><a href="https://news.pedaily.cn/202606/565546.shtml" target="_blank">投资界 — 「与光科技」完成亿元级A轮系列融资，推进物理AI视觉芯片研发</a>（2026-06；投资方含舜宇光学科技、老股东信熹资本、观新投资、中桥创投、京广协同）</li>
+          <li id="ref18"><a href="http://stock.stockstar.com/RB2026080700035573.shtml" target="_blank">证券之星 — 【投融资动态】寻界科技A轮融资，投资方为信熹资本、Alphaist Partners等</a>（2026-08-07；含公司源自具身机器人产业、主营游戏外设、面向海外市场的描述）</li>
+          <li id="ref19"><a href="https://finance.china.com/xiaofei/13004691/20260227/49274479.html" target="_blank">中华网财经 — 国际复材年内股价翻倍，上海神秘私募信熹资本一把浮盈50亿</a>（2026-02-26；含云南云熹持股、投入8.06亿元获4.62亿股、总浮盈50.22亿元等数据；同题报道见<a href="https://stock.jrj.com.cn/2026/02/26202556098952.shtml" target="_blank">金融界</a>）</li>
+          <li id="ref20"><a href="https://finance.eastmoney.com/a/202606253783066458.html" target="_blank">东方财富 — 国际复材二股东48天大手笔减持套现超32亿元，公司今年以来股价涨幅达5.8倍</a>（2026-06-25）</li>
+          <li id="ref21"><a href="https://www.stcn.com/article/detail/3598350.html" target="_blank">证券时报 — 天普股份：换届稳推进，中昊芯英独立上市方向不变</a>（2026年；澄清中昊芯英无借壳安排，走独立IPO路径）</li>
+          <li id="ref22">深圳市微觉未来科技有限公司 — 乐山创投企业库 <a href="http://qydb.leshanvc.com/wap/company.php?id=47957" target="_blank">微觉未来科技</a>（公司全称深圳市微觉未来科技有限公司，成立2016-01-07，创始人陈四海，激光雷达研发商，面向自动行走机器人/无人汽车；2016年11月2日获天使轮融资，投资方为信熹资本。该库自述"信息来自于网络公开信息，并不是由该企业发布"）</li>
+          <li id="ref23">烟台奇创芯源科技有限公司工商与融资信息 — <a href="http://www.innohere.com/ir/131845/finance.html" target="_blank">innohere 融资历史</a>；股东与财务数据见烟台睿创微纳技术股份有限公司《关于公司2026年度日常关联交易预计的公告》（688002，2026-01-23，上交所披露，<a href="https://star.sse.com.cn/disclosure/listedinfo/announcement/c/new/2026-01-23/688002_20260123_CYK8.pdf" target="_blank">PDF</a>）</li>
+          <li id="ref24"><a href="https://www.sohu.com/a/302126233_558640" target="_blank">搜狐财经 — 山东首批冲刺科创板的企业可能是他们，其中一家已完成IPO辅导</a>（2019年；引天眼查信息"第二次为2016年5月，信熹资本投资800万元"，并引睿创微纳IPO辅导材料"信熹投资持股935.06万股、持股比例2.43%"）</li>
+          <li id="ref25">中昊芯英融资与工商信息 — 乐山创投企业库 <a href="http://qydb.leshanvc.com/wap/company.php?id=49831" target="_blank">中昊芯英（杭州）科技有限公司</a>（成立2020-10-28，总部杭州，创始人杨龚轶凡；融资记录：2021-04-08 种子轮投资方为信熹资本，此后 2022-01 Pre-A、2022-09 A轮、2023-04 战略投资、2023-05 Pre-B轮。该库自述"信息来自于网络公开信息，并不是由该企业发布"）</li>
+          <li id="ref26">水滴信用 — <a href="https://m.shuidi.cn/company-9630135e5042c1c5a8b6c8f9a3151e05.html" target="_blank">上海信熹投资管理有限公司企业工商信息</a>（2026-09-18访问；统一社会信用代码 91310115351052371U，注册资本12,500万元人民币，成立2015-07-30，营业期限至2045-07-29，核准日期2026-03-26，登记机关普陀区市场监督管理局，企业地址上海市普陀区武南路88号6层616室，股东3名：信熹资产管理（上海）有限公司48%/认缴6,000万元、上海信熹投资中心（有限合伙）40%/认缴5,000万元、上海恩熹企业管理有限公司12%）</li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">最新更新于 2026-09-18 · 数据来源见「2 参考资料」 · 官网投资组合页为代表性案例列示，非完整组合清单 · 部分数据来自机构自述与媒体报道口径，请审慎参考</div>
+</div>
+</body>
+</html>
