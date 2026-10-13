@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>三度智能 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> <span class="breadcrumb-sep">›</span> <span>三度智能</span></div>
+  <div class="wiki-header"><h1>三度智能</h1><div class="subtitle">三度（佛山）智能科技有限公司 · 成立于2023年 · 工业具身智能 · "一脑多机"柔性操作 · 战略投资</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#founder">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#product">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenario">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financial">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#others">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl3"><a href="#a21">2.1 团队背景与场景选择匹配度</a></li>
+        <li class="toc-lvl3"><a href="#a22">2.2 技术路线与场景适配性</a></li>
+        <li class="toc-lvl3"><a href="#a23">2.3 股东/资本结构对战略的影响</a></li>
+        <li class="toc-lvl3"><a href="#a24">2.4 试错过程与路径调整</a></li>
+        <li class="toc-lvl3"><a href="#a25">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl3"><a href="#a26">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#refs">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">三度智能</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">三度（佛山）智能科技有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">品牌名</div><div class="ib-value">三度智能</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2023年3月22日（工商注册）</div></div>
+        <div class="ib-row"><div class="ib-label">注册地</div><div class="ib-value">佛山市禅城区佛山国家火炬创新创业园</div></div>
+        <div class="ib-row"><div class="ib-label">研发中心</div><div class="ib-value">广州市南沙区</div></div>
+        <div class="ib-row"><div class="ib-label">法定代表人/董事长</div><div class="ib-value">帅威</div></div>
+        <div class="ib-row"><div class="ib-label">总经理</div><div class="ib-value">仵沛宸</div></div>
+        <div class="ib-row"><div class="ib-label">首席科学家</div><div class="ib-value">陈小平</div></div>
+        <div class="ib-row"><div class="ib-label">员工规模</div><div class="ib-value">20余人（绝大多数为科研人员）</div></div>
+        <div class="ib-section">融资信息</div>
+        <div class="ib-row"><div class="ib-label">最新轮次</div><div class="ib-value">战略投资（2025.10）</div></div>
+        <div class="ib-row"><div class="ib-label">本轮投资方</div><div class="ib-value">祥鑫科技（002965.SZ，直接+间接双重持股）</div></div>
+        <div class="ib-row"><div class="ib-label">孵化/早期股东</div><div class="ib-value">广东省科学院佛山产业技术研究院</div></div>
+        <div class="ib-row"><div class="ib-label">累计融资</div><div class="ib-value">约5000万元（亿欧数据，未获公司确认）</div></div>
+        <div class="ib-row"><div class="ib-label">估值</div><div class="ib-value">未披露</div></div>
+        <div class="ib-section">核心技术</div>
+        <div class="ib-row"><div class="ib-label">核心技术</div><div class="ib-value">"一脑多机" + 柔性操作技术</div></div>
+        <div class="ib-row"><div class="ib-label">硬件形态</div><div class="ib-value">单臂/固定双臂/轮式移动双臂/复合机器人</div></div>
+        <div class="ib-section">官网</div>
+        <div class="ib-row"><div class="ib-label">官网</div><div class="ib-value">未见公开官网（多个企业数据平台标注为"无"）</div></div>
+      </aside>
+
+      <p class="article-intro">三度智能（三度（佛山）智能科技有限公司）是一家专注工业场景具身智能与复合机器人的科技公司，成立于2023年3月，注册于佛山市禅城区佛山国家火炬创新创业园，研发中心位于广州南沙。公司核心技术团队根植于原中国科学技术大学机器人实验室，由首席科学家陈小平带队，2022年以"团队引进"方式落地广东省科学院，经广东省科学院佛山产业技术研究院孵化并获其战略投资。公司以<strong>"一脑多机"</strong>系统（一套软件控制系统适配单臂、固定式双臂、轮式移动双臂与复合机器人）与<strong>柔性操作技术</strong>为核心，将柔性执行器控制方法与柔性材料适应性相结合，为工艺流程与操作对象多变的产线自动化升级提供低成本柔性解决方案。<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref2">[2]</a></sup><sup><a href="#ref6">[6]</a></sup><sup><a href="#ref4">[4]</a></sup>公司已明确锚定<strong>点焊装配</strong>方向，机器人已进入汽车生产线、家电生产线等场景；2025年获得上市企业祥鑫科技的战略投资。<sup><a href="#ref6">[6]</a></sup><sup><a href="#ref3">[3]</a></sup></p>
+
+      <h2 id="facts">1 事实层</h2>
+      <p style="font-size:0.82rem;color:#54595d;margin-bottom:10px;">来源可靠性标注：<span class="tag tag-info">招股书</span> = IPO/上市公司申报材料 · <span class="tag tag-info">上市公司公告</span> = 沪深交易所披露 · <span class="tag tag-info">媒体报道</span> = 第三方独立报道 · <span class="tag tag-info">官网/公司自述</span> = 公司官方披露 · <span class="tag tag-info">工商登记</span> = 企业信用信息系统 · <span class="tag tag-info">学术论文</span> = 同行评议期刊</p>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper"><table class="wikitable infotable">
+        <tr><th>项目</th><th>内容</th></tr>
+        <tr><td>公司全称</td><td>三度（佛山）智能科技有限公司</td></tr>
+        <tr><td>品牌名/简称</td><td>三度智能</td></tr>
+        <tr><td>成立时间</td><td>2023年3月22日（工商注册）<sup><a href="#ref4">[4]</a></sup></td></tr>
+        <tr><td>注册地</td><td>佛山市禅城区张槎街道华宝南路13号佛山国家火炬创新创业园E座407-1（住所申报）<sup><a href="#ref4">[4]</a></sup></td></tr>
+        <tr><td>研发中心</td><td>广州市南沙区<sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>企业类型</td><td>其他有限责任公司<sup><a href="#ref4">[4]</a></sup></td></tr>
+        <tr><td>法定代表人</td><td>帅威<sup><a href="#ref4">[4]</a></sup></td></tr>
+        <tr><td>上市状态</td><td>未上市</td></tr>
+        <tr><td>员工规模</td><td>20余人，绝大多数为科研人员（截至2026年9月）<sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>核心定位</td><td>工业场景具身智能机器人 · 复合机器人 · "一脑多机"柔性操作解决方案</td></tr>
+        <tr><td>经营范围（摘要）</td><td>智能机器人的研发；工业机器人制造、安装、维修、销售；人工智能应用软件开发；人工智能硬件销售等<sup><a href="#ref4">[4]</a></sup></td></tr>
+        <tr><td>官网</td><td>未见公开官网。innoHere、亿欧数据等多个企业数据库的"企业网址"栏均标注为空<sup><a href="#ref4">[4]</a></sup><sup><a href="#ref13">[13]</a></sup>（本页不做域名推测）</td></tr>
+      </table></div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>时间</th><th>事件</th></tr>
+        <tr><td>2022年</td><td>中国科学技术大学教授陈小平率机器人核心人才以"团队引进"方式进入广东省科学院<sup><a href="#ref6">[6]</a></sup></td></tr>
+        <tr><td>2023年3月22日</td><td>公司工商注册成立，由广东省科学院智能制造研究所、广东省科学院佛山产业技术研究院孵化<sup><a href="#ref4">[4]</a></sup><sup><a href="#ref2">[2]</a></sup></td></tr>
+        <tr><td>2024年</td><td>广东省科学院智能制造研究所建设"广州市具身智能机器人概念验证中心"，支持团队样机研制与场景验证<sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>2025年3月15—16日</td><td>与上市企业祥鑫科技（002965.SZ）签订《人形机器人关键零部件战略合作协议》，祥鑫科技探索向三度智能进行资金投资<sup><a href="#ref8">[8]</a></sup><sup><a href="#ref7">[7]</a></sup></td></tr>
+        <tr><td>2025年3月底</td><td>与广东省科学院智能制造研究所共同研发的"微生物仿人双臂机器人系统"面世，可实现梯度稀释、培养基接种等自主操作<sup><a href="#ref2">[2]</a></sup></td></tr>
+        <tr><td>2025年10月30日</td><td>祥鑫科技完成战略投资，通过全资子公司祥鑫（东莞）智能机器人有限公司直接持股 + 广州远见创新科技创业投资基金合伙企业（有限合伙）间接持股，工商变更办结<sup><a href="#ref3">[3]</a></sup><sup><a href="#ref5">[5]</a></sup></td></tr>
+        <tr><td>2026年</td><td>明确"锚定点焊场景，以'一脑多机'探索柔性操作落地路径"；机器人进入汽车零部件上下料（东莞）、冰箱冷媒灌注（家电）等产线<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref6">[6]</a></sup></td></tr>
+      </table></div>
+
+      <h3 id="founder">1.2 创始人及核心团队</h3>
+      <p>三度智能的核心团队源自原中国科学技术大学机器人实验室，由"同门师兄弟"组团创业。团队在机器人柔性操作方向有长期学术积累，曾作为主要成员获得 2014 年 RoboCup@Home 总冠军、2015 年国际家庭服务机器人标准测试第一名、2016 年世界机器人大赛 Robocup 挑战赛家庭组冠军、2017 年 RoboCup@Home Best Manipulation Award、2019 年 IJCAI Eldercare Robot Challenges Task Challenge 总冠军、2021 年第三届 Leaderobot 中国机器人行业年会"科学引领奖"等专业赛事奖项。<sup><a href="#ref2">[2]</a></sup><sup><a href="#ref3">[3]</a></sup></p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+        <tr><td>首席科学家</td><td>陈小平</td><td>原中国科学技术大学计算机科学与技术学院教授、博士生导师、机器人实验室主任、人工智能中心主任；国务院政府特殊津贴专家。长期从事智能机器人柔性化操作、人机交互研究，提出基于"融差性"原理和"开放知识"的技术路线。现为广东省科学院人工智能方向首席科学家、广东省科学院智能制造研究所集成智能创新团队负责人、广东省科学院人形机器人创新中心主任。<sup><a href="#ref11">[11]</a></sup><sup><a href="#ref2">[2]</a></sup></td></tr>
+        <tr><td>董事长</td><td>帅威</td><td>15岁考入中国科学技术大学少年班，计算机专业博士；2012年在中科大攻读计算机专业时加入陈小平教授研究团队，开始从事机器人研究。现为公司董事长、法定代表人。<sup><a href="#ref2">[2]</a></sup><sup><a href="#ref6">[6]</a></sup><sup><a href="#ref4">[4]</a></sup></td></tr>
+        <tr><td>总经理</td><td>仵沛宸</td><td>中国科学技术大学计算机专业博士，2014年开始从事机器人研究，博士研究方向为柔性机器人与灵巧手。参与多项课题，发表SCI、EI论文10余篇，申请获批专利9件；为柔性抓取"融差控制"方向的论文作者之一。<sup><a href="#ref2">[2]</a></sup><sup><a href="#ref12">[12]</a></sup><sup><a href="#ref10">[10]</a></sup></td></tr>
+        <tr><td>核心骨干</td><td>崔国伟、高杨</td><td>团队中的核心骨干，具有丰富的机器人研究、开发、实践经验；同为柔性抓取融差控制论文署名作者。<sup><a href="#ref2">[2]</a></sup><sup><a href="#ref10">[10]</a></sup></td></tr>
+      </table></div>
+      <p style="font-size:0.8rem;color:#54595d;">团队身份说明：公司骨干同时是广东省科学院智能制造研究所的职工，兼具"科研人员"与"创业者"双重身份。<sup><a href="#ref2">[2]</a></sup></p>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>轮次/事件</th><th>时间</th><th>金额</th><th>投资方</th><th>说明</th></tr>
+        <tr><td>孵化投资/股权优化</td><td>2023年成立前后</td><td>未披露</td><td>广东省科学院佛山产业技术研究院</td><td>在广东省科学院"过程赋权"支持下获得佛山产研院战略投资和股权结构优化支持<sup><a href="#ref2">[2]</a></sup></td></tr>
+        <tr><td>战略合作协议</td><td>2025年3月15—16日</td><td>框架性协议（不涉及金额）</td><td>祥鑫科技（002965.SZ）</td><td>签订《人形机器人关键零部件战略合作协议》，祥鑫探索向三度智能进行资金投资并探索成立祥鑫控股的合资公司<sup><a href="#ref8">[8]</a></sup><sup><a href="#ref7">[7]</a></sup><sup><a href="#ref14">[14]</a></sup></td></tr>
+        <tr><td>战略投资（落地）</td><td>2025年10月30日</td><td>未披露（亿欧数据记为累计约5000万元）</td><td>祥鑫科技</td><td>通过全资子公司祥鑫（东莞）智能机器人有限公司<strong>直接持股</strong>，并透过广州远见创新科技创业投资基金合伙企业（有限合伙）<strong>间接持股</strong>，工商变更办结<sup><a href="#ref3">[3]</a></sup><sup><a href="#ref5">[5]</a></sup><sup><a href="#ref13">[13]</a></sup><sup><a href="#ref15">[15]</a></sup></td></tr>
+      </table></div>
+      <p style="font-size:0.8rem;color:#54595d;">注：innoHere 记录"融资次数 1 次"，于 2025-10-30 发生"战略融资"，投资方祥鑫科技，金额标注为"未披露"<sup><a href="#ref5">[5]</a></sup>；亿欧数据记录融资总金额约 5000 万元人民币<sup><a href="#ref13">[13]</a></sup>。该金额为第三方数据平台口径，未见公司或投资方正式确认，仅供参考。</p>
+      <h4>股东结构特征</h4>
+      <p>三度智能的股东结构带有鲜明的"科研院所孵化 + 产业资本战略绑定"特征。早期由广东省科学院佛山产业技术研究院以战略投资和股权结构优化方式孵化持股；2025年引入上市企业祥鑫科技（汽车精密结构件与新能源领域制造商）作为战略投资方。<sup><a href="#ref2">[2]</a></sup><sup><a href="#ref3">[3]</a></sup>祥鑫科技的入股并非单纯财务投资，而是与其"核心部件攻坚+全产业链布局"的人形机器人战略绑定——祥鑫将为三度智能提供高精度结构件定制与批量化生产能力，并共享其在汽车、新能源领域的全球供应链资源<sup><a href="#ref3">[3]</a></sup>。公司目前未上市，历轮融资后的具体估值均未对外披露。</p>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>维度</th><th>详情</th></tr>
+        <tr><td>总体架构</td><td><strong>"一脑多机"</strong>：一套软件控制系统适配多种形态的机器人硬件，包括单臂、固定式双臂、轮式移动双臂及复合机器人；追求极致模块化与复用性，机器人大部分动作通过软件技能排列组合实现，仅需 <strong>10%—20% 的定制化研发</strong>，避免逐项目单独定制开发<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref6">[6]</a></sup></td></tr>
+        <tr><td>柔性操作技术</td><td>将柔性执行器（拟人化柔性控制方法）与配套柔性部件相结合，依靠柔性部件受压形变建立反馈机制，使机器人在感知和执行存在误差时仍能"随机应变"；区别于传统意义上的"全柔性结构机器人"，而是通过<strong>柔性执行部件与刚性系统结合</strong>，解决制造业中工艺流程多变、操作对象复杂的痛点<sup><a href="#ref2">[2]</a></sup></td></tr>
+        <tr><td>行为模块化</td><td>将生产场景中高频、标准的操作行为（如搬运、装配、检测）提炼为可复用的行为模块，打包集成至智能控制系统，快速安全地部署到机器人本体，使机器人从"结构展示"转向"场景实战"<sup><a href="#ref3">[3]</a></sup></td></tr>
+        <tr><td>学术基础（融差控制）</td><td>团队提出基于"融差性思维"的融差控制方法：无需精确感知，用相同控制量即可在一定范围内完成不同抓取任务，只需知道该类物体的边界条件。实验显示，控制量不变时柔性手爪可抓取且不抓坏宽度 5～45 mm 的嫩豆腐，并可成功抓取宽度 5～60 mm 的硬质长方体<sup><a href="#ref10">[10]</a></sup></td></tr>
+        <tr><td>感知与操作</td><td>涉及视觉、触觉、任务编排等关键技术；在无序堆放场景中实现准确抓取与放置（如汽车零部件上下料）<sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>技术路线特征</td><td>公司公开表述侧重"柔性操作 + 一脑多机 + 行为模块化"，未强调端到端 VLA 大模型或世界模型等路线；技术壁垒更多体现在柔性抓取的物理机理、柔性手爪硬件与多形态复用软件系统上<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref2">[2]</a></sup><sup><a href="#ref10">[10]</a></sup></td></tr>
+      </table></div>
+      <p>三度智能的技术路线可概括为"<strong>以柔性操作切入工业多品类生产</strong>"。传统工业自动化按固定程序与专用夹具作业，面对工艺流程多变、操作对象复杂的产线升级往往需要逐项目定制开发、成本高企。公司用柔性手爪（软硬结合、以形变反馈替代精确感知）解决"抓取什么、抓得住的容差"问题，再用"一脑多机"的软件复用降低多形态部署的边际成本，最终以"行为模块化"把高频标准操作沉淀为可复用资产。<sup><a href="#ref2">[2]</a></sup><sup><a href="#ref1">[1]</a></sup><sup><a href="#ref3">[3]</a></sup>该路线与"通用大模型驱动泛化"的路线不同，更偏"经典机器人学 + 柔性机构 + 工程化复用"，落点是对柔性能力有强需求、但尚未被传统自动化充分覆盖的工业长尾场景。</p>
+
+      <h3 id="product">1.5 产品形态</h3>
+      <p>三度智能未以单一型号产品对外销售，而是提供覆盖多形态的"一脑多机"柔性机器人产品与解决方案。公开报道中展示的产品包括单臂机器人、固定式双臂机器人、轮式移动双臂机器人及复合机器人，以及柔性手爪等核心执行部件。<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref2">[2]</a></sup></p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>产品/形态</th><th>关键特征</th><th>适用场景</th></tr>
+        <tr><td>柔性手爪（核心部件）</td><td>软硬结合、以形变建立反馈；控制量不变时可抓取不同形状、尺寸、材质的物体——从易碎的嫩豆腐到硬质物块、柔软水果乃至小巧硬币；可抓取且不抓坏宽度 5～45 mm 嫩豆腐、5～60 mm 硬质长方体<sup><a href="#ref2">[2]</a></sup><sup><a href="#ref10">[10]</a></sup></td><td>复杂生产环境中对精度与柔韧度要求高的操作（抓取、上下料、装配）</td></tr>
+        <tr><td>轮式移动双臂机器人</td><td>轮式驱动 + 双机械臂，可像人类员工一样在车间、实验室参与生产活动<sup><a href="#ref2">[2]</a></sup></td><td>车间/实验室柔性作业、汽车零部件双臂点焊、上下料</td></tr>
+        <tr><td>固定式双臂机器人</td><td>"一脑多机"形态之一，可在产线旁固定工位执行双臂作业<sup><a href="#ref1">[1]</a></sup></td><td>产线固定工位（点焊、装配、上下料）</td></tr>
+        <tr><td>单臂 / 复合机器人</td><td>同一软件控制系统适配的另两种形态<sup><a href="#ref1">[1]</a></sup></td><td>单工位操作 / 移动+操作复合任务</td></tr>
+        <tr><td>微生物仿人双臂机器人系统（2025年3月底面世，与广东省科学院智能制造研究所共同研发）</td><td>双臂自主操作平台，可实现梯度稀释、培养基接种等多个自主操作<sup><a href="#ref2">[2]</a></sup></td><td>传统微生物培养、检测等实验室场景</td></tr>
+      </table></div>
+      <p style="font-size:0.8rem;color:#54595d;">注：公司未公开具体型号命名、标准参数表与售价，上述产品形态依据公开报道整理。<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref2">[2]</a></sup></p>
+
+      <h3 id="scenario">1.6 应用场景</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>场景领域</th><th>状态</th><th>典型客户/合作方</th><th>说明</th></tr>
+        <tr><td>汽车零部件——双臂点焊</td><td><span class="tag tag-info">已落地</span></td><td>未具名（汽车生产线）</td><td>机器人可对汽车零部件进行双臂点焊作业<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref6">[6]</a></sup></td></tr>
+        <tr><td>汽车零部件——无序上下料</td><td><span class="tag tag-info">试生产</span></td><td>东莞某企业</td><td>零部件无序堆放在产线旁，机器人需准确抓取与放置；2025年4月起在生产线旁试生产，单次操作成功率99%以上，工人质检合格率98%<sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>家电生产——冰箱冷媒灌注</td><td><span class="tag tag-info">推进落地</span></td><td>某冰箱企业</td><td>需跟随传送带动态作业，对节拍与精度要求极高，需适应柔性生产<sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>纺织</td><td><span class="tag tag-info">已验证/应用</span></td><td>未具名</td><td>自动接线等；经广州具身智能机器人概念验证中心完成场景适配验证<sup><a href="#ref2">[2]</a></sup><sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>半导体</td><td><span class="tag tag-info">已验证/应用</span></td><td>未具名</td><td>高精度物料抓取<sup><a href="#ref2">[2]</a></sup></td></tr>
+        <tr><td>生物医药/微生物检测</td><td><span class="tag tag-info">已落地</span></td><td>与广东省科学院智能制造研究所共建</td><td>微生物仿人双臂机器人系统；用于微生物培养、检测等实验室环节<sup><a href="#ref2">[2]</a></sup></td></tr>
+        <tr><td>智慧农业——果蔬无损采摘</td><td><span class="tag tag-info">已验证</span></td><td>未具名</td><td>苦瓜、丝瓜等作物的无损采摘<sup><a href="#ref2">[2]</a></sup><sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>微生物、半导体、汽车、光伏储能（协议方向）</td><td><span class="tag tag-warn">拓展中</span></td><td>祥鑫科技（战略合作）</td><td>《人形机器人关键零部件战略合作协议》约定的重点应用方向<sup><a href="#ref8">[8]</a></sup><sup><a href="#ref7">[7]</a></sup></td></tr>
+      </table></div>
+      <p style="font-size:0.8rem;color:#54595d;">注：公司未披露各场景的具体台数分布，上表状态依据公开报道与协议表述整理。<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref2">[2]</a></sup></p>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <p>三度智能处于从"实验室成果"走向"产线实战"的早期商业化阶段。公司研发的机器人已进入汽车生产线、家电生产线等场景：在东莞某企业实现汽车零部件上下料，自2025年4月起试生产，单次操作成功率99%以上，产品经工厂质检合格率98%；同时推进在一家冰箱企业产线落地，负责冰箱冷媒灌注。<sup><a href="#ref1">[1]</a></sup>此外，公司此前已在纺织（自动接线）、半导体（高精度物料抓取）、生物医药、智慧农业（果蔬无损采摘）等场景完成应用或验证。<sup><a href="#ref2">[2]</a></sup></p>
+      <p>公司商业化的核心逻辑是"用模块化复用降低多场景部署成本"：凭借"一脑多机"仅需 10%—20% 定制化研发的特性，向工艺流程与操作对象多变的产线快速复制；董事长帅威表示，选择佛山正是看中广东扎实的供应链与制造业基础、以及密集的制造业场景访问机会，"一项技术是否真正有效，最终都要在工厂的产线上接受检验"。<sup><a href="#ref6">[6]</a></sup></p>
+      <p>战略合作层面，公司于2025年3月与上市企业祥鑫科技签订《人形机器人关键零部件战略合作协议》，双方约定在微生物、半导体、汽车、光伏储能等领域推动应用，并探索成立由祥鑫控股的合资公司作为产业合作载体；祥鑫科技后续于2025年10月完成对三度智能的双重战略投资。<sup><a href="#ref8">[8]</a></sup><sup><a href="#ref3">[3]</a></sup></p>
+
+      <h3 id="financial">1.8 财务数据</h3>
+      <p>三度智能目前未公开披露营收、利润、毛利率等财务数据，也未披露估值。公司尚处于商业化早期，收入预计以柔性机器人产品与工业解决方案交付为主，现阶段仍以科研院所孵化资金与产业战略投资支撑研发和场景拓展。因公司未披露实际出货台数、订单规模与收入确认口径，此处不作收入测算。<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref5">[5]</a></sup><sup><a href="#ref13">[13]</a></sup></p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>指标</th><th>2023</th><th>2024</th><th>2025</th><th>2026（至10月）</th></tr>
+        <tr><td>营收披露</td><td>未披露（成立期）</td><td>未披露（研发/验证期）</td><td>未披露</td><td>未披露</td></tr>
+        <tr><td>当年资本事件</td><td>佛山产研院孵化投资</td><td>—</td><td>祥鑫科技战略投资（3月协议、10月落地）</td><td>未披露新融资</td></tr>
+        <tr><td>累计融资</td><td>未披露</td><td>未披露</td><td>约5000万元（亿欧数据口径，未获确认）</td><td>约5000万元（同上）</td></tr>
+        <tr><td>估值</td><td>未披露</td><td>未披露</td><td>未披露</td><td>未披露</td></tr>
+      </table></div>
+
+      <h3 id="others">1.9 其他信息</h3>
+      <ul>
+        <li>公司由广东省科学院佛山产业技术研究院（佛山产研院）引进并重点投资孵化；佛山产研院在方向探索、需求验证、客户对接、股东协议与公司治理、战略投资沟通协调等环节提供支持，并曾组织柔性操作论坛帮助对接纺织企业及地方政府。<sup><a href="#ref6">[6]</a></sup><sup><a href="#ref2">[2]</a></sup></li>
+        <li>研发所依托的"广州市具身智能机器人概念验证中心"由广东省科学院智能制造研究所于2024年牵头建设，已入库48个项目，其中2个项目孵化落地并成立公司（三度智能为其一，另一家未具名）；中心先后完成纺织、微生物检测、智慧农业、汽车零配件等多领域场景适配验证。<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref9">[9]</a></sup></li>
+        <li>2025年3月10日，广东省科学院人形机器人创新中心、广东省科学院智能制造研究所先进激光与增材制造技术研究中心正式揭牌，人形机器人创新中心主任由陈小平担任。<sup><a href="#ref2">[2]</a></sup></li>
+        <li>公司骨干同时是广东省科学院智能制造研究所的职工，公司是"科研人员创业 + 新型研发机构孵化"模式的典型样本。<sup><a href="#ref2">[2]</a></sup></li>
+        <li>团队在学术界有柔性机器人研究积累：陈小平团队此前研发了基于蜂巢气动网络结构的柔性机器人手臂（可开门、开抽屉、拧瓶盖等），成果发表于《国际机器人研究杂志》（IJRR）。<sup><a href="#ref10">[10]</a></sup></li>
+        <li>公司目前未见公开官网；公开联系方式多为招聘/孵化平台邮箱（如 wsway@163.com、gdasfs.gd.cn 域名邮箱）。<sup><a href="#ref4">[4]</a></sup><sup><a href="#ref13">[13]</a></sup></li>
+      </ul>
+
+            <h2 id="analysis">2 分析层</h2>
+      <p style="font-size:0.82rem;color:#54595d;margin-bottom:10px;">分析层数据综合来自 <span class="tag tag-info">媒体报道</span>（第三方独立报道）、<span class="tag tag-info">上市公司公告</span>、<span class="tag tag-info">学术论文</span> 与 <span class="tag tag-info">公司/机构自述</span>。公司自述数据与独立验证数据已在事实层标注区分，分析层观点仅供参考。</p>
+
+      <div class="analysis-block" id="a21">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>三度智能的团队构成与"柔性操作切入工业长尾"的定位高度自洽。首席科学家陈小平长期研究智能机器人柔性化操作，提出"融差性"原理；董事长帅威、总经理仵沛宸均为中科大计算机博士，仵沛宸博士方向即为柔性机器人与灵巧手，团队核心论文《抓取任务中的融差控制方法》正是柔性抓取机理的直接成果——这意味着公司选择"柔性手爪 + 柔性操作"作为技术起点，是从实验室第一性研究中自然生长出来的，而非机会主义的赛道选择。<sup><a href="#ref10">[10]</a></sup><sup><a href="#ref2">[2]</a></sup>但也要看到，团队的强项在机器人学与柔性机构，产业侧（尤其汽车、家电的工艺 know-how 与客户准入）并非其原生优势，这也解释了公司为何需要引入祥鑫科技这类具备汽车/新能源精密制造能力与客户基础的产业资本作为战略股东，以及为何依托佛山产研院、广州概念验证中心这类平台来做"客户对接与场景验证"。<sup><a href="#ref3">[3]</a></sup><sup><a href="#ref6">[6]</a></sup>团队规模（20余人、绝大多数为科研人员）说明其仍处于"轻型科研型创始团队"阶段，工程化、量产与商务团队的补强将是规模化的前置条件。<sup><a href="#ref1">[1]</a></sup></p>
+      </div>
+
+      <div class="analysis-block" id="a22">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>公司选择"柔性操作 + 一脑多机"而非"端到端大模型泛化"路线，与其目标场景的物理特性相匹配。工业长尾场景的核心难点往往不是"决策不智能"，而是"抓取/操作的物理容差不足"——面对形状、材质、姿态各异的工件，传统刚性夹具与精确感知方案成本高、适配慢。柔性手爪以"受力形变反馈"替代"精确感知+精确建模"，用物理机理换取容差，正是对症下药；"一脑多机"的软件复用（仅需10%—20%定制化）则直指"多品种小批量产线自动化改造成本高"的行业痛点。<sup><a href="#ref2">[2]</a></sup><sup><a href="#ref1">[1]</a></sup>从已披露的落地数据看（汽车零部件上下料单次成功率99%+、质检合格率98%），该路线在中低节拍、柔性要求高的场景具备可行性；但冰箱冷媒灌注这类"需跟随传送带动态作业、节拍与精度双高"的场景，则对实时性与重复精度提出了更高要求，是该路线能否向高节拍产线延伸的关键验证点。<sup><a href="#ref1">[1]</a></sup>相对地，该路线在大模型泛化、跨场景零样本迁移方面并非其强项，其护城河更多建立在柔性机构的物理设计、柔性抓取控制算法与软件复用体系上，复制门槛取决于后来者对"融差"机理与柔性硬件的掌握程度。<sup><a href="#ref10">[10]</a></sup></p>
+      </div>
+
+      <div class="analysis-block" id="a23">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>三度智能的资本结构呈现"科研院所系 + 产业上市公司系"的双轨特征，二者分别提供"技术合法性/政策资源"与"制造能力/客户资源"。广东省科学院佛山产业技术研究院作为孵化方，提供的是新型研发机构的平台资源、政府与产业链对接、公司治理搭建——这对一个"科学家团队创业"的早期公司尤为关键；祥鑫科技的战略入股（直接+间接双重持股）则带来精密结构件定制与批量生产能力、汽车/新能源供应链与客户基础，以及"制造业客户愿意付费采购"的验证通道。<sup><a href="#ref3">[3]</a></sup><sup><a href="#ref6">[6]</a></sup>这种"被产业方深度绑定"的结构，一方面为商业化提供了稀缺的落地土壤，另一方面也意味着公司的战略方向会与祥鑫的人形机器人布局（"核心部件攻坚+全产业链布局"）产生较强的耦合，未来是否会出现"更偏零部件供应商"还是"独立整机/解决方案商"的路线张力，是需要持续观察的点。<sup><a href="#ref3">[3]</a></sup></p>
+      </div>
+
+      <div class="analysis-block" id="a24">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>从公开信息看，三度智能的路径演进体现为"从宽泛验证到单点聚焦"的收敛。公司依托广州具身智能机器人概念验证中心，先后在纺织、微生物检测、智慧农业、汽车零配件等多个方向完成场景适配验证，再从中筛出"点焊装配"作为主攻方向——这是典型的"概念验证—场景筛选—聚焦落地"漏斗，也是新型研发机构孵化模式的显性产物。<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref6">[6]</a></sup>关键的路径调整节点是：2025年3月与祥鑫科技达成战略合作（从"纯科研转化"转向"绑定产业方"），2025年10月战略投资落地，2026年公开表述收敛为"锚定点焊场景，以'一脑多机'探索柔性操作落地路径"<sup><a href="#ref3">[3]</a></sup><sup><a href="#ref6">[6]</a></sup>。当前公司处于"单点场景（点焊装配）深挖 + 多形态复用"的阶段，其落地节奏能否从"试生产"走向"批量产线部署"，是检验这一收敛是否成功的关键。</p>
+      </div>
+
+      <div class="analysis-block" id="a25">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>三度智能的核心取舍，是在"通用具身/人形机器人"浪潮中选择了一条"工业专用 + 柔性操作 + 科研院所孵化"的务实路线。与同期动辄数十亿甚至上百亿估值、主攻通用人形或通用 VLA 大模型的头部公司不同，三度智能没有披露估值、未强调大模型叙事，也未发布人形整机，而是把资源集中在柔性手爪、"一脑多机"多形态复用与工业点焊/上下料/灌注等具体工序上。<sup><a href="#ref1">[1]</a></sup>这一取舍的优势是：赛道需求刚性、客户付费逻辑清晰（替代人工、降低定制成本）、技术壁垒来自物理机理而非算力堆叠；风险则在于：其一，工业场景天花板受资本开支周期约束，单场景放量速度依赖客户验证与复制；其二，公司规模小（20余人）、缺乏公开估值与后续融资信息，抗风险与扩产能力受限；其三，柔性操作虽差异化，但在部分高节拍、高精度工序上可能遭遇传统工业自动化与专用夹具方案的正面竞争。<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref6">[6]</a></sup>总体而言，这是一条"低估值、低叙事、高确定性（相对）"的路线，与公司所处的广东省科学院孵化生态及其"以产线检验为准"的风格一致。</p>
+      </div>
+
+      <div class="analysis-block" id="a26">
+        <h4>2.6 其他重要观察</h4>
+        <p>三度智能最具辨识度的标签是"中科大机器人实验室师门创业 + 新型研发机构孵化"。公司并非资本市场热点意义上的"明星项目"，而是中国科技成果转化体系中一个值得观察的样本：由一流研究团队（发表 IJRR、机器人学报等成果）带着柔性机器人技术，经省科学院平台"团队引进—概念验证—产业绑定"三级助推落地，再由产业上市公司战略入股完成场景对接。<sup><a href="#ref2">[2]</a></sup><sup><a href="#ref3">[3]</a></sup><sup><a href="#ref10">[10]</a></sup>这种模式的优点是转化路径短、场景真实；挑战则在于科研团队向规模化企业的跃迁——包括团队扩充、量产制造、跨客户复制与持续融资。就本 Wiki 关注范围而言，三度智能代表了具身智能"柔性操作/工业工序"这一相对冷门但务实的分支：当行业普遍把注意力放在通用大模型与人形整机时，柔性抓取与"一脑多机"所解决的恰是工厂里最细碎、最难标准化、却也最真实存在的自动化缺口。<sup><a href="#ref1">[1]</a></sup>其数据（单次操作成功率99%+、质检合格率98%）若能在更多产线上稳定复现，将构成对该路线的有力验证；反之，若长期停留在"验证/试生产"而难以跨越到批量部署，则可能受限于团队与资本规模。<sup><a href="#ref1">[1]</a></sup></p>
+      </div>
+
+      <h2 id="refs">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://gzdaily.dayoo.com/h5/html5/2026-09/30/content_877_915699.htm" target="_blank">人形机器人上岗 酵母酿出驱蚊剂（广州日报·科技周刊，2026-09-30，记者武威）</a></li>
+          <li><a href="https://static.nfnews.com/content/202504/15/c11189244.html" target="_blank">科研"追光"者仵沛宸：同门师兄弟组团创业，在佛山得到升华 — 南方+（2025-04-16）</a></li>
+          <li><a href="https://www.gkzhan.com/news/detail/186748.html" target="_blank">祥鑫科技战略投资三度智能，加速布局人形机器人新赛道！（来源：祥鑫科技股份有限公司微信公众号，2025-11-03）— 智能制造网</a></li>
+          <li><a href="https://www.innohere.com/ir/162699/general.html" target="_blank">三度智能 公司简介（全称/成立时间/注册地/法定代表人/经营范围/员工数量）— innoHere 英诺嘿呀</a></li>
+          <li><a href="https://www.innohere.com/ir/162699/finance.html" target="_blank">三度智能 融资历史（2025-10-30 战略融资，投资方祥鑫科技，金额未披露）— innoHere 英诺嘿呀</a></li>
+          <li><a href="http://www.gdasfs.gd.cn/zhzx/zhxw/t71746.html" target="_blank">近悦远来·广科高才丨三度智能帅威：锚定点焊场景，以"一脑多机"探索柔性操作落地路径 — 广东省科学院佛山产业技术研究院</a></li>
+          <li><a href="http://gdasfs.gd.cn/zhzx/zhxw/t68225.html" target="_blank">育成孵化企业动态 | 三度智能与上市企业祥鑫科技签订战略合作协议 — 广东省科学院佛山产业技术研究院</a></li>
+          <li><a href="https://www.cnstock.com/commonDetail/375815" target="_blank">祥鑫科技：公司分别与三度智能和武迪电子签订战略合作协议 — 上海证券报·中国证券网</a></li>
+          <li><a href="https://finance.sina.com.cn/wm/2026-10-04/doc-initzerm0253621.shtml" target="_blank">【国内动态】人形机器人上岗 广州市具身智能机器人概念验证中心助力技术产业化 — 新浪财经（2026-10-04）</a></li>
+          <li><a href="https://robot.sia.cn/cn/article/id/3994c534-7375-4045-a4a5-6b58a83fd554" target="_blank">仵沛宸、帅威、陈小平 等《抓取任务中的融差控制方法》，《机器人》2022年第5期 — 中国自动化学会《机器人》期刊</a></li>
+          <li><a href="http://www.gdasfs.gd.cn/rctd/cxcyfzr/t66785.html" target="_blank">陈小平 教授（人物简介）— 广东省科学院佛山产业技术研究院</a></li>
+          <li><a href="http://www.gdasfs.gd.cn/rctd/qnbsgg/t66806.html" target="_blank">仵沛宸（人物简介）— 广东省科学院佛山产业技术研究院</a></li>
+          <li><a href="https://data.iyiou.com/company/details/b27a1d9bc074442e640475d562fa2f32/profile" target="_blank">三度智能 企业详情（融资总金额约5000万元人民币）— 亿欧数据</a></li>
+          <li><a href="https://stcn.com/article/detail/1586556.html" target="_blank">祥鑫科技：签订《人形机器人关键零部件战略合作协议》等 — 证券时报 e 公司（2025-03）</a></li>
+          <li><a href="https://m.hexun.com/tech/2025-10-31/222084016.html" target="_blank">祥鑫科技战略投资三度智能，加速卡位人形机器人商用化赛道 — 和讯网（2025-10-31）</a></li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">本页面由具身智能Wiki项目生成 | 数据截止至2026年10月8日 | 最后更新：2026-10-08</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

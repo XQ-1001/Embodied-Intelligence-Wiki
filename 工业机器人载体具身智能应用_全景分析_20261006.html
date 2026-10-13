@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>以工业机器人为载体的具身智能应用 · 中国市场公司全景分析</title>
+<style>
+:root{--bg:#fff;--text:#202122;--link:#0645ad;--border:#a2a9b1;--infobox-bg:#f9f9f9;--heading:#000;--toc-bg:#f8f9fa;--table-stripe:#f8f9fa;--table-header:#eaecf0;--accent:#1a3a5c;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,'微软雅黑','Microsoft YaHei','Segoe UI',sans-serif;font-size:.875rem;line-height:1.65;color:var(--text);background:#f6f6f6;}
+.page-container{max-width:1200px;margin:0 auto;}
+.top-nav{background:#fff;border-bottom:1px solid #c8ccd1;padding:8px 20px;font-size:.8rem;color:#54595d;position:sticky;top:0;z-index:200;}
+.top-nav a{color:var(--link);text-decoration:none;}
+.wiki-header{background:#fff;border-bottom:1px solid #c8ccd1;padding:24px 20px 12px;}
+.wiki-header h1{font-family:Georgia,'Times New Roman',serif;font-size:1.75rem;font-weight:400;color:var(--heading);border-bottom:1px solid #a2a9b1;padding-bottom:6px;margin-bottom:6px;}
+.wiki-header .subtitle{font-size:.85rem;color:#54595d;font-style:italic;}
+.stats-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:0;background:#fff;border-bottom:1px solid #eaecf0;}
+.stat{padding:14px 18px;border-right:1px solid #eaecf0;}
+.stat:last-child{border-right:none;}
+.stat .num{font-size:1.5rem;font-weight:700;color:var(--accent);font-family:Georgia,serif;}
+.stat .lbl{font-size:.78rem;color:#54595d;margin-top:2px;}
+.wiki-layout{display:grid;grid-template-columns:230px minmax(0,1fr);background:#fff;min-height:100vh;}
+.toc-nav{padding:20px 12px 40px 16px;border-right:1px solid #eaecf0;background:var(--toc-bg);position:sticky;top:48px;height:calc(100vh - 48px);overflow-y:auto;font-size:.8rem;}
+.toc-nav .toc-title{font-weight:700;font-size:.85rem;margin-bottom:8px;color:#1a3a5c;}
+.toc-nav ul{list-style:none;}
+.toc-nav li{margin:2px 0;}
+.toc-nav a{color:var(--link);text-decoration:none;display:block;padding:1px 0;}
+.toc-nav a:hover{text-decoration:underline;}
+.toc-nav .toc-lvl2{font-weight:600;}
+.toc-nav .toc-lvl3{padding-left:14px;font-size:.78rem;}
+.wiki-article{padding:24px 32px 60px;}
+.wiki-article h2{font-family:Georgia,'Times New Roman',serif;font-size:1.35rem;font-weight:400;border-bottom:1px solid #a2a9b1;padding-bottom:5px;margin:28px 0 12px;color:var(--heading);}
+.wiki-article h3{font-size:1.08rem;margin:20px 0 8px;color:var(--accent);}
+.wiki-article h4{font-size:.95rem;margin:14px 0 6px;color:#333;}
+.wiki-article p{margin:8px 0;}
+.wiki-article ul,.wiki-article ol{margin:8px 0 8px 22px;}
+.wiki-article li{margin:3px 0;}
+a{color:var(--link);}
+sup a{font-size:.72rem;text-decoration:none;}
+.table-wrapper{overflow-x:auto;margin:12px 0;border:1px solid #eaecf0;}
+table.wikitable{border-collapse:collapse;width:100%;font-size:.78rem;}
+table.wikitable th,table.wikitable td{border:1px solid #eaecf0;padding:6px 8px;text-align:left;vertical-align:top;}
+table.wikitable th{background:var(--table-header);font-weight:700;position:sticky;top:0;}
+table.wikitable tbody tr:nth-child(even){background:var(--table-stripe);}
+table.wikitable td strong{color:#1a3a5c;}
+.article-intro{font-size:.95rem;line-height:1.7;}
+.notice{border-left:4px solid #f0ad4e;background:#fdf7ec;padding:10px 14px;margin:12px 0;font-size:.82rem;}
+.notice-red{border-left-color:#d9534f;background:#fdecea;}
+.notice-blue{border-left-color:#1a3a5c;background:#eef3f8;}
+.chart{margin:14px 0;}
+.bar-row{display:grid;grid-template-columns:130px 1fr 70px;align-items:center;gap:8px;margin:5px 0;font-size:.82rem;}
+.bar-track{background:#eef1f4;border-radius:3px;height:18px;position:relative;}
+.bar-fill{background:linear-gradient(90deg,#1a3a5c,#3f6d94);height:18px;border-radius:3px;}
+.bar-fill.alt{background:linear-gradient(90deg,#8a6d1a,#c9a227);}
+.bar-val{text-align:right;color:#333;}
+.tag{display:inline-block;font-size:.72rem;padding:1px 8px;border-radius:10px;margin:2px 3px 2px 0;border:1px solid transparent;white-space:nowrap;}
+.t-industry{background:#fde8d4;color:#a6530a;border-color:#f3c79b;}
+.t-humanoid{background:#dff3e3;color:#1f7a3a;border-color:#a9dcb8;}
+.t-logistics{background:#d9f0ef;color:#136b68;border-color:#a3d9d7;}
+.t-ai{background:#e6e0f5;color:#503a9e;border-color:#c8bce8;}
+.t-listed{background:#e8eef7;color:#1a3a5c;border-color:#b9c9de;}
+.references{font-size:.78rem;color:#333;}
+.references ol{margin-left:20px;}
+.references li{margin:4px 0;word-break:break-word;}
+.page-footer{border-top:1px solid #eaecf0;padding:14px 32px;font-size:.75rem;color:#72777d;background:#fff;}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+@media(max-width:820px){.wiki-layout{grid-template-columns:1fr;}.toc-nav{display:none;}.stats-bar{grid-template-columns:repeat(2,1fr);}.two-col{grid-template-columns:1fr;}}
+</style></head>
+<body>
+<div class="page-container">
+<div class="top-nav"><a href="index.html">具身智能Wiki</a> <span style="color:#a2a9b1">›</span> <span>专题报告 · 工业机器人载体具身智能</span></div>
+<div class="wiki-header">
+  <h1>以工业机器人为载体的具身智能应用<br><span style="font-size:1.05rem;color:#54595d;">——中国市场公司全景分析</span></h1>
+  <div class="subtitle">数据截至 2026-10-06 · 基于 IDC《中国工业具身智能机器人市场份额，2025》《技术评估，2026》及公开资料整理</div>
+</div>
+<div class="stats-bar">
+  <div class="stat"><div class="num">57.4 亿元</div><div class="lbl">2025 中国工业具身智能机器人市场（IDC）</div></div>
+  <div class="stat"><div class="num">36.2 亿元</div><div class="lbl">以工业机器人为载体的具身智能应用</div></div>
+  <div class="stat"><div class="num">21.1 亿元</div><div class="lbl">以人形机器人为载体的应用（对照）</div></div>
+  <div class="stat"><div class="num">53 家</div><div class="lbl">本报告收录的中国厂商样本</div></div>
+</div>
+<div class="wiki-layout">
+<nav class="toc-nav">
+  <div class="toc-title">目录</div>
+  <ul>
+    <li class="toc-lvl2"><a href="#summary">0 摘要与核心判断</a></li>
+    <li class="toc-lvl2"><a href="#method">1 研究方法与口径</a></li>
+    <li class="toc-lvl2"><a href="#background">2 产业背景</a></li>
+    <li class="toc-lvl2"><a href="#framework">3 生态分层框架</a></li>
+    <li class="toc-lvl2"><a href="#list">4 公司名单总表</a></li>
+    <li class="toc-lvl3"><a href="#l1">4.1 工业AI / 眼脑手组件</a></li>
+    <li class="toc-lvl3"><a href="#l2">4.2 协作机器人本体</a></li>
+    <li class="toc-lvl3"><a href="#l3">4.3 复合 / 移动操作机器人</a></li>
+    <li class="toc-lvl3"><a href="#l4">4.4 多关节工业机器人本体</a></li>
+    <li class="toc-lvl3"><a href="#l5">4.5 跨界平台 / 大厂</a></li>
+    <li class="toc-lvl2"><a href="#deep">5 分层深度分析</a></li>
+    <li class="toc-lvl2"><a href="#people">6 团队规模与人才结构</a></li>
+    <li class="toc-lvl3"><a href="#people-scale">6.1 团队规模总览</a></li>
+    <li class="toc-lvl3"><a href="#people-rd">6.2 研发强度</a></li>
+    <li class="toc-lvl3"><a href="#people-delivery">6.3 交付与销售团队</a></li>
+    <li class="toc-lvl3"><a href="#people-caveat">6.4 口径与数据提示</a></li>
+    <li class="toc-lvl2"><a href="#valuation">7 竞争格局与估值图谱</a></li>
+    <li class="toc-lvl2"><a href="#trend">8 趋势、风险与数据提示</a></li>
+    <li class="toc-lvl2"><a href="#refs">9 参考来源</a></li>
+  </ul>
+</nav>
+<main class="wiki-article">
+<h2 id="summary">0 摘要与核心判断</h2>
+<p class="article-intro">2026 年 WAIC 上「物理 AI（Physical AI）」成为产业焦点，而工业是物理世界中数据密集、任务复杂且商业价值明确的领域，正在成为物理 AI 率先落地的场景。IDC 数据显示，<strong>2025 年中国工业具身智能机器人市场规模约为 57.4 亿元</strong>，其中<strong>以工业机器人为载体的具身智能应用市场规模约为 36.2 亿元</strong>，占据当前市场的主体地位；以人形机器人为载体的应用约为 21.1 亿元，仍处于示范产线部署、场景验证及 POC 测试阶段。<sup><a href="#ref1">[1]</a></sup></p>
+<p>本报告以 IDC 口径为基准，把「以工业机器人为载体的具身智能应用」拆解为五层生态——工业 AI「眼-脑-手」组件商、协作机器人本体、复合/移动操作机器人、多关节工业机器人本体、跨界平台——并以 53 家中国厂商为样本，梳理其发展背景、技术强项、商业模式、<strong>团队规模（研发/销售/交付）</strong>与估值/市值。</p>
+<p>核心判断如下：</p>
+<ul>
+  <li><strong>竞争焦点已从「单点 AI 能力」转向「软硬协同 + 行业 Know-how + 数据闭环」的综合能力。</strong> IDC 构建了覆盖工业智能决策、多模态感知、自主操作、复杂场景适配、工程化、系统融合、规模化落地、ROI 验证 8 个维度的技术评估框架。<sup><a href="#ref1">[1]</a></sup></li>
+  <li><strong>份额头部是「组件供应商」而非「本体厂商」。</strong> 按 2025 年收入计，以工业机器人为载体的具身智能应用市场中，<strong>微亿智造（11.8%）居首、梅卡曼德（11.3%）第二、优艾智合（8.8%）第三</strong>，前四名合计约占 38.8%。<sup><a href="#ref1">[1]</a></sup></li>
+  <li><strong>资本市场已给出「分层定价」。</strong> 头部组件商梅卡曼德登陆港交所（09615.HK），协作机器人/力控厂商多为独角兽级（非夕、思灵、法奥），传统本体厂商则分化——工控与机器人龙头（汇川、埃斯顿）维持数百亿至千亿元市值，纯本体二线厂商仍在亏损与估值回调中。</li>
+  <li><strong>ROI 是商业落地的核心指标。</strong> IDC 用户调研显示，超过 80% 的制造企业希望项目能在两年内实现投资回收；能否快速部署、稳定运行并产生明确经济价值，决定订单走向。<sup><a href="#ref1">[1]</a></sup></li>
+</ul>
+
+<h2 id="method">1 研究方法与口径</h2>
+<p><strong>数据来源。</strong> 本报告的事实信息来自三类来源：其一，IDC 公开发布的两份研究报告核心观点（《中国工业具身智能机器人市场份额，2025》与《中国工业具身智能机器人技术评估，2026》）；其二，本知识库（具身智能 Wiki）中已建档并逐条标注来源的公司页面；其三，对知识库未收录公司的公开资料（公司公告、招股书、交易所披露、权威媒体报道）补充调研。每一条关键数据后均以角标标注来源编号。<sup><a href="#ref1">[1]</a></sup></p>
+<p><strong>「以工业机器人为载体」的定义。</strong> 依据 IDC，该类机器人依托成熟工业基础，通过融合视觉感知、力控技术、环境理解以及具身智能模型能力，实现「机器人硬件 + 智能软件 + 行业服务」的一体化交付，主要形态包括<strong>协作机器人、复合（移动操作）机器人、多关节机器人</strong>，已应用于上下料、质量检测、打磨修复、柔性装配、物料搬运等工业场景。<sup><a href="#ref1">[1]</a></sup> 本报告的收录范围据此扩展到一切「以工业机器人本体为执行载体、叠加具身智能能力」的中国厂商，包括不造本体但提供「眼-脑-手」组件的工业 AI 公司。</p>
+<div class="notice notice-blue"><strong>口径提示（重要）：</strong> IDC 的 11.8% / 11.3% 份额口径是「<em>以工业机器人为载体的具身智能应用市场</em>」（2025 年）。该口径与「工业具身智能机器人整体市场」、以及部分公司自述的细分赛道（如梅卡曼德招股书引用的灼识咨询「全球 AI+3D 视觉引导通用智能机器人组件」口径，其份额为 22.1%）<em>不可直接比较</em>。本报告在引用时均标明口径与年份，请勿跨口径混用。<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref3">[3]</a></sup></div>
+
+<h2 id="background">2 产业背景：物理 AI 的工业落地窗口</h2>
+<h3>2.1 市场已进入规模化导入阶段</h3>
+<p>IDC 数据显示，2025 年中国工业具身智能机器人市场进入商业化加速阶段，整体规模约 57.4 亿元，主要以多形态机器人为载体，通过对工业生产线和制造工位进行智能化升级，实现感知、学习、决策和执行能力的融合，推动制造场景向柔性化、自主化方向发展。<sup><a href="#ref1">[1]</a></sup></p>
+<div class="two-col">
+  <div>
+    <h4>以工业机器人为载体（36.2 亿元，主体）</h4>
+    <p>包括协作机器人、复合（移动操作）机器人、多关节机器人。依托成熟工业基础，以「硬件 + 软件 + 服务」整包模式快速渗透进各类制造工位，商业化主力地位清晰。<sup><a href="#ref1">[1]</a></sup></p>
+  </div>
+  <div>
+    <h4>以人形机器人为载体（21.1 亿元，探索期）</h4>
+    <p>2025 年主要集中于示范产线部署、场景验证及 POC 测试；产品成本、可靠性、工程化成熟度与实际生产效率仍在验证中，IDC 建议参考其《Worldwide Annual Humanoid Robotics Tracker》。<sup><a href="#ref1">[1]</a></sup></p>
+  </div>
+</div>
+<h3>2.2 三类玩家从各自优势切入</h3>
+<p><strong>工业 AI 厂商率先建立竞争优势。</strong> 当前竞争主要来自工业视觉、感知决策与场景数据积累。以微亿智造、梅卡曼德为代表的企业，依托工业 AI 技术和数据闭环能力，将具身智能应用于质检、打磨、修复、上下料等标准化工业场景，并推动跨行业复制。<sup><a href="#ref1">[1]</a></sup></p>
+<p><strong>本体、自动化及 AI 厂商加速布局。</strong> 大量机器人本体、工业自动化及 AI 厂商依托硬件、算法、软件平台与行业资源探索差异化定位，市场竞争持续加剧。<sup><a href="#ref1">[1]</a></sup></p>
+<p><strong>出海由单机走向软硬一体。</strong> 2025 年，中国厂商出海模式由单机产品输出逐步转向软硬一体化解决方案输出，产品进入欧洲汽车、东南亚电子、北美制造等海外市场；本地化部署、模型优化与运维服务成为拓展海外的关键支撑。<sup><a href="#ref1">[1]</a></sup></p>
+<h3>2.3 用户评价标准正在变化</h3>
+<p>随着行业从技术验证走向商业化应用，制造企业用户关注厂商的「技术能力 + 工程化能力 + 商业价值」综合表现。IDC 据此构建了 8 个维度的技术评估框架，对已在汽车制造、新能源、半导体、3C 电子等场景开展商业化探索的中国典型供应商进行综合评估。<sup><a href="#ref1">[1]</a></sup></p>
+
+<h2 id="framework">3 生态分层框架</h2>
+<p>综合 IDC 口径与产业实际，本报告将「以工业机器人为载体的具身智能应用」生态划分为五层。分层的依据是<strong>厂商在价值链中的角色</strong>——从提供「眼-脑-手」智能组件，到提供不同物理形态的机器人本体，再到跨界平台。</p>
+<div class="table-wrapper"><table class="wikitable"><thead><tr><th>层级</th><th>角色</th><th>与 IDC 载体的对应</th><th>代表企业</th><th>样本数</th></tr></thead><tbody>
+<tr><td><strong>L1</strong></td><td>工业 AI / 「眼-脑-手」软硬组件供应商</td><td>跨载体的智能组件（份额主要来源）</td><td>微亿智造、梅卡曼德、阿丘科技、视比特、星猿哲</td><td>16</td></tr>
+<tr><td><strong>L2</strong></td><td>协作机器人本体厂商</td><td>协作机器人</td><td>越疆、节卡、遨博、法奥、艾利特、非夕、珞石、思灵、睿尔曼、华沿</td><td>12</td></tr>
+<tr><td><strong>L3</strong></td><td>复合 / 移动操作机器人厂商</td><td>复合（移动操作）机器人</td><td>优艾智合、仙工智能、斯坦德、海康机器人、迦智、国自、墨影、快仓</td><td>11</td></tr>
+<tr><td><strong>L4</strong></td><td>多关节工业机器人本体厂商</td><td>多关节机器人</td><td>埃斯顿、汇川、埃夫特、新松、拓斯达、卡诺普、配天、图灵</td><td>11</td></tr>
+<tr><td><strong>L5</strong></td><td>跨界平台 / 大厂</td><td>平台、生态与整机供给</td><td>华为（极目机器）、美的/库卡、海康威视</td><td>3</td></tr>
+</tbody></table></div>
+<div class="chart">
+  <p style="font-size:.8rem;color:#54595d;">IDC 2025「以工业机器人为载体的具身智能应用」市场份额（前四名合计约 38.8%）<sup><a href="#ref1">[1]</a></sup></p>
+  <div class="chart"><div class="bar-row"><span>微亿智造</span><span class="bar-track"><span class="bar-fill " style="width:11.8%"></span></span><span class="bar-val">11.8%</span></div><div class="bar-row"><span>梅卡曼德</span><span class="bar-track"><span class="bar-fill " style="width:11.3%"></span></span><span class="bar-val">11.3%</span></div><div class="bar-row"><span>优艾智合</span><span class="bar-track"><span class="bar-fill " style="width:8.8%"></span></span><span class="bar-val">8.8%</span></div><div class="bar-row"><span>其他/前四之外</span><span class="bar-track"><span class="bar-fill alt" style="width:68.1%"></span></span><span class="bar-val">68.1%</span></div></div>
+</div>
+
+<h2 id="list">4 公司名单总表</h2>
+<div class="notice">下表为本报告收录的 53 家中国厂商样本，聚焦工业机器人载体与具身智能结合、且已披露融资或经营数据者。估值/市值为公开披露口径，均标注时点；「—」表示未披露。全样本的团队规模、研发强度与交付/销售团队对比见第 6 节。</div>
+<h3 id="l1">1. 工业AI / “眼-脑-手”软硬组件供应商</h3><p>不自行制造机器人本体，将具身智能的视觉、大模型与操作能力做成标准组件，赋能协作/复合/多关节机器人。是 IDC 口径下“以工业机器人载体的具身智能应用”最核心的份额来源（微亿智造、梅卡曼德分列前二）。</p><p style="font-size:.78rem;color:#54595d;">本层收录 16 家（抽样，聚焦已披露融资/经营数据者）</p><div class="table-wrapper"><table class="wikitable"><thead><tr><th>公司</th><th>英文/简称</th><th>载体角色</th><th>成立</th><th>总部</th><th>技术强项</th><th>商业模式</th><th>人员规模</th><th>估值 / 市值</th><th>上市/备注</th></tr></thead><tbody><tr><td><strong>微亿智造</strong><sup><a href="#ref1">[1]</a></sup><sup><a href="#ref2">[2]</a></sup><sup><a href="#ref14">[14]</a></sup></td><td>Micro-E / WeiYi</td><td>工业AI“眼脑手”全栈组件</td><td>2018.08</td><td>江苏常州</td><td>工业质检/打磨/分拣/上下料标准工作站；收购智云天工(算法)+捷勃特(本体/驱控)形成软硬全栈</td><td>“硬件+软件+行业服务”整包交付，标准化工作站跨行业复制；客户含25+世界500强</td><td>约490人（2025末，招股书）｜研发272（56%）｜销售与营销76（16%）｜工程与交付75（15%）</td><td>未披露（2026.09.20 获境外上市备案）</td><td>港交所递表 2026.03；东方证券国际保荐</td></tr><tr><td><strong>梅卡曼德</strong><sup><a href="#ref3">[3]</a></sup><sup><a href="#ref15">[15]</a></sup></td><td>Mech-Mind</td><td>3D视觉+具身大模型“眼脑手”组件</td><td>2016.09</td><td>雄安/北京(德国慕尼黑研发)</td><td>Mech-Eye 3D相机、Mech-GPT 多模态具身大模型、Mech-DLK 深度学习平台、Mech-Hand 灵巧手；不造本体</td><td>向系统集成商销售标准化智能组件；截至2026.03合作集成商1369家，累计部署超2.9万台，销往近50国</td><td>635人（2026.03，招股章程）｜研发229（36.1%）｜销售及营销184（29.0%）｜无独立生产/交付口径</td><td>上市市值约100–127亿港元（2026.09 首日127亿港元，后回落至约90–100亿区间）；Pre-IPO投后63.67亿元</td><td>港交所主板 09615.HK（2026.09.01 上市）</td></tr><tr><td><strong>阿丘科技</strong><sup><a href="#ref4">[4]</a></sup><sup><a href="#ref19">[19]</a></sup></td><td>AInnovation? / Aqui</td><td>工业AI视觉质检软件</td><td>2016</td><td>北京</td><td>源于清华计算机系AI实验室；工业缺陷检测算法平台，深度学习视觉</td><td>工业视觉AI软件+方案；3C/半导体/新能源制造缺陷检测</td><td>约500人（2026口径）｜硕博占比&gt;70%｜分职能未披露</td><td>最新估值未披露（最近一轮为2021年B+轮；B轮2000万美元）</td><td>非上市；累计融资约数亿元人民币</td></tr><tr><td><strong>视比特机器人</strong><sup><a href="#ref5">[5]</a></sup><sup><a href="#ref20">[20]</a></sup></td><td>SpeedBot Robotics</td><td>3D视觉+工业智能产线</td><td>2018.08</td><td>湖南长沙</td><td>大尺寸3D测量 MVM、智能分拣、PaintPro喷涂、SpeedWeld焊接；重工/船舶/钢构场景</td><td>智能工作站+产线交付；全球300+行业龙头客户，重工钢板分拣细分市占超50%</td><td>近450人（2026）｜研发占比约60%｜分职能未披露（2025初口径340余人）</td><td>未披露（2022年公司自述约“二三十亿”）；累计融资超6亿元（截至2026.07）</td><td>2026.06 完成B++轮（亿元级，达晨财智等）</td></tr><tr><td><strong>星猿哲</strong><sup><a href="#ref6">[6]</a></sup></td><td>XYZ Robotics</td><td>3D视觉引导抓取/拆码垛</td><td>2018</td><td>上海</td><td>CMU/MIT/北大团队；工业3D视觉+抓取算法，物流分拣与上下料</td><td>视觉引导机器人系统集成；物流、制造产线</td><td>100–499人（区间口径）｜分职能未披露</td><td>约7亿美元（2023.11《解放日报》口径）；累计融资约1亿美元</td><td>自2022.06 B+轮后暂无新一轮披露</td></tr><tr><td><strong>库柏特</strong><sup><a href="#ref7">[7]</a></sup></td><td>COBOT</td><td>机器人操作系统+行业方案</td><td>2016.05</td><td>湖北武汉</td><td>自研 CobotSys 机器人操作系统(3D视觉+力控+抓取规划)；医疗、食品、物流方案</td><td>操作系统+行业解决方案；智慧药房/静配中心/远程超声</td><td>100余人｜博士12人、硕士以上&gt;75%｜分职能未披露</td><td>未披露（累计融资约3.47亿元）</td><td>C+轮 2025.02（武汉高科）</td></tr><tr><td><strong>中科慧远</strong><sup><a href="#ref7">[7]</a></sup></td><td>CASI Vision</td><td>工业外观智能检测(AOI)</td><td>2016.11</td><td>河南洛阳</td><td>中科院自动化所孵化；“慧视+慧脑+慧灵”手眼脑协同；2025发布仿人双臂质检机器人 CASIVIBOT</td><td>AOI检测装备+品质数字化；3C/半导体/新能源</td><td>近500人（2024媒体口径）｜研发占比&gt;50%｜分职能未披露（2024参保约248人）</td><td>未披露（C/C+轮各数亿元）</td><td>非上市；2026.06 CASIVIBOT 量产</td></tr><tr><td><strong>知象光电</strong><sup><a href="#ref7">[7]</a></sup></td><td>Chishine3D / Revopoint</td><td>3D成像与扫描</td><td>2014.07</td><td>陕西西安</td><td>自研微结构光芯片+3D成像算法；消费级/工业级3D扫描仪、机器人三维扫描系统</td><td>3D扫描硬件+软件，海外电商为主，出口150多国，累计销量超20万台</td><td>300余人（2023年报导）｜研发约150（&gt;50%）｜分职能未披露</td><td>未披露（C轮过亿元，2022）</td><td>国家级专精特新重点“小巨人”</td></tr><tr><td><strong>大界机器人</strong><sup><a href="#ref8">[8]</a></sup></td><td>RoboticPlus.AI</td><td>工业软件+智能建造/焊接机器人</td><td>2017</td><td>上海</td><td>机器人控制+几何算法+视觉+AI；金属加工、建筑钢构、船舶焊接柔性产线</td><td>机器人软件平台+产线交付；2025营收近2亿元，金属行业市占第一，复购率近50%</td><td>约150人｜研发占比&gt;1/3｜分职能未披露</td><td>未披露（2026.03 完成D轮数亿元，博华资本/中金资本联合领投）</td><td>2025年基本实现盈亏平衡</td></tr><tr><td><strong>中科第五纪</strong><sup><a href="#ref9">[9]</a></sup></td><td></td><td>超少样本具身操作大模型</td><td>2024</td><td>北京</td><td>中科院自动化所+清华团队；FAM超少样本具身操作大模型，“大脑+本体”软硬一体</td><td>具身大脑授权+工作站；工业/服务场景</td><td>未披露（早期初创，仅列核心团队）</td><td>未披露（成立一年余完成六轮，估值涨约20倍；Pre-A 数亿元）</td><td>2026.02 红杉中国领投 Pre-A</td></tr><tr><td><strong>仝人智能</strong><sup><a href="#ref10">[10]</a></sup></td><td></td><td>智能焊接/测量机器人(类脑芯片)</td><td>2016</td><td>陕西西安</td><td>中科院西安光机所孵化；基于微分几何/拓扑的具身智能理论；智能板卡+类脑芯片</td><td>智能焊接机器人、智能测量机器人已批产交付</td><td>约145人｜研发占比67%</td><td>未披露（2026.03 A轮近4亿元）</td><td>非上市</td></tr><tr><td><strong>知有无界</strong><sup><a href="#ref11">[11]</a></sup></td><td></td><td>船舶具身大模型+机器人</td><td>2025</td><td>江苏苏州(相城)</td><td>船舶具身大模型、MOE多专家、模型定义硬件；愚公1号、马良X1</td><td>船舶/重工场景机器人；2025营收约4000万元，2026预计约8000万元</td><td>全职70–79人＋在读硕博30–40人（招聘口径）</td><td>未披露（累计融资近5000万元）</td><td>天使轮 2026.01–02</td></tr><tr><td><strong>天元兴</strong><sup><a href="#ref12">[12]</a></sup></td><td></td><td>工业具身智能机器人</td><td>2025</td><td>北京</td><td>端到端闭环控制；TX01 轮式双臂工业机器人</td><td>工业场景具身智能工作站</td><td>未披露（早期初创，融资用途含研发团队扩张）</td><td>未披露（天使轮数千万元，2026.02）</td><td>非上市</td></tr><tr><td><strong>佳安智能</strong><sup><a href="#ref13">[13]</a></sup></td><td></td><td>智能磨抛+复合机器人</td><td>2018</td><td>广东</td><td>力控磨抛工艺；单台工作站售价约30万元</td><td>磨抛工作站+复合机器人；2025H1 订单量四五千万元</td><td>约25–29人（Pre-A至2024）｜研发占比约80%</td><td>未披露（累计融资近2亿元）</td><td>B轮 2026.02</td></tr><tr><td><strong>蓝芯科技</strong><sup><a href="#ref14">[14]</a></sup></td><td>Lanxin</td><td>3D视觉+移动机器人</td><td>2016</td><td>浙江杭州</td><td>自研3D视觉传感器+移动机器人(AMR)；视觉感知导航</td><td>移动机器人本体+视觉传感器；2019-2024营收CAGR 80%+</td><td>300余人｜研发占比45%</td><td>未披露（累计融资超2.15亿元）</td><td>C+轮数亿元 2025.04</td></tr><tr><td><strong>熵智科技</strong><sup><a href="#ref7">[7]</a></sup></td><td>Seizet</td><td>3D视觉无序分拣</td><td>2018.03</td><td>广东深圳</td><td>3D视觉+自主路径规划；3D Picking 分拣软件</td><td>无序分拣系统；物流/棒料分拣</td><td>—（经营已终止）</td><td>—</td><td>⚠️ 2024.10 深圳中院裁定破产清算（经营已终止）</td></tr></tbody></table></div><h3 id="l2">2. 协作机器人本体厂商</h3><p>以协作机器人（cobot）为载体，通过力控、视觉与具身智能模型升级为“可变任务”的柔性执行单元，是 IDC 明确的三大载体之一。</p><p style="font-size:.78rem;color:#54595d;">本层收录 12 家（抽样，聚焦已披露融资/经营数据者）</p><div class="table-wrapper"><table class="wikitable"><thead><tr><th>公司</th><th>英文/简称</th><th>载体角色</th><th>成立</th><th>总部</th><th>技术强项</th><th>商业模式</th><th>人员规模</th><th>估值 / 市值</th><th>上市/备注</th></tr></thead><tbody><tr><td><strong>越疆机器人</strong><sup><a href="#ref16">[16]</a></sup></td><td>Dobot</td><td>协作机器人本体</td><td>2015</td><td>广东深圳</td><td>全栈自研协作机器人(四/六轴)+具身智能；2025营收4.93亿元</td><td>协作机器人本体全球销售；教育/工业/商业</td><td>约768人（2025）</td><td>港股上市（02432.HK）；2025营收4.93亿元、净亏0.84亿元</td><td>港交所 2024.12 上市；拟A股创业板IPO</td></tr><tr><td><strong>节卡机器人</strong><sup><a href="#ref17">[17]</a></sup><sup><a href="#ref23">[23]</a></sup></td><td>JAKA</td><td>协作机器人本体</td><td>2014</td><td>上海</td><td>协作机器人(6轴)+力控；2024营收约4.00亿元</td><td>协作机器人本体；汽车/3C/新能源</td><td>492人（2024末，招股书）｜研发及技术157（31.9%）｜销售144（29.3%）｜生产114（23.2%）</td><td>累计融资超14亿元；D轮投前35亿元；IPO终止后估值约28亿元(倒挂约20%)</td><td>科创板IPO已终止；2026.03 新一轮(临港数科基金领投)</td></tr><tr><td><strong>遨博智能</strong><sup><a href="#ref18">[18]</a></sup><sup><a href="#ref25">[25]</a></sup></td><td>AUBO</td><td>协作机器人本体</td><td>2015.01</td><td>北京</td><td>伺服/减速器/驱控/机器人OS全栈自研；AUBO-i系列；力控；2025供天工Ultra双臂</td><td>本体+工业方案；电子/金属加工/新能源/新零售，销往60余国，工业应用约70%</td><td>500余人（招聘口径）｜研发约160（~32%）｜工商参保口径北京主体98人</td><td>评估值约23.32亿元（2026.05基准，东杰智能公告）；媒体另有C轮73.5亿元口径，差异大</td><td>2025营收3.42亿元、净亏1.63亿元（审计口径）</td></tr><tr><td><strong>法奥机器人</strong><sup><a href="#ref14">[14]</a></sup><sup><a href="#ref19">[19]</a></sup><sup><a href="#ref25">[25]</a></sup></td><td>FAIR Innovation</td><td>协作机器人本体+关节模组</td><td>2018</td><td>江苏苏州</td><td>哈工大+ABB背景；协作机器人本体+关节模组(累计超30万套)</td><td>本体+模组外销；年产销破万台</td><td>未披露确切值（招聘区间500–1000）｜工商参保口径约197人｜设苏州/威海/淄博3大研发中心</td><td>未披露（C轮近1亿美元，累计超2亿美元，独角兽级别）</td><td>2026.03 国寿双碳基金领投 C轮</td></tr><tr><td><strong>艾利特机器人</strong><sup><a href="#ref14">[14]</a></sup><sup><a href="#ref19">[19]</a></sup><sup><a href="#ref25">[25]</a></sup></td><td>Elite Robots</td><td>协作机器人本体</td><td>2016</td><td>江苏苏州</td><td>北航+清华团队；协作/复合机器人+具身智能平台；2025前9月营收2.39亿元</td><td>协作机器人本体；工业/医疗/新零售</td><td>未披露确切值（招聘区间100–500）｜研发约40–60人｜工商参保口径约130–141人</td><td>约80亿元（2026.03 D+轮6亿元口径）</td><td>2025前9月营收2.39亿元、净亏1801万元(大幅收窄)</td></tr><tr><td><strong>Flexiv非夕</strong><sup><a href="#ref14">[14]</a></sup><sup><a href="#ref19">[19]</a></sup><sup><a href="#ref25">[25]</a></sup></td><td>Flexiv</td><td>自适应力控协作机器人</td><td>2016</td><td>上海</td><td>斯坦福4博士创立；自适应/力控机械臂，具身智能；研发占比超60%</td><td>力控机器人本体+方案；复购率超60%</td><td>全球400+人（2024媒体）｜研发占比&gt;60%｜分职能未披露（上海主体参保约227人）</td><td>独角兽级别（超10亿美元）；累计融资超3.2亿美元</td><td>2026.03 C+轮(Invus领投)</td></tr><tr><td><strong>珞石机器人</strong><sup><a href="#ref14">[14]</a></sup><sup><a href="#ref19">[19]</a></sup><sup><a href="#ref25">[25]</a></sup></td><td>Rokae</td><td>协作机器人+工业机器人本体</td><td>2015</td><td>北京</td><td>全栈自研控制/伺服；工业+协作机器人(3–35kg)；具身智能布局</td><td>本体+方案；2025营收5.22亿元(+60.4%)</td><td>约800人（百科口径）｜研发团队中硕博占比&gt;80%｜研发人数/占比未单独披露</td><td>港股递表（拟上市）；累计融资超14亿元</td><td>2025净亏1.79亿元</td></tr><tr><td><strong>思灵机器人</strong><sup><a href="#ref14">[14]</a></sup><sup><a href="#ref19">[19]</a></sup></td><td>Agile Robots</td><td>力控机器人+灵巧手</td><td>2018</td><td>北京(德国慕尼黑)</td><td>德国DLR团队；力控机器人、物理AI、灵巧手；2024营收约2亿欧元</td><td>力控机器人+工业方案+医疗；全球员工约3200人</td><td>约3,200人（2026，全球）</td><td>独角兽级别（超10亿美元）；累计融资超3.5亿美元</td><td>2021 C轮2.2亿美元(软银愿景领投)；收购Franka</td></tr><tr><td><strong>睿尔曼智能</strong><sup><a href="#ref14">[14]</a></sup><sup><a href="#ref19">[19]</a></sup><sup><a href="#ref25">[25]</a></sup></td><td>RealMan</td><td>超轻量机械臂+具身智能基础设施</td><td>2017</td><td>北京</td><td>机械臂底层全栈(电机/减速器/驱动器/控制器)；关节模组年产能10万台</td><td>超轻量机械臂+关节模组；2025净利润数千万元，连续三年三倍增长</td><td>100–499人（招聘口径）｜研发占比&gt;50%｜工商参保口径北京主体97人</td><td>约32亿元（2026.03 C轮近5亿元投后）</td><td>7轮累计融资约5亿元</td></tr><tr><td><strong>华沿机器人</strong><sup><a href="#ref18">[18]</a></sup><sup><a href="#ref23">[23]</a></sup></td><td>Han&#x27;s Robot / Huayan</td><td>协作机器人本体+人形关节模组</td><td>2017.09</td><td>广东深圳</td><td>协作机器人3–35kg；无框力矩电机、轴向磁通电机、9种人形关节模组(力控≤0.02N·m)</td><td>本体(海外收入占比约50%)+核心运动部件外销(2026H1占比23.1%)</td><td>548人（2025末）→658人（2026.06）｜研发人数/占比未披露</td><td>港股上市，市值约百亿港元；2025营收3.87亿元</td><td>港交所 1021.HK（2026.03.30 上市，原大族机器人）</td></tr><tr><td><strong>中科新松(多可)</strong><sup><a href="#ref18">[18]</a></sup><sup><a href="#ref25">[25]</a></sup></td><td>DUCO</td><td>协作机器人本体</td><td>2014.05</td><td>上海</td><td>2015推出国内首台七轴协作机器人；GCR系列(3–30kg)、移动协作机器人；核心部件自研</td><td>本体+移动协作方案；累计服务客户1500余家；2024营收约2亿元</td><td>182人（2024，参保口径）｜研发人数/占比未单列</td><td>未披露（2023增资扩股引入战投）</td><td>新松机器人(300024)参股子公司</td></tr><tr><td><strong>长广溪智造</strong><sup><a href="#ref18">[18]</a></sup><sup><a href="#ref25">[25]</a></sup></td><td>CGX Robotics</td><td>车规级协作机器人</td><td>2018.11</td><td>江苏无锡</td><td>全球唯一按IATF 16949车规标准生产协作机器人；自研VLA多模态大模型(双臂)</td><td>协作机器人+汽车智能部件；全球首家车载机器人供应商</td><td>200余人（2025参保口径约269人）｜研发“超150人”（百科口径，待核）</td><td>未披露（2023.09 A轮近亿元）</td><td>2024协作机器人产能4000套</td></tr></tbody></table></div><h3 id="l3">3. 复合 / 移动操作机器人厂商</h3><p>AMR（移动机器人）叠加机械臂，实现跨工位、跨空间的移动操作，是 IDC 三大载体中“复合（移动操作）机器人”的对应群体。</p><p style="font-size:.78rem;color:#54595d;">本层收录 11 家（抽样，聚焦已披露融资/经营数据者）</p><div class="table-wrapper"><table class="wikitable"><thead><tr><th>公司</th><th>英文/简称</th><th>载体角色</th><th>成立</th><th>总部</th><th>技术强项</th><th>商业模式</th><th>人员规模</th><th>估值 / 市值</th><th>上市/备注</th></tr></thead><tbody><tr><td><strong>优艾智合</strong><sup><a href="#ref14">[14]</a></sup><sup><a href="#ref19">[19]</a></sup><sup><a href="#ref23">[23]</a></sup></td><td>YOUIBOT</td><td>移动操作机器人(AMR+机械臂)</td><td>2017</td><td>广东深圳</td><td>西交大团队；移动操作机器人(复合)+智能巡检；工业物流</td><td>移动操作机器人+方案；半导体/能源/电子；2024营收2.55亿元</td><td>约416人｜研发144（34.6%）</td><td>上市前投后超20亿元；累计融资约6.58亿元</td><td>港交所递表；IDC 2025 工业机器人载体份额 8.8%（第三）</td></tr><tr><td><strong>仙工智能</strong><sup><a href="#ref14">[14]</a></sup><sup><a href="#ref19">[19]</a></sup><sup><a href="#ref23">[23]</a></sup></td><td>SEER</td><td>移动机器人控制器+本体</td><td>2015</td><td>上海</td><td>浙大团队；通用移动机器人控制器+AMR；2024营收3.39亿元</td><td>控制器(平台化)+本体；累计出货大；三年CAGR 35.7%</td><td>527人（2025末，招股章程）｜研发193（36.6%）｜销售及营销246（46.7%）</td><td>约32.7亿元（2025.04 C轮投后）</td><td>港股18C递表</td></tr><tr><td><strong>斯坦德机器人</strong><sup><a href="#ref14">[14]</a></sup><sup><a href="#ref19">[19]</a></sup><sup><a href="#ref23">[23]</a></sup></td><td>Standard Robots</td><td>工业AMR+具身智能</td><td>2016</td><td>广东深圳</td><td>哈工大团队；工业AMR+调度；2022-2024营收CAGR 61.3%</td><td>AMR本体+方案；3C/半导体/汽配；2024营收2.51亿元</td><td>453人（2026.04，招股书）｜研发141（31.1%）｜销售及营销70（15.5%）｜交付及服务109（24.1%）</td><td>Pre-C后达21亿元，后回调，C+D轮后回升（未披露最新）</td><td>港交所递表；小米智造持股8.40%</td></tr><tr><td><strong>海康机器人</strong><sup><a href="#ref14">[14]</a></sup><sup><a href="#ref24">[24]</a></sup></td><td>Hikrobot</td><td>机器视觉+移动机器人</td><td>2016</td><td>浙江杭州</td><td>海康威视旗下；机器视觉+移动机器人(AMR)+具身智造</td><td>视觉+AMR+机器人；2025营收64.52亿元</td><td>3,400+人（2022招股口径）｜研发2,000+（官网称研发及技术服务人员占比约60%）</td><td>拟分拆上市（海康威视 002415.SZ 子公司）</td><td>2025营收64.52亿元</td></tr><tr><td><strong>迦智科技</strong><sup><a href="#ref14">[14]</a></sup><sup><a href="#ref19">[19]</a></sup><sup><a href="#ref23">[23]</a></sup></td><td></td><td>通用智能移动机器人(AMR)</td><td>2017</td><td>浙江杭州</td><td>浙大熊蓉教授团队；AMR(全球前5/中国前3)；2025前9月营收2.01亿元(+约294%)</td><td>AMR本体+方案；半导体/3C/锂电</td><td>410人（2026.06，招股书）｜研发133（32.4%）｜销售及营销83（20.2%）｜部署服务99（24.1%）</td><td>约21.3亿元（2026.01 C++轮投后）</td><td>拟IPO；字节/联想创投/深创投参股</td></tr><tr><td><strong>国自机器人</strong><sup><a href="#ref14">[14]</a></sup><sup><a href="#ref25">[25]</a></sup></td><td></td><td>智能巡检+AGV/AMR</td><td>2011</td><td>浙江杭州</td><td>浙大系；智能巡检机器人+移动机器人；工业场景</td><td>巡检+物流机器人；2024营收3.34亿元</td><td>口径不一（100–499 / 500–1000 / 约109）｜研发人数未披露</td><td>被杭叉集团旗下杭叉智能以约3.98亿元收购99.23%股权（2025.07），100%评估值4.01亿元</td><td>杭叉集团(603298.SH)收购</td></tr><tr><td><strong>木蚁机器人</strong><sup><a href="#ref14">[14]</a></sup><sup><a href="#ref25">[25]</a></sup></td><td>Mooe Robot</td><td>无人叉车/物流自动化</td><td>2016</td><td>上海</td><td>无人叉车+群体调度；2024营收同比增长约300%</td><td>无人叉车本体+方案；海外收入数千万</td><td>研发占比约50%｜员工总数未披露</td><td>约10亿元</td><td>累计融资超3亿元</td></tr><tr><td><strong>飒智智能</strong><sup><a href="#ref14">[14]</a></sup><sup><a href="#ref25">[25]</a></sup></td><td>SAIZHI</td><td>移动复合机器人</td><td>2017</td><td>上海</td><td>SAGE-OS+SAGE-Brain+VLAS；移动复合机器人</td><td>移动复合机器人+方案；2025.12 A++/A+++两轮合计数亿元</td><td>近300人｜硕博占比60%</td><td>未披露</td><td>海通开元/国元股权联合投资</td></tr><tr><td><strong>赛那德</strong><sup><a href="#ref14">[14]</a></sup><sup><a href="#ref25">[25]</a></sup></td><td></td><td>装卸货具身机器人</td><td>2019</td><td>山东</td><td>iLoabot 系列装卸货机器人；具身智能物流自动化</td><td>装卸货机器人；港口/工厂物流</td><td>100+人</td><td>未披露（累计融资约4亿元）</td><td>2026.03 战略轮超2亿元(中国外运/阿里/达晨)</td></tr><tr><td><strong>墨影科技</strong><sup><a href="#ref21">[21]</a></sup><sup><a href="#ref25">[25]</a></sup></td><td>MOYING</td><td>一体化移动协作机器人(MCR)</td><td>2019.04</td><td>广东深圳</td><td>爱丁堡AI博士团队；一体化“单脑”MCR、百川控制器、天工调度系统；2026中部出货近1000套</td><td>MCR本体+产线方案(CNC上下料)；3C/汽车电子/半导体</td><td>约50–150人（招聘口径）｜研发占比&gt;60%</td><td>未披露（8轮融资；2026.05 B轮超亿元）</td><td>另有约6亿元新一轮在募</td></tr><tr><td><strong>快仓智能</strong><sup><a href="#ref21">[21]</a></sup><sup><a href="#ref25">[25]</a></sup></td><td>Quicktron</td><td>仓储移动机器人(AMR)</td><td>2014.03</td><td>上海</td><td>潜伏/料箱/叉车/行业专机四大系列AMR+RCS/WCS；累计出货约2.5万台</td><td>AMR本体+系统方案；菜鸟/丰田/宝洁/马士基；2023营收近4亿元</td><td>口径不一（中文官网500+ / 全球官网1,000+ / 总部300余）｜研发占比约60%</td><td>约10亿美元（2024.09 D轮逾1亿美元口径）</td><td>2025年被报秘密申请港股IPO</td></tr></tbody></table></div><h3 id="l4">4. 多关节工业机器人本体厂商（传统+转型）</h3><p>以多关节工业机器人为载体，通过控制器、力控与具身智能能力升级；含传统工业机器人龙头与向具身智能延伸的上市公司。</p><p style="font-size:.78rem;color:#54595d;">本层收录 11 家（抽样，聚焦已披露融资/经营数据者）</p><div class="table-wrapper"><table class="wikitable"><thead><tr><th>公司</th><th>英文/简称</th><th>载体角色</th><th>成立</th><th>总部</th><th>技术强项</th><th>商业模式</th><th>人员规模</th><th>估值 / 市值</th><th>上市/备注</th></tr></thead><tbody><tr><td><strong>埃斯顿</strong><sup><a href="#ref14">[14]</a></sup><sup><a href="#ref19">[19]</a></sup><sup><a href="#ref24">[24]</a></sup></td><td>Estun</td><td>多关节工业机器人龙头</td><td>1993</td><td>江苏南京</td><td>伺服/控制+工业机器人本体全栈；中国工业机器人出货量第一(份额10.5%)；埃斯顿酷卓(人形)</td><td>机器人+自动化产线+数字产品；2025营收48.88亿元</td><td>3,261人（2025年报）｜研发968（29.7%）</td><td>A股市值约246亿元(机构目标口径)；2025营收48.88亿元、扭亏</td><td>A股 002747.SZ（2015） + 港股 02715.HK（2026.03）</td></tr><tr><td><strong>汇川技术</strong><sup><a href="#ref22">[22]</a></sup><sup><a href="#ref24">[24]</a></sup></td><td>Inovance</td><td>工控+工业机器人+人形零部件</td><td>2003.04</td><td>广东深圳</td><td>伺服/变频/PLC/控制器全自研；SCARA市占国内第一(约27.3%)；人形核心零部件(无框力矩电机/关节模组)</td><td>核心零部件+工控系统+整机；2025营收451.05亿元、归母净利50.50亿元</td><td>27,292人（2025年报）｜技术/研发7,670（28.1%）｜销售2,965｜生产13,150</td><td>A股市值约1406亿元（2026.10.06）</td><td>A股 300124.SZ（2010）；2024工业机器人收入约11亿元</td></tr><tr><td><strong>埃夫特</strong><sup><a href="#ref14">[14]</a></sup><sup><a href="#ref19">[19]</a></sup><sup><a href="#ref24">[24]</a></sup></td><td>EFORT</td><td>多关节工业机器人本体</td><td>2007</td><td>安徽芜湖</td><td>芜湖国资控股；机器人本体+系统集成；具身智能储备研发人员超130人；布局人形(启智机器人)</td><td>机器人本体+系统集成；2025营收9.32亿元</td><td>1,284人（2025年报）｜研发411（32.0%）</td><td>科创板上市；2025营收9.32亿元、净亏4.97亿元</td><td>科创板 688165.SH；拟收购上海盛普(估值10–12亿元)</td></tr><tr><td><strong>新松机器人</strong><sup><a href="#ref14">[14]</a></sup><sup><a href="#ref24">[24]</a></sup></td><td>SIASUN</td><td>多关节工业机器人+全品类</td><td>2000</td><td>辽宁沈阳</td><td>中科院沈阳自动化所孵化；工业机器人+移动+洁净+特种全品类；具身智能研究院</td><td>机器人本体+系统集成；2025营收41.22亿元</td><td>3,422人</td><td>A股市值（深交所 300024.SZ）；2025营收41.22亿元、净亏3.98亿元</td><td>A股 300024.SZ（2009）</td></tr><tr><td><strong>拓斯达</strong><sup><a href="#ref14">[14]</a></sup><sup><a href="#ref24">[24]</a></sup></td><td>Topstar</td><td>工业机器人+自动化装备</td><td>2007</td><td>广东东莞</td><td>全栈自研工业机器人；注塑/数控/工业机器人+自动化；2025机器人及自动化收入6.85亿元</td><td>工业机器人本体+自动化装备；2025营收25.10亿元</td><td>2,141人（2025年报）｜研发809（37.8%）</td><td>A股市值（深交所 300607.SZ）</td><td>A股 300607.SZ；推进H股IPO(A+H)</td></tr><tr><td><strong>卡诺普</strong><sup><a href="#ref22">[22]</a></sup><sup><a href="#ref23">[23]</a></sup></td><td>CRP</td><td>控制器起家+工业/具身机器人</td><td>2012.09</td><td>四川成都</td><td>控制器起家(弧焊控制器市占约90%)；控制器+本体+具身智能；专利326项；轮式人形 RHM-T1W</td><td>工业/协作/具身三大产品线；出口40国；2025具身收入2414万元(+144%)</td><td>424人（2026.05，招股书）｜研发141（33.3%，媒体转引）</td><td>港股递表（18C，拟上市）；2025营收3.24亿元</td><td>2025营收3.24亿元(+38.5%)；国泰海通保荐</td></tr><tr><td><strong>配天机器人</strong><sup><a href="#ref22">[22]</a></sup><sup><a href="#ref25">[25]</a></sup></td><td>Puttian</td><td>多关节工业机器人本体</td><td>2010</td><td>北京(安徽蚌埠基地)</td><td>本体+核心零部件(除减速器多自研)；负载3–280kg；晶圆传输机器人；布局具身智能/行为大模型</td><td>本体+自动化产线；汽车/3C/半导体/喷涂</td><td>100–500人（校招口径）｜研发逾200名、硕博&gt;75%</td><td>未披露（京城机电(北京国资)控股）</td><td>2021出货超3000套；非上市</td></tr><tr><td><strong>图灵机器人</strong><sup><a href="#ref22">[22]</a></sup><sup><a href="#ref25">[25]</a></sup></td><td>Turing Robot</td><td>工业机器人本体+控制器</td><td>2007</td><td>上海嘉定</td><td>上海交大出资组建；全自研总线控制器(超2万台)；六轴1.5–500kg；收购意大利R.R.Robotica</td><td>本体+控制器+方案；3C/光伏/锂电/钢铁</td><td>约130人（2025，参保口径）｜研发人数未披露</td><td>被宝信软件控股（2024.01 完成42%股权收购，实付1.95亿元）</td><td>宝信软件(600845.SH)并表</td></tr><tr><td><strong>华成工控</strong><sup><a href="#ref22">[22]</a></sup><sup><a href="#ref24">[24]</a></sup></td><td>HC System</td><td>机器人控制系统/驱控一体</td><td>2005.10</td><td>广东深圳</td><td>运动控制+驱控一体；具身/人形“小脑”控制系统(ARM+FPGA、≤1ms、最高32轴)</td><td>控制系统/驱控一体+方案；注塑/机床/3C/锂电；2024营收2.16亿元</td><td>190人（2025年报）｜研发52（27.4%）｜2024年销售56、生产44</td><td>新三板挂牌(无一级估值)</td><td>新三板 873553（创新层）</td></tr><tr><td><strong>若贝特</strong><sup><a href="#ref14">[14]</a></sup><sup><a href="#ref25">[25]</a></sup></td><td>Robet</td><td>并联机器人</td><td>2016</td><td>广东</td><td>高速并联机器人；Delta/Scara</td><td>并联机器人本体；食品/3C分拣；员工少于50人</td><td>&lt;50人</td><td>未披露（累计公开融资约4000–5000万元）</td><td>非上市</td></tr><tr><td><strong>天机智能</strong><sup><a href="#ref14">[14]</a></sup><sup><a href="#ref19">[19]</a></sup><sup><a href="#ref25">[25]</a></sup></td><td>Tianji</td><td>力控操作本体+具身基础设施</td><td>2016</td><td>广东深圳</td><td>长盈精密体系；力控操作本体、Marvin系列力控双臂；MEMS/运动控制</td><td>力控本体+具身基础设施</td><td>50–99人（广东主体参保约70人）｜研发人数未披露</td><td>投后估值近百亿元（2026.05 B/B+轮合计10亿元）</td><td>高瓴创投/美团战投联合领投</td></tr></tbody></table></div><h3 id="l5">5. 跨界平台 / 大厂</h3><p>以制造巨头、ICT 平台或安防龙头身份切入工业具身智能，提供平台、算力、生态或整机能力。</p><p style="font-size:.78rem;color:#54595d;">本层收录 3 家（抽样，聚焦已披露融资/经营数据者）</p><div class="table-wrapper"><table class="wikitable"><thead><tr><th>公司</th><th>英文/简称</th><th>载体角色</th><th>成立</th><th>总部</th><th>技术强项</th><th>商业模式</th><th>人员规模</th><th>估值 / 市值</th><th>上市/备注</th></tr></thead><tbody><tr><td><strong>华为(极目机器)</strong><sup><a href="#ref14">[14]</a></sup></td><td>Huawei</td><td>产业具身平台+本体</td><td>2023(极目机器)</td><td>广东深圳</td><td>华为极目机器；具身智能平台、AI大模型、算力与生态</td><td>平台+生态赋能；工业具身智能解决方案</td><td>未披露（极目机器）；母集团另计</td><td>母公司未上市</td><td>工商登记 2023 设立</td></tr><tr><td><strong>美的/库卡(KUKA)</strong><sup><a href="#ref21">[21]</a></sup><sup><a href="#ref25">[25]</a></sup></td><td>Midea / KUKA</td><td>工业机器人本体+AMMR</td><td>2017(收购KUKA)</td><td>广东佛山(KUKA德国奥格斯堡)</td><td>库卡Physical AI与AMMR(自主移动操作机器人)；工业人形“美罗”“美罗U”</td><td>库卡中国2025出货3.2万台；美的机器人及自动化2025收入310亿元</td><td>库卡全球约15,000人（2025）；机器人板块单列未披露</td><td>美的集团 A股市值（000333.SZ）</td><td>美的100%持股KUKA(2022完成全资私有化)</td></tr><tr><td><strong>海康威视(海康机器人母体)</strong><sup><a href="#ref14">[14]</a></sup></td><td>Hikvision</td><td>机器视觉+移动机器人</td><td>2001</td><td>浙江杭州</td><td>安防视觉+机器视觉+移动机器人协同</td><td>集团2025营收体量千亿元级；机器人板块分拆</td><td>未披露（母体口径）</td><td>A股市值（002415.SZ）</td><td>海康机器人拟分拆上市</td></tr></tbody></table></div>
+<h2 id="deep">5 分层深度分析</h2>
+
+<h3>5.1 L1 · 工业 AI / 「眼-脑-手」组件供应商——份额的核心来源</h3>
+<p><strong>发展背景。</strong> 这一层的企业多成立于 2014–2018 年，创始团队以学术派（清华、中科院、斯坦福、CMU、ETH 等）与产业派（华为、ABB、大厂高管）混合为主。它们<em>不制造机器人本体</em>，而是把 3D 视觉、具身大模型、力控与抓取规划做成标准化组件，交付给系统集成商或直接嵌入工业产线。这是 IDC 口径下份额最集中的一层——微亿智造与梅卡曼德分列前二。<sup><a href="#ref1">[1]</a></sup></p>
+<p><strong>技术强项。</strong> 核心是「眼-脑-手」闭环：3D 视觉（梅卡曼德的 Mech-Eye 相机、视比特的大尺寸测量、蓝芯的 3D 传感器）、大模型与深度学习平台（梅卡曼德 Mech-GPT / Mech-DLK、中科第五纪 FAM 超少样本模型、知有无界的船舶具身大模型）、以及力控与操作算法。微亿智造则通过收购智云天工（软件/算法）与捷勃特（硬件/本体）来实现全栈闭环。<sup><a href="#ref2">[2]</a></sup><sup><a href="#ref3">[3]</a></sup></p>
+<p><strong>商业模式。</strong> 主流是「标准化智能组件 + 集成商生态」：梅卡曼德截至 2026 年 3 月已合作 1369 家集成商、累计部署超 2.9 万台、销往近 50 国；微亿智造则以「硬件 + 软件 + 行业服务」整包交付给 25+ 世界 500 强，2025 年营收 7.96 亿元、毛利率 48.4%。视比特、星猿哲则更贴近具体产线场景（重工分拣、物流拆码垛）。<sup><a href="#ref2">[2]</a></sup><sup><a href="#ref3">[3]</a></sup><sup><a href="#ref5">[5]</a></sup></p>
+<p><strong>估值与资本化。</strong> 该层是 2026 年资本化最活跃的一层：梅卡曼德已于 2026 年 9 月 1 日登陆港交所（09615.HK）；微亿智造于 2026 年 3 月递表、9 月获境外上市备案。一级市场方面，星猿哲曾达约 7 亿美元估值（2023 年口径），多数厂商的最新估值未披露，最新轮次集中在 2025–2026 年的 B 轮至 D 轮。<sup><a href="#ref2">[2]</a></sup><sup><a href="#ref3">[3]</a></sup><sup><a href="#ref6">[6]</a></sup></p>
+<div class="notice notice-red"><strong>风险提示：</strong>该层已出现分化与出清。熵智科技（3D 视觉无序分拣）于 2024 年 10 月被深圳中院裁定受理破产清算，欠付职工工资赔偿金，说明单纯依赖 3D 视觉、缺乏数据闭环与规模化场景的厂商面临生存压力。<sup><a href="#ref7">[7]</a></sup></div>
+
+<h3>5.2 L2 · 协作机器人本体厂商——力控与具身智能的载体</h3>
+<p><strong>发展背景。</strong> 国产协作机器人集中成立于 2014–2018 年，创始团队多为高校（上海交大、哈工大、北航、山东大学、斯坦福、德国 DLR）背景。经过十余年发展，头部厂商已从「卖本体」升级为「本体 + 力控 + 具身智能」的三段式定位。越疆（02432.HK）2024 年 12 月港股上市，华沿机器人（原大族机器人，1021.HK）2026 年 3 月上市，珞石、节卡等亦已启动或完成资本化动作。<sup><a href="#ref16">[16]</a></sup><sup><a href="#ref18">[18]</a></sup></p>
+<p><strong>技术强项。</strong> 分两条路线：一条是全栈自研核心部件（遨博、睿尔曼、华沿的自研电机/减速器/驱控/关节模组，华沿已把 9 种规格人形关节模组与七轴人形手臂作为对外销售的核心运动部件）；另一条是力控与自适应能力（非夕的自适应力控、思灵的 DLR 力控与灵巧手、天机智能的力控双臂）。这两条路线都在向「具身智能」延伸，成为人形机器人关节与双臂的供应来源。<sup><a href="#ref18">[18]</a></sup><sup><a href="#ref19">[19]</a></sup></p>
+<p><strong>商业模式。</strong> 以本体销售为主、并叠加方案与核心部件外销。华沿 2026 上半年核心运动部件收入占比 23.1%、海外收入占比约 50%；法奥与睿尔曼则将关节模组对外销售（法奥累计超 30 万套、睿尔曼年产能 10 万台）。商业模式的差异化正在从「负载/精度」转向「是否提供机器人 OS 与数据闭环」。<sup><a href="#ref18">[18]</a></sup><sup><a href="#ref19">[19]</a></sup></p>
+<p><strong>估值与经营分层。</strong> 该层估值分化明显：<em>独角兽级</em>——非夕（累计融资超 3.2 亿美元）、思灵（超 3.5 亿美元）、法奥（C 轮近 1 亿美元）；<em>数十亿元级</em>——睿尔曼约 32 亿元、艾利特约 80 亿元；<em>估值倒挂案例</em>——节卡 D 轮投前 35 亿元，但 IPO 终止后估值倒挂约 20%（约 28 亿元）。经营层面，2025 年多数厂商仍未盈利：越疆 2025 营收 4.93 亿元、净亏 0.84 亿元；遨博 2025 营收 3.42 亿元、净亏 1.63 亿元（审计口径）。<sup><a href="#ref17">[17]</a></sup><sup><a href="#ref18">[18]</a></sup><sup><a href="#ref19">[19]</a></sup></p>
+
+<h3>5.3 L3 · 复合 / 移动操作机器人厂商——AMR 与机械臂的融合</h3>
+<p><strong>发展背景。</strong> 该层企业多由移动机器人（AGV/AMR）起家，向「底盘 + 机械臂」的复合形态演进，对应 IDC 口径中的「复合（移动操作）机器人」。优艾智合在该细分以 8.8% 位列 IDC 全市场第三，是唯一进入份额前三的「本体派」。<sup><a href="#ref1">[1]</a></sup></p>
+<p><strong>技术强项。</strong> 核心竞争力在移动底盘、集群调度与「单脑」控制。仙工智能以通用控制器（平台化）见长，斯坦德、迦智、国自均源自高校团队（哈工大、浙大），墨影科技主打一体化「单脑」移动协作机器人（区别于「底盘 + 机械臂」双脑拼接）。海康机器人则依托海康威视的机器视觉基因形成「视觉 + AMR」协同。<sup><a href="#ref14">[14]</a></sup><sup><a href="#ref21">[21]</a></sup></p>
+<p><strong>商业模式。</strong> 以本体 + 系统方案为主，下游集中于半导体、3C、锂电、汽车与仓储物流。经营分化明显：优艾智合 2024 营收 2.55 亿元、毛利率 35.2% 持续改善；仙工智能 2024 营收 3.39 亿元、毛利率约 46%，但 2024 年底账面现金仅约 9,286 万元、融资款消耗 82.69%；斯坦德毛利率从 2022 年 12.9% 提升至 2024 年 38.8%。<sup><a href="#ref14">[14]</a></sup></p>
+<p><strong>估值与资本化。</strong> 该层是 IPO 最密集的一层——优艾智合、仙工智能、斯坦德、迦智科技均已递表或拟 IPO，海康机器人拟分拆上市；一级估值方面，仙工智能约 32.7 亿元、迦智科技约 21.3 亿元、优艾智合投后超 20 亿元。此外也出现了并购退出：国自机器人被杭叉集团以约 3.98 亿元收购 99.23% 股权（2025 年 7 月）。<sup><a href="#ref14">[14]</a></sup></p>
+
+<h3>5.4 L4 · 多关节工业机器人本体厂商——传统龙头的具身智能转型</h3>
+<p><strong>发展背景。</strong> 该层是中国工业机器人产业的「基本盘」，包含工控龙头（汇川）、出货量龙头（埃斯顿）、国资背景龙头（新松、埃夫特）与控制器起家的新兴厂商（卡诺普、华成工控）。它们的共同命题是：如何在多关节机器人这一成熟载体上叠加具身智能能力，并切入人形零部件供应链。<sup><a href="#ref14">[14]</a></sup><sup><a href="#ref22">[22]</a></sup></p>
+<p><strong>技术强项。</strong> 核心是控制器、伺服与核心零部件的自研能力。汇川技术的伺服/变频/PLC/控制器全自研，SCARA 国内市占第一（约 27.3%），并已切入人形核心零部件（无框力矩电机、关节模组、行星滚柱丝杠），2026 上半年无框力矩电机出货 11.36 万台（+422.9%）。卡诺普以控制器起家（弧焊控制器市占约 90%），2025 年发布「灵烁」「灵迅」并推出轮式人形 RHM-T1W。埃斯顿则通过子公司埃斯顿酷卓（人形）布局。<sup><a href="#ref14">[14]</a></sup><sup><a href="#ref22">[22]</a></sup></p>
+<p><strong>商业模式。</strong> 以本体销售 + 系统集成 + 产线交付为主，体量大但盈利承压。2025 年营收：汇川 451.05 亿元（归母净利 50.50 亿元，是全层唯一大额盈利者）、埃斯顿 48.88 亿元（扭亏）、新松 41.22 亿元（净亏 3.98 亿元）、拓斯达 25.10 亿元、埃夫特 9.32 亿元（净亏 4.97 亿元）。纯本体厂商普遍面临价格战导致的毛利率下滑与持续亏损。<sup><a href="#ref14">[14]</a></sup><sup><a href="#ref22">[22]</a></sup></p>
+<p><strong>估值与资本化。</strong> 上市公司市值差异显著：汇川技术约 1,406 亿元（2026-10-06），埃斯顿 A 股市值约 246 亿元（机构目标口径）；埃夫特、新松、拓斯达均为 A 股上市公司。非上市与跨境上市方面，卡诺普递表港交所（18C），配天机器人为北京国资（京城机电）控股，图灵机器人为宝信软件控股（2024 年完成 42% 股权收购）。<sup><a href="#ref14">[14]</a></sup><sup><a href="#ref22">[22]</a></sup></p>
+
+<h3>5.5 L5 · 跨界平台 / 大厂</h3>
+<p>华为以极目机器切入具身智能平台与本体；美的自 2017 年收购库卡并于 2022 年完成 100% 私有化，库卡中国 2025 年工业机器人出货 3.2 万台（+超 30%），并提出 Physical AI 与 AMMR（自主移动操作机器人）方向，工业人形「美罗」「美罗 U」已进入工厂；海康威视以机器视觉基因分拆海康机器人。（美的工业技术层面的机器人及自动化业务 2025 年收入 310 亿元。）<sup><a href="#ref21">[21]</a></sup><sup><a href="#ref14">[14]</a></sup></p>
+
+<h2 id="people">6 团队规模与人才结构</h2>
+<p>团队规模是判断一家具身智能公司「真实工程能力」与「规模化落地能力」的重要观察面：<strong>研发团队</strong>决定技术上限，<strong>交付/实施团队</strong>决定项目能否按期落地并复制，<strong>销售团队</strong>决定市场覆盖与出海节奏。本报告把「人员规模」作为与估值、技术并列的对比口径，数据统一到「员工总数 + 研发 / 销售 / 交付分项」。</p>
+<div class="notice notice-blue"><strong>披露度提示：</strong>只有已申报 IPO 的公司（梅卡曼德、微亿智造、节卡、仙工智能、斯坦德、迦智科技、华沿、卡诺普）与 A 股上市公司（汇川、埃斯顿、拓斯达、埃夫特、新松、华成工控）会按职能完整披露人员结构；其余非上市公司通常只披露「员工总数」或仅给出「研发占比」，<strong>部署/交付团队与销售团队的独立人数极少公开</strong>。凡未披露者，本报告一律标注「未披露」，不作推测。</div>
+
+<h3 id="people-scale">6.1 团队规模总览</h3>
+<p>样本公司的团队规模跨越近三个数量级——从工控巨头汇川技术的约 2.7 万人，到早期初创（中科第五纪、天元兴、若贝特、佳安智能）的数十人。规模与「是否自建本体 / 产线」强相关：自建本体与集成产线的厂商（L4 传统本体、L2 头部协作）人员明显更重，而纯软件/组件厂商与早期初创团队精简。</p>
+<div class="table-wrapper"><table class="wikitable"><thead><tr><th>规模区间</th><th>代表公司（人员口径）</th><th>典型特征</th></tr></thead><tbody>
+<tr><td><strong>≥ 10,000 人</strong></td><td>汇川技术 27,292｜库卡(全球) 约 15,000</td><td>工控/整机平台型，多业务大兵团</td></tr>
+<tr><td><strong>3,000–5,000 人</strong></td><td>新松 3,422｜海康机器人 3,400+｜埃斯顿 3,261｜思灵 约 3,200（全球）</td><td>全品类/多家子公司或全球化团队</td></tr>
+<tr><td><strong>1,000–3,000 人</strong></td><td>拓斯达 2,141｜埃夫特 1,284</td><td>本体 + 集成，工程交付重</td></tr>
+<tr><td><strong>400–800 人</strong></td><td>越疆 768｜华沿 548→658｜梅卡曼德 635｜仙工 527｜阿丘/中科慧远 约 500｜节卡 492｜微亿智造 490｜斯坦德 453｜视比特 约 450｜卡诺普 424｜迦智 410｜优艾智合 约 416</td><td>已完成 IPO/递表的细分头部，组织成型</td></tr>
+<tr><td><strong>100–400 人</strong></td><td>蓝芯 300+｜中科新松 182｜华成工控 190｜大界 150｜仝人 约 145｜知象 300+｜飒智 近 300｜图灵 约 130｜配天 100–500｜赛那德 100+｜库柏特 100余</td><td>成长期，职能分工初具</td></tr>
+<tr><td><strong>&lt; 100 人</strong></td><td>木蚁/墨影 50–150｜天机 50–99｜知有无界 70–79｜佳安 25–29｜若贝特 &lt;50｜中科第五纪、天元兴 未披露</td><td>早期初创或轻资产软件团队</td></tr>
+</tbody></table></div>
+<p style="font-size:.78rem;color:#54595d;">注：口径不一——上市公司/递表公司为「在职员工」，非上市多为招聘平台区间或工商社保参保人数，后者普遍低于实际在职人数；详见 6.4。</p>
+
+<h3 id="people-rd">6.2 研发强度：技术型公司的「最低门槛」</h3>
+<p>把披露了研发人员占比的公司横向对比，可见一条清晰的分野：<strong>工业 AI / 组件商与力控厂商的研发占比普遍在 50%–80%</strong>（微亿智造 56%、非夕/墨影 60%、佳安 80%、仝人 67%），<strong>而本体与整机厂商多在 27%–38%</strong>（汇川 28.1%、埃斯顿 29.7%、斯坦德 31.1%、节卡 31.9%、埃夫特 32.0%、拓斯达 37.8%）。前者是「人即资产」的算法密集型企业，后者因包含大量生产、装配与现场交付人员而摊薄了研发占比。</p>
+<div class="chart">
+  <p style="font-size:.8rem;color:#54595d;">已披露公司的研发人员占比对比（%；仅含公司披露了数值口径者）<sup><a href="#ref23">[23]</a></sup><sup><a href="#ref24">[24]</a></sup><sup><a href="#ref25">[25]</a></sup></p>
+  <div class="chart"><div class="bar-row"><span>微亿智造</span><span class="bar-track"><span class="bar-fill" style="width:56%"></span></span><span class="bar-val">56%</span></div><div class="bar-row"><span>佳安智能</span><span class="bar-track"><span class="bar-fill" style="width:80%"></span></span><span class="bar-val">80%</span></div><div class="bar-row"><span>仝人智能</span><span class="bar-track"><span class="bar-fill" style="width:67%"></span></span><span class="bar-val">67%</span></div><div class="bar-row"><span>视比特</span><span class="bar-track"><span class="bar-fill" style="width:60%"></span></span><span class="bar-val">60%</span></div><div class="bar-row"><span>非夕</span><span class="bar-track"><span class="bar-fill" style="width:60%"></span></span><span class="bar-val">60%</span></div><div class="bar-row"><span>墨影科技</span><span class="bar-track"><span class="bar-fill" style="width:60%"></span></span><span class="bar-val">60%</span></div><div class="bar-row"><span>拓斯达</span><span class="bar-track"><span class="bar-fill" style="width:37.8%"></span></span><span class="bar-val">37.8%</span></div><div class="bar-row"><span>仙工智能</span><span class="bar-track"><span class="bar-fill" style="width:36.6%"></span></span><span class="bar-val">36.6%</span></div><div class="bar-row"><span>梅卡曼德</span><span class="bar-track"><span class="bar-fill" style="width:36.1%"></span></span><span class="bar-val">36.1%</span></div><div class="bar-row"><span>优艾智合</span><span class="bar-track"><span class="bar-fill" style="width:34.6%"></span></span><span class="bar-val">34.6%</span></div><div class="bar-row"><span>卡诺普</span><span class="bar-track"><span class="bar-fill" style="width:33.3%"></span></span><span class="bar-val">33.3%</span></div><div class="bar-row"><span>迦智科技</span><span class="bar-track"><span class="bar-fill" style="width:32.4%"></span></span><span class="bar-val">32.4%</span></div><div class="bar-row"><span>埃夫特</span><span class="bar-track"><span class="bar-fill" style="width:32.0%"></span></span><span class="bar-val">32.0%</span></div><div class="bar-row"><span>遨博</span><span class="bar-track"><span class="bar-fill" style="width:32%"></span></span><span class="bar-val">32%</span></div><div class="bar-row"><span>节卡</span><span class="bar-track"><span class="bar-fill" style="width:31.9%"></span></span><span class="bar-val">31.9%</span></div><div class="bar-row"><span>斯坦德</span><span class="bar-track"><span class="bar-fill" style="width:31.1%"></span></span><span class="bar-val">31.1%</span></div><div class="bar-row"><span>埃斯顿</span><span class="bar-track"><span class="bar-fill" style="width:29.7%"></span></span><span class="bar-val">29.7%</span></div><div class="bar-row"><span>汇川技术</span><span class="bar-track"><span class="bar-fill" style="width:28.1%"></span></span><span class="bar-val">28.1%</span></div><div class="bar-row"><span>华成工控</span><span class="bar-track"><span class="bar-fill" style="width:27.4%"></span></span><span class="bar-val">27.4%</span></div></div>
+</div>
+<p>值得注意的是，<strong>研发占比高不等于研发人数多</strong>：汇川技术研发人员 7,670 人已是全样本最大，而占比仅 28.1%；反过来，佳安智能研发占比约 80%，但公司总人数仅二三十人。评估技术实力应「人数 × 占比 × 人均产出」三者结合。</p>
+
+<h3 id="people-delivery">6.3 交付 / 部署团队：规模化落地的隐形瓶颈</h3>
+<p>具身智能项目普遍需要「进厂」——现场勘测、产线改造、模型微调、调试与运维。因此<strong>交付/部署团队的人数，往往直接决定一家公司一年能交付多少个项目、能覆盖多少个行业</strong>。全样本中只有递表公司把该团队单列出来，构成一组难得的可比数据：</p>
+<div class="table-wrapper"><table class="wikitable"><thead><tr><th>公司（口径）</th><th>总数</th><th>研发</th><th>销售及营销</th><th>交付 / 部署服务</th><th>生产/供应链</th></tr></thead><tbody>
+<tr><td><strong>梅卡曼德</strong>（2026.03）</td><td>635</td><td>229（36.1%）</td><td>184（29.0%）</td><td>未单列（并入职能口径）</td><td>—</td></tr>
+<tr><td><strong>微亿智造</strong>（2025末）</td><td>490</td><td>272（56%）</td><td>76（16%）</td><td>工程与交付 75（15%）</td><td>—</td></tr>
+<tr><td><strong>仙工智能</strong>（2025末）</td><td>527</td><td>193（36.6%）</td><td>246（46.7%）</td><td>—</td><td>—</td></tr>
+<tr><td><strong>斯坦德</strong>（2026.04）</td><td>453</td><td>141（31.1%）</td><td>70（15.5%）</td><td>交付及服务 109（24.1%）</td><td>84（18.5%）</td></tr>
+<tr><td><strong>迦智科技</strong>（2026.06）</td><td>410</td><td>133（32.4%）</td><td>83（20.2%）</td><td>部署服务 99（24.1%）</td><td>64（15.6%）</td></tr>
+<tr><td><strong>节卡</strong>（2024末）</td><td>492</td><td>157（31.9%）</td><td>144（29.3%）</td><td>生产 114（23.2%）</td><td>—</td></tr>
+</tbody></table></div>
+<p>三个可读出的判断：其一，<strong>纯组件/软件商的交付团队薄、销售团队重</strong>（仙工智能销售及营销占 46.7%，是其「控制器平台化、靠渠道放量」模式的直接体现）；其二，<strong>移动操作机器人的交付团队重</strong>（斯坦德 24.1%、迦智 24.1%，因为 AMR 项目高度依赖现场部署与调试）；其三，<strong>微亿智造用 15% 的工程交付人员支撑 25+ 世界 500 强客户</strong>，其「标准化工作站 + 跨行业复制」模式在人力效率上有优势（也与它 56% 的研发占比形成「重研发、轻部署」的组合）。</p>
+<p>反观未披露该数据的非上市公司，其交付能力无法从公开信息核验——这既是本报告的数据缺口，也是投资尽调中应重点追问的指标。</p>
+
+<h3 id="people-caveat">6.4 口径与数据提示</h3>
+<div class="notice notice-red"><strong>人员数据不可直接横比，请务必看清口径：</strong>
+<ul>
+<li><strong>在职员工 vs 工商参保：</strong>上市公司/递表公司披露「在职员工」（含全部子公司在册），而多数非上市公司只能取到「工商社保参保人数」，后者通常显著偏低（如遨博 500余人 vs 北京主体参保98人），两者不可混用。</li>
+<li><strong>集团 vs 子公司：</strong>汇川、埃斯顿、新松等为上市公司合并口径；中科新松（多可）、海康机器人、图灵等为其母公司的子公司口径。</li>
+<li><strong>时点差异：</strong>各公司数据时点不一（2022–2026），行业处于快速扩张期，跨年比较需谨慎。</li>
+<li><strong>在职规模区间：</strong>非上市公司多仅有招聘平台给出的区间（如「100–499人」），精度有限。</li>
+<li><strong>分职能披露稀缺：</strong>除递表公司与 A 股上市公司外，绝大多数厂商未公开研发/销售/交付的分项人数，本报告已逐条标注「未披露」。</li>
+</ul></div>
+
+<h2 id="valuation">7 竞争格局与估值图谱</h2>
+<h3>6.1 竞争格局：三个「错位竞争」的战场</h3>
+<p>把 53 家样本放在一张地图上看，竞争并非同质化，而是三个错位的战场：</p>
+<ul>
+  <li><strong>份额战场（组件层 L1）：</strong>微亿智造与梅卡曼德在「以工业机器人为载体的具身智能应用」市场份额上贴身竞争（11.8% vs 11.3%），两者都把「标准化组件 + 集成商生态」作为扩张引擎；这一战场决定谁能成为「工业具身智能的眼脑手平台」。<sup><a href="#ref1">[1]</a></sup></li>
+  <li><strong>本体战场（L2/L3/L4）：</strong>协作、移动操作与多关节机器人本体厂商在「负载 / 精度 / 可靠性」上已高度成熟，差异化正转向「是否具备机器人 OS、数据闭环与具身智能能力」；缺乏数据闭环的纯本体厂商将持续承压。<sup><a href="#ref1">[1]</a></sup></li>
+  <li><strong>生态战场（L5）：</strong>华为、美的/库卡、海康威视以平台、算力与整机能力切入，可能重塑价值链分配。</li>
+</ul>
+<h3>6.2 估值图谱：从百亿市值到亏损本体</h3>
+<div class="table-wrapper"><table class="wikitable"><thead><tr><th>估值/市值区间</th><th>代表公司</th><th>共性</th></tr></thead><tbody>
+<tr><td><strong>≥ 1,000 亿元</strong></td><td>汇川技术（约 1,406 亿元）</td><td>工控 + 机器人 + 人形零部件全栈，规模盈利</td></tr>
+<tr><td><strong>100–300 亿元</strong></td><td>埃斯顿（约 246 亿元目标口径）</td><td>工业机器人出货量龙头，扭亏</td></tr>
+<tr><td><strong>百亿港元级（港股）</strong></td><td>梅卡曼德（09615.HK）、华沿机器人（1021.HK）、越疆（02432.HK）</td><td>组件或协作机器人头部，已完成 IPO</td></tr>
+<tr><td><strong>独角兽级（一级，≥10 亿美元）</strong></td><td>非夕、思灵、法奥、快仓</td><td>力控/协作/移动机器人，累计融资数亿美元</td></tr>
+<tr><td><strong>数十亿元级（一级）</strong></td><td>睿尔曼（约 32 亿）、艾利特（约 80 亿）、仙工智能（约 32.7 亿）、迦智（约 21.3 亿）、天机智能（近百亿）</td><td>细分头部，最新轮次在 2025–2026</td></tr>
+<tr><td><strong>估值倒挂 / 承压</strong></td><td>节卡（D 轮 35 亿 → IPO 后约 28 亿）、遨博（评估值约 23 亿元，媒体口径 73.5 亿元存疑）</td><td>IPO 遇阻或估值口径分歧</td></tr>
+<tr><td><strong>已出清</strong></td><td>熵智科技（2024 破产清算）</td><td>纯视觉、缺乏数据闭环与规模化场景</td></tr>
+</tbody></table></div>
+<p style="font-size:.78rem;color:#54595d;">注：市值随交易日波动，上表为报告制作日的公开口径；一级估值多为最新轮次投后，未必反映当前公允值。</p>
+
+<h2 id="trend">8 趋势、风险与数据提示</h2>
+<h3>7.1 四大趋势（IDC）</h3>
+<ul>
+  <li><strong>从单工位智能走向生产流程智能。</strong> 机器人将与 MES、WMS、ERP、PLC 及工业互联网平台深度融合，从执行单一任务的设备演进为生产系统中的智能节点。<sup><a href="#ref1">[1]</a></sup></li>
+  <li><strong>工业知识成为模型能力的重要组成。</strong> 具身智能模型需融合工艺规则、设备机理与生产经验，从「完成任务」走向「理解生产过程」；未来竞争不仅取决于数据规模，也取决于工业知识融合能力。<sup><a href="#ref1">[1]</a></sup></li>
+  <li><strong>多形态机器人长期共存。</strong> 人形适用于高柔性、非结构化任务；移动操作机器人适用于跨空间任务；协作机器人适用于人机协作；专用工业机器人适用于高精度、高稳定任务。竞争重点不是形态，而是「谁能真正解决工业问题」。<sup><a href="#ref1">[1]</a></sup></li>
+  <li><strong>数据闭环与工程化能力决定规模化落地。</strong> 能建立「数据采集 → 模型训练 → 工业部署 → 反馈优化」闭环的企业将获得长期竞争优势。<sup><a href="#ref1">[1]</a></sup></li>
+</ul>
+<h3>7.2 风险与不确定性</h3>
+<ul>
+  <li><strong>ROI 门槛。</strong> 超过 80% 的制造企业希望两年内收回投资，若单站部署成本高、切换频繁，将抑制规模化。<sup><a href="#ref1">[1]</a></sup></li>
+  <li><strong>盈利压力。</strong> 本报告样本中绝大多数厂商 2025 年仍处亏损（节卡、越疆、珞石、遨博、新松、埃夫特等），仅少数（汇川、埃斯顿、睿尔曼、大界）实现或接近盈亏平衡。</li>
+  <li><strong>估值口径分歧。</strong> 同公司不同来源的估值差异极大（如遨博的评估值约 23 亿元 vs 媒体口径 73.5 亿元），需以交易所公告/审计口径为准。<sup><a href="#ref18">[18]</a></sup></li>
+  <li><strong>口径混用风险。</strong> 各公司常引用对自身最有利的细分赛道口径宣称「第一」，与 IDC 全市场口径不可比。<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref3">[3]</a></sup></li>
+</ul>
+<div class="notice"><strong>数据提示：</strong>本报告的部分一级市场融资与估值数据来自媒体报道转述，未经审计披露，不构成独立验证的财务事实；涉及上市公司的财务与市值以交易所披露为准。读者在引用具体数字时应回源核对，见「9 参考来源」。</p></div>
+
+<h2 id="refs">9 参考来源</h2>
+<div class="references"><ol>
+<li id="ref1">IDC《中国工业具身智能机器人市场份额，2025》与《中国工业具身智能机器人技术评估，2026》核心观点；及 IDC 文章《物理 AI 加速工业落地：2025 年中国工业具身智能机器人市场达 57.4 亿元，商业化进程全面提速》（微信公众号）。市场份额报道交叉来源：新华日报《IDC 首次分析中国工业具身智能机器人市场份额，锚定新产业起点》、新浪财经《微亿智造获 IPO 备案》（2026-09-20）、九方智投。https://www.xhby.net/content/s6a730af7e4b03b461cd0137a.html</li>
+<li id="ref2">微亿智造公司页面（具身智能 Wiki）及其中引用的港股招股书口径财务数据；新浪财经《微亿智造获 IPO 备案》（2026-09-20）。</li>
+<li id="ref3">梅卡曼德港股上市报道：证券之星《三名清华学霸带队，梅卡曼德机器人港交所上市首日平开、市值 127 亿港元》（2026-09-01）、《127 亿港元市值背后，梅卡曼德给机器人行业打了个样》；Yahoo 財經 9615.HK 行情页；东方财富 09615.HK 资料页。</li>
+<li id="ref4">阿丘科技公司页面（具身智能 Wiki）。</li>
+<li id="ref5">视比特机器人公司页面（具身智能 Wiki）；湖南省工信厅、湖南日报、投中网、泰伯网等。</li>
+<li id="ref6">星猿哲（XYZ Robotics）公司页面（具身智能 Wiki），估值引自《解放日报》2023-11 报道。</li>
+<li id="ref7">工业 AI / 视觉厂商补充调研：库柏特（投资界/爱企查）、中科慧远（洛阳日报/河南日报 2026）、知象光电（和讯 2025）、熵智科技破产清算（全国企业破产重整案件信息网/法院公告 2024）。</li>
+<li id="ref8">大界机器人公司页面（具身智能 Wiki）。</li>
+<li id="ref9">中科第五纪公司页面（具身智能 Wiki）。</li>
+<li id="ref10">仝人智能公司页面（具身智能 Wiki）。</li>
+<li id="ref11">知有无界公司页面（具身智能 Wiki）。</li>
+<li id="ref12">天元兴公司页面（具身智能 Wiki）。</li>
+<li id="ref13">佳安智能公司页面（具身智能 Wiki）。</li>
+<li id="ref14">具身智能 Wiki 各相关公司页面汇总（蓝芯科技、法奥、艾利特、非夕、珞石、思灵、睿尔曼、斯坦德、仙工智能、优艾智合、海康机器人、迦智科技、国自机器人、木蚁机器人、飒智智能、赛那德、埃斯顿、埃夫特、新松、拓斯达、若贝特、天机智能、华为、海康威视等）。</li>
+<li id="ref15">梅卡曼德招股书及媒体对招股书的引用（灼识咨询「全球 AI+3D 视觉引导通用智能机器人组件」口径 22.1%）；新浪财经《梅卡曼德去年营收仅 3 亿多却自称「市场第一」微亿智造认可吗？》（2026-08-20）。</li>
+<li id="ref16">越疆机器人公司页面（具身智能 Wiki），港股招股书口径。</li>
+<li id="ref17">节卡机器人公司页面（具身智能 Wiki），招股书/证券时报口径。</li>
+<li id="ref18">协作机器人补充调研：遨博（深交所东杰智能公告 2026-08-25、北航技术转移中心）、华沿机器人/原大族机器人（港交所招股书/年报、证券时报、钛媒体）、中科新松（多可）、长广溪智造、捷勃特。</li>
+<li id="ref19">协作/力控机器人融资与财务数据：具身智能 Wiki 各公司页面汇总。</li>
+<li id="ref20">视比特机器人 B++轮（2026-06）报道。</li>
+<li id="ref21">复合/移动机器人及跨界大厂补充调研：墨影科技（投中网 2026、投资界）、快仓智能（东方财富 2024、信报/AASTOCKS 2025、PitchBook）、稳石机器人（官网/天眼查）、埃斯顿酷卓（证券日报 2026、深交所公告）、美的/库卡（经济参考报 2026、金融界 2025、kuka.cn）。</li>
+<li id="ref22">传统工业机器人补充调研：汇川技术（证券时报、东方财富、爱集微 2026）、配天机器人（机电商情 2023、中国能源报 2024、中国上市公司协会）、卡诺普（经济观察报/福布斯中国 2026、36 氪）、华成工控（全国股转系统公告、同花顺、公司官网）、图灵机器人（清科、证券之星、上海市政府网、复旦大学）。</li>
+<li id="ref23">港股招股书/年报人员结构（在职员工总数与研发/销售/交付分项）：梅卡曼德招股章程（港交所，2026-08-24）；微亿智造招股书（2026-03-31 递表）；节卡股份招股说明书申报稿（2024-12-31 数据）；仙工智能全球发售招股章程；斯坦德机器人招股书（2026-07-27）；迦智科技招股书（2026-08-31）；华沿机器人 2025 年报及 2026 中期报告（hkexnews）；卡诺普招股书（媒体转引，2026-05）。</li>
+<li id="ref24">A 股上市公司年报人员数据：汇川技术 2025 年年度报告（2026-04-28）；埃斯顿 2025 年年度报告（2026-03-31）；拓斯达 2025 年年度报告（2026-03-31）；埃夫特 2025 年年度报告（2026-04-15）；新松机器人年报；华成工控 2025 年年度报告（全国股转系统）；数据经同花顺/巨潮资讯网交叉核对。</li>
+<li id="ref25">非上市厂商人员规模来源（招聘平台区间、工商年报参保人数、权威媒体报道，可靠性中低，仅供量级参考）：遨博、法奥、艾利特、非夕、珞石、睿尔曼、长广溪、中科新松、库柏特、中科慧远、知象光电、知有无界、佳安智能、国自、木蚁、飒智、赛那德、墨影、快仓、配天、图灵、天机智能等（各公司页面及补充调研，2023–2026）。</li>
+</ol></div>
+</main></div>
+<div class="page-footer">
+具身智能 Wiki · 专题报告《以工业机器人为载体的具身智能应用——中国市场公司全景分析》 · 制作日期 2026-10-06 · 数据来源见第 9 节
+</div>
+</div></body></html>

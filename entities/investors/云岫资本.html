@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>云岫资本 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 288px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article ol { padding-left: 1.8em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .t-vc { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .t-cvc { background: #fce4ec; color: #c62828; border-color: #f8bbd0; }
+  .t-gov-fund { background: #fff3e0; color: #e65100; border-color: #ffe0b2; }
+  .t-national-fund { background: #f3e5f5; color: #7b1fa2; border-color: #e1bee7; }
+  .t-overseas-fund { background: #e0f2f1; color: #00695c; border-color: #b2dfdb; }
+  .t-academic-fund { background: #e8f5e9; color: #2e7d32; border-color: #c5e1a5; }
+  .t-embodied-active { background: #e8f5e9; color: #2e7d32; border-color: #a5d6a7; }
+  .t-lead-investor { background: #fff8e1; color: #f57f17; border-color: #ffecb3; }
+  .t-follow-investor { background: #f5f5f5; color: #616161; border-color: #e0e0e0; }
+  .t-fa { background: #ede7f6; color: #5e35b1; border-color: #d1c4e9; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../../index.html">具身智能Wiki</a> <span class="breadcrumb-sep">›</span> <a href="../../index.html#investors">投资机构</a> <span class="breadcrumb-sep">›</span> <span>云岫资本</span></div>
+  <div class="wiki-header"><h1>云岫资本</h1><div class="subtitle">Winsoul Capital · 2015年成立于上海 · 科技产业精品投行(FA) + 私募股权投资复合型机构<sup><a href="#ref1">[1]</a></sup> · 累计FA交易超400笔、超1100亿元<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref2">[2]</a></sup> · 具身智能领域FA为主、直投2家</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实与分析</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#team">1.2 核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funds">1.3 基金结构与LP</a></li>
+        <li class="toc-lvl3"><a href="#philosophy">1.4 投资哲学与偏好</a></li>
+        <li class="toc-lvl3"><a href="#tracks">1.5 主要投资赛道</a></li>
+        <li class="toc-lvl3"><a href="#embodied">1.6 具身智能领域布局</a></li>
+        <li class="toc-lvl3"><a href="#cases">1.7 典型投资案例</a></li>
+        <li class="toc-lvl3"><a href="#performance">1.8 基金业绩</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#references">2 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">云岫资本</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">上海岫扬云科技有限责任公司<sup><a href="#ref4">[4]</a></sup></div></div>
+        <div class="ib-row"><div class="ib-label">英文名</div><div class="ib-value">Winsoul Capital</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2015年<sup><a href="#ref3">[3]</a></sup></div></div>
+        <div class="ib-row"><div class="ib-label">注册地</div><div class="ib-value">上海市浦东新区<sup><a href="#ref4">[4]</a></sup></div></div>
+        <div class="ib-row"><div class="ib-label">机构类型</div><div class="ib-value"><span class="tag t-vc">财务投资机构</span><span class="tag t-fa">精品投行(FA)</span></div></div>
+        <div class="ib-row"><div class="ib-label">管理规模</div><div class="ib-value">管理人备案0–5亿元；另有5亿元硬科技产业基金<sup><a href="#ref3">[3]</a></sup><sup><a href="#ref5">[5]</a></sup></div></div>
+        <div class="ib-section">核心人物</div>
+        <div class="ib-row"><div class="ib-label">创始合伙人</div><div class="ib-value">高超（创始合伙人兼CEO）<sup><a href="#ref6">[6]</a></sup></div></div>
+        <div class="ib-section">登记与合规</div>
+        <div class="ib-row"><div class="ib-label">AMAC登记号</div><div class="ib-value">P1064802<sup><a href="#ref7">[7]</a></sup></div></div>
+        <div class="ib-section">投资偏好</div>
+        <div class="ib-row"><div class="ib-label">投资领域</div><div class="ib-value">半导体、AI/智能制造、新能源/新材料、企业服务、前沿科技、生命科学</div></div>
+        <div class="ib-row"><div class="ib-label">投资阶段</div><div class="ib-value">种子/天使为主（直投偏早期），FA覆盖多轮次</div></div>
+        <div class="ib-row"><div class="ib-label">币种</div><div class="ib-value">人民币</div></div>
+        <div class="ib-section">具身智能</div>
+        <div class="ib-row"><div class="ib-label">暴露程度</div><div class="ib-value"><span class="tag t-embodied-active">FA约21家 + 直投2家</span></div></div>
+        <div class="ib-row"><div class="ib-label">直投代表</div><div class="ib-value">无论科技、深度机智<sup><a href="#ref15">[15]</a></sup><sup><a href="#ref16">[16]</a></sup></div></div>
+        <div class="ib-section">官网</div>
+        <div class="ib-row"><div class="ib-label">网址</div><div class="ib-value"><a href="https://www.yunxiucap.com" target="_blank">www.yunxiucap.com</a><sup><a href="#ref8">[8]</a></sup></div></div>
+      </aside>
+
+      <p class="article-intro"><strong>云岫资本</strong>（Winsoul Capital，工商主体为上海岫扬云科技有限责任公司）成立于2015年，总部位于上海，并在北京、深圳、合肥设有办公室<sup><a href="#ref3">[3]</a></sup><sup><a href="#ref4">[4]</a></sup>。公司定位为"科技产业投资服务机构"，是兼具精品投行（FA）与私募股权投资双重身份的复合型机构：财务顾问业务覆盖半导体、AI/智能制造、新能源/新材料、企业服务、前沿科技、生命科学等科技赛道；投资业务（直投）于2021年后逐步展开，管理十数支硬科技专项基金及一支总规模5亿元的硬科技产业人民币基金<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref5">[5]</a></sup>。截至2026年8月，云岫资本以财务顾问角色累计帮助客户完成超400笔、超1100亿元人民币的私募融资与并购交易<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref2">[2]</a></sup>。在具身智能领域，云岫资本既是最早深耕机器人赛道的财务顾问之一（代表案例包括宇树科技、星动纪元等），也通过自有基金以天使领投角色直接布局了无论科技、深度机智等具身智能公司。</p>
+
+      <h2 id="facts">1 事实与分析</h2>
+      <p style="font-size:0.82rem;color:#54595d;margin-bottom:10px;">来源可靠性标注：<span class="tag tag-info">AMAC登记</span> = 基金业协会法定公示信息 · <span class="tag tag-info">机构自述</span> = 官网/公众号/官方演讲 · <span class="tag tag-info">媒体报道</span> = 第三方独立报道 · <span class="tag tag-info">工商登记</span> = 企业信用信息公示系统 · <span class="tag tag-info">招股书/监管文件</span> = 法定披露文件</p>
+
+      <h3 id="basic">1.1 基本信息</h3>
+      <p><strong>云岫资本</strong>成立于2015年，总部位于上海，并在北京、深圳、合肥设有办公室<sup><a href="#ref3">[3]</a></sup><sup><a href="#ref4">[4]</a></sup>。公司定位为"科技产业投资服务机构"，财务顾问业务覆盖半导体、AI/智能制造、新能源/新材料、企业服务、前沿科技、生命科学等科技赛道；投资业务于2021年后逐步展开，管理十数支硬科技专项基金及一支总规模5亿元的硬科技产业人民币基金<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref5">[5]</a></sup>。其官网列出的服务案例覆盖7大分类、超130家企业，累计FA交易超400笔、超1100亿元人民币（2024年口径）<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref14">[14]</a></sup>。云岫资本是中国私募股权市场中典型的"FA+直投"复合型机构：以财务顾问业务积累产业认知与项目源，再以自有基金在早期阶段直接下注。</p>
+
+      <div class="table-wrapper">
+        <table class="wikitable infotable">
+          <tr><th>项目</th><th>内容</th></tr>
+          <tr><td>机构全称</td><td>上海岫扬云科技有限责任公司（品牌：云岫资本 / Winsoul Capital）<sup><a href="#ref4">[4]</a></sup></td></tr>
+          <tr><td>品牌名称</td><td>云岫资本 / Winsoul Capital</td></tr>
+          <tr><td>成立时间</td><td>2015年<sup><a href="#ref3">[3]</a></sup></td></tr>
+          <tr><td>注册地址</td><td>上海市浦东新区（办公地址：浦东新区耀元路58号中农投大厦19层）<sup><a href="#ref4">[4]</a></sup></td></tr>
+          <tr><td>机构类型</td><td>财务投资机构（vc-pe）—— 精品投行（FA）+ 私募股权投资复合型</td></tr>
+          <tr><td>管理规模</td><td>管理人备案规模区间0–5亿元人民币；另有5亿元硬科技产业基金（合肥）及十数支硬科技专项基金<sup><a href="#ref3">[3]</a></sup><sup><a href="#ref5">[5]</a></sup></td></tr>
+          <tr><td>创始合伙人</td><td>高超（创始合伙人兼CEO，原清科资本合伙人）<sup><a href="#ref6">[6]</a></sup></td></tr>
+          <tr><td>投资阶段</td><td>种子期、扩张期（天使/种子为主，直投偏早期）<sup><a href="#ref3">[3]</a></sup></td></tr>
+          <tr><td>币种</td><td>人民币为主</td></tr>
+          <tr><td>AMAC登记号</td><td>P1064802（宁波梅山保税港区云岫金涌投资管理有限公司）<sup><a href="#ref7">[7]</a></sup></td></tr>
+          <tr><td>官网</td><td><a href="https://www.yunxiucap.com" target="_blank">www.yunxiucap.com</a><sup><a href="#ref8">[8]</a></sup></td></tr>
+        </table>
+      </div>
+
+      <h3 id="team">1.2 核心团队</h3>
+      <p>云岫资本团队规模约60余位专业人士（官网与36氪不同口径为"30余位"至"60余位"），核心成员来自斯坦福大学、清华大学、北京大学、中国科学技术大学等高校及微软、博通、海思、应用材料等科技企业<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref4">[4]</a></sup>。团队按赛道分组，具身智能/机器人被归入"AI/智能制造组"。以下为官网披露的核心成员<sup><a href="#ref6">[6]</a></sup>。</p>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+          <tr><td>创始合伙人兼CEO</td><td>高超</td><td>近20年精品投行及投资管理经验，曾任清科资本合伙人，中国高科技领域精品投行开拓者之一；带领团队完成超430笔融资及并购交易、累计交易金额超1200亿元人民币；参与投资埃泰克、英韧科技、芯旺微电子、赛昉科技、深度机智、无论科技、诺瓦聚变、长飞先进等。中国科学技术大学学士，长江商学院EMBA<sup><a href="#ref6">[6]</a></sup></td></tr>
+          <tr><td>合伙人兼AI/智能制造组负责人</td><td>符志龙</td><td>多年AI、汽车、机器人及新材料领域投融资经验，曾任某私募机构高级投资经理，累计交易金额近200亿元；代表案例：富特科技、摩尔线程、埃泰克、凌川科技、宇树科技、元戎启行、天能新材料、星河动力等。清华大学机械工程学士、材料科学与工程硕士<sup><a href="#ref6">[6]</a></sup></td></tr>
+          <tr><td>合伙人兼前沿科技组负责人</td><td>宋旭文</td><td>近15年股权投资经验，曾任早期投资机构中路资本合伙人；关注前沿科技、工业、能源材料、AI；代表案例：诺瓦聚变、幺正量子、量晶超导、曦融兆波、华镁钛、亮道智能等。上海财经大学经济学硕士<sup><a href="#ref6">[6]</a></sup></td></tr>
+          <tr><td>投资合伙人</td><td>申珺</td><td>23年VC/PE投资经验，曾任德丰杰全球基金、罗斯柴尔德中国基金、元禾重元基金合伙人；专注电子与信息技术领域，案例包括中芯国际、展讯、AOS、顺丰、杰华特等<sup><a href="#ref6">[6]</a></sup></td></tr>
+          <tr><td>董事总经理兼半导体组负责人</td><td>段方庆</td><td>多年芯片半导体产业与投资经验，曾任原点资产、彤源投资、元创资本MD，具备Marvell、华为等科技公司从业背景；案例：兆易创新、中际旭创、TCL中环。华中科大通信工程硕士、上海财大企业管理硕士<sup><a href="#ref6">[6]</a></sup></td></tr>
+          <tr><td>AI/智能制造组 董事</td><td>徐笛</td><td>曾在复星集团从事收并购与财务分析，精品投行8年以上经验；关注汽车产业链、<strong>具身智能、机器人</strong>及消费电子；代表案例：云鲸智能、睿尔曼、UniX AI、松灵机器人、XbotGo等。中国人民大学经济学学士、杜伦大学理学硕士<sup><a href="#ref6">[6]</a></sup></td></tr>
+          <tr><td>执行董事兼智能产业组负责人</td><td>刘沁</td><td>10年投行与战略经验，曾于某头部机构任董事，并在美团任职期间牵头S级战略项目；案例：海拍客、moody、ForwardX、易买工品等<sup><a href="#ref6">[6]</a></sup></td></tr>
+        </table>
+      </div>
+      <div class="callout"><span class="tag tag-info">简评</span> 云岫资本的核心团队呈现典型的"投行基因+产业背景"组合：以高超（原清科资本合伙人）为灵魂人物，各赛道组负责人多具备清华、中科大等工科背景及产业公司从业经历，使其能在半导体、机器人等硬科技赛道同时胜任FA撮合与早期投资判断。相比纯财务VC，其投行业务带来的交易流、定价能力与产业人脉是差异化优势；但直投团队相对精简（投资合伙人申珺等少数成员），早期直投的规模化投后管理能力仍有待验证。</div>
+
+      <h3 id="funds">1.3 基金结构与LP</h3>
+      <p>云岫资本的私募基金管理人为<strong>宁波梅山保税港区云岫金涌投资管理有限公司</strong>（AMAC登记编号P1064802，成立于2016年11月18日，登记于2017年9月13日，注册资本1000万元人民币、实缴100%，法定代表人及实控人为高超，管理规模区间0–5亿元，在管基金6只）<sup><a href="#ref7">[7]</a></sup><sup><a href="#ref3">[3]</a></sup>。云岫资本整体"管理十数支硬科技专项基金及一支硬科技产业人民币基金"<sup><a href="#ref1">[1]</a></sup>，已公开可查的备案基金包括：</p>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>基金名称</th><th>设立/备案时间</th><th>规模</th><th>备注</th></tr>
+          <tr><td>嘉兴云涌岫阳股权投资合伙企业（有限合伙）</td><td>基金编号SXE579</td><td>未披露</td><td>创业投资基金，托管行兴业银行；持有埃泰克（603293.SH）0.23%股份（发行前）<sup><a href="#ref9">[9]</a></sup><sup><a href="#ref10">[10]</a></sup></td></tr>
+          <tr><td>宁波梅山保税港区云涌岫阳股权投资合伙企业（有限合伙）</td><td>2021年6月15日备案</td><td>未披露</td><td>基金编号SQP955，托管行广发证券，运作状态"正在运作"<sup><a href="#ref9">[9]</a></sup></td></tr>
+          <tr><td>嘉兴云朗岫通创业投资合伙企业（有限合伙）</td><td>2023年3月21日</td><td>认缴3000万元</td><td>云岫金涌任执行事务合伙人（GP，持1%）<sup><a href="#ref9">[9]</a></sup></td></tr>
+          <tr><td>嘉兴岫励云创业投资合伙企业（有限合伙）</td><td>2023年3月20日</td><td>未披露</td><td>云岫金涌任执行事务合伙人<sup><a href="#ref9">[9]</a></sup></td></tr>
+          <tr><td>安徽岫瀚云新研创业投资合伙企业（有限合伙）</td><td>2023年12月</td><td>约2.58亿元</td><td>云岫金涌任GP/基金管理人联合发起设立（合肥）<sup><a href="#ref9">[9]</a></sup></td></tr>
+          <tr><td>合肥硬科技产业基金（首支产业人民币基金）</td><td>2024年5月落地</td><td>总规模5亿元</td><td>由科大硅谷母基金、安徽省新型研发机构母基金及恒烁股份（688416.SH）、宿迁联盛（603065.SH）等产业方共同发起；云岫资本为科大硅谷引导基金第一批入选子基金<sup><a href="#ref5">[5]</a></sup><sup><a href="#ref11">[11]</a></sup></td></tr>
+        </table>
+      </div>
+      <div class="callout"><span class="tag tag-info">简评</span> 云岫资本的LP结构以地方国资引导基金（科大硅谷引导基金）、安徽省母基金及上市公司产业方为主，属于典型的"国资LP+产业LP"组合，尚无公开信息显示其引入市场化美元LP或大型捐赠基金。其合肥5亿元硬科技产业基金的设立深度绑定科大硅谷"双招双引"政策目标（返投合肥、孵化引入100家创业项目），反映其募资策略依托创始人高超的中科大校友网络与地方政府产业政策的结合。管理人备案规模仅0–5亿元，与其"十数支专项基金"的自述存在口径差异——专项基金多为单项目/小规模载体，合计直投盘子仍较小。</div>
+
+      <h3 id="philosophy">1.4 投资哲学与偏好</h3>
+      <p>云岫资本的投资哲学以创始合伙人高超的公开表述最为系统。其核心判断是：基于生产关系创新的互联网模式机会已进入尾声，而基于<strong>生产力创新</strong>的芯片、机器视觉、人工智能、机器人等新兴科技创业"刚刚开始"；自2017年起，云岫资本加大在底层芯片、机器视觉和机器人领域的投入<sup><a href="#ref12">[12]</a></sup>。</p>
+      <p>在AI/具身智能时代判断上，高超提出："移动互联网时代本质是连接，连接交付价值；AI时代本质是智能体，智能体交付价值"，并认为"未来肯定会诞生出AI时代的字节、AI时代的腾讯，但范式会发生变化"<sup><a href="#ref12">[12]</a></sup>。</p>
+      <p>高超在2026年AI Partner·北京亦庄AI+产业大会圆桌中进一步阐述了具体筛选标准<sup><a href="#ref13">[13]</a></sup>：</p>
+      <ul>
+        <li><strong>关注三大类AI企业</strong>：① AI有巨大应用前景的垂直行业（AI for Science、AI+医药、AI+新材料、可控核聚变）；② 具备自身数据积累及数据闭环的场景（金融、能源等）；③ 商业模式具有良好延展性的项目（如AI与虚拟电厂结合）。</li>
+        <li><strong>评估企业壁垒看三点</strong>：独特的场景资源（大客户资源）、数据优势（如AI+材料领域的百万级数据支撑）、团队复合能力（把行业know-how转化为自有模型能力，不完全依赖第三方大模型）。</li>
+        <li><strong>风险判断</strong>：没有强技术壁垒、缺乏工程化能力的"伪AI概念"公司"肯定会被出清"。</li>
+      </ul>
+      <p>在机器人领域，高超在2021年服务宇树科技B轮融资时做出了"非共识"判断——当时多数投资人认为四足机器狗并非刚需，但云岫判断"机器人有机会成为下一代在人类生活工作场景中渗透率非常高的智能硬件终端"；同时他坦言"人形机器人现在还没有PMF（产品市场匹配）"，按Gartner技术曲线"正处于期望膨胀或泡沫期"，但长期看好人形机器人"有机会成为类汽车的家庭产品"、"未来每个家庭都会有1到2位人形机器人，未来10-20年有机会能看到"<sup><a href="#ref12">[12]</a></sup>。</p>
+      <p>从投资行为归纳，云岫资本的直投呈现以下可观察模式（基于投资案例分析）：<strong>种子/天使轮领投或早期参与</strong>（无论科技天使领投、容芯致远种子领投、深度机智天使参与），<strong>FA与直投联动</strong>——通常先以财务顾问身份介入项目、再以自有基金下注，或先直投后担任后续轮次独家FA；<strong>单笔金额较小</strong>（多为数千万元级别），与其0–5亿元管理人备案规模匹配。</p>
+      <div class="callout"><span class="tag tag-info">简评</span> 云岫资本的投资哲学兼具"产业投行视角"与"技术理想主义"：其判断框架（生产力创新 vs 生产关系创新、人形机器人处于泡沫期但长期空间巨大）具有清晰的周期意识，与主流财务VC的叙事高度契合，但差异化在于"先FA后直投"的项目获取路径。值得注意的是，其公开表述的AI筛选标准更偏垂直行业应用与数据闭环，而具身智能直投案例（无论科技、深度机智）更多体现为对"非共识"早期技术的下注——两种逻辑之间存在一定张力，未来其直投重心是向"应用层"还是"技术层"倾斜有待观察。</div>
+
+      <h3 id="tracks">1.5 主要投资赛道</h3>
+      <p>云岫资本的官网服务案例（FA业务）覆盖7大分类；其直投业务聚焦硬科技早期。下表按官网分类列出其代表性FA案例与赛道布局<sup><a href="#ref14">[14]</a></sup>。</p>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>赛道</th><th>代表性被投/服务公司</th><th>赛道投资/服务逻辑</th><th>布局时间</th></tr>
+          <tr><td>半导体</td><td>英诺赛科、佰维存储、杰华特、本源量子、芯华章、锐泰微电子、超芯星、欧冶半导体</td><td>覆盖芯片设计、半导体材料、设备、EDA、量子计算全产业链，为云岫第一大FA赛道</td><td>2017–至今</td></tr>
+          <tr><td>AI/智能制造</td><td>宇树科技、星动纪元、深朴智能、摩尔线程、艾利特机器人、擎朗智能、梅卡曼德</td><td>以具身智能/机器人与AI芯片为核心，FA+直投联动</td><td>2019–至今</td></tr>
+          <tr><td>新能源/新材料</td><td>一道新能、中润光能、纤纳光电、天能新材料、宿迁时代储能、英创汇智</td><td>光伏、储能、锂电回收、氢能等，光伏行业协会金融专委会首届委员单位</td><td>2020–至今</td></tr>
+          <tr><td>企业服务/产业科技</td><td>六方云、智臾科技、山景智能、Choiceform、焱融科技</td><td>工业互联网安全、数据库、超自动化等企业软件</td><td>2018–至今</td></tr>
+          <tr><td>前沿科技</td><td>诺瓦聚变、幺正量子、汉邦科技、星河动力、曦融兆波</td><td>核聚变、量子计算、3D打印、商业航天等"硬核前沿"</td><td>2021–至今</td></tr>
+          <tr><td>生命科学/医疗科技</td><td>视微影像、迪视医疗、恩凯赛药、柏视医疗</td><td>医疗影像、手术机器人、细胞治疗等</td><td>2018–至今</td></tr>
+        </table>
+      </div>
+
+      <h3 id="embodied">1.6 具身智能领域布局【重点】</h3>
+      <div class="callout">
+        <div class="callout-title">具身智能投资概况</div>
+        <p>具身智能/机器人FA服务案例：<strong>约21家</strong>（官网服务案例口径）｜ 具身智能直接股权投资：<strong>2家</strong>（无论科技、深度机智，另有容芯致远等AI算力方向）｜ 最早进入时间：<strong>2021年</strong>（宇树科技B轮FA）｜ 投资角色：<strong>FA为主、直投以天使/种子领投为主</strong></p>
+      </div>
+
+      <h4>A. 布局概览</h4>
+      <p>云岫资本是具身智能赛道最早的财务顾问玩家之一。早在2021年即担任<strong>宇树科技</strong>B轮融资财务顾问（当时四足机器人赛道尚未被主流资本认可），此后持续以FA角色服务星动纪元、深朴智能、UniX AI、星际光年、中科新松等具身智能公司，覆盖人形机器人本体、具身大脑、机械臂、移动底盘、机器人核心零部件等产业链环节<sup><a href="#ref12">[12]</a></sup><sup><a href="#ref14">[14]</a></sup>。2024–2025年起，云岫资本开始以自有基金直接布局具身智能：天使领投仿生表情机器人<strong>无论科技</strong>，参与具身智能大脑公司<strong>深度机智</strong>天使轮并持续跟投，形成"FA+直投"双轮驱动的具身智能布局<sup><a href="#ref15">[15]</a></sup><sup><a href="#ref16">[16]</a></sup>。</p>
+
+      <h4>B. 具身智能投资组合</h4>
+      <p>由于云岫资本兼具FA与直投双重身份，以下分两个表呈现：<strong>表B-1为直接股权投资</strong>（自有基金下注，股权可追溯），<strong>表B-2为具身智能FA服务案例</strong>（财务顾问服务，非股权投资）。</p>
+
+      <h4>表B-1：具身智能直接股权投资</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>被投公司</th><th>投资时间</th><th>轮次</th><th>金额</th><th>角色</th><th>后续参与</th><th>核心方向</th></tr>
+          <tr>
+            <td>无论科技（AnyWit Robotics）</td>
+            <td>2025年2月前后（天使轮）</td>
+            <td>天使轮</td>
+            <td>未披露</td>
+            <td><span class="tag t-lead-investor">领投方</span></td>
+            <td>后续Pre-A、Pre-A+轮任独家财务顾问<sup><a href="#ref15">[15]</a></sup><sup><a href="#ref17">[17]</a></sup></td>
+            <td>仿生表情/情感交互机器人（高自由度头面部组件）</td>
+          </tr>
+          <tr>
+            <td>深度机智（北京机智赛博）</td>
+            <td>2025年12月（天使轮）</td>
+            <td>天使轮</td>
+            <td>数亿元（联合）</td>
+            <td><span class="tag t-follow-investor">参投方</span></td>
+            <td>2026年5月天使+轮作为老股东继续跟投<sup><a href="#ref16">[16]</a></sup><sup><a href="#ref18">[18]</a></sup></td>
+            <td>具身通用智能基座模型（"人类第一视角数据驱动"）</td>
+          </tr>
+        </table>
+      </div>
+      <p style="font-size:0.8rem;color:#54595d;margin:4px 0 10px;"><strong>确认度说明</strong>：无论科技"天使轮领投方"角色经云岫官方公众号及媒体报道交叉确认；深度机智"天使轮参投+老股东跟投"经普华资本官网、投资界报道确认。两家公司均为官网未单独披露股权比例的早期投资，具体持股比例未公开。</p>
+
+      <h4>表B-2：具身智能/机器人FA服务案例（官网服务案例列表）</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>被投/服务公司</th><th>FA时间</th><th>轮次</th><th>金额</th><th>云岫角色</th><th>核心方向</th></tr>
+          <tr><td>宇树科技</td><td>2022年4月</td><td>B轮系列</td><td>数亿元</td><td>财务顾问<sup><a href="#ref14">[14]</a></sup></td><td>四足机器人/人形机器人本体</td></tr>
+          <tr><td>星动纪元</td><td>官网陈列</td><td>新一轮</td><td>10亿元</td><td>财务顾问<sup><a href="#ref14">[14]</a></sup></td><td>全栈自研具身（大脑/运控/本体/灵巧手）</td></tr>
+          <tr><td>深朴智能</td><td>2025年11月</td><td>种子+种子+轮</td><td>累计2亿元</td><td>财务顾问<sup><a href="#ref19">[19]</a></sup></td><td>通用具身智能（家庭场景）</td></tr>
+          <tr><td>UniX AI</td><td>2025年5月</td><td>天使轮</td><td>数亿元</td><td>财务顾问<sup><a href="#ref14">[14]</a></sup></td><td>全栈式通用具身智能</td></tr>
+          <tr><td>星际光年</td><td>2025年5月</td><td>天使+轮</td><td>数千万元</td><td>财务顾问<sup><a href="#ref14">[14]</a></sup></td><td>具身智能（场景落地）</td></tr>
+          <tr><td>中科新松</td><td>2026年7月</td><td>A+轮</td><td>数亿元</td><td>财务顾问<sup><a href="#ref20">[20]</a></sup></td><td>工业场景具身智能机器人</td></tr>
+          <tr><td>白马科技</td><td>2026年1月</td><td>B轮</td><td>近5亿元</td><td>独家财务顾问<sup><a href="#ref21">[21]</a></sup></td><td>户外机器人</td></tr>
+          <tr><td>睿尔曼</td><td>2023年5月</td><td>A+轮</td><td>未披露</td><td>财务顾问<sup><a href="#ref14">[14]</a></sup></td><td>超轻量仿人机械臂</td></tr>
+          <tr><td>嘉腾机器人</td><td>2026年8月</td><td>战略轮</td><td>数千万元</td><td>后续融资独家财务顾问<sup><a href="#ref22">[22]</a></sup></td><td>工业具身智能移动底盘</td></tr>
+          <tr><td>艾利特机器人</td><td>2021年4月</td><td>B1轮</td><td>2亿元</td><td>独家财务顾问<sup><a href="#ref14">[14]</a></sup></td><td>协作机器人</td></tr>
+          <tr><td>擎朗智能</td><td>2020年</td><td>B轮</td><td>2亿元</td><td>独家财务顾问<sup><a href="#ref3">[3]</a></sup></td><td>服务机器人</td></tr>
+          <tr><td>梅卡曼德</td><td>官网陈列</td><td>Pre-A/A/A+轮</td><td>过亿元</td><td>财务顾问<sup><a href="#ref14">[14]</a></sup></td><td>工业3D视觉</td></tr>
+          <tr><td>大界机器人</td><td>官网陈列</td><td>A轮</td><td>数千万元</td><td>财务顾问<sup><a href="#ref14">[14]</a></sup></td><td>建筑机器人</td></tr>
+          <tr><td>凯乐士科技</td><td>2022年12月</td><td>E轮</td><td>数亿元</td><td>财务顾问<sup><a href="#ref14">[14]</a></sup></td><td>物流机器人</td></tr>
+          <tr><td>启玄科技</td><td>2022年12月</td><td>A++轮</td><td>数千万元</td><td>财务顾问<sup><a href="#ref14">[14]</a></sup></td><td>焊接机器人</td></tr>
+          <tr><td>寅成智能</td><td>官网陈列</td><td>天使轮</td><td>千万元</td><td>财务顾问<sup><a href="#ref14">[14]</a></sup></td><td>通用拣选机器人</td></tr>
+          <tr><td>璇玑动力</td><td>官网陈列</td><td>Pre-A轮</td><td>数亿元</td><td>财务顾问<sup><a href="#ref14">[14]</a></sup></td><td>机器人本体平台及核心零部件</td></tr>
+          <tr><td>Trifo</td><td>2021年9月</td><td>C1轮</td><td>数亿元</td><td>财务顾问<sup><a href="#ref14">[14]</a></sup></td><td>AI家庭机器人</td></tr>
+          <tr><td>XbotGo（深眸远智）</td><td>2026年5月</td><td>新一轮</td><td>近亿元</td><td>长期独家财务顾问<sup><a href="#ref23">[23]</a></sup></td><td>智能体育影像/AI运动相机</td></tr>
+          <tr><td>迪视医疗</td><td>2023年2月</td><td>天使/Pre-A轮</td><td>数千万元</td><td>财务顾问<sup><a href="#ref14">[14]</a></sup></td><td>显微外科手术机器人</td></tr>
+          <tr><td>无论科技</td><td>2025年12月</td><td>Pre-A/Pre-A+轮</td><td>数千万元</td><td>独家财务顾问（同时为天使股东）<sup><a href="#ref15">[15]</a></sup></td><td>仿生表情/情感交互机器人</td></tr>
+        </table>
+      </div>
+      <p style="font-size:0.8rem;color:#54595d;margin:4px 0 10px;"><strong>说明</strong>：表B-2以云岫资本官网服务案例列表（2026年8月31日访问）为完整名单基础<sup><a href="#ref14">[14]</a></sup>，并补充投资界等媒体的交易新闻交叉验证。表中"官网陈列"表示该公司出现在官网服务案例分类中但未单独标注交易日期。星动纪元（10亿元新一轮）以官网陈列为准，其在2026年多轮大额融资中云岫的具体FA角色未经独立新闻确认。</p>
+
+      <h4>C. 投资逻辑与观点</h4>
+      <p>云岫资本对具身智能赛道的投资逻辑可从创始人高超的公开论述中提炼<sup><a href="#ref12">[12]</a></sup><sup><a href="#ref13">[13]</a></sup>：</p>
+      <ul>
+        <li><strong>为何看好</strong>：机器人被视为"下一代在人类生活工作场景中渗透率非常高的智能硬件终端"，且这一波机器人热潮与上一波工业自动化有本质不同——强调通用泛化能力。高超判断人形机器人"未来10-20年每个家庭会有1到2位"，长期空间类汽车。</li>
+        <li><strong>时间线判断</strong>：按Gartner技术曲线，当前人形机器人"正处于期望膨胀或泡沫期"、尚无PMF；但他认为泡沫期是新技术必经阶段，"不止宇树，相信也会有更多机器人公司到这个位置上来"，爆火会吸引更多资本与创业者，是好事。</li>
+        <li><strong>选择标的标准</strong>：结合高超在AI大会的表述，云岫偏好①技术壁垒真实、②具备场景资源与数据闭环、③团队具备将行业know-how转化为自有模型能力的团队；在具身智能具体标的上，其直投案例（无论科技、深度机智）显示其对"非共识"技术方向（情感交互、人类视角数据）的偏好。</li>
+        <li><strong>FA+直投联动</strong>：云岫惯常以FA身份深度介入具身智能公司的融资过程（宇树、星动纪元、深朴智能等），从而获得早期信息优势，再选择少数项目以自有基金下注（无论科技、深度机智）——这使其具身智能布局兼具"覆盖面广"（FA）与"下注精准"（直投）的特征。</li>
+      </ul>
+
+      <h4>D. 布局特征分析</h4>
+      <p>综合云岫资本在具身智能领域的数据，可归纳以下特征<sup><a href="#ref14">[14]</a></sup><sup><a href="#ref15">[15]</a></sup><sup><a href="#ref16">[16]</a></sup>：</p>
+      <ul>
+        <li><strong>FA"广撒网" + 直投"精准下注"</strong>：FA服务覆盖约21家具身智能/机器人公司，横跨本体（宇树、星动纪元、UniX AI）、大脑（深度机智、星际光年）、零部件（璇玑动力、睿尔曼）、移动底盘（嘉腾机器人）、应用场景（建筑、物流、焊接、医疗）等全产业链；但直投仅2家，且均为2025年后进入的天使/种子期项目，体现审慎的早期下注策略。</li>
+        <li><strong>细分方向偏好</strong>：直投偏好"具身大脑/交互"类（深度机智=具身基座模型，无论科技=情感交互），与当前资本对人形本体"估值高、同质化"的担忧形成对照——云岫选择避开本体军备竞赛，押注差异化技术层。</li>
+        <li><strong>进入时机</strong>：FA业务2021年即切入（宇树B轮），早于行业共识；直投2025年才真正落地具身智能标的，恰逢行业融资高峰期，属于"FA早、直投跟随"的节奏。</li>
+        <li><strong>差异化定位</strong>：与红杉、IDG等头部财务VC"大额领投+持续加注"的模式不同，云岫以小额早期领投+独家FA绑定为主，单笔金额小、投后深度绑定（如无论科技"天使领投+后续独家FA"），形成轻资产、高粘性的生态位。</li>
+      </ul>
+
+      <div class="callout"><span class="tag tag-info">简评</span> 云岫资本在具身智能赛道的布局具有鲜明的"FA生态位"特征：其以财务顾问身份触达了行业中大量头部具身智能公司（宇树、星动纪元、深朴智能等），但直投转化率极低——截至2026年8月仅2家具身智能直投标的。这既是审慎（避免在人形本体高估值泡沫中接盘），也反映其直投盘子（管理人备案规模0–5亿元）难以支撑大额领投。其选择"大脑/交互"细分方向（深度机智、无论科技）而非本体，与该领域估值相对合理、技术壁垒可验证有关，也与其"产业投行"的信息优势匹配。若具身智能行业出清，云岫的FA组合可能面临服务收入下降风险，但其直投敞口有限、风险可控。</div>
+
+      <h3 id="cases">1.7 典型投资案例</h3>
+      <p>云岫资本的典型案例分为直投退出案例与FA陪伴上市案例两类。其作为FA服务的多家公司已成功IPO（宇树科技、摩尔线程、恒烁半导体、英诺赛科、佰维存储、富特科技等）；直投端目前最清晰的退出案例为埃泰克（通过基金嘉兴云涌岫阳持股）。</p>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>被投公司</th><th>所属赛道</th><th>投资/服务时间</th><th>轮次</th><th>退出方式</th><th>云岫角色</th></tr>
+          <tr><td>埃泰克（603293.SH）</td><td>汽车电子</td><td>2022年10月入股</td><td>股权受让</td><td>2026年上交所主板IPO（发行价33.49元/股），云岫持股发行前0.23%、发行后0.17%</td><td><span class="tag t-lead-investor">直投</span><sup><a href="#ref10">[10]</a></sup></td></tr>
+          <tr><td>宇树科技（688836.SH）</td><td>四足/人形机器人</td><td>2022年4月</td><td>B轮</td><td>2025年科创板IPO</td><td>FA<sup><a href="#ref14">[14]</a></sup></td></tr>
+          <tr><td>摩尔线程（688795.SH）</td><td>GPU</td><td>2021年（A轮）</td><td>Pre-A/A轮</td><td>2025年科创板IPO</td><td>FA<sup><a href="#ref14">[14]</a></sup></td></tr>
+          <tr><td>恒烁半导体</td><td>存储芯片</td><td>2021年（B轮）</td><td>B轮</td><td>2022年科创板IPO过会</td><td>FA<sup><a href="#ref14">[14]</a></sup></td></tr>
+          <tr><td>佰维存储（688525.SH）</td><td>存储解决方案</td><td>2021年（B/B+轮）</td><td>B/B+轮</td><td>科创板IPO</td><td>FA<sup><a href="#ref14">[14]</a></sup></td></tr>
+          <tr><td>英诺赛科</td><td>氮化镓芯片</td><td>官网陈列</td><td>B/C轮</td><td>港股IPO（2024年12月上市）</td><td>FA<sup><a href="#ref14">[14]</a></sup></td></tr>
+          <tr><td>富特科技（301607.SZ）</td><td>新能源汽车电子</td><td>2022年1月</td><td>两轮近3亿元</td><td>创业板IPO</td><td>FA<sup><a href="#ref14">[14]</a></sup></td></tr>
+        </table>
+      </div>
+      <p style="font-size:0.8rem;color:#54595d;margin:4px 0 10px;"><strong>说明</strong>：除埃泰克（云岫通过嘉兴云涌岫阳基金直投，招股书可查）外，其余案例均为云岫担任财务顾问、非股权投资。云岫未公开披露其直投项目的退出回报倍数。</p>
+      <div class="callout"><span class="tag tag-info">简评</span> 云岫资本"FA陪伴上市"的退出路径清晰：其服务过的一批硬科技公司（宇树、摩尔线程、恒烁、佰维、英诺赛科等）已先后完成IPO，为FA业务建立了可观的品牌背书，但FA模式不分享股权增值收益，回报有限。直投端目前仅埃泰克一家实现IPO退出，且持股比例仅0.17%、入股于上市前一年（2022年10月），属于典型的"Pre-IPO财务投资"而非早期高风险高回报投资；其早期直投（无论科技、深度机智等）尚未到退出期，基金真实回报有待验证。</div>
+
+      <h3 id="performance">1.8 基金业绩</h3>
+      <p>该机构未公开披露基金业绩数据（IRR/DPI/TVPI）。作为私募投资机构，其基金业绩指标通常仅向LP报告，不对外公开；公开渠道亦未见其LP（如恒烁股份、宿迁联盛等上市公司）披露所投云岫基金的净值或回报信息。<sup><a href="#ref11">[11]</a></sup></p>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li><strong>云岫全球科创总部落户合肥</strong>：2024年5月，云岫资本在合肥落地"科大硅谷云岫创新单元（云岫全球科创总部）"，规划未来五年孵化引入累计100家高质量创业项目，以"基地+基金"方式推动"双招双引"；云岫资本为科大硅谷首批签约的全球合伙人<sup><a href="#ref5">[5]</a></sup><sup><a href="#ref11">[11]</a></sup>。</li>
+        <li><strong>行业荣誉</strong>：曾获2022年度第一新声"财务顾问机构活跃榜"TOP 1、投中2022年度"中国最佳新型投行"Top 3、企名片2022年度"中国最佳财务顾问半导体榜"TOP 1、2021科创板最具贡献机构等；高超入选钛媒体2022"年度青年合伙人TOP 20"<sup><a href="#ref24">[24]</a></sup>。</li>
+        <li><strong>行业角色</strong>：中国半导体行业协会会员、SEMI国际半导体产业协会会员、中国光伏行业协会金融专委会首届委员单位、北京市经信局"专精特新"FA服务库成员<sup><a href="#ref24">[24]</a></sup>。</li>
+        <li><strong>具身智能产业链上的FA布局</strong>：除本体外，云岫还服务了机器人产业链上下游，包括运动控制与核心零部件（璇玑动力、睿尔曼、嘉腾机器人移动底盘）及AI基础设施（摩尔线程、蓝芯算力、凌川科技、记忆张量等），形成对具身智能生态的较完整覆盖<sup><a href="#ref14">[14]</a></sup>。</li>
+        <li><strong>团队变动注意</strong>：清科私募通页面显示"赵占祥（合伙人兼首席技术官）、苏丹丹（董事总经理兼股权资本市场部负责人）、丰韫喆（投资合伙人）"等为历史在职高管，与官网当前披露的团队名单存在差异，提示云岫资本近年存在人事调整<sup><a href="#ref3">[3]</a></sup>。</li>
+      </ul>
+
+      <h2 id="references">2 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li id="ref1"><a href="https://www.yunxiucap.com" target="_blank">云岫资本官网 — 首页/关于我们（公司定位与累计交易口径）</a>（2026-08-31访问）</li>
+          <li id="ref2"><a href="https://www.sfccn.com/2024/5-27/yMMDE1NzBfMTkyMTcyMw.html" target="_blank">证券时报网 — 云岫资本设立5亿元硬科技基金，联合科创总部助力科大硅谷"双招双引"</a>（2024-05-27）</li>
+          <li id="ref3"><a href="https://zdb.pedaily.cn/company/show28087/" target="_blank">投资界/清科私募通 — 云岫资本机构页</a>（2026-08-31访问）</li>
+          <li id="ref4"><a href="https://pitchhub.36kr.com/organization/1678522138211329" target="_blank">36氪PitchHub — 云岫资本机构信息页</a>（2026-08-31访问）</li>
+          <li id="ref5"><a href="https://m.pedaily.cn/news/534668" target="_blank">投资界 — 云岫资本在合肥落地一支硬科技基金</a>（2024-05-29）</li>
+          <li id="ref6"><a href="https://www.yunxiucap.com/about.html" target="_blank">云岫资本官网 — 管理团队</a>（2026-08-31访问，数据来源于官网 member/index API）</li>
+          <li id="ref7"><a href="https://www.k1wave.com/fundm/ning-bo-mei-shan-bao-shui-gang-qu-yun-xiu-jin-yong-tou-zi-guan-li-you-xian-gong-si" target="_blank">中国证券投资基金业协会私募基金管理人公示 — 宁波梅山保税港区云岫金涌投资管理有限公司（P1064802）</a>（2026-08-31访问）</li>
+          <li id="ref8"><a href="https://www.yunxiucap.com" target="_blank">云岫资本官网</a>（2026-08-31访问）</li>
+          <li id="ref9"><a href="https://www.k1wave.com/fund/jia-xing-yun-yong-xiu-yang-gu-quan-tou-zi-he-huo-qi-ye-you-xian-he-huo-" target="_blank">中国证券投资基金业协会 — 云岫系备案基金（嘉兴云涌岫阳SXE579、宁波云涌岫阳SQP955、嘉兴云朗岫通、安徽岫瀚云新研等）</a>（2026-08-31访问）</li>
+          <li id="ref10"><a href="https://www.9fzt.com/detail/sh_603293_9_41cf2c1af556a502a4b10d852c974636.html" target="_blank">埃泰克（603293）首次公开发行股票招股说明书 — 嘉兴云涌岫阳持股与入股安排</a>（2026年）</li>
+          <li id="ref11"><a href="https://www.163.com/dy/article/J374FRLN05199NPP.html" target="_blank">云岫资本设立5亿元硬科技基金，联合科创总部助力科大硅谷"双招双引"</a>（2024-05-27）</li>
+          <li id="ref12"><a href="https://mp.weixin.qq.com/s?__biz=MzU2OTgzMDg3Mg==&amp;idx=1&amp;mid=2247514424&amp;sn=d760add064094c111797cf6d50aafd80" target="_blank">对话云岫资本高超：王兴兴、梁文锋是技术理想主义者，AI时代的字节和腾讯肯定会诞生</a>（微信公众号访谈）</li>
+          <li id="ref13"><a href="https://m.36kr.com/p/3820091365871748" target="_blank">36氪 — 圆桌对话：AI+的"国家推进计划"与企业的"生存路线图"（高超在2026 AI Partner·北京亦庄AI+产业大会发言）</a>（2026-05-22）</li>
+          <li id="ref14"><a href="https://www.yunxiucap.com/services.html" target="_blank">云岫资本官网 — 服务案例列表（公司案例数据来源于官网 company_case/index API，2026-08-31访问）</a></li>
+          <li id="ref15"><a href="https://media.qimingpian.cn/2025/12/31/e66e242608cbc6e2de0883108ec52952.html" target="_blank">企名片资讯 — 无论科技（AnyWit Robotics）完成Pre-A+轮融资（云岫为天使轮领投方及独家FA）</a>（2025-12-31）</li>
+          <li id="ref16"><a href="https://stock.stockstar.com/RB2026070100037814.shtml" target="_blank">证券之星 — 深度机智天使++轮融资数亿元，投资方含国寿投资、普华资本、云岫资本等</a>（2026-07-01）</li>
+          <li id="ref17"><a href="https://eu.36kr.com/zh/newsflashes/3577695147293827" target="_blank">36氪 — "无论科技"完成数千万元Pre-A轮融资（滴滴战投等领投，云岫任独家FA）</a>（2025-12）</li>
+          <li id="ref18"><a href="http://www.puhuacapital.com/index.php/news/info/301" target="_blank">普华资本 — 投资「深度机智」数亿元天使轮融资</a>（2026年）</li>
+          <li id="ref19"><a href="https://www.pedaily.cn/first/137763.shtml" target="_blank">投资界 — 首发｜深朴智能获2亿元融资，具身机器人落地进程加速（云岫担任财务顾问）</a>（2025-11-07）</li>
+          <li id="ref20"><a href="https://m.pedaily.cn/news/565986" target="_blank">投资界 — 中科新松完成A+轮数亿元股权融资（云岫担任财务顾问）</a>（2026-07-08）</li>
+          <li id="ref21"><a href="https://m.pedaily.cn/news/560339" target="_blank">投资界 — 白马科技完成近5亿元B轮融资（云岫担任独家财务顾问）</a>（2026-01-23）</li>
+          <li id="ref22"><a href="https://www.pedaily.cn/first/172212.shtml" target="_blank">投资界 — 嘉腾机器人完成数千万战略融资，聚焦具身智能"物理基座"（云岫任后续融资独家财务顾问）</a>（2026-08-18）</li>
+          <li id="ref23"><a href="https://m.pedaily.cn/news/563852" target="_blank">投资界 — XbotGo（深眸远智）完成近亿元新一轮融资（云岫担任长期独家财务顾问）</a>（2026-05-14）</li>
+          <li id="ref24"><a href="https://www.yunxiucap.com/industry.html" target="_blank">云岫资本官网 — 产业赋能/行业认可（数据来源于官网 industry/index API）</a>（2026-08-31访问）</li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">最新更新于 2026-08-31 · 数据来源见「2 参考资料」 · 云岫资本为精品投行(FA)+私募股权投资复合型机构，页面已区分FA服务案例与直接股权投资 · 部分数据来自机构自述与媒体报道口径，请审慎参考</div>
+</div>
+</body>
+</html>
