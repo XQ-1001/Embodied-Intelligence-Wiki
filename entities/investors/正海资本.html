@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>正海资本 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 288px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article ol { padding-left: 1.8em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .t-vc { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .t-cvc { background: #fce4ec; color: #c62828; border-color: #f8bbd0; }
+  .t-gov-fund { background: #fff3e0; color: #e65100; border-color: #ffe0b2; }
+  .t-national-fund { background: #f3e5f5; color: #7b1fa2; border-color: #e1bee7; }
+  .t-overseas-fund { background: #e0f2f1; color: #00695c; border-color: #b2dfdb; }
+  .t-academic-fund { background: #e8f5e9; color: #2e7d32; border-color: #c5e1a5; }
+  .t-embodied-active { background: #e8f5e9; color: #2e7d32; border-color: #a5d6a7; }
+  .t-lead-investor { background: #fff8e1; color: #f57f17; border-color: #ffecb3; }
+  .t-follow-investor { background: #f5f5f5; color: #616161; border-color: #e0e0e0; }
+  .t-fa { background: #ede7f6; color: #5e35b1; border-color: #d1c4e9; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../../index.html">具身智能Wiki</a> <span class="breadcrumb-sep">›</span> <a href="../../index.html#investors">投资机构</a> <span class="breadcrumb-sep">›</span> <span>正海资本</span></div>
+  <div class="wiki-header"><h1>正海资本</h1><div class="subtitle">Royalsea Capital · 2008年成立于上海 · 在管约50亿元 / 累计管理超80亿元（机构自述）<sup><a href="#ref1">[1]</a></sup> · AMAC登记 P1003518<sup><a href="#ref7">[7]</a></sup> · 具身智能：以「工业机器人软件 + 机器人零部件 + 物理AI」间接布局，无本体/具身大模型直投<sup><a href="#ref4">[4]</a></sup><sup><a href="#ref9">[9]</a></sup></div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实与分析</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#team">1.2 核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funds">1.3 基金结构与LP</a></li>
+        <li class="toc-lvl3"><a href="#philosophy">1.4 投资哲学与偏好</a></li>
+        <li class="toc-lvl3"><a href="#tracks">1.5 主要投资赛道</a></li>
+        <li class="toc-lvl3"><a href="#embodied">1.6 具身智能领域布局</a></li>
+        <li class="toc-lvl3"><a href="#cases">1.7 典型投资案例</a></li>
+        <li class="toc-lvl3"><a href="#performance">1.8 基金业绩</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#references">2 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">正海资本</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">上海正海资产管理有限公司<sup><a href="#ref7">[7]</a></sup></div></div>
+        <div class="ib-row"><div class="ib-label">英文名</div><div class="ib-value">Royalsea Capital<sup><a href="#ref1">[1]</a></sup></div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2008年1月31日<sup><a href="#ref7">[7]</a></sup></div></div>
+        <div class="ib-row"><div class="ib-label">注册地</div><div class="ib-value">上海市杨浦区<sup><a href="#ref7">[7]</a></sup></div></div>
+        <div class="ib-row"><div class="ib-label">机构类型</div><div class="ib-value"><span class="tag t-vc">财务投资机构</span></div></div>
+        <div class="ib-row"><div class="ib-label">管理规模</div><div class="ib-value">在管约50亿元；累计管理超80亿元（机构自述，截至2025年7月）<sup><a href="#ref1">[1]</a></sup></div></div>
+        <div class="ib-section">核心人物</div>
+        <div class="ib-row"><div class="ib-label">创始人/董事长</div><div class="ib-value">王正东（法定代表人）<sup><a href="#ref7">[7]</a></sup></div></div>
+        <div class="ib-section">登记与合规</div>
+        <div class="ib-row"><div class="ib-label">AMAC登记号</div><div class="ib-value">P1003518（2014-06-04）<sup><a href="#ref7">[7]</a></sup></div></div>
+        <div class="ib-row"><div class="ib-label">备案基金数</div><div class="ib-value">35只（AMAC，2026-10-20）<sup><a href="#ref7">[7]</a></sup></div></div>
+        <div class="ib-section">投资偏好</div>
+        <div class="ib-row"><div class="ib-label">投资领域</div><div class="ib-value">新一代信息技术、高端装备制造、节能环保、汽车产业链、医疗健康<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref2">[2]</a></sup></div></div>
+        <div class="ib-row"><div class="ib-label">投资阶段</div><div class="ib-value">种子期—成熟期（Pre-IPO 与成长期并重）<sup><a href="#ref12">[12]</a></sup></div></div>
+        <div class="ib-row"><div class="ib-label">币种</div><div class="ib-value">人民币</div></div>
+        <div class="ib-section">具身智能</div>
+        <div class="ib-row"><div class="ib-label">暴露程度</div><div class="ib-value"><span class="tag tag-warn">无本体直投 · 产业链关联6家</span></div></div>
+        <div class="ib-row"><div class="ib-label">代表被投</div><div class="ib-value">华航唯实（工业机器人软件）、果纳半导体（晶圆传输机械手）、同驭汽车（线控底盘）、Momenta（物理AI）<sup><a href="#ref9">[9]</a></sup><sup><a href="#ref24">[24]</a></sup><sup><a href="#ref22">[22]</a></sup><sup><a href="#ref10">[10]</a></sup></div></div>
+        <div class="ib-section">官网</div>
+        <div class="ib-row"><div class="ib-label">网址</div><div class="ib-value">www.royalsea-capital.com（2026-10-20 实测可访问）<sup><a href="#ref1">[1]</a></sup></div></div>
+      </aside>
+
+      <p class="article-intro"><strong>正海资本</strong>（Royalsea Capital），基金管理人主体为<strong>上海正海资产管理有限公司</strong>，成立于2008年1月31日，是中国较早一批本土人民币私募股权投资机构之一，2014年6月4日在中国证券投资基金业协会登记为私募股权、创业投资基金管理人（编号P1003518）<sup><a href="#ref7">[7]</a></sup>。机构总部位于上海市杨浦区杨树浦路1198号，官网自述截至2025年7月已备案管理基金30只、在管规模50亿元、累计管理规模超80亿元，累计投资成长型企业近100家<sup><a href="#ref1">[1]</a></sup>。其投资组合以半导体与集成电路、高端装备制造、汽车产业链、节能环保和医疗健康为主，退出高度依赖A股与港股IPO<sup><a href="#ref3">[3]</a></sup>。在具身智能领域，正海资本<strong>没有公开披露的人形机器人本体、具身大模型或灵巧手/关节模组直投</strong>，其相关敞口来自工业机器人软件（华航唯实）、半导体晶圆传输机械手（果纳半导体）、线控底盘（同驭汽车）、触觉反馈（索迩电子）与物理AI/智能驾驶（Momenta、寅家科技）等产业链环节<sup><a href="#ref9">[9]</a></sup><sup><a href="#ref24">[24]</a></sup><sup><a href="#ref22">[22]</a></sup><sup><a href="#ref21">[21]</a></sup><sup><a href="#ref10">[10]</a></sup>。</p>
+
+      <h2 id="facts">1 事实与分析</h2>
+
+      <h3 id="basic">1.1 基本信息</h3>
+      <p>正海资本是一家总部位于上海的本土人民币股权投资机构，业务包括创业投资与股权投资（含并购）<sup><a href="#ref1">[1]</a></sup>。官网将投资领域归纳为「新一代信息技术、节能环保、高端装备制造业」三大方向，实际投资组合则延伸至半导体、新材料、汽车零部件、新能源、医疗健康与消费互联网<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref3">[3]</a></sup><sup><a href="#ref4">[4]</a></sup>。机构自2008年成立至2026年已运作18年，管理基金数量多、单只规模偏小、注册地分散于上海、安徽（芜湖/宣城）、浙江（安吉/长兴/桐乡/嘉兴）与江苏（南通），带有明显的「地方政府引导基金 + 区域产业落地」特征<sup><a href="#ref12">[12]</a></sup><sup><a href="#ref13">[13]</a></sup><sup><a href="#ref14">[14]</a></sup>。</p>
+
+      <div class="table-wrapper">
+        <table class="wikitable infotable">
+          <tr><th>项目</th><th>内容</th></tr>
+          <tr><td>全称</td><td>上海正海资产管理有限公司<sup><a href="#ref7">[7]</a></sup></td></tr>
+          <tr><td>英文名</td><td>Royalsea Capital<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>成立时间</td><td>2008年1月31日<sup><a href="#ref7">[7]</a></sup></td></tr>
+          <tr><td>基金管理人登记</td><td>2014年6月4日；编号P1003518；机构类型「私募股权、创业投资基金管理人」；AMAC会员类型「观察会员」<sup><a href="#ref7">[7]</a></sup></td></tr>
+          <tr><td>注册地址</td><td>上海市杨浦区杨树浦路1198号14楼01单元<sup><a href="#ref7">[7]</a></sup></td></tr>
+          <tr><td>办公地址</td><td>上海市杨浦区杨树浦路1198号山金金融大厦C座16楼（AMAC登记为1601室）<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref7">[7]</a></sup></td></tr>
+          <tr><td>法定代表人</td><td>王正东<sup><a href="#ref7">[7]</a></sup></td></tr>
+          <tr><td>机构类型</td><td><span class="tag t-vc">财务投资机构</span>（本土人民币VC/PE，非产业资本、非政府基金管理人）</td></tr>
+          <tr><td>管理规模</td><td>在管约50亿元；累计管理超80亿元（机构自述，截至2025年7月）<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>备案基金数</td><td>35只（AMAC公示，2026-10-20查询）；官网2025年7月口径为30只<sup><a href="#ref7">[7]</a></sup><sup><a href="#ref8">[8]</a></sup></td></tr>
+          <tr><td>投资阶段</td><td>种子期、初创期、扩张期、成熟期（清科私募通口径）<sup><a href="#ref12">[12]</a></sup></td></tr>
+          <tr><td>官网</td><td>www.royalsea-capital.com<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>联系电话</td><td>86-21-5093-7908<sup><a href="#ref1">[1]</a></sup></td></tr>
+        </table>
+      </div>
+
+      <h3 id="team">1.2 核心团队</h3>
+      <p>官网披露的投资团队共10人，核心合伙人多为复旦、同济、上海交大校友，背景覆盖银行、咨询、产业研发与海外基金，未见机器人或具身智能技术背景的专职合伙人<sup><a href="#ref2">[2]</a></sup>。</p>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>角色</th><th>姓名</th><th>背景与代表项目</th></tr>
+          <tr><td>创始人 / CEO</td><td>王正东</td><td>复旦大学理学士、同济大学管理工程学硕士，曾赴德国柏林工业大学深造；上海市创投协会副会长、复旦管院企业导师。曾任中国银行信托投资公司部门经理、德国BKD银行高级主管；2008年1月创立正海资本。主导东方财富网、百视通、易游天下、合力科技、科华控股、伯特利、尤顺汽车、长安热力等项目<sup><a href="#ref2">[2]</a></sup>。</td></tr>
+          <tr><td>创始合伙人</td><td>沈洪良</td><td>复旦大学理学学士、经济学硕士，曾任复旦大学管理学院教师、IT企业总经理十余年。主导或参与银联商务、应流股份、赛特网科、泓济环保、国惠环保、联芸科技、星宸科技等项目<sup><a href="#ref2">[2]</a></sup>。</td></tr>
+          <tr><td>管理合伙人</td><td>洪林</td><td>上海交通大学工科学士、硕士，挪威科技大学海洋科技博士、博士后；曾任英国劳氏集团风险管理咨询高级/主任咨询师。关注智能制造、节能环保、新能源的Pre-IPO项目，参与嘉麟杰、中国天楹、数据港、威奥股份、美新科技、国富氢能、同驭汽车、上海精智、华航唯实等项目<sup><a href="#ref2">[2]</a></sup>。</td></tr>
+          <tr><td>合伙人</td><td>吴晋</td><td>复旦大学管理学硕士，历任交通银行上海分行中心支行行长助理、金融机构部副总经理，曾任中叶资本总裁/创始合伙人，主管10亿元医药产业基金。加入后负责交融正海智车基金，主导寅家电子、宝瀛气体等项目<sup><a href="#ref2">[2]</a></sup>。</td></tr>
+          <tr><td>合伙人</td><td>花菓</td><td>浙江大学信息与电子工程学士，复旦大学MBA、产业经济学博士；求是缘半导体联盟第三届常务理事。曾在伊士曼柯达、飞利浦、霍尼韦尔从事研发与运营管理。2018年加盟，主导或参与陶特容器、联芸科技、星宸科技、珂玛科技、盾源聚芯、成都超纯、御微半导体、科利德等硬科技项目<sup><a href="#ref2">[2]</a></sup>。</td></tr>
+          <tr><td>合伙人</td><td>耿万京</td><td>西安交通大学工科学士、同济大学管理工程硕士、加拿大西安大略大学经济学博士，CFA；曾在美国多家基金公司任职。主导或参与无锡德斯普、京颐科技、易维视、融智通、艾福电子、快友世纪、西恩科技、星商电子、柯林布瑞等项目<sup><a href="#ref2">[2]</a></sup>。</td></tr>
+          <tr><td>基金总监</td><td>钟芸</td><td>华东师范大学区域经济专业研究生、澳门科技大学MBA；负责募集设立芜湖世纪江东、正海聚缘、正海聚兴、正海聚弘、正海宣城等基金，主管基金策划、募集与LP关系<sup><a href="#ref2">[2]</a></sup>。</td></tr>
+          <tr><td>投资总监</td><td>谭帧华</td><td>美国密歇根理工大学学士、复旦大学管理学院EMBA，复旦管院创投俱乐部秘书长。2018年加入，主导宝碳新能源、国富氢能、冠众光学、国网智芯微、海创循环、寅家科技、灵思泰恪等项目，专注绿色低碳<sup><a href="#ref2">[2]</a></sup>。</td></tr>
+          <tr><td>投资总监</td><td>陆锋伟</td><td>东华大学工学学士、复旦大学MBA，逾十年私募股权投资经验，2025年度融中榜最佳青年投资人物。2008年加入，主导或参与优刻得、艾福电子、星商电子、挚达科技、Momenta等项目，聚焦新能源汽车与绿色出行<sup><a href="#ref2">[2]</a></sup>。</td></tr>
+          <tr><td>投资总监</td><td>李仲庆</td><td>同济大学经济学学士、MBA，2025年度母基金研究中心「40U40最具潜力直投基金青年投资人」。2011年入职正海资本，主导或参与超20家企业，代表项目包括伯特利、波汇科技、快友世纪、泓济环保、西恩科技、同驭汽车<sup><a href="#ref2">[2]</a></sup>。</td></tr>
+        </table>
+      </div>
+      <div class="callout"><span class="tag tag-info">简评</span> 正海资本的团队结构是典型的「本土综合型VC」：以复旦/同济/交大校友网络为纽带，合伙人分别覆盖金融、风控、产业运营与半导体技术，但没有机器人学、运动控制或具身智能算法背景的专职投资人。这决定了机构对具身智能项目的判断更依赖「制造业客户验证 + 财务可预测性」而非技术路线判断，也解释了其为何在机器人领域只投了商业模式接近教育装备/工业软件的华航唯实，而未进入本体或大模型。团队平均司龄长、合伙人共事十年以上，决策稳定性高，但也意味着对2023年后具身智能一级市场的高估值、快节奏打法适应性有限<sup><a href="#ref2">[2]</a></sup>。</div>
+
+      <h3 id="funds">1.3 基金结构与LP</h3>
+      <p>正海资本采用「多期、小额、区域化」的基金架构。据投资界（清科私募通）募资事件记录，2011—2021年间先后设立正海聚亿、无锡正海联云、上海正海国鑫基金、上海正海国鑫源、上海正海聚弘、浙江安吉安海基金、宣城正海资本创业基金、正海聚高、长兴绿能慧通、宁波正海聚锐等基金<sup><a href="#ref12">[12]</a></sup>。2023年起，机构与交银资本合作设立20亿元规模的交融正海智车基金，并连续设立桐乡乌镇、安吉、嘉兴、南通等区域基金；其中2026年两只南通基金由上市公司恒为科技（603496）出资约20%，是公开可查的少数LP明细<sup><a href="#ref15">[15]</a></sup><sup><a href="#ref13">[13]</a></sup><sup><a href="#ref14">[14]</a></sup>。</p>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>基金名称</th><th>设立 / 备案</th><th>规模</th><th>主要LP / 合作方</th><th>备注</th></tr>
+          <tr><td>正海聚亿</td><td>2011.02</td><td>未披露</td><td>未披露</td><td>早期基金序列<sup><a href="#ref12">[12]</a></sup></td></tr>
+          <tr><td>无锡正海联云</td><td>2012.12</td><td>未披露</td><td>未披露</td><td>无锡平台；曾为上市公司基金执行事务合伙人<sup><a href="#ref12">[12]</a></sup></td></tr>
+          <tr><td>上海正海国鑫基金</td><td>2013.10</td><td>未披露</td><td>未披露</td><td>—<sup><a href="#ref12">[12]</a></sup></td></tr>
+          <tr><td>上海正海国鑫源</td><td>2013.11</td><td>未披露</td><td>未披露</td><td>—<sup><a href="#ref12">[12]</a></sup></td></tr>
+          <tr><td>上海正海聚弘</td><td>2014.08</td><td>未披露</td><td>未披露</td><td>—<sup><a href="#ref12">[12]</a></sup></td></tr>
+          <tr><td>浙江安吉安海基金</td><td>2016.01</td><td>未披露</td><td>安吉政府引导基金</td><td>区域基金<sup><a href="#ref12">[12]</a></sup><sup><a href="#ref5">[5]</a></sup></td></tr>
+          <tr><td>宣城正海资本创业基金</td><td>2017.08</td><td>未披露</td><td>宣城政府引导基金</td><td>区域基金<sup><a href="#ref12">[12]</a></sup><sup><a href="#ref5">[5]</a></sup></td></tr>
+          <tr><td>正海聚高基金</td><td>2019.10</td><td>未披露</td><td>未披露</td><td>—<sup><a href="#ref12">[12]</a></sup></td></tr>
+          <tr><td>长兴绿能慧通</td><td>2021.01</td><td>未披露</td><td>未披露</td><td>绿色能源主题<sup><a href="#ref12">[12]</a></sup></td></tr>
+          <tr><td>宁波正海聚锐</td><td>2021.04</td><td>未披露</td><td>未披露</td><td>—<sup><a href="#ref12">[12]</a></sup></td></tr>
+          <tr><td>交融正海智车（安徽）股权投资基金</td><td>2023.09</td><td><strong>20亿元</strong></td><td>交银资本（合作方）、安徽省新能源汽车和智能网联汽车产业主题母基金；上海正海资产任普通合伙人</td><td>安徽省该主题母基金首只备案子基金；正海以此持有寅家科技5.09%<sup><a href="#ref15">[15]</a></sup><sup><a href="#ref16">[16]</a></sup><sup><a href="#ref19">[19]</a></sup></td></tr>
+          <tr><td>桐乡乌镇正海长宏创业投资基金</td><td>2025.01</td><td>未披露</td><td>桐乡（世界互联网大会举办地）相关方</td><td>独家投资灵思泰恪A轮；以7000万元认购寅家科技1,589,689股（持股7.58%）<sup><a href="#ref8">[8]</a></sup><sup><a href="#ref18">[18]</a></sup></td></tr>
+          <tr><td>安吉正海长晟创业投资合伙企业</td><td>2025.07</td><td>未披露</td><td>安吉相关方</td><td>区域基金<sup><a href="#ref12">[12]</a></sup></td></tr>
+          <tr><td>嘉兴长寰创业投资合伙企业</td><td>2025.12</td><td>未披露</td><td>未披露</td><td>区域基金<sup><a href="#ref12">[12]</a></sup></td></tr>
+          <tr><td>南通正海恒浦创业投资合伙企业</td><td>2026.02设立 / 2026.03.18备案（SBTY79）</td><td><strong>1.75亿元</strong></td><td>恒为科技（3500万元，20.00%）、王正东、沈振宇、倪丽萍、谭秀阳、上海石盈信、温州瑾悦合信、海南利盛能源、上海环境节能工程、上海津晟投资</td><td>招商银行托管；正海资产为管理人<sup><a href="#ref13">[13]</a></sup></td></tr>
+          <tr><td>南通正海国恒创业投资合伙企业</td><td>2026.07设立 / 2026.08.25备案（SEK150）</td><td><strong>1.5亿元</strong></td><td>恒为科技（2900万元，19.3333%）等</td><td>招商银行托管；投资范围含高端装备、先进制造、新材料、算力芯片、<strong>机器人</strong>等<sup><a href="#ref14">[14]</a></sup></td></tr>
+        </table>
+      </div>
+      <p><strong>LP结构</strong>：官网「投资理念」页列出的合作基金（政府引导基金）包括国家科技部引导基金、国家发改委母基金、上海市创业投资引导基金、安徽芜湖政府引导基金、安徽宣城政府引导基金、浙江安吉政府引导基金<sup><a href="#ref5">[5]</a></sup>；投资界2016年机构简介另提及宝山区政府引导基金<sup><a href="#ref12">[12]</a></sup>。2026年两只南通基金的LP名单显示，除政府与国资外，还包括上市公司恒为科技、民营企业与高净值自然人<sup><a href="#ref13">[13]</a></sup><sup><a href="#ref14">[14]</a></sup>。</p>
+      <div class="callout"><span class="tag tag-info">简评</span> 正海的募资能力呈现「双轨」：一端是长期合作的国家级/地方级政府引导基金，保证基金设立与区域项目来源；另一端是2026年新出现的产业LP恒为科技（连续出资两只基金、合计6400万元，占两只基金约两成），显示其正在把半导体/算力产业资源转化为募资抓手。代价是基金高度区域化——芜湖、宣城、安吉、长兴、桐乡、嘉兴、南通各自对应返投与落地要求，项目选择不可避免受地域约束；同时除交融正海（20亿元）外，单只基金多在1.5—2亿元量级，难以支撑人形机器人这类高估值、长周期、需连续加注的赛道，这与其「不投本体」的行为一致<sup><a href="#ref13">[13]</a></sup><sup><a href="#ref14">[14]</a></sup><sup><a href="#ref15">[15]</a></sup>。</div>
+
+      <h3 id="philosophy">1.4 投资哲学与偏好</h3>
+      <p>官网将投资理念概括为三个「聚焦」：聚焦目标企业与投资机构在成长期所需模式提升、资源重整方面的<strong>互补性</strong>；聚焦团队熟悉的<strong>新技术应用领域</strong>；聚焦细分行业中商业模式具创新愿景、管理团队具创新能力的中小企业<sup><a href="#ref5">[5]</a></sup>。董事长王正东在致辞中将其表述为「大道至简，匠心独运」，并把机构角色从「对成长性企业的资本注入」提升为「助推企业成长的服务」，服务理念为「感怀重托、专心投资、共享成长」<sup><a href="#ref6">[6]</a></sup>。</p>
+      <p>从投资行为看，正海的可观察偏好包括：</p>
+      <ul>
+        <li><strong>阶段</strong>：覆盖种子期至成熟期，但组合以成长期与Pre-IPO为主；官网案例页的IPO项目数量（16家）与创投项目数量（30家）大致相当，说明PE属性仍强<sup><a href="#ref3">[3]</a></sup><sup><a href="#ref4">[4]</a></sup>。</li>
+        <li><strong>赛道</strong>：以「国产替代 + 可验证的工业客户」为标准，半导体设备零部件、汽车零部件、新材料占比最高；对纯软件、平台型、前沿算法的敞口很小<sup><a href="#ref3">[3]</a></sup><sup><a href="#ref4">[4]</a></sup>。</li>
+        <li><strong>角色</strong>：以参投为主，领投案例少；公开可确认的领投/独家投资包括索迩电子A+轮（领投）与灵思泰恪A轮（通过桐乡乌镇正海长宏独家投资）<sup><a href="#ref21">[21]</a></sup><sup><a href="#ref8">[8]</a></sup>。</li>
+        <li><strong>区域</strong>：基金注册地与项目来源深度绑定芜湖、宣城、安吉、桐乡、南通等长三角周边城市，带有招商引资与产业培育的附加目标<sup><a href="#ref5">[5]</a></sup><sup><a href="#ref12">[12]</a></sup>。</li>
+        <li><strong>投后</strong>：官网强调资源整合与「管家式」服务，但未披露专职投后团队规模、董事会席位或赋能案例，公开信息不足以评估其投后深度<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref2">[2]</a></sup>。</li>
+      </ul>
+      <div class="callout"><span class="tag tag-info">简评</span> 这套「细分龙头 + 国产替代 + Pre-IPO」的方法论在2010—2021年的A股发行节奏下有效性很高，正海16家IPO项目大多属于此类。但2023年后IPO审核趋严、半导体一二级估值倒挂，Pre-IPO套利空间收窄，其组合中大量未上市项目（官网创投项目30家）面临退出周期拉长的压力。2025—2026年新设基金转向「区域招商 + 产业LP」、并把机器人写入投资范围，可视为对这一变化的应对，但其单只基金规模与团队技术背景仍不支持其在前沿具身智能项目上领投大额轮次<sup><a href="#ref14">[14]</a></sup><sup><a href="#ref2">[2]</a></sup>。</div>
+
+      <h3 id="tracks">1.5 主要投资赛道</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>赛道</th><th>代表性被投公司</th><th>赛道投资逻辑</th><th>布局时间</th></tr>
+          <tr><td>半导体 / 集成电路</td><td>联芸科技（688449）、星宸科技（301536）、珂玛科技（301611）、比亚迪半导体、超纯应材（301717）、果纳半导体、泽丰半导体、英迪芯微、景略半导体、盾源聚芯、御微半导体、科利德、芯启源</td><td>国产替代 + 设备/材料零部件；以Pre-IPO和成长期为主，单笔参投，覆盖设计、设备、零部件、涂层材料全链条<sup><a href="#ref3">[3]</a></sup><sup><a href="#ref4">[4]</a></sup><sup><a href="#ref11">[11]</a></sup></td><td>2019—</td></tr>
+          <tr><td>高端装备 / 智能制造</td><td>华航唯实、上海精智、威奥股份（605001）、应流股份（603308）、合力科技（603917）、纬诚科技、精智实业</td><td>工业软件、系统集成与精密制造；看重制造业客户的重复采购与进口替代<sup><a href="#ref3">[3]</a></sup><sup><a href="#ref9">[9]</a></sup></td><td>2014—</td></tr>
+          <tr><td>汽车产业链 / 新能源</td><td>伯特利（603596）、同驭汽车、挚达科技（02650.HK）、正力新能（03677.HK）、国富氢能（2582.HK）、Momenta（6880.HK）、寅家科技、尤顺汽车、戈尔德、灵思泰恪、长安热力</td><td>沿整车厂供应链横向扩张，从制动、充电、电池、氢能延伸至智能驾驶与线控底盘<sup><a href="#ref3">[3]</a></sup><sup><a href="#ref4">[4]</a></sup><sup><a href="#ref10">[10]</a></sup></td><td>2010—</td></tr>
+          <tr><td>节能环保 / 绿色产业</td><td>泓济环保、国惠环保、西恩科技、宝碳新能源、宝瀛气体</td><td>工业三废治理、固废资源化、碳交易与工业气体；现金流稳定、政策驱动<sup><a href="#ref4">[4]</a></sup><sup><a href="#ref12">[12]</a></sup></td><td>2012—</td></tr>
+          <tr><td>医疗健康</td><td>京颐科技、柯林布瑞、中科奥格、远泰生物、鹍远生物、沪创医疗、欣吉特</td><td>医疗信息化、异种器官移植、抗体与细胞治疗；多为成长期参投<sup><a href="#ref4">[4]</a></sup><sup><a href="#ref12">[12]</a></sup></td><td>2016—</td></tr>
+          <tr><td>新材料</td><td>美新科技（301588）、昌亚新材、小小科技、陶特容器</td><td>塑木、全降解材料、汽车精密锻件、电子气体容器；制造属性强、客户认证壁垒高<sup><a href="#ref3">[3]</a></sup><sup><a href="#ref4">[4]</a></sup></td><td>2018—</td></tr>
+          <tr><td>消费 / 互联网</td><td>东方财富（300059）、东方明珠（600637，原百视通）、永裕家居、爹地宝贝、快友股份、星商电子</td><td>早期成长股投资，多为2010年前后的历史项目，已逐步退出<sup><a href="#ref3">[3]</a></sup></td><td>2009—2015</td></tr>
+        </table>
+      </div>
+
+      <h3 id="embodied">1.6 具身智能领域布局</h3>
+
+      <h4>A. 布局概览</h4>
+      <p>按本 Wiki 的口径（具身智能 = 具备物理身体、在真实环境中感知—决策—行动的智能系统，含人形/移动/工业机器人本体、具身大模型、灵巧手与关节模组、机器人感知与运动控制），正海资本<strong>不属于具身智能的活跃投资机构</strong>：官网46个投资案例中没有一家人形机器人、具身大模型、灵巧手或关节模组企业<sup><a href="#ref3">[3]</a></sup><sup><a href="#ref4">[4]</a></sup>。其与机器人相关的敞口可分为三层：</p>
+      <ul>
+        <li><strong>L1 工业机器人 / 机器人软件</strong>：华航唯实（工业机器人离线编程软件 PQArt、智能制造系统集成与职业教育装备），2020年11月B轮参投——这是唯一一家公司名称与主营业务均明确为「机器人」的被投企业<sup><a href="#ref9">[9]</a></sup><sup><a href="#ref20">[20]</a></sup>。</li>
+        <li><strong>L2 机器人零部件 / 感知执行</strong>：果纳半导体（晶圆传输机械手、EFEM、AMHS）、同驭汽车（线控制动/转向/悬架/底盘域控制器）、索迩电子（宽频触觉反馈马达）——均为「机器人可复用」的零部件能力，但当前收入几乎全部来自半导体设备或汽车<sup><a href="#ref24">[24]</a></sup><sup><a href="#ref22">[22]</a></sup><sup><a href="#ref21">[21]</a></sup>。</li>
+        <li><strong>L3 物理AI / 智能驾驶</strong>：Momenta（世界模型、城市NOA、Robotaxi/Robovan）与寅家科技（智能驾驶、智能座舱，第三条产品线VT-Robotics先从低空经济无人机切入，通用机器人业务仍在定点前验证）——正海将Momenta定义为「物理AI第一股」，但其当下收入仍来自量产智驾<sup><a href="#ref10">[10]</a></sup><sup><a href="#ref17">[17]</a></sup><sup><a href="#ref18">[18]</a></sup>。</li>
+      </ul>
+
+      <div class="callout">
+        <div class="callout-title">具身智能投资概况</div>
+        <p>严格口径具身智能直投：<strong>0</strong>家（无本体/大模型/灵巧手/关节模组）｜机器人相关被投：<strong>6</strong>家（华航唯实、果纳半导体、同驭汽车、索迩电子、寅家科技、Momenta）｜最早进入时间：<strong>2020年11月</strong>（华航唯实B轮）｜投资角色：<strong>以参投为主</strong>（仅索迩电子为领投）｜单笔可查金额：<strong>2000万元—7000万元</strong>｜基金层面：2026年南通正海国恒基金首次将「机器人」写入投资范围<sup><a href="#ref14">[14]</a></sup></p>
+      </div>
+
+      <h4>B. 具身智能投资组合</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>被投公司</th><th>投资时间</th><th>投资轮次</th><th>投资金额</th><th>角色</th><th>后续轮次参与</th><th>核心方向 / 层级</th></tr>
+          <tr>
+            <td>华航唯实</td><td>2020.11</td><td>B轮</td><td>未披露</td><td><span class="tag t-follow-investor">参投</span></td><td>未见公开披露</td><td><span class="tag">L1 工业机器人</span>工业机器人离线编程软件PQArt、智能产线虚拟调试PQFactory、职教系统集成装备；2018年创业板IPO申报未果、2021年7月改道深市主板、2022年8月终止审查<sup><a href="#ref9">[9]</a></sup><sup><a href="#ref20">[20]</a></sup><sup><a href="#ref29">[29]</a></sup><sup><a href="#ref30">[30]</a></sup></td>
+          </tr>
+          <tr>
+            <td>果纳半导体</td><td>2023.10</td><td>股权受让（老股）</td><td>2000万元（受让注册资本45.5893万元）</td><td><span class="tag t-follow-investor">参股</span>（无锡正海缘宇）</td><td>2026年C轮未见正海参与披露</td><td><span class="tag">L2 机器人零部件</span>晶圆传输机械手、EFEM、SORTER、AMHS；按2025年收入计，在中国12英寸晶圆制造晶圆传输设备市场居国内企业首位、份额7.8%（整体晶圆传输设备市场国内第二、6.3%），2025年收入5.215亿元；2026年5月递表港交所<sup><a href="#ref24">[24]</a></sup><sup><a href="#ref23">[23]</a></sup></td>
+          </tr>
+          <tr>
+            <td>同驭汽车</td><td>2022.08</td><td>A+轮</td><td>近2亿元（联合投资，正海份额未披露）</td><td><span class="tag t-follow-investor">跟投</span></td><td>超5亿元B轮公开名单未见正海</td><td><span class="tag">L2 运动控制</span>线控制动、线控转向、线控悬架、底盘域控制器；汽车线控底盘一级供应商<sup><a href="#ref22">[22]</a></sup><sup><a href="#ref23">[23]</a></sup></td>
+          </tr>
+          <tr>
+            <td>索迩电子</td><td>2026.05</td><td>A+轮</td><td>数千万元</td><td><span class="tag t-lead-investor">领投</span></td><td>首轮进入</td><td><span class="tag">L2 触觉感知</span>宽频振动马达/触觉反馈引擎（VR手柄、智能座舱、智能手表），并延伸至骨传导耳机品牌Mojawa<sup><a href="#ref21">[21]</a></sup></td>
+          </tr>
+          <tr>
+            <td>寅家科技</td><td>2023.12 / 2025.10</td><td>战略融资 / Pre-IPO</td><td>4700万元（交融正海）/ 7000万元（乌镇正海）</td><td><span class="tag t-follow-investor">参股</span>（合计12.67%，第一大外部股东）</td><td>2026年9月递表港交所</td><td><span class="tag">L3 物理AI</span>智能驾驶、智能座舱；VT-Robotics（通用机器人）系列首款产品为低空经济无人机方案（2025年11月推出，2025年收入770万元、2026H1收入830万元，约占2026H1营收3.363亿元的2.5%）；面向通用机器人的感知与定位方案截至招股书日处于定点前客户验证阶段；割草机器人VT-Mow预计2027年推出，募资用途含eVTOL与人形机器人应用<sup><a href="#ref17">[17]</a></sup><sup><a href="#ref19">[19]</a></sup></td>
+          </tr>
+          <tr>
+            <td>Momenta</td><td>未披露（投资界记录为C+轮）</td><td>C+轮</td><td>投资界记为9200万元（币种标注存疑）</td><td><span class="tag t-follow-investor">参投</span></td><td>2026.07港交所上市（6880.HK）</td><td><span class="tag">L3 物理AI</span>世界模型R7、城市NOA、Robotaxi/Robovan；正海官网称其为「物理AI第一股」，并称其世界模型未来有望扩展至具身智能<sup><a href="#ref10">[10]</a></sup><sup><a href="#ref12">[12]</a></sup></td>
+          </tr>
+        </table>
+      </div>
+      <p style="font-size:0.8rem;color:#54595d;margin:4px 0 10px;"><strong>说明</strong>：官网「投资案例」页共列46家（IPO项目16家 + 创投项目30家），其中仅华航唯实一家为机器人企业；同驭、果纳、寅家、索迩未出现在案例页，系依据官网新闻、港交所文件与融资披露补入<sup><a href="#ref3">[3]</a></sup><sup><a href="#ref4">[4]</a></sup><sup><a href="#ref23">[23]</a></sup>。华航唯实B轮金额、Momenta轮次金额均未见机构官方披露，分别采用融资数据库与投资界口径，引用时需注意。</p>
+
+      <h4>C. 投资逻辑与观点</h4>
+      <p>正海资本<strong>未公开发表过成体系的具身智能投资逻辑</strong>：官网的投资理念、董事长致辞与团队介绍均未提及具身智能、人形机器人或物理AI；合伙人的公开访谈集中在半导体、新能源汽车与绿色投资<sup><a href="#ref5">[5]</a></sup><sup><a href="#ref6">[6]</a></sup><sup><a href="#ref2">[2]</a></sup>。因此只能从投资行为做有限推断：</p>
+      <ul>
+        <li><strong>沿「汽车智能化」外溢，而非从机器人本体切入。</strong>正海在汽车链上有十余年积累（伯特利、尤顺、挚达、正力新能），Momenta、寅家、同驭、索迩均是这条链上「感知—决策—执行—触觉」的相邻环节；机器人被视为智能汽车能力的可迁移方向，而非独立赛道<sup><a href="#ref3">[3]</a></sup><sup><a href="#ref10">[10]</a></sup><sup><a href="#ref17">[17]</a></sup>。</li>
+        <li><strong>沿「半导体设备国产化」进入机器人硬件。</strong>果纳半导体的晶圆传输机械手是正海最接近「机器人本体」的一笔投资，但驱动它的是半导体设备零部件的进口替代逻辑，客户是晶圆厂而非机器人厂商<sup><a href="#ref24">[24]</a></sup>。</li>
+        <li><strong>沿「智能制造」投软件与教育装备。</strong>华航唯实是正海唯一名称含「机器人」的被投企业，其核心资产是工业机器人离线编程软件与职教系统集成，收入高度依赖职业院校采购，本质是「教育信息化 + 工业软件」，不涉及具身智能算法<sup><a href="#ref9">[9]</a></sup><sup><a href="#ref29">[29]</a></sup>。</li>
+        <li><strong>不投本体的可能原因</strong>：一是团队无机器人技术背景，难以判断本体技术路线；二是单只基金规模1.5—2亿元，无法承受人形机器人单轮数亿元、需连续加注的资金结构；三是政府引导基金的返投与退出期限偏好，与本体的长周期不匹配<sup><a href="#ref13">[13]</a></sup><sup><a href="#ref14">[14]</a></sup><sup><a href="#ref2">[2]</a></sup>。</li>
+        <li><strong>2026年的边际变化</strong>：南通正海国恒基金将「机器人」列入投资范围（与GPU、算力芯片、Fabless设计、高速互连、服务器并列），这是正海首次在基金合同层面明确机器人方向，但截至2026年10月尚无该基金投资机器人项目的公开记录<sup><a href="#ref14">[14]</a></sup>。</li>
+      </ul>
+
+      <h4>D. 布局特征分析</h4>
+      <p>正海资本的具身智能布局可概括为「<strong>产业链视角、后置进入、以参投为主、敞口极小</strong>」。与专注具身智能的机构相比：绿洲资本在2023—2025年系统性布局了逐际动力、千寻智能、因克斯等10家，道翼资本以2026年领投恒璇科技单点下注关节环节，而正海的6家关联企业中没有一家以具身智能为主营——华航唯实的机器人业务是教育装备，果纳的机械手用于晶圆厂，同驭的线控底盘用于乘用车，索迩的马达用于VR/耳机，寅家的机器人相关收入（现阶段来自无人机方案）占比约2.5%、通用机器人方案尚未定点，Momenta的收入来自量产智驾<sup><a href="#ref9">[9]</a></sup><sup><a href="#ref24">[24]</a></sup><sup><a href="#ref22">[22]</a></sup><sup><a href="#ref21">[21]</a></sup><sup><a href="#ref17">[17]</a></sup><sup><a href="#ref10">[10]</a></sup>。</p>
+      <p>其差异化在于「不追风口、用制造业现金流验证」，优点是在具身智能估值泡沫中保持了组合的安全性；缺点是若具身智能在2027—2030年进入规模化，正海将缺乏直接受益标的，只能通过Momenta的世界模型外溢与寅家的机器人产品线获得间接期权。相对而言，正海在「具身智能的上游制造」——半导体设备、精密零部件、触觉马达——的覆盖反而比多数专注本体的机构更扎实，这构成其未来转向的产业基础<sup><a href="#ref10">[10]</a></sup><sup><a href="#ref21">[21]</a></sup>。</p>
+
+      <div class="callout"><span class="tag tag-info">简评</span> 把正海资本列入具身智能投资机构名录，需要加一个限定：它的敞口本质是「汽车智能化与半导体国产化的期权」，而不是对具身智能的主动配置。按收入口径衡量，6家关联企业中具身智能相关收入占比最高的寅家也仅约2.5%（且来自无人机而非机器人本体），华航唯实的机器人业务是职教装备、且IPO已终止，Momenta的具身智能仍是「未来有望扩展」。因此对正海的合理定位是「具身智能产业链的边缘参与者」：其价值在于提供了观察传统制造业VC如何被物理AI叙事吸引的样本——先由汽车链感知层（Momenta、寅家）与半导体设备（果纳）被动接触，再在2026年新基金中把「机器人」写入合同，但真正的本体/大模型下注尚未发生。若未来12个月国恒基金出现机器人首单，将是其策略转向的第一个可验证信号<sup><a href="#ref14">[14]</a></sup>。</div>
+
+      <h3 id="cases">1.7 典型投资案例</h3>
+      <p>正海资本的退出以A股IPO为主，2024—2026年港股IPO集中兑现。官网IPO项目页列16家，加上2026年新上市的超纯应材与Momenta，累计可确认18家上市企业<sup><a href="#ref3">[3]</a></sup><sup><a href="#ref10">[10]</a></sup><sup><a href="#ref11">[11]</a></sup>。下表按赛道汇总代表性案例，投资时间未公开披露者以「—」表示。</p>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>被投公司</th><th>代码</th><th>所属赛道</th><th>正海角色</th><th>退出方式</th><th>备注</th></tr>
+          <tr><td>东方财富</td><td>300059</td><td>互联网券商</td><td>早期投资</td><td>A股IPO</td><td>官网列示，具体轮次未披露<sup><a href="#ref3">[3]</a></sup></td></tr>
+          <tr><td>东方明珠（原百视通）</td><td>600637</td><td>文化传媒</td><td>早期投资</td><td>A股上市/重组</td><td>官网列示为「东方明珠」<sup><a href="#ref3">[3]</a></sup></td></tr>
+          <tr><td>应流股份</td><td>603308</td><td>高端装备零部件</td><td>B轮参投</td><td>A股IPO（2014）</td><td>投资界记录2014年上市退出<sup><a href="#ref3">[3]</a></sup><sup><a href="#ref12">[12]</a></sup></td></tr>
+          <tr><td>伯特利</td><td>603596</td><td>汽车制动</td><td>—</td><td>A股IPO</td><td>王正东、李仲庆代表项目<sup><a href="#ref2">[2]</a></sup><sup><a href="#ref3">[3]</a></sup></td></tr>
+          <tr><td>合力科技</td><td>603917</td><td>精密铸造模具</td><td>—</td><td>A股IPO</td><td>官网列示<sup><a href="#ref3">[3]</a></sup></td></tr>
+          <tr><td>科华控股</td><td>603161</td><td>涡轮增压器零部件</td><td>—</td><td>A股IPO</td><td>官网列示<sup><a href="#ref3">[3]</a></sup></td></tr>
+          <tr><td>威奥股份</td><td>605001</td><td>轨道交通装备</td><td>—</td><td>A股IPO</td><td>洪林代表项目<sup><a href="#ref2">[2]</a></sup><sup><a href="#ref3">[3]</a></sup></td></tr>
+          <tr><td>优刻得</td><td>688158</td><td>云计算</td><td>—</td><td>科创板IPO</td><td>陆锋伟代表项目<sup><a href="#ref2">[2]</a></sup><sup><a href="#ref3">[3]</a></sup></td></tr>
+          <tr><td>赛特斯</td><td>832800</td><td>软件定义通信</td><td>—</td><td>新三板挂牌</td><td>官网列入IPO项目页，实为新三板<sup><a href="#ref3">[3]</a></sup></td></tr>
+          <tr><td>联芸科技</td><td>688449</td><td>数据存储芯片</td><td>A轮参投</td><td>科创板IPO（2024）</td><td>沈洪良、花菓代表项目<sup><a href="#ref2">[2]</a></sup><sup><a href="#ref3">[3]</a></sup></td></tr>
+          <tr><td>星宸科技</td><td>301536</td><td>智能视觉芯片</td><td>—</td><td>创业板IPO（2024）</td><td>官网新闻确认2024年上市<sup><a href="#ref3">[3]</a></sup></td></tr>
+          <tr><td>美新科技</td><td>301588</td><td>塑木材料</td><td>—</td><td>创业板IPO（2024）</td><td>官网新闻确认2024年上市<sup><a href="#ref3">[3]</a></sup></td></tr>
+          <tr><td>珂玛科技</td><td>301611</td><td>精密陶瓷部件</td><td>—</td><td>创业板IPO（2024）</td><td>花菓代表项目<sup><a href="#ref2">[2]</a></sup><sup><a href="#ref3">[3]</a></sup></td></tr>
+          <tr><td>国富氢能</td><td>2582.HK</td><td>氢能装备</td><td>—</td><td>港交所IPO（2024）</td><td>谭帧华代表项目<sup><a href="#ref2">[2]</a></sup><sup><a href="#ref3">[3]</a></sup></td></tr>
+          <tr><td>正力新能</td><td>03677.HK</td><td>动力电池</td><td>—</td><td>港交所IPO（2025）</td><td>官网新闻确认2025年上市<sup><a href="#ref3">[3]</a></sup></td></tr>
+          <tr><td>挚达科技</td><td>02650.HK</td><td>新能源汽车充电</td><td>—</td><td>港交所IPO（2025）</td><td>陆锋伟代表项目；官网发稿祝贺<sup><a href="#ref2">[2]</a></sup><sup><a href="#ref3">[3]</a></sup></td></tr>
+          <tr><td>Momenta</td><td>6880.HK</td><td>物理AI / 智能驾驶</td><td>C+轮参投</td><td>港交所IPO（2026.07.08）</td><td>正海称其为「物理AI第一股」<sup><a href="#ref10">[10]</a></sup></td></tr>
+          <tr><td>超纯应材</td><td>301717</td><td>半导体零部件涂层</td><td>参股</td><td>创业板IPO（2026.08.11）</td><td>发行价65.99元/股<sup><a href="#ref11">[11]</a></sup></td></tr>
+        </table>
+      </div>
+      <p style="font-size:0.8rem;color:#54595d;margin:4px 0 10px;"><strong>口径说明</strong>：官网「公司简介」页仍写「12家企业已IPO上市、20余家成功退出」，而「IPO项目」页已列16家，加上2026年超纯应材、Momenta共18家，说明简介页数据未同步更新<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref3">[3]</a></sup>。正海未公开任何项目的投资成本与回报倍数，上表不列回报数据。</p>
+      <div class="callout"><span class="tag tag-info">简评</span> 正海的退出结构高度集中在A股制造业IPO：半导体（联芸、星宸、珂玛、超纯）、汽车零部件（伯特利、科华、威奥）、新材料（美新）构成主体，2024年后港股（国富氢能、正力新能、挚达、Momenta）成为新增出口。这一结构与它的「Pre-IPO + 国产替代」策略完全吻合，也意味着其回报高度依赖A股发行窗口与制造业估值中枢。值得注意的是，其两家机器人相关企业均未完成IPO——华航唯实2022年终止审查，果纳半导体仍在冲刺——机器人资产在其组合中尚未经过公开市场定价检验<sup><a href="#ref30">[30]</a></sup><sup><a href="#ref24">[24]</a></sup>。</div>
+
+      <h3 id="performance">1.8 基金业绩</h3>
+      <p>正海资本<strong>未公开披露</strong>IRR、DPI、TVPI等基金业绩指标。作为私募股权基金管理人，这类数据通常仅向LP报告，公开渠道亦未见其LP（含政府引导基金、上市公司恒为科技）披露所投基金的净值或分配情况<sup><a href="#ref13">[13]</a></sup><sup><a href="#ref14">[14]</a></sup>。</p>
+      <p>可获得的公开代理指标包括：</p>
+      <ul>
+        <li><strong>IPO数量</strong>：官网IPO项目页16家，加2026年新上市的超纯应材、Momenta共18家；官网简介页仍写12家（未更新）<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref3">[3]</a></sup><sup><a href="#ref10">[10]</a></sup><sup><a href="#ref11">[11]</a></sup>。</li>
+        <li><strong>年度IPO排名</strong>：据官网援引清科「2024年度IPO成绩单」，正海资本2024年IPO数量5家，全国并列第十<sup><a href="#ref25">[25]</a></sup>。</li>
+        <li><strong>投资与退出总量</strong>：官网自述累计投资成长型企业近100家、成功退出20余家（简介页口径，时点不明）<sup><a href="#ref1">[1]</a></sup>。</li>
+      </ul>
+      <p>上述指标只能反映退出数量，不能反映基金层面的现金回报；在缺乏LP披露的情况下，不应据此推算IRR或DPI。</p>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li><strong>「双湾产业协同发展联盟」</strong>：2025年11月18日，正海资本牵头，联合佛山华南电源创新科技产业园、南庄湾区智造港、佛山鹰创园、佛山（禅城）中交城建壹里科创云廊、佛山祖庙投资大厦五家国资下属产业载体，在上海成立「双湾产业协同发展联盟」，试图打通粤港澳大湾区与长三角的产业资源；管理合伙人洪林在会上分享政府国资基金运作<sup><a href="#ref26">[26]</a></sup>。</li>
+        <li><strong>2025—2026年荣誉</strong>：2025—2026年度融中「中国集成电路与半导体领域卓越投资机构」「中国新材料领域卓越投资机构」；2025年投中榜、母基金研究中心榜、金投奖等；管理合伙人洪林、投资总监陆锋伟、李仲庆亦多次上榜<sup><a href="#ref27">[27]</a></sup><sup><a href="#ref2">[2]</a></sup>。</li>
+        <li><strong>主体消歧——「正海资本」≠「正海系」</strong>：烟台正海集团体系（实际控制人秘波海，旗下正海磁材300224、正海生物300653）与上海正海资产管理有限公司（法定代表人王正东）是两家完全不同的主体，公开资料未见股权或人事关联。正海磁材曾于2025年9月否认「通过上海正海磁材间接持有宇树科技股权」的传闻；投资者查阅时应避免将正海磁材的人形机器人材料业务、正海生物的IPO计入正海资本<sup><a href="#ref28">[28]</a></sup><sup><a href="#ref7">[7]</a></sup>。</li>
+        <li><strong>数据平台的主体混同风险</strong>：投资界（清科私募通）正海资本机构页的「相关资讯」中混入了正海生物、正海磁材的新闻，这两家公司并不属于上海正海资产的投资组合；引用该页面时需逐条核对主体<sup><a href="#ref12">[12]</a></sup>。</li>
+        <li><strong>官网数据滞后</strong>：官网「公司简介」页的IPO数量（12家）与「IPO项目」页（16家）不一致，且未包含2026年上市的超纯应材与Momenta；本页以可逐条核对的IPO项目页与新闻稿为准<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref3">[3]</a></sup>。</li>
+      </ul>
+
+      <h2 id="references">2 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li id="ref1"><a href="https://www.royalsea-capital.com/profile/" target="_blank">正海资本官网 — 公司简介（成立2008年1月；累计投资近100家、12家IPO、20余家退出；累计管理规模超80亿元、在管近50亿元；投资领域新一代信息技术/节能环保/高端装备制造；办公地址杨树浦路1198号山金金融大厦C座16楼）</a><span class="tag tag-info">机构自述</span>（2026-10-20访问）</li>
+          <li id="ref2"><a href="https://www.royalsea-capital.com/team/" target="_blank">正海资本官网 — 投资团队（王正东、沈洪良、洪林、吴晋、花菓、耿万京、钟芸、谭帧华、陆锋伟、李仲庆履历与代表项目）</a><span class="tag tag-info">机构自述</span>（2026-10-20访问）</li>
+          <li id="ref3"><a href="https://www.royalsea-capital.com/case/ipo/" target="_blank">正海资本官网 — 投资案例·IPO项目（正力新能、美新科技、珂玛科技、星宸科技、国富氢能、伯特利、科华控股、赛特斯、优刻得、应流股份、威奥股份、合力科技、东方财富、东方明珠、联芸科技、挚达科技共16家）</a><span class="tag tag-info">机构自述</span>（2026-10-20访问）</li>
+          <li id="ref4"><a href="https://www.royalsea-capital.com/case/venture/" target="_blank">正海资本官网 — 投资案例·创投项目（灵思泰恪、英迪芯微、纬诚科技、泽丰半导体、中科奥格、远泰生物、昌亚新材、华航唯实、智芯微电子、戈尔德、比亚迪半导体、Momenta、景略半导体、宝碳新能源、尤顺汽车、快友股份、柯林布瑞、永裕家居、国惠环保、西恩科技、泓济环保、星商电子、京颐股份、艾福电子、陶特容器、小小科技、波汇科技、精智实业、爹地宝贝、长安热力共30家）</a><span class="tag tag-info">机构自述</span>（2026-10-20访问）</li>
+          <li id="ref5"><a href="https://www.royalsea-capital.com/profile/idea/" target="_blank">正海资本官网 — 投资理念（互补性/新技术/创新愿景三聚焦；合作基金：国家科技部引导基金、安徽芜湖政府引导基金、国家发改委母基金、安徽宣城政府引导基金、上海市创业投资引导基金、浙江安吉政府引导基金）</a><span class="tag tag-info">机构自述</span>（2026-10-20访问）</li>
+          <li id="ref6"><a href="https://www.royalsea-capital.com/profile/speech/" target="_blank">正海资本官网 — 董事长致辞（王正东：「大道至简，匠心独运」「感怀重托、专心投资、共享成长」）</a><span class="tag tag-info">机构自述</span>（2026-10-20访问）</li>
+          <li id="ref7">中国证券投资基金业协会 — 私募基金管理人公示：上海正海资产管理有限公司（登记编号P1003518，法定代表人王正东，成立2008-01-31，登记2014-06-04，注册地址上海市杨浦区杨树浦路1198号14楼01单元，办公地址1601室，在管基金35只，机构类型私募股权/创业投资基金管理人，观察会员）<span class="tag tag-info">AMAC登记</span>（经 gs.amac.org.cn 管理人公示接口查询，2026-10-20）</li>
+          <li id="ref8"><a href="https://www.royalsea-capital.com/%e6%ad%a3%e6%b5%b7%e5%8a%a8%e6%80%81%ef%bd%9c%e7%81%b5%e6%80%9d%e6%b3%b0%e6%81%aa%e5%ae%8c%e6%88%90a%e8%bd%ae%e6%88%98%e7%95%a5%e8%9e%8d%e8%b5%84%ef%bc%8c%e6%ad%a3%e6%b5%b7%e8%b5%84%e6%9c%ac%e7%8b%ac/" target="_blank">正海资本官网 — 正海动态｜灵思泰恪完成A轮战略融资，正海资本独家投资（2025-09-25；本轮由桐乡乌镇正海长宏创业投资基金独家投资；截至2025年7月备案30只、在管50亿元、累计超80亿元）</a><span class="tag tag-info">机构自述</span>（2026-10-20访问）</li>
+          <li id="ref9"><a href="http://www.royalsea-capital.com/%e6%ad%a3%e6%b5%b7family-%e6%ad%a3%e6%b5%b7%e5%a4%9a%e5%ae%b6%e8%a2%ab%e6%8a%95%e4%bc%81%e4%b8%9a%e5%85%a5%e9%80%89%e5%9b%bd%e5%ae%b6%e7%ba%a7%e4%b8%93%e7%b2%be%e7%89%b9%e6%96%b0%e5%b0%8f/" target="_blank">正海资本官网 — 正海Family｜正海五家被投企业入选国家级专精特新「小巨人」企业（2021-08-06；华航唯实为被投企业，主营工业机器人离线编程软件PQArt、智能产线虚拟调试软件PQFactory及职教系统集成）</a><span class="tag tag-info">机构自述</span>（2026-10-20访问）</li>
+          <li id="ref10"><a href="https://www.royalsea-capital.com/%e6%ad%a3%e6%b5%b7family-%e6%ad%a3%e6%b5%b7%e8%b5%84%e6%9c%ac%e5%8f%82%e8%82%a1%e4%bc%81%e4%b8%9amomenta%e5%9c%a8%e6%b8%af%e4%ba%a4%e6%89%80%e4%b8%8a%e5%b8%82/" target="_blank">正海资本官网 — 正海Family｜正海资本参股企业Momenta在港交所上市（2026-07-08；6880.HK；称Momenta为「物理AI第一股」，R7世界模型未来有望扩展至具身智能）</a><span class="tag tag-info">机构自述</span>（2026-10-20访问）</li>
+          <li id="ref11"><a href="https://www.royalsea-capital.com/%e6%ad%a3%e6%b5%b7family-%e6%ad%a3%e6%b5%b7%e8%b5%84%e6%9c%ac%e5%8f%82%e8%82%a1%e4%bc%81%e4%b8%9a%e8%b6%85%e7%ba%af%e5%ba%94%e6%9d%90%e5%9c%a8%e5%88%9b%e4%b8%9a%e6%9d%bf%e6%8c%82%e7%89%8c%e4%b8%8a/" target="_blank">正海资本官网 — 正海Family｜正海资本参股企业超纯应材在创业板挂牌上市（2026-08-11；301717；发行价65.99元/股）</a><span class="tag tag-info">机构自述</span>（2026-10-20访问）</li>
+          <li id="ref12"><a href="https://m.pedaily.cn/data/vc/6875" target="_blank">投资界（清科私募通）— 正海资本机构页（成立2008年、总部杨浦、投资阶段种子期至成熟期；募资事件：正海聚亿2011.02、无锡正海联云2012.12、上海正海国鑫基金2013.10、上海正海国鑫源2013.11、上海正海聚弘2014.08、浙江安吉安海2016.01、宣城正海资本创业基金2017.08、正海聚高2019.10、长兴绿能慧通2021.01、宁波正海聚锐2021.04、安吉正海长晟2025.07、嘉兴长寰2025.12；投资事件含Momenta C+轮、比亚迪半导体A+轮9.2亿元等；相关资讯混入正海生物/正海磁材，主体需核对）</a><span class="tag tag-info">数据平台</span>（2026-10-20访问）</li>
+          <li id="ref13"><a href="http://stock.stockstar.com/KX2026021200029212.shtml" target="_blank">证券之星（转同花顺快讯）— 恒为科技：使用自有资金3500万元认缴南通正海恒浦创业投资合伙企业出资额（2026-02-12；基金总额1.75亿元，恒为认缴3500万元、占20%；LP含上海正海资产、上海石盈信、沈振宇、王正东、温州瑾悦合信、倪丽萍、谭秀阳、海南利盛能源、上海环境节能工程、上海津晟投资）</a><span class="tag tag-info">上市公司公告</span>（2026-10-20访问）</li>
+          <li id="ref14"><a href="https://paper.cnstock.com/html/2026-09/10/content_2267242.htm" target="_blank">上海证券报 — 恒为科技（上海）股份有限公司关于对外投资设立投资基金的进展公告（2026-09-10；南通正海国恒创业投资合伙企业，总额1.5亿元，恒为认缴2900万元、占19.3333%，备案编码SEK150，2026-08-25备案，管理人上海正海资产，托管招商银行；投资范围含高端装备、先进制造、新材料、GPU及专用加速芯片、算力芯片、Fabless设计、高速互连与存储、服务器与智算基础设施、机器人等）</a><span class="tag tag-info">上市公司公告</span>（2026-10-20访问）</li>
+          <li id="ref15"><a href="https://qyml.curtao.com/qyml/91340200MA8R129D0E" target="_blank">客套企业名录 — 交融正海智车（安徽）股权投资基金合伙企业（有限合伙）工商信息（统一社会信用代码91340200MA8R129D0E，注册资本20亿元，成立2023-09-15，营业期限至2038-09-15，注册地安徽省芜湖市经济技术开发区龙山街道九华北路146号）</a><span class="tag tag-info">工商登记</span>（2026-10-20访问；启信宝同类页面实测返回451，故改用本页）</li>
+          <li id="ref16"><a href="http://ah.people.com.cn/n2/2023/1124/c401605-40653594.html" target="_blank">人民网安徽 — 安徽交行创新金融服务 支持全省打造汽车「首位产业」（2023-11-24；交融正海智车基金为安徽省新能源汽车和智能网联汽车产业主题母基金下属首只备案子基金，2023年9月底完成首期出资和备案）</a><span class="tag tag-info">媒体报道</span>（2026-10-20访问）</li>
+          <li id="ref17"><a href="https://stcn.com/article/detail/4205865.html" target="_blank">证券时报 — 又一智驾公司闯关港股IPO！深创投、东方富海参投（2026-10-02；寅家科技2026-09-27递表港交所，正海资本入股，最新估值约27.8亿元；业务含智能驾驶、智能座舱及通用机器人解决方案；通用机器人感知及定位方案处于定点前客户验证阶段；2026H1收入3.36亿元）</a><span class="tag tag-info">媒体报道</span>（2026-10-20访问）</li>
+          <li id="ref18"><a href="https://www.itiger.com/hans/news/2671642002" target="_blank">老虎证券（转载）— 半年营收3.36亿，又一智驾公司赴港IPO（援引招股书：桐乡乌镇正海长宏持有寅家科技7.58%、为第一大外部股东，2025-10-09以7000万元认购1,589,689股，投前估值7.299亿元；交融正海持股5.09%，2023-12-27以4700万元认购1,067,362股）</a><span class="tag tag-info">媒体报道</span>（2026-10-20访问）</li>
+          <li id="ref19"><a href="https://www1.hkexnews.hk/app/sehk/2026/108906/documents/sehk26092700111.pdf" target="_blank">香港交易所披露易 — 上海寅家电子科技股份有限公司上市申请文件（2026-09-27；页117/118载交融正海2023-12-27以4700万元认购1,067,362股、乌镇正海2025-10-09以7000万元认购1,589,689股、投前估值7.299亿元；页208附注6载上海正海资产为乌镇正海与交融正海之普通合伙人，两者合计持股12.67%；页137/158载VT-Robotics无人机方案2025年及2026H1收入770万元/830万元、VT-Mow预计2027年推出、通用机器人感知定位方案处于定点前验证）</a><span class="tag tag-info">招股书</span>（2026-10-20访问）</li>
+          <li id="ref20"><a href="https://www.innohere.com/ir/136558/finance.html" target="_blank">innoHere — 华航唯实机器人融资历史（2020-11-27 B轮，投资方正海资本，金额未披露；2017-08-24 A轮，赛富投资基金/海尔赛富/潇湘资本；公司全称北京华航唯实机器人科技股份有限公司，成立2013-06-17）</a><span class="tag tag-info">数据平台</span>（2026-10-20访问）</li>
+          <li id="ref21"><a href="https://m.pedaily.cn/news/564418" target="_blank">投资界 — 前苹果工程师跨界骨传导耳机，「索迩电子」完成数千万元A+轮融资（2026-05-26；正海资本领投；索迩电子早期聚焦B端触觉反馈技术，为VR手柄、智能座舱提供宽频振动马达）</a><span class="tag tag-info">媒体报道</span>（2026-10-20访问）</li>
+          <li id="ref22"><a href="https://pitchhub.36kr.com/project/1817522598528899" target="_blank">36氪 PitchHub — 同驭汽车科技项目信息（2022年8月A+轮近2亿元，投资方含小米私募股权基金、东风交银汽车基金、安亭实业、劲邦资本、同创投资、若木资本、武岳峰科创、正海资本、交银国际）</a><span class="tag tag-info">数据平台</span>（2026-10-20访问）</li>
+          <li id="ref23"><a href="http://www.royalsea-capital.com/%e6%ad%a3%e6%b5%b7family-%e5%90%8c%e9%a9%ad%e6%b1%bd%e8%bd%a6%e7%a7%91%e6%8a%80%e3%80%81%e6%9e%9c%e7%ba%b3%e5%8d%8a%e5%af%bc%e4%bd%93%e3%80%81%e6%b3%bd%e4%b8%b0%e8%8d%a3%e7%99%bb%e6%8a%95%e4%b8%ad20/" target="_blank">正海资本官网 — 正海Family｜正海资本参股企业同驭汽车科技、果纳半导体、泽丰荣登投中榜锐公司2024年度榜单（确认三家均为参股企业）</a><span class="tag tag-info">机构自述</span>（2026-10-20访问）</li>
+          <li id="ref24"><a href="https://www1.hkexnews.hk/app/sehk/2026/108598/documents/sehk26052903008_c.pdf" target="_blank">香港交易所披露易 — 上海果纳半导体技术股份有限公司上市申请文件（2026-05-29；2023-10-20上海仕芯与无锡正海缘宇创业投资合伙企业签署股权转让协议，转让注册资本45.5893万元、代价2000万元，2023-11-24结清；果纳主营EFEM、SORTER、LOADPORT、ROBOT机械手、AMHS；2025年收入5.215亿元，中国12英寸晶圆制造晶圆传输设备市场国内企业第一、份额7.8%）</a><span class="tag tag-info">招股书</span>（2026-10-20访问）</li>
+          <li id="ref25"><a href="https://www.royalsea-capital.com/%e6%ad%a3%e6%b5%b7%e8%8d%a3%e8%aa%89%ef%bd%9c%e6%b8%85%e7%a7%912024%e5%b9%b4%e5%ba%a6ipo%e6%88%90%e7%bb%a9%e5%8d%95%ef%bc%8c%e6%ad%a3%e6%b5%b7%e8%b5%84%e6%9c%acipo%e6%95%b05%e5%ae%b6%ef%bc%8c%e5%85%a8/" target="_blank">正海资本官网 — 正海荣誉｜清科2024年度IPO成绩单，正海资本IPO数5家，全国并列第十（2025-01-10）</a><span class="tag tag-info">机构自述</span>（2026-10-20访问）</li>
+          <li id="ref26"><a href="https://m.toutiao.com/article/7574363121842782774/" target="_blank">南方+客户端（今日头条转载）— 大湾区+长三角，禅城「结盟」促投资（2025-11-19；2025-11-18佛山市禅城区赴沪举办创新驱动投资交流会并成立「双湾产业协同发展联盟」，由上海正海资产管理有限公司牵头，联合佛山华南电源创新科技产业园、南庄湾区智造港、佛山鹰创园、佛山（禅城）中交城建壹里科创云廊、佛山祖庙投资大厦五家国资下属产业载体共同发起；管理合伙人洪林就政府国资基金运作作主题分享）</a><span class="tag tag-info">媒体报道</span>（2026-10-20访问；禅城区政府原发布页当日不可达，故引用南方+原文转载）</li>
+          <li id="ref27"><a href="https://www.royalsea-capital.com/%e6%ad%a3%e6%b5%b7%e8%8d%a3%e8%aa%89%ef%bd%9c%e6%ad%a3%e6%b5%b7%e8%b5%84%e6%9c%ac%e8%8d%a3%e7%99%bb%e8%9e%8d%e4%b8%ad2025-2026%e5%b9%b4%e5%ba%a6%e4%b8%ad%e5%9b%bd%e4%ba%a7%e4%b8%9a%e6%8a%95%e8%b5%84/" target="_blank">正海资本官网 — 正海荣誉｜正海资本荣登融中2025-2026年度中国产业投资榜单（2026-07-31；集成电路与半导体领域卓越投资机构、新材料领域卓越投资机构）</a><span class="tag tag-info">机构自述</span>（2026-10-20访问）</li>
+          <li id="ref28"><a href="https://4g.stockstar.com/detail/SN2024040100017344" target="_blank">证券之星 — 正海生物（300653）2023年年度报告（控股股东、实际控制人秘波海；秘波海同时为正海磁材300224实际控制人，正海集团为实际控制人控制的其他企业）</a><span class="tag tag-info">上市公司公告</span>（2026-10-20访问）</li>
+          <li id="ref29"><a href="https://www.thepaper.cn/newsDetail_forward_18352304" target="_blank">澎湃新闻·湃客（《投资者网》）— 华航唯实再次闯关IPO，募投项目说明与环评文件不一致（2022-05-31；2018年创业板申报折戟、更换保荐机构为国泰君安后于2021年7月改道深交所主板；主营工业软件与智能制造系统集成，以职业教育为主要切入点，系统集成产品的主要原材料为ABB、库卡、安川等机器人本体；2018—2020年营收2.2亿/1.79亿/2.76亿元）</a><span class="tag tag-info">媒体报道</span>（2026-10-20访问）</li>
+          <li id="ref30"><a href="https://m.hexun.com/stock/2022-08-01/206475166.html" target="_blank">和讯网 — 华航唯实终止深交所主板IPO（2022-08-01；证监会决定终止对华航唯实首次公开发行股票申请的审查；原拟发行不超过2,717万股、募资40,680万元，保荐机构国泰君安）</a><span class="tag tag-info">媒体报道</span>（2026-10-20访问）</li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">最新更新于 2026-10-20 · 数据来源见「2 参考资料」 · 正海资本基金管理人为上海正海资产管理有限公司（AMAC P1003518）· 具身智能直投为0家，页面所列6家为机器人/物理AI产业链关联企业 · 管理规模与IPO数量为机构自述口径，与AMAC/交易所披露存在时点差异，请审慎参考</div>
+</div>
+</body>
+</html>

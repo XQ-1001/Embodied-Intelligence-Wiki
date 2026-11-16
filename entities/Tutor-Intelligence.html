@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>Tutor Intelligence — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .tag-logistics { background: #e6f4f1; color: #146b5c; border-color: #b6ded5; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .callout-danger { border-left-color: #c0392b; background: #fdf2f2; }
+  .callout-danger .callout-title { color: #c0392b; }
+  .callout-warn { border-left-color: #b8860b; background: #fdf8ec; }
+  .callout-warn .callout-title { color: #8a6508; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> › <span>Tutor Intelligence</span></div>
+  <div class="wiki-header"><h1>Tutor Intelligence</h1><div class="subtitle">Tutor Intelligence · 2021年创立 · 总部美国马萨诸塞州沃特敦 · 未上市 · 运营中</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#founders">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenarios">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financials">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#a1">2.1 团队背景与场景选择的匹配度</a></li>
+        <li class="toc-lvl4"><a href="#a2">2.2 技术路线与场景的适配性</a></li>
+        <li class="toc-lvl4"><a href="#a3">2.3 股东与资本结构对战略的影响</a></li>
+        <li class="toc-lvl4"><a href="#a4">2.4 试错过程与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#a5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#a6">2.6 风险与挑战</a></li>
+        <li class="toc-lvl2"><a href="#refs">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">Tutor Intelligence</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">Tutor Intelligence（官方通稿使用名，未披露注册实体后缀）</div></div>
+        <div class="ib-row"><div class="ib-label">创立</div><div class="ib-value">2021年2月（创始人博客自述"正式注册"）</div></div>
+        <div class="ib-row"><div class="ib-label">总部</div><div class="ib-value">美国马萨诸塞州沃特敦（Watertown, MA），Riverworks 园区（Pleasant Street，原 Boston Scientific 厂址，更早为 Aetna Mills 棉纺厂）</div></div>
+        <div class="ib-row"><div class="ib-label">联合创始人</div><div class="ib-value">Josh Gruenstein（CEO）、Alon Kosowsky-Sachs（CTO）</div></div>
+        <div class="ib-row"><div class="ib-label">状态</div><div class="ib-value" style="color:#146b5c;font-weight:700;">运营中</div></div>
+        <div class="ib-section">财务数据</div>
+        <div class="ib-row"><div class="ib-label">累计融资</div><div class="ib-value">1.17亿美元（$117M）</div></div>
+        <div class="ib-row"><div class="ib-label">最新轮次</div><div class="ib-value">2026年11月2日 B轮 7,500万美元，Andreessen Horowitz 领投</div></div>
+        <div class="ib-row"><div class="ib-label">估值</div><div class="ib-value">未披露（公司未公布，第三方数据库中亦无投后估值）</div></div>
+        <div class="ib-row"><div class="ib-label">主要投资方</div><div class="ib-value">Andreessen Horowitz、Union Square Ventures、Fundomo、Neo</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">员工规模</div><div class="ib-value">160+（官网招聘页）；2025年12月为60+，2026年4月近90人</div></div>
+        <div class="ib-row"><div class="ib-label">商业模式</div><div class="ib-value">RaaS：按机器人小时（$14–18/小时）或按件计费，月付、可随时终止，无长期合同</div></div>
+        <div class="ib-row"><div class="ib-label">产品</div><div class="ib-value">Cassie（单臂移动机器人）、Sonny（双臂半人形机器人）</div></div>
+        <div class="ib-section">官网</div>
+        <div class="ib-row"><div class="ib-label">官网</div><div class="ib-value">tutorintelligence.com（2026-11-11 实测 HTTP 200）<sup><a href="#ref1">[1]</a></sup></div></div>
+      </aside>
+
+      <div class="callout"><div class="callout-title">公司定位速览</div>Tutor Intelligence 是一家<b>"研究＋部署"一体的仓储与制造业机器人公司</b>。其核心主张是：机器人智能的瓶颈不是算法而是<b>真实世界数据</b>，因此不必等模型成熟再商业化，而是先把机器人投入客户现场，由远程人类"导师"（tutors）遥操作兜底，边干活边采集数据，再训练基础模型反哺整个车队。产品为单臂移动机器人 <b>Cassie</b> 与双臂半人形机器人 <b>Sonny</b>，按小时或按件出租；自建 100 台规模的 <b>Data Factory 1（DF1）</b>作为数据引擎。2026年11月完成 a16z 领投的 7,500万美元 B轮，累计融资 1.17亿美元。</div>
+
+      <p class="article-intro"><strong>Tutor Intelligence</strong> 是一家总部位于美国马萨诸塞州沃特敦（Watertown）的机器人与人工智能公司，源自 MIT CSAIL，由 <strong>Josh Gruenstein</strong> 与 <strong>Alon Kosowsky-Sachs</strong> 于 2021 年 2 月创立<sup><a href="#ref9">[9]</a></sup>。公司把自己定义为"机器人研究与部署公司"（a robotics research and deployment company），主张同时拥有硬件、模型与部署运营三层能力<sup><a href="#ref2">[2]</a></sup>。其商业化路径与多数具身智能公司相反：不追求先实现全自主再交付，而是"<strong>deploy ahead of autonomy</strong>"——先由人类远程导师补足机器人的智能缺口，让机器人在真实产线上创造可计费的价值，同时把每一次作业转成训练数据<sup><a href="#ref8">[8]</a></sup>。截至 2026 年 11 月，公司累计融资 1.17 亿美元，最新一轮为 Andreessen Horowitz 领投的 7,500 万美元 B轮<sup><a href="#ref13">[13]</a></sup>；其机器人已在美国多地的工厂与仓库从事码垛、卸垛、整箱与单件拣选作业<sup><a href="#ref13">[13]</a></sup>。</p>
+
+      <h2 id="facts">1 事实层</h2>
+      <p style="font-size:0.82rem;color:#54595d;margin-bottom:10px;">来源可靠性标注：<span class="tag tag-info">官方新闻稿</span> = 公司发布的正式新闻稿 · <span class="tag tag-info">官网/公司自述</span> = 公司官方页面或创始人博客自述 · <span class="tag tag-info">媒体报道</span> = 第三方独立报道 · <span class="tag tag-info">测算</span> = 本页依据公开价格与参数所做的算术推导，非公司披露</p>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper">
+        <table class="wikitable infotable">
+          <tr><th>项目</th><th>内容</th></tr>
+          <tr><td>公司名称</td><td>Tutor Intelligence（官方新闻稿与官网统一使用该名称，未披露 Inc./Corp. 等注册后缀）<sup><a href="#ref13">[13]</a></sup></td></tr>
+          <tr><td>成立时间</td><td>2021年2月。创始人 Josh Gruenstein 在 2026年11月的长文中自述"2021年2月，Alon 和我正式注册了 Tutor Intelligence"<sup><a href="#ref8">[8]</a></sup>；公司对外亦表述为"spun out of MIT CSAIL"<sup><a href="#ref2">[2]</a></sup></td></tr>
+          <tr><td>总部</td><td>美国马萨诸塞州沃特敦（Watertown, MA）。2026年4月23日在 Riverworks 园区举行开业活动——该建筑位于 Pleasant Street，原为 Boston Scientific 厂址，更早为 Aetna Mills 棉纺厂；此前五年公司在 Coolidge Hill Road 的 Eastern Clothing 楼下办公（约1万平方英尺）。迁入 Riverworks 后，办公、研发与 DF1 数据工厂设于新址，<strong>制造仍留在原 Coolidge Hill Road 场地</strong><sup><a href="#ref17">[17]</a></sup></td></tr>
+          <tr><td>上市情况</td><td>未上市（私人公司），无招股书等经中介机构背书的财务披露文件</td></tr>
+          <tr><td>官网</td><td>tutorintelligence.com（2026-11-11 实测可正常访问，HTTP 200）<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>所属赛道</td><td>仓储与制造业机器人 / 具身智能（码垛、卸垛、整箱拣选、单件拣选）<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref11">[11]</a></sup></td></tr>
+          <tr><td>商业模式</td><td>按使用量计费的 RaaS：码垛/卸垛按机器人小时计价（$14–18/小时），整箱与单件拣选按件计价（较客户现有单件成本低10%–50%）；月付、可随时终止，无长期合同；亦提供买断选项<sup><a href="#ref5">[5]</a></sup></td></tr>
+          <tr><td>制造布局</td><td>公司称所有机器人均在美国制造并从美国部署<sup><a href="#ref13">[13]</a></sup>；创始人称未来一年（2027年）Tutor 将制造"美国工业机器人总量中相当大的比例（a plurality）"，其中大部分为 Cassie<sup><a href="#ref8">[8]</a></sup>（公司自述，未见第三方核实）</td></tr>
+        </table>
+      </div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>时间</th><th>事件</th></tr>
+          <tr><td>2020年</td><td>Gruenstein 加入 Kosowsky-Sachs 所在的 MIT 实验室，从事基于深度学习的机器人 AI 研究；两人将机器人学习视为"数据问题"而非纯算法问题<sup><a href="#ref9">[9]</a></sup></td></tr>
+          <tr><td>2021年2月</td><td>正式注册成立 Tutor Intelligence，目标是搭建"机器人＋远程导师＋数据"的完整平台<sup><a href="#ref8">[8]</a></sup></td></tr>
+          <tr><td>2024年</td><td>完成种子轮，由 Neo 领投（金额未公开披露）<sup><a href="#ref9">[9]</a></sup></td></tr>
+          <tr><td>2025年12月1日</td><td>宣布 3,400万美元 A轮，Union Square Ventures 领投、Fundomo 联合领投、Neo 跟投，累计融资 4,200万美元；当时团队 60余人<sup><a href="#ref9">[9]</a></sup></td></tr>
+          <tr><td>2026年4月23日</td><td>沃特敦 Riverworks 新总部举行开业活动；员工数从迁入时的约30人增至近90人；旧址约1万平方英尺的场地继续承担制造<sup><a href="#ref17">[17]</a></sup></td></tr>
+          <tr><td>2026年4月30日</td><td>发布 Data Factory 1（DF1）：100台 Sonny 组成的数据工厂，同时发布首个基于 DF1 数据训练的 VLA 模型 TI-0<sup><a href="#ref10">[10]</a></sup></td></tr>
+          <tr><td>2026年9月16日</td><td>发布第二代 Cassie 与 Sonny：Cassie 增加全自主移动、板载真空与双3D LiDAR；Sonny 从 DF1 原型走向工业化量产形态<sup><a href="#ref11">[11]</a></sup></td></tr>
+          <tr><td>2026年11月1日</td><td>CEO 发布长文《Tutor Intelligence and the Next Age of Machines》，系统阐述"先部署、后自主"的方法论与公司使命<sup><a href="#ref8">[8]</a></sup></td></tr>
+          <tr><td>2026年11月2日</td><td>宣布 7,500万美元 B轮，Andreessen Horowitz 领投，USV 与 Neo 跟投，累计融资 1.17亿美元<sup><a href="#ref13">[13]</a></sup></td></tr>
+          <tr><td>2026年11月9日</td><td>发布 TI-0.1 技术报告与 TRACE 训练框架：用前沿 LLM 智能体从少量演示重建仿真环境，在仿真中强化学习后再蒸馏回真机<sup><a href="#ref12">[12]</a></sup><sup><a href="#ref6">[6]</a></sup></td></tr>
+        </table>
+      </div>
+
+      <h3 id="founders">1.2 创始人及核心团队</h3>
+      <p>Tutor 的创始团队是" MIT 本科＋实验室"组合，而非教授带博士的学术创业。两人共同的背景是长期自己动手做机器人，并把机器人学习明确框定为数据与系统工程问题<sup><a href="#ref9">[9]</a></sup>。</p>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+          <tr><td>联合创始人、CEO</td><td>Josh Gruenstein</td><td>MIT 计算机科学与工程学士、人工智能工程硕士（2021）；MIT CSAIL 研究助理；MIT Battlecode 竞赛主席；曾在 Bridgewater Associates、Intel（深度学习软件工程）、Cornell Tech 实习；自述从9岁起造机器人<sup><a href="#ref9">[9]</a></sup></td></tr>
+          <tr><td>联合创始人、CTO</td><td>Alon Kosowsky-Sachs</td><td>与 Gruenstein 在 MIT 本科相识，因自制"DIY Segway 机器人"而被称为"那个做平衡车的家伙"；2020年起在 MIT 实验室研究深度学习驱动的机器人 AI；负责技术与制造<sup><a href="#ref9">[9]</a></sup><sup><a href="#ref17">[17]</a></sup></td></tr>
+          <tr><td>创始工程师</td><td>未具名</td><td>与 Kosowsky-Sachs 共同制作 DIY Segway 的 MIT 同学，后加入 Tutor 成为创始工程师<sup><a href="#ref9">[9]</a></sup></td></tr>
+        </table>
+      </div>
+      <p>团队规模扩张较快：2025年12月 A轮时为"60余人"<sup><a href="#ref9">[9]</a></sup>，2026年4月新总部启用时"近90人"<sup><a href="#ref17">[17]</a></sup>，2026年11月官网招聘页写"160+ 人的团队"<sup><a href="#ref18">[18]</a></sup>。创始人强调团队的职能跨度异常宽——"技术人员、工程师、研究人员、销售人员、数据标注员、运营人员"都在同一家公司内<sup><a href="#ref9">[9]</a></sup>，官网亦称团队是"full stack"的：自行设计并制造硬件、训练模型、直接面对大小客户、并在全美维护车队<sup><a href="#ref18">[18]</a></sup>。公开招聘以"Member of Technical Staff（MoTS）"为研发岗位称谓<sup><a href="#ref18">[18]</a></sup>。</p>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <h4>融资历史</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>轮次</th><th>时间</th><th>金额</th><th>投资方</th></tr>
+          <tr><td>种子轮</td><td>2024年（具体月份未披露）</td><td>未公开披露；按 A轮公布时累计 4,200万美元减去 A轮 3,400万美元推算约 800万美元（<span class="tag tag-warn">测算</span>）</td><td>Neo 领投<sup><a href="#ref9">[9]</a></sup></td></tr>
+          <tr><td>A轮</td><td>2025年12月1日</td><td>3,400万美元</td><td>Union Square Ventures 领投；Fundomo 联合领投；Neo 跟投<sup><a href="#ref9">[9]</a></sup></td></tr>
+          <tr><td>B轮</td><td>2026年11月2日</td><td>7,500万美元</td><td>Andreessen Horowitz 领投；Union Square Ventures、Neo 跟投<sup><a href="#ref13">[13]</a></sup></td></tr>
+        </table>
+      </div>
+      <p>B轮资金用途，官方口径为三项：前沿机器人基础模型的训练、Sonny 与 Cassie 的制造、以及在美国的部署扩张<sup><a href="#ref13">[13]</a></sup>。a16z 的合伙人 Raghu Raghuram（VMware 前 CEO）在新闻稿中给出的投资逻辑是："Tutor 的洞见在于，部署不只是机器人研究的终点，而是克服其局限的方式——不是让真实世界去迁就研究，而是从真实部署的需求出发，倒推分销、硬件与研究。"<sup><a href="#ref13">[13]</a></sup></p>
+
+      <h4>股东结构与估值</h4>
+      <p>公司未披露任何轮次的投后估值，B轮后的估值亦未公开；第三方报道明确指出"公司未披露估值与营收"<sup><a href="#ref15">[15]</a></sup>。从公开信息可确认的股东仅四家：<strong>Andreessen Horowitz</strong>（B轮领投）、<strong>Union Square Ventures</strong>（A轮领投）、<strong>Fundomo</strong>（A轮联合领投）、<strong>Neo</strong>（种子轮领投、连续跟投）<sup><a href="#ref9">[9]</a></sup><sup><a href="#ref13">[13]</a></sup>。官网 About 页的"Backed by"区域列出的是 Fundomo 与 Neo（USV 以"A轮领投方"引语形式出现）<sup><a href="#ref2">[2]</a></sup>，a16z 作为最新领投方未出现在该区域（截至2026-11-11）。</p>
+      <div class="callout callout-warn"><div class="callout-title">⚠ 估值与轮次口径提示</div>本页不填写任何估值数字。原因有二：其一，公司从未公布投后估值，B轮新闻稿只披露融资额与累计融资额<sup><a href="#ref13">[13]</a></sup>；其二，媒体在报道中明确说明"估值未披露"<sup><a href="#ref15">[15]</a></sup>，任何具体估值数字都属于外部推测。种子轮金额同理，页面中的"约800万美元"是减法推算，不应作为公司披露数据引用。</div>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <p>Tutor 的技术主张可以概括为一句反常识的判断：<strong>机器人缺的不是更聪明的算法，而是真实世界的数据；而获取数据最便宜的方式，是让机器人先去上班</strong><sup><a href="#ref8">[8]</a></sup><sup><a href="#ref9">[9]</a></sup>。围绕这一判断，公司把硬件、模型与部署做成一个闭环：部署产生数据，数据训练模型，模型让下一台机器人更能干、更便宜、更容易部署<sup><a href="#ref13">[13]</a></sup>。</p>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>技术维度</th><th>具体方案</th></tr>
+          <tr><td>核心命题</td><td>"先部署、后自主"（deploy ahead of autonomy）：在完全自主尚不可行时，用远程人类导师补位，使机器人在真实产线立即产生经济价值，同时把作业过程转化为训练数据<sup><a href="#ref8">[8]</a></sup><sup><a href="#ref14">[14]</a></sup></td></tr>
+          <tr><td>数据获取</td><td>自建 <strong>Data Factory 1（DF1）</strong>：100台 Sonny 双臂机器人组成的"数据工厂"，由国际远程导师团队通过 VR 本体感受遥操作（PTeleop）演示与纠错，覆盖行为克隆、监督微调与强化学习的完整数据生命周期<sup><a href="#ref10">[10]</a></sup></td></tr>
+          <tr><td>并行评估</td><td>同一策略在 100 台机器人上并行运行，公司称原本需要 8 小时机器人运行才能发现的边缘案例，在 DF1 中 5 分钟即可暴露，纠错速度提升约 100 倍（公司自述）<sup><a href="#ref10">[10]</a></sup></td></tr>
+          <tr><td>训练方法</td><td>从人类干预中学习：模型 rollout 出错后由遥操作员演示正确动作；导师在任务完成后对回合打分，形成奖励监督用于后训练；并以"速度归一化"（velocity normalization）对齐不同遥操作员的速度曲线，降低车队级数据的抖动<sup><a href="#ref10">[10]</a></sup></td></tr>
+          <tr><td>模型体系</td><td>两套命名并存：<strong>Turing</strong> 系列（约2亿参数，运行于 Cassie）<sup><a href="#ref3">[3]</a></sup><sup><a href="#ref11">[11]</a></sup>；<strong>TI-0</strong>（45亿参数 VLA，运行于 Sonny）<sup><a href="#ref11">[11]</a></sup>；<strong>TI-0.1</strong> 为 2026年11月发布的最新迭代<sup><a href="#ref12">[12]</a></sup></td></tr>
+          <tr><td>仿真路线</td><td><strong>TRACE</strong>（Telemetry-grounded Reconstruction, Alignment, and Closed-loop Evaluation）：由前沿 LLM 智能体从少量真机演示重建 real2sim 场景与机器人运动，在仿真中强化学习，再 sim2real 蒸馏回 TI-0.1；每次真机试跑暴露的"仿真-现实"差异会回流到下一轮训练，使性能随算力提升<sup><a href="#ref12">[12]</a></sup></td></tr>
+          <tr><td>软件栈</td><td>自研 <strong>Golem</strong> 机器人软件栈：相机处理与机械臂控制用 Rust 实现，策略推理跑在机器人端 GPU 上；公司称相较旧 Python 栈，CPU 占用降低 90%、内存降低 79%、相机流延迟降低 68%<sup><a href="#ref12">[12]</a></sup></td></tr>
+          <tr><td>硬件策略</td><td>全栈自研：Sonny 与 Cassie 共用协作机器人硬件、传感器栈、电气栈与代工供应链，这是实现高机器可用率与数据吞吐的前提<sup><a href="#ref10">[10]</a></sup>；公司强调"客户要的是墙上的洞，不是四分之一英寸的钻头"，因此必须自有本体<sup><a href="#ref11">[11]</a></sup></td></tr>
+          <tr><td>系统集成</td><td><strong>EVE</strong> I/O 模块：把外部传感器接入机器人，简化产线集成并提供数据可观测性<sup><a href="#ref3">[3]</a></sup></td></tr>
+          <tr><td>云与算力</td><td>全部机器人接入 AWS；公司入选 AWS＋NVIDIA＋MassRobotics 的 Physical AI Fellowship 首期，获 20万美元 AWS 额度及两家的工程支持<sup><a href="#ref16">[16]</a></sup></td></tr>
+          <tr><td>安全</td><td>两款产品均符合 ISO/TS 15066 协作机器人安全标准，并以 LiDAR 划分安全区；第二代 Cassie 在原有 2D LiDAR 之外增加两套 3D LiDAR，用于人体检测与无碰撞自主导航<sup><a href="#ref3">[3]</a></sup><sup><a href="#ref11">[11]</a></sup><sup><a href="#ref4">[4]</a></sup></td></tr>
+        </table>
+      </div>
+      <div class="callout"><div class="callout-title">模型命名的媒体混淆</div>部分媒体把 Tutor 的模型统一称作"Ti0 VLA 模型"，并称 Cassie 也由其驱动<sup><a href="#ref15">[15]</a></sup>。公司官网的实际口径是分层的：Cassie 使用 <strong>Turing</strong> 系列（约2亿参数）<sup><a href="#ref3">[3]</a></sup><sup><a href="#ref11">[11]</a></sup>，Sonny 使用 <strong>TI-0</strong> 系列（45亿参数 VLA）<sup><a href="#ref11">[11]</a></sup>。两者是同一"Tutor 基础模型"体系下的不同规模产品，引用时不宜混为一谈。</div>
+
+      <h3 id="products">1.5 产品形态</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>产品</th><th>定位</th><th>关键参数/特征</th><th>时间</th></tr>
+          <tr><td><strong>Cassie</strong>（第二代）</td><td>单臂移动机器人，面向托盘与箱体的物料搬运</td><td>负载 50+ 磅（约23kg）；节拍 5–18+ 箱/分钟（规格表另记"最高8循环/分钟，14箱/分钟"）；续航16小时；典型安装2天；四轮全自主移动；伸缩升降可堆至100英寸高；真空吸盘夹爪（独立气杯控制）；4个主动立体深度相机；占地61"×46"；208–240V/30A<sup><a href="#ref3">[3]</a></sup></td><td>第二代 2026-09-16<sup><a href="#ref11">[11]</a></sup></td></tr>
+          <tr><td><strong>Sonny</strong>（第二代）</td><td>双臂半人形机器人，面向需要"手工作业"的灵巧任务</td><td>单臂负载10磅；节拍最高100次拣选/小时；可达高度7英尺；两条6自由度机械臂；续航12小时；腕部、头部与躯干均配立体 RGBD 相机；力控柔性夹爪；自主导航于既有仓库通道；ISO/TS 15066 安全<sup><a href="#ref4">[4]</a></sup></td><td>第二代 2026-09-16（原型用于 DF1）<sup><a href="#ref11">[11]</a></sup></td></tr>
+          <tr><td><strong>Turing / TI-0 模型系列</strong></td><td>机器人基础模型</td><td>Turing：约2亿参数，服务 Cassie 的感知与任务执行，无需编程或现场标定；TI-0：45亿参数 VLA，服务 Sonny；TI-0.1：TRACE 训练的首个模型<sup><a href="#ref3">[3]</a></sup><sup><a href="#ref11">[11]</a></sup><sup><a href="#ref12">[12]</a></sup></td><td>TI-0 2026-04-30；TI-0.1 2026-11-09<sup><a href="#ref10">[10]</a></sup><sup><a href="#ref12">[12]</a></sup></td></tr>
+          <tr><td><strong>Tutor Portal</strong></td><td>云端车队管理与数据平台</td><td>实时视频流、性能追踪、跨站点运营指标；随模型升级持续下发新能力<sup><a href="#ref3">[3]</a></sup></td><td>随产品提供<sup><a href="#ref3">[3]</a></sup></td></tr>
+          <tr><td><strong>EVE</strong></td><td>产线集成 I/O 枢纽</td><td>把任意外部传感器在数秒内接入机器人，提供上下游数据可观测性<sup><a href="#ref3">[3]</a></sup></td><td>随第二代产品<sup><a href="#ref3">[3]</a></sup></td></tr>
+          <tr><td><strong>Golem</strong></td><td>机器人软件栈</td><td>Rust 实现相机处理与臂控，GPU 端策略推理，统一时间轴记录"看到什么/被要求做什么/如何运动"<sup><a href="#ref12">[12]</a></sup></td><td>2026-11 披露<sup><a href="#ref12">[12]</a></sup></td></tr>
+          <tr><td><strong>TRACE</strong></td><td>训练框架（非独立售卖产品）</td><td>LLM 智能体重建 real2sim、仿真内 RL、sim2real 蒸馏的闭环；公司称把原本需机器人团队数周的场景搭建与奖励调试工作自动化<sup><a href="#ref12">[12]</a></sup></td><td>2026-11-09<sup><a href="#ref12">[12]</a></sup></td></tr>
+        </table>
+      </div>
+      <p>第二代 Cassie 相比初代的关键升级是<strong>移动能力与现场适配</strong>：四轮驱动使其可在厂内自主行驶、在工作站之间转移；板载真空发生，省去压缩空气与固定安装；双3D LiDAR 提升人机共存安全。公司称这些改动让"主要固定的上料与码垛应用部署更快"，并首次把 Cassie 投入端到端的整箱拣选（case picking）作业<sup><a href="#ref11">[11]</a></sup>。Sonny 的第二代则是在 DF1 原型基础上按工业可靠性、可制造性与成本重新设计，是公司首款为 45亿参数 TI-0 模型打造的量产本体<sup><a href="#ref11">[11]</a></sup>。</p>
+
+      <h3 id="scenarios">1.6 应用场景</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>场景分类</th><th>具体场景</th><th>状态与已知客户/案例</th></tr>
+          <tr><td>产线末端码垛</td><td>按"剪贴板上的托盘图案"把纸箱堆成托盘，SKU 混排、换型无需停机，也不改动客户设备</td><td>已商用（公司主力场景）。客户 3PL Productiv 在德州达拉斯工厂用 Cassie 支持配套、合同包装与定制履约<sup><a href="#ref3">[3]</a></sup>；BetterBody Foods 在犹他州 Lindon 与马萨诸塞州 Greenfield 部署共3台<sup><a href="#ref16">[16]</a></sup></td></tr>
+          <tr><td>卸垛/上料</td><td>把整托盘货物拆垛送上产线，按线速运行</td><td>已商用；公司列为 Cassie 的三大工作流之一，客户场景含 de-palletization 与 induction<sup><a href="#ref3">[3]</a></sup><sup><a href="#ref11">[11]</a></sup></td></tr>
+          <tr><td>整箱拣选（B2B 履约）</td><td>车队在既有货架通道行驶，按 WMS 订单拼箱或拼托盘</td><td>2026年秋季起首次进入端到端整箱拣选；公司称是面向 3PL、分销、制造、零售与食品杂货的"1000亿美元级问题"，且无需资本开支与库房改造<sup><a href="#ref11">[11]</a></sup></td></tr>
+          <tr><td>电商单件拣选</td><td>从货架拣出任意单件商品放入订单箱，送至打包区</td><td>Sonny 的首个岗位，处于部署扩张阶段；公司称可处理多种商品形状与包装，接入客户 WMS<sup><a href="#ref4">[4]</a></sup><sup><a href="#ref11">[11]</a></sup></td></tr>
+          <tr><td>制造/维修类手工作业</td><td>装配线包装、装配、设备维护等</td><td>公司称在扩展 Sonny 的任务与环境范围，尚未列为已规模化商用<sup><a href="#ref4">[4]</a></sup></td></tr>
+          <tr><td>快消品生产与分销</td><td>早餐麦片、零食、糖果、化妆品、家居用品、玩具等货物的搬运与码垛</td><td>公司在 B轮新闻稿中称机器人正服务"全美最大的制造与物流网络"，货物覆盖上述品类，但未逐一点名客户<sup><a href="#ref13">[13]</a></sup></td></tr>
+        </table>
+      </div>
+      <div class="callout callout-warn"><div class="callout-title">⚠ 客户名单的核实提示</div>截至 2026-11-11，公开可具名核实的客户只有两家：<strong>Productiv</strong>（3PL，达拉斯）与 <strong>BetterBody Foods</strong>（健康食品制造商，Lindon/Greenfield 三处工厂）<sup><a href="#ref3">[3]</a></sup><sup><a href="#ref16">[16]</a></sup>。新闻稿与官网提到的"Fortune 50 3PL""Fortune 500 包装食品公司""全美最大制造与物流网络"均为不具名表述<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref13">[13]</a></sup>，引用时应按"公司自述"处理。</div>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>指标</th><th>情况</th><th>来源口径</th></tr>
+          <tr><td>定价（码垛/卸垛）</td><td>每机器人小时 14–18 美元；每月最低 80 小时；可退还押金 8,000 美元；一次性实施费 10,000 美元（不论起订几台）；从沃特敦发货的运费 1,000–3,500 美元；产线末端就绪组件 50–300 美元/线</td><td>官网定价页<sup><a href="#ref5">[5]</a></sup></td></tr>
+          <tr><td>定价（整箱/单件拣选）</td><td>按件计价，报价比客户当前的单件成本低 10%–50%；依据客户业务量与库房布局做仿真后报价</td><td>官网定价页<sup><a href="#ref5">[5]</a></sup></td></tr>
+          <tr><td>合同结构</td><td>月付、可随时终止（at will），无长期合同；机器人运行才计费，产线停机不计费（80小时/月下限除外）；亦提供买断＋年度服务费选项</td><td>官网定价页<sup><a href="#ref5">[5]</a></sup></td></tr>
+          <tr><td>交付周期</td><td>从签约到投产中位数约 40 天；码垛机器人到货后约 2 天投产；整箱拣选车队 2 周内上岗；a16z 称最快可达 8 小时</td><td>官网 FAQ／a16z<sup><a href="#ref5">[5]</a></sup><sup><a href="#ref14">[14]</a></sup></td></tr>
+          <tr><td>运维方式</td><td>远程运营团队 7×24 监控全部机器人；故障机器人"整机换新"而非在客户产线上维修；客户无需配备"机器人保姆"</td><td>官网定价页与产品页<sup><a href="#ref5">[5]</a></sup><sup><a href="#ref3">[3]</a></sup></td></tr>
+          <tr><td>部署规模</td><td>机器人所在设施数量同比增长近 4 倍；过去12个月新增部署中近三分之一来自老客户复购；目标 2027 年底前"在约 1,000 台以上机器人"</td><td>B轮新闻稿／a16z<sup><a href="#ref13">[13]</a></sup><sup><a href="#ref14">[14]</a></sup></td></tr>
+          <tr><td>车队增速</td><td>公司称车队正以每月 20% 的速度增长（2026年9月口径）</td><td>公司博客（自述）<sup><a href="#ref11">[11]</a></sup></td></tr>
+          <tr><td>累计作业量</td><td>"数百万次整托盘拣选"（Cassie 页面）；"帮助制造并发运了数亿件美国人日常依赖的产品"（创始人长文）</td><td>公司自述<sup><a href="#ref3">[3]</a></sup><sup><a href="#ref8">[8]</a></sup></td></tr>
+          <tr><td>客户实证</td><td>BetterBody Foods 设施经理 Jeff Pulley 称，相较人工装卸托盘的成本节省 36%，并计划一年半内再添3台 Cassie、后续引入 Sonny</td><td>媒体报道（Manufacturing Dive 采访）<sup><a href="#ref16">[16]</a></sup></td></tr>
+        </table>
+      </div>
+
+      <h3 id="financials">1.8 财务数据</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>指标</th><th>数据</th><th>备注</th></tr>
+          <tr><td>累计融资</td><td>1.17亿美元</td><td>官方新闻稿口径（B轮后）<sup><a href="#ref13">[13]</a></sup></td></tr>
+          <tr><td>最新公开轮次</td><td>2026年11月2日 B轮 7,500万美元</td><td>a16z 领投，USV、Neo 跟投<sup><a href="#ref13">[13]</a></sup></td></tr>
+          <tr><td>估值</td><td>未披露</td><td>公司未公布，媒体报道明确"未披露估值"<sup><a href="#ref15">[15]</a></sup></td></tr>
+          <tr><td>营收</td><td>未披露</td><td>公司从未公布收入、毛利或盈亏；仅有"按小时/按件收费"的价格体系可查<sup><a href="#ref5">[5]</a></sup></td></tr>
+          <tr><td>员工规模</td><td>160+</td><td>官网招聘页（2026-11）；2025-12 为60+，2026-04 近90人<sup><a href="#ref18">[18]</a></sup><sup><a href="#ref9">[9]</a></sup><sup><a href="#ref17">[17]</a></sup></td></tr>
+          <tr><td>单台机器人收入（<span class="tag tag-warn">测算</span>）</td><td>按最低 80 小时/月：1,120–1,440 美元/月；按 16 小时/日×22 工作日＝352 小时/月：4,928–6,336 美元/月</td><td>由公开时薪 14–18 美元乘以工时推导，未扣除运维、折旧与遥操作人力成本；实际利用率未披露<sup><a href="#ref5">[5]</a></sup><sup><a href="#ref3">[3]</a></sup></td></tr>
+          <tr><td>场地</td><td>沃特敦 Riverworks 园区（办公、研发与 DF1 数据工厂）＋原 Coolidge Hill Road 场地（约1万平方英尺，继续用于制造）；Riverworks 面积未披露</td><td>媒体报道<sup><a href="#ref17">[17]</a></sup></td></tr>
+        </table>
+      </div>
+      <div class="callout callout-warn"><div class="callout-title">⚠ 财务透明度的边界</div>Tutor 不是上市公司，也不在 IPO 申报流程中，因此<strong>不存在招股书等经保荐机构、律师、会计师三方背书的财务文件</strong>。可确证的硬数据只有融资额（新闻稿）与价格表（官网）；营收、毛利、现金消耗、机器人保有量、单台经济性均未披露。页面中的单台收入区间是算术测算，用于理解商业模式量级，不能当作公司经营数据引用。</div>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li><strong>公司名的含义</strong>："Tutor"指的是远程人类"导师"——公司的方法论不是让机器人一步到位全自主，而是让人类在关键节点教它、纠正它，并把教学过程沉淀为数据<sup><a href="#ref8">[8]</a></sup>。</li>
+        <li><strong>创业灵感的来源</strong>：创始人在 MIT 读书时读到委内瑞拉大停电的报道——约1万名委内瑞拉人曾全职在《RuneScape》里打金换取美元，停电导致游戏内经济崩溃。这让他们意识到"智能早已被网络化并定价"，与其在实验室等通用智能，不如先把机器人接到现成的人类智能上<sup><a href="#ref8">[8]</a></sup>。</li>
+        <li><strong>使命表述</strong>："为公共利益普及机器人"（proliferate robotics for the common good）；CEO 给出的终极 KPI 是"机器人完成了多少有经济价值的劳动"，并自称目前约为美国经济价值的 0.02 个基点（公司估算，无法独立验证）<sup><a href="#ref8">[8]</a></sup><sup><a href="#ref2">[2]</a></sup>。</li>
+        <li><strong>总部与本地制造业传统</strong>：新总部所在的 Riverworks 前身是 Boston Scientific 厂区，再往前是 Aetna Mills 棉纺厂；本地媒体把 Tutor 的迁入视为沃特敦制造业历史的延续<sup><a href="#ref17">[17]</a></sup>。</li>
+        <li><strong>与云与芯片生态的关系</strong>：公司是 AWS＋NVIDIA＋MassRobotics "Physical AI Fellowship"首期成员，获 20万美元 AWS 额度、两家公司的科学与工程支持；所有机器人在线接入 AWS<sup><a href="#ref16">[16]</a></sup>。</li>
+        <li><strong>客户对产品的典型评价</strong>：一位客户对 CEO 说，Tutor 的机器人是"少数几件我完全不用操心的事之一"——公司把"机器人消失在背景里"视为最好的赞美<sup><a href="#ref8">[8]</a></sup>。</li>
+        <li><strong>公开研究的节奏</strong>：官网"Research"页集中列出技术报告：2026年4月30日 DF1 报告、2026年11月9日 TI-0.1/TRACE 报告，均配博客解读与视频<sup><a href="#ref6">[6]</a></sup>；传播上采用"技术报告＋创始人长文＋播客"的组合，而非只在学术会议发布<sup><a href="#ref7">[7]</a></sup>。</li>
+        <li><strong>资本市场的"对照下注"</strong>：a16z 在领投 Tutor 的 12 天前刚领投了以仿真路线为主的 Eka，被媒体解读为对"仿真优先"与"真实部署优先"两条路线同时下注<sup><a href="#ref15">[15]</a></sup>。</li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+      <p style="font-size:0.82rem;color:#54595d;margin-bottom:10px;">分析层依据<span class="tag tag-info">官方新闻稿</span>、<span class="tag tag-info">官网/公司自述</span>与<span class="tag tag-info">媒体报道</span>综合判断；涉及公司未披露数据的推断已标注，观点仅供参考。</p>
+
+      <div class="analysis-block" id="a1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>Tutor 的团队配置与它选择的场景高度自洽，但自洽的方式与多数机器人公司不同。多数具身智能公司是"教授／博士团队＋前沿论文＋先找场景"，Tutor 则是两名 MIT 本科生、长期自己动手造机器人的"maker"型创始人，从一开始就把问题定义为<strong>数据与系统工程</strong>而非算法突破<sup><a href="#ref9">[9]</a></sup>。这个背景解释了公司为何敢做几件"学术团队通常不愿意做"的事：自己建数据工厂、雇佣远程遥操作员、自建制造与全国运维、按小时卖劳动力。这些是运营密集型工作，而不是论文密集型工作。CEO 在 A轮信中特意强调团队职能跨度——技术人员、工程师、研究人员、销售、数据标注、运营——这实际上是其商业模式的缩影<sup><a href="#ref9">[9]</a></sup>。场景选择也与此匹配：码垛与整箱搬运是仓储里最"脏、重、重复"的活，客户对 ROI 的感知直接，不需要教育市场，且对"是否人形"毫无兴趣。相较之下，Figure、Physical Intelligence 等公司以通用人形或通用大脑叙事融资，Tutor 选择的是"先把一件苦活干到能收费"。风险在于：公开信息中未见 COO/CFO 层级的规模化制造与供应链高管，而公司同时要管制造、车队资产与全国现场服务，组织能力能否跟上 160 人→更大规模的扩张，是团队维度最现实的考验<sup><a href="#ref18">[18]</a></sup>。</p>
+      </div>
+
+      <div class="analysis-block" id="a2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>Tutor 的技术路线可以概括为"用人力换数据，用数据换自主"，其对场景的适配性体现在三个环节。第一，<strong>遥操作不是权宜之计，而是数据采集装置</strong>：传统遥操作被视作产品不成熟的证据，Tutor 把它产品化——客户买到的是"有人在背后兜底的机器人劳动"，公司得到的是带纠错标签的真实作业数据<sup><a href="#ref8">[8]</a></sup><sup><a href="#ref10">[10]</a></sup>。第二，<strong>DF1 把数据采集从"项目制"变成"工厂制"</strong>：100台同构机器人并行运行同一策略，使边缘案例的发现速度提升约百倍，这是单站点部署无法获得的统计效率<sup><a href="#ref10">[10]</a></sup>。第三，<strong>TRACE 是对"真实数据昂贵"这一约束的工程回应</strong>：公司并未放弃真机数据，而是用少量真机演示去"锚定"仿真，再用仿真里的强化学习换取随算力增长的可靠性<sup><a href="#ref12">[12]</a></sup>。这条路线与场景的契合点在于：仓储任务的物理约束强、评价标准单一（节拍、成功率、破损率），仿真与真机的差距比家庭开放场景小得多，real2sim2real 的收益更容易兑现。但也应看到其阶段性：公司自述 TI-0 训练所用的数据"少于 DF1 一周的产量"，TI-0.1 也只是"第一步"<sup><a href="#ref10">[10]</a></sup><sup><a href="#ref12">[12]</a></sup>；换言之，数据飞轮的商业叙事已经成立，但"飞轮转起来后模型能力指数级提升"尚未被独立验证。</p>
+      </div>
+
+      <div class="analysis-block" id="a3">
+        <h4>2.3 股东与资本结构对战略的影响</h4>
+        <p>Tutor 的资本结构是"顶级早期基金接力"的典型样本：Neo 从种子轮一路跟到 B轮，USV 领投 A轮，a16z 领投 B轮<sup><a href="#ref9">[9]</a></sup><sup><a href="#ref13">[13]</a></sup>。这种结构的直接好处是战略连续性强——三家机构都接受"先部署、后自主"的长周期叙事，不会在模型指标尚未领先时施压转向。a16z 的加入还带来两层战略含义：其一，a16z 在 12 天内同时下注 Eka（仿真优先）与 Tutor（真实部署优先），说明其把两条技术路线视为互补而非互斥，Tutor 不必在"仿真 vs 真机"的教条争论中站队<sup><a href="#ref15">[15]</a></sup>；其二，a16z 的合伙人 Raghu Raghuram 是 VMware 前 CEO，其背书强调的是"产品体验、销售流程、售后生命周期"这类企业软件能力，而非单纯的模型能力<sup><a href="#ref13">[13]</a></sup>，这与 Tutor 的 RaaS 商业模式一致。但资本结构也暴露了一个结构性约束：<strong>按小时收费意味着 Tutor 自己持有机器人资产</strong>，每新增一台部署都要先占用现金（制造、运输、部署、押金退还风险），而客户是零资本开支入场<sup><a href="#ref5">[5]</a></sup>。1.17亿美元相对于"2027年底 1,000台以上在约"的目标并不宽裕——若单台制造成本在数万美元量级，仅设备资产就会吞掉相当比例的融资。这也解释了为何 B轮用途被明确写成"模型训练＋制造＋部署"三件事，而不是单纯的研发<sup><a href="#ref13">[13]</a></sup>。</p>
+      </div>
+
+      <div class="analysis-block" id="a4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>从公开信息可以辨认出四次清晰的路径调整。<strong>第一次是从"等自主"转向"先部署"</strong>：公司创立时的判断是通用机器人智能短期不可得，于是把人类导师嵌入产品，这在2021年是相当非主流的選擇<sup><a href="#ref8">[8]</a></sup>。<strong>第二次是产品顺序：先做 Cassie 而非人形</strong>。Cassie 是单臂轮式、只做托盘与箱体，形态上毫无叙事优势，但它是唯一能在客户现场立即算得过账的形态；Sonny 的半人形设计则等到 DF1 积累了一年数据、TI-0 成型之后才产品化<sup><a href="#ref10">[10]</a></sup><sup><a href="#ref11">[11]</a></sup>。这是"先用专用形态赚钱、再用通用形态扩张"的典型次序。<strong>第三次是 2026年9月的第二代硬件</strong>：Cassie 从"固定式单臂"升级为"全自主移动＋板载真空＋双3D LiDAR"，并首次进入端到端整箱拣选<sup><a href="#ref11">[11]</a></sup>——这不是参数迭代，而是把 Cassie 的目标市场从"产线末端"扩展到"整个仓库动线"，直接对应公司所称的"1000亿美元级 B2B 履约问题"。<strong>第四次是 2026年11月的 TRACE</strong>：公司此前反复强调"真实世界没有互联网级数据"，如今却大举投入仿真训练<sup><a href="#ref12">[12]</a></sup>。这看似自我否定，实则是把仿真降格为"真机数据的放大器"——用少量真机演示锚定仿真，而非用仿真替代真机。四次调整的共同逻辑是：<strong>不改变"数据是瓶颈"的核心命题，只改变获取数据的手段</strong>。</p>
+      </div>
+
+      <div class="analysis-block" id="a5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>Tutor 所处的竞争格局可以分三层。第一层是<strong>仓储专用自动化</strong>：Ambi Robotics 以龙门架式方案做包裹分拣与混合箱码垛、同样采用 RaaS；Dexterity、RightHand Robotics 聚焦单件拣选；Pickle Robot 聚焦卸车；Boston Dynamics 的 Stretch 聚焦集装箱卸货。第二层是<strong>通用机器人大脑</strong>：Physical Intelligence 等公司以"卖大脑"而非"卖劳动力"的方式融资，模型能力与资本规模是其主要筹码。第三层是<strong>人形机器人</strong>：Figure、Agility、Apptronik 等以通用人形叙事争夺资本与注意力。Tutor 的位置在第二层与第一层之间：它既有自研 VLA 模型，又自己造本体、自己部署收费，形态上刻意"非人形"（Sonny 是带双臂的半人形，Cassie 是单臂轮式）<sup><a href="#ref11">[11]</a></sup>。这个取舍的好处是：不为形态叙事支付成本，直接按"每机器人小时"与客户的人工成本对标，销售话术极短；坏处是天花板被锚定在仓储与制造业的体力活，且一旦人形机器人成本下降，Tutor 的形态优势可能被抹平。与 Ambi 的差异也值得注意：Ambi 的龙门架追求单点极高吞吐与高密度码垛，Tutor 的移动单臂追求"不改造现场、快速上线、可切换工位"，两者对客户的价值主张不同——前者是"更快的专机"，后者是"更便宜的劳动力"。Tutor 真正的差异化不在硬件，而在<strong>把数据工厂、制造与全国运维三件事同时装进一家公司</strong>；这让它的复制难度高于单纯的算法公司，也让它的资本消耗高于单纯的软件公司。</p>
+      </div>
+
+      <div class="analysis-block" id="a6">
+        <h4>2.6 风险与挑战</h4>
+        <p>第一，<strong>单位经济性不透明，且遥操作人力成本被内置</strong>。公司按小时收费，但未披露每台机器人需要多少远程导师、导师与机器人的比例如何随模型进步下降。若比例下降慢于部署增速，规模越大亏损越大；若下降过快，则"导师"作为差异化数据来源的价值被削弱。外部无法用公开数据验证这一点<sup><a href="#ref5">[5]</a></sup><sup><a href="#ref10">[10]</a></sup>。第二，<strong>重资产＋美国制造的现金压力</strong>。RaaS 意味着公司持有车队，美国制造意味着单台成本高于中国供应链；而客户零资本开支、月付可终止，需求波动直接打到 Tutor 的资产负债表<sup><a href="#ref5">[5]</a></sup><sup><a href="#ref13">[13]</a></sup>。第三，<strong>客户与部署数据的独立验证不足</strong>。可具名客户仅 Productiv 与 BetterBody Foods 两家，"近4倍设施数""每月20%增长""1,000台在约"均为公司自述；36% 的成本节省来自单一客户、单一场景的受访表述，不能外推为产品平均效果<sup><a href="#ref16">[16]</a></sup><sup><a href="#ref13">[13]</a></sup>。第四，<strong>技术主张的强度高于公开证据</strong>。"美国工业机器人产量的相当比例""美国经济价值的0.02个基点""边缘案例发现快100倍"等表述均无第三方审计或基准测试支撑<sup><a href="#ref8">[8]</a></sup><sup><a href="#ref10">[10]</a></sup>。第五，<strong>竞争与替代</strong>：亚马逊自研仓储机器人、中国低成本协作机器人、以及资本更充裕的人形公司，分别从客户、成本与人才三端施压；Tutor 的"非人形"选择在短期内是成本优势，长期可能变成形态天花板<sup><a href="#ref11">[11]</a></sup>。第六，<strong>安全与责任</strong>：50磅级负载、在有人环境中高速移动的机器人，即使符合 ISO/TS 15066，事故责任与保险成本仍是规模化部署的隐性门槛<sup><a href="#ref3">[3]</a></sup>。第七，<strong>融资节奏</strong>：估值未披露意味着外部无法判断 B轮是否溢价；若 2027年"1,000台"目标延期，下一轮融资的定价与叙事都会承压<sup><a href="#ref15">[15]</a></sup>。</p>
+      </div>
+
+      <h2 id="refs">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li id="ref1"><a href="https://tutorintelligence.com/">Tutor Intelligence 官网首页</a>（公司定位、Cassie/Sonny 简介、$14/小时起、Palletizing/Case Pick/Each Pick 方案、客户表述；访问日期2026-11-11，HTTP 200）</li>
+          <li id="ref2"><a href="https://tutorintelligence.com/about">Tutor Intelligence — About</a>（"robotics research and deployment company"、MIT CSAIL 渊源、Watertown 总部、Backed by Fundomo/Neo/USV；访问日期2026-11-11）</li>
+          <li id="ref3"><a href="https://tutorintelligence.com/cassie">Tutor Intelligence — Cassie 产品页</a>（50+ lbs 负载、5–18+ 箱/分钟、16小时续航、2天安装、Turing 2亿参数模型、4×主动立体相机、61"×46"、ISO/TS 15066、Productiv 达拉斯案例；访问日期2026-11-11）</li>
+          <li id="ref4"><a href="https://tutorintelligence.com/sonny">Tutor Intelligence — Sonny 产品页</a>（单臂10磅、100次拣选/小时、7英尺可达、双6自由度臂、12小时续航、TI-0 VLA、立体RGBD配置、扩展至制造与维护场景；访问日期2026-11-11）</li>
+          <li id="ref5"><a href="https://tutorintelligence.com/pricing">Tutor Intelligence — Pricing</a>（$14–18/机器人小时、80小时/月下限、$8,000押金、$10,000实施费、运费$1,000–3,500、按件低于现成本10%–50%、月付可终止、约40天交付、买断选项与FAQ；访问日期2026-11-11）</li>
+          <li id="ref6"><a href="https://tutorintelligence.com/research">Tutor Intelligence — Research（技术报告列表）</a>（2026-11-09 TI-0.1 Technical Report、2026-04-30 Data Factory 1 Technical Report；访问日期2026-11-11）</li>
+          <li id="ref7"><a href="https://tutorintelligence.com/newsroom">Tutor Intelligence — Newsroom</a>（2026年报道与播客索引：Forbes、CBS Boston、SiliconANGLE、A3、USV、a16z 等；访问日期2026-11-11）</li>
+          <li id="ref8"><a href="https://tutorintelligence.com/blog/tutor-intelligence-and-the-next-age-of-machines">公司博客：Tutor Intelligence and the Next Age of Machines（2026-11-01，Josh Gruenstein）</a>（2021年2月注册、RuneScape/委内瑞拉创业灵感、deploy ahead of autonomy、美国2025年部署3.8万台机器人/九成工厂无机器人、0.02个基点、数亿件产品、美国工业机器人"a plurality"预测、客户"不用操心"引语）</li>
+          <li id="ref9"><a href="https://tutorintelligence.com/blog/tutor-series-a-letter">公司博客：Tutor Series A Announcement Letter（2025-12-01，Josh Gruenstein）</a>（$34M A轮、USV领投/Fundomo联合领投/Neo跟投、累计$42M、60余人团队、创始人履历、2020年MIT实验室、数据视角起源）</li>
+          <li id="ref10"><a href="https://tutorintelligence.com/blog/building-a-100-robot-data-factory-toward-factory-ready-ai">公司博客：Building a 100-Robot Data Factory Toward Factory-Ready AI（2026-04-30）</a>（DF1 100台Sonny、PTeleop遥操作、同一策略百台并行评估/边缘案例快100倍、人类干预学习、导师打分奖励、velocity normalization、TI-0训练数据少于DF1一周产量、与Cassie共用硬件与供应链）</li>
+          <li id="ref11"><a href="https://tutorintelligence.com/blog/announcing-the-next-generation-of-robot-workers-cassie-and-sonny">公司博客：Announcing the next generation of robot workers Cassie and Sonny（2026-09-16）</a>（第二代硬件、Cassie全自主移动/板载真空/双3D LiDAR、首次端到端整箱拣选、$100B+ B2B履约、Sonny为TI-0 4.5B打造、车队月增20%、美国12%工厂/10%仓库有机器人）</li>
+          <li id="ref12"><a href="https://tutorintelligence.com/blog/ti0-1">公司博客：TI-0.1 — Deployment-time compute scaling for robot learning（2026-11-09）</a>（TRACE 全称与三步流程、LLM智能体重建real2sim、仿真RL、蒸馏至TI-0.1、Golem软件栈Rust/CPU-90%/RAM-79%/延迟-68%、GPT-6 Astra 作为前沿模型示例）</li>
+          <li id="ref13"><a href="http://business.woonsocketcall.com/woonsocketcall/article/bizwire-2026-11-2-tutor-intelligence-raises-75-million-series-b-led-by-andreessen-horowitz-to-scale-frontier-robotics-model-training-manufacturing-and-deployment">Business Wire 新闻稿（经 Woonsocket Call 转载）：Tutor Intelligence Raises $75 Million Series B Led by Andreessen Horowitz（2026-11-02）</a>（$75M B轮、累计$117M、USV/Neo跟投、Raghu Raghuram 与 Josh Gruenstein 引语、设施数近4倍、1,000+台在约、近三分之一复购、全部美国制造、货物品类）</li>
+          <li id="ref14"><a href="https://a16z.com/announcement/investing-in-tutor-intelligence/">Andreessen Horowitz：Investing in Tutor Intelligence（2026-11-02）</a>（a16z 投资逻辑、客户访谈、最快8小时实施、近三分之一复购、1,000+台目标、对"产品体验与全业务系统"的评价）</li>
+          <li id="ref15"><a href="https://techfundingnews.com/tutor-intelligence-75m-series-b-robot-rental/">Tech Funding News：Tutor Intelligence raises $75M from a16z to rent out robot workers by the hour（2026-11-03）</a>（估值与营收未披露、累计$117M、A轮前60余人、设施数近4倍/三分之一复购/2027年1,000台、a16z 12天前领投 Eka 的对照下注、媒体将模型统称Ti0的口径）</li>
+          <li id="ref16"><a href="https://www.manufacturingdive.com/news/boston-startup-launches-largest-robot-data-factory-US-df1/819576/">Manufacturing Dive：Massachusetts startup launches 'largest robot data factory in the US'（2026-05-07）</a>（DF1 100台、BetterBody Foods 三处工厂部署与36%成本节省、计划再添3台Cassie、AWS/NVIDIA/MassRobotics Physical AI Fellowship、20万美元AWS额度、机器人全部接入AWS）</li>
+          <li id="ref17"><a href="https://watertownmanews.com/2026/04/27/robotics-company-builds-on-watertowns-history-of-manufacturing-in-former-mill-building/">Watertown News：Robotics Company Builds on Watertown's History of Manufacturing in Former Mill Building（2026-04-27）</a>（Riverworks 园区、Pleasant Street、原 Boston Scientific/Aetna Mills、此前 Coolidge Hill Road、迁入时约30人现近90人、CTO Alon Kosowsky 受访）</li>
+          <li id="ref18"><a href="https://tutorintelligence.com/careers">Tutor Intelligence — Careers</a>（"Our team of 160+"、full stack 团队描述、MIT 创立与 Watertown 总部、MoTS 岗位体系；访问日期2026-11-11）</li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">此页面最后编辑于2026年11月11日 · 内容基于公开可用信息编制 · 具身智能Wiki</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body>
+</html>

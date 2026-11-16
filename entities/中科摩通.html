@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>中科摩通 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> <span class="breadcrumb-sep">›</span> <span>中科摩通</span></div>
+  <div class="wiki-header"><h1>中科摩通</h1><div class="subtitle">中科摩通（常州）智能制造股份有限公司 · 成立于2019年 · AI驱动工业自动化 · 具身机器人核心零部件智能装配线 · CASMT AI</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 公司基本信息</a></li>
+        <li class="toc-lvl3"><a href="#founder">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#product">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenario">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financial">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#others">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl3"><a href="#a21">2.1 团队背景与场景选择匹配度</a></li>
+        <li class="toc-lvl3"><a href="#a22">2.2 技术路线与场景适配性</a></li>
+        <li class="toc-lvl3"><a href="#a23">2.3 股东/资本结构对战略的影响</a></li>
+        <li class="toc-lvl3"><a href="#a24">2.4 试错过程与路径调整</a></li>
+        <li class="toc-lvl3"><a href="#a25">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl3"><a href="#a26">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#refs">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">中科摩通</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">中科摩通（常州）智能制造股份有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">品牌名/英文</div><div class="ib-value">中科摩通 / CASMT</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2019年11月7日（创业团队始于2014年）</div></div>
+        <div class="ib-row"><div class="ib-label">总部</div><div class="ib-value">江苏省常州市钟楼经济开发区星港路65-26号</div></div>
+        <div class="ib-row"><div class="ib-label">企业类型</div><div class="ib-value">股份有限公司（非上市）</div></div>
+        <div class="ib-row"><div class="ib-label">法定代表人/董事长</div><div class="ib-value">赵丹</div></div>
+        <div class="ib-row"><div class="ib-label">注册资本</div><div class="ib-value">3103.08万元</div></div>
+        <div class="ib-row"><div class="ib-label">员工规模</div><div class="ib-value">700余人（官网）；548人（2023年报）；研发人员占比约50%</div></div>
+        <div class="ib-row"><div class="ib-label">生产基地</div><div class="ib-value">厂房面积约55,000㎡</div></div>
+        <div class="ib-section">融资信息</div>
+        <div class="ib-row"><div class="ib-label">最新轮次</div><div class="ib-value">C+轮（2026.07.27）</div></div>
+        <div class="ib-row"><div class="ib-label">最新投资方</div><div class="ib-value">凯迪股份（605288.SH）战略投资</div></div>
+        <div class="ib-row"><div class="ib-label">C轮</div><div class="ib-value">近2亿元（2026年6—7月，金浦投资领投）</div></div>
+        <div class="ib-row"><div class="ib-label">估值</div><div class="ib-value">近10亿元人民币（阳光电源领投C轮投后）</div></div>
+        <div class="ib-section">核心技术</div>
+        <div class="ib-row"><div class="ib-label">平台</div><div class="ib-value">CASMT AI 柔性自动化大模型 / CASMT AI+CAX 工业仿真底座</div></div>
+        <div class="ib-row"><div class="ib-label">工业模型</div><div class="ib-value">天矩 IWAM 工业世界行动模型</div></div>
+        <div class="ib-row"><div class="ib-label">具身产品</div><div class="ib-value">关节模组、减速器、丝杠、空心杯/无框力矩电机等装配测试线</div></div>
+        <div class="ib-section">官网</div>
+        <div class="ib-row"><div class="ib-label">官网</div><div class="ib-value">casmt.com / casmt.cn（另有 en.casmt.com、jap.casmt.com）</div></div>
+      </aside>
+
+      <p class="article-intro">中科摩通（中科摩通（常州）智能制造股份有限公司，英文简称 CASMT）是一家总部位于江苏常州的<strong>国家级专精特新"小巨人"</strong>企业，专注以 AI 驱动的工业自动化智能装备整体解决方案。<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref13">[13]</a></sup>公司主营围绕新能源汽车热管理、电驱动、线控底盘等核心零部件的智能装配与检测产线，并自研 <strong>CASMT AI 柔性自动化大模型</strong>与 <strong>CASMT AI+CAX 工业仿真底座</strong>。<sup><a href="#ref1">[1]</a></sup>2024 年起，公司前瞻布局具身智能赛道，围绕人形机器人全栈自研关键零部件与智能装备，已推出机器人<strong>总装测试线</strong>及关节模组、谐波/RV 减速机、滚珠/滚柱丝杠、空心杯电机、无框力矩电机等核心零部件的自动化装配测试线。<sup><a href="#ref2">[2]</a></sup><sup><a href="#ref3">[3]</a></sup>融资方面，公司于 2026 年完成由金浦投资领投的近 2 亿元 C 轮融资，并于 2026 年 7 月获上市公司凯迪股份（605288.SH）C+ 轮战略投资。<sup><a href="#ref12">[12]</a></sup><sup><a href="#ref14">[14]</a></sup><sup><a href="#ref4">[4]</a></sup></p>
+
+      <h2 id="facts">1 事实层</h2>
+      <p style="font-size:0.82rem;color:#54595d;margin-bottom:10px;">来源可靠性标注：<span class="tag tag-info">上市公司公告</span> = 沪深交易所披露 · <span class="tag tag-info">券商研报</span> = 持牌机构研究报告 · <span class="tag tag-info">媒体报道</span> = 第三方独立报道 · <span class="tag tag-info">官网/公司自述</span> = 公司官方披露 · <span class="tag tag-info">工商登记</span> = 企业信用信息系统</p>
+
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper"><table class="wikitable infotable">
+        <tr><th>项目</th><th>内容</th></tr>
+        <tr><td>公司全称</td><td>中科摩通（常州）智能制造股份有限公司<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref19">[19]</a></sup></td></tr>
+        <tr><td>品牌名/英文简称</td><td>中科摩通 / CASMT<sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>成立时间</td><td>2019年11月7日（创业团队及"摩通"品牌始于2014年）<sup><a href="#ref19">[19]</a></sup><sup><a href="#ref20">[20]</a></sup></td></tr>
+        <tr><td>总部地址</td><td>江苏省常州市钟楼经济开发区星港路65-26号（官网"常州总部"）<sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>注册地址</td><td>常州市钟楼区五星街道新新村委工业路98号（企业数据平台记录）<sup><a href="#ref19">[19]</a></sup></td></tr>
+        <tr><td>企业类型</td><td>股份有限公司（非上市）<sup><a href="#ref19">[19]</a></sup></td></tr>
+        <tr><td>法定代表人/董事长</td><td>赵丹<sup><a href="#ref19">[19]</a></sup><sup><a href="#ref20">[20]</a></sup></td></tr>
+        <tr><td>注册资本</td><td>3103.08万元<sup><a href="#ref19">[19]</a></sup></td></tr>
+        <tr><td>员工规模</td><td>官网称 700 余人；企业数据平台记录 2023 年报社保人数 548 人、"500-999人"规模区间；研发人员占比约 50%<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref19">[19]</a></sup><sup><a href="#ref20">[20]</a></sup></td></tr>
+        <tr><td>生产基地</td><td>厂房面积约 55,000㎡（官网）；研发中心分布于上海、苏州、昆山、西安等地<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref20">[20]</a></sup></td></tr>
+        <tr><td>专利数量</td><td>企业数据平台记录专利 110 项<sup><a href="#ref19">[19]</a></sup></td></tr>
+        <tr><td>上市状态</td><td>未上市；2025年11月入选"2025年度江苏省科技企业上市培育计划拟入库企业名单"<sup><a href="#ref13">[13]</a></sup></td></tr>
+        <tr><td>核心定位</td><td>AI 驱动工业自动化 · 新能源汽车智能装备 · 具身机器人核心零部件智能装配与检测装备</td></tr>
+        <tr><td>官网</td><td>casmt.com（主站）、casmt.cn，另有英文站 en.casmt.com、日文站 jap.casmt.com；官网邮箱 juy@china-automore.com，总机 400-1363633<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref3">[3]</a></sup></td></tr>
+      </table></div>
+
+      <h4>资质与荣誉</h4>
+      <ul>
+        <li>国家级专精特新"小巨人"企业（2026年10月官网新闻中亦称"国家级重点'小巨人'企业"）<sup><a href="#ref9">[9]</a></sup><sup><a href="#ref7">[7]</a></sup></li>
+        <li>江苏省潜在独角兽企业、江苏省智能制造领军服务机构、江苏省首台（套）重大装备认定、科创中国新锐企业<sup><a href="#ref15">[15]</a></sup></li>
+        <li>2025年11月入选"2025年度江苏省科技企业上市培育计划拟入库企业名单"<sup><a href="#ref13">[13]</a></sup></li>
+        <li>2026年8月获"2026年江苏省先进级智能工厂"称号<sup><a href="#ref3">[3]</a></sup></li>
+      </ul>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>时间</th><th>事件</th></tr>
+        <tr><td>2014年</td><td>赵丹回常州组建创业团队，成立"摩通机器人科技有限公司"，从事工业机器人集成<sup><a href="#ref20">[20]</a></sup></td></tr>
+        <tr><td>2015年</td><td>获格力博 200 万元锂电池装配订单，成为团队业务转折点<sup><a href="#ref20">[20]</a></sup></td></tr>
+        <tr><td>2019年11月7日</td><td>与常州市五星创业投资基金、中科院江苏智能院（江苏省中科智能科学技术应用研究院）达成战略合作并重组，成立中科摩通<sup><a href="#ref11">[11]</a></sup><sup><a href="#ref20">[20]</a></sup></td></tr>
+        <tr><td>2020年4月</td><td>完成天使轮融资（启泰资本、常州中科智造创业投资天使基金等）<sup><a href="#ref16">[16]</a></sup></td></tr>
+        <tr><td>2021年11月</td><td>完成 2000 万元 A 轮融资（常创投独家）<sup><a href="#ref16">[16]</a></sup></td></tr>
+        <tr><td>2022年</td><td>完成超亿元 B 轮融资（平陵集团、敦行资本、明善资本、钟楼金控集团、金投致源、瑞源创投、悦达普达母基金等）<sup><a href="#ref16">[16]</a></sup></td></tr>
+        <tr><td>2023年11月</td><td>完成 5000 万元 B+ 轮融资（民生证券投资、上海沣泉峪、无锡星源资本）<sup><a href="#ref16">[16]</a></sup></td></tr>
+        <tr><td>2024年10月</td><td>完成由阳光电源领投的 C 轮融资（证券之星记为"B++轮"），投后估值近 10 亿元人民币<sup><a href="#ref15">[15]</a></sup><sup><a href="#ref8">[8]</a></sup><sup><a href="#ref18">[18]</a></sup></td></tr>
+        <tr><td>2026年6—7月</td><td>完成近 2 亿元 C 轮融资，金浦投资领投<sup><a href="#ref12">[12]</a></sup><sup><a href="#ref14">[14]</a></sup></td></tr>
+        <tr><td>2026年7月27日</td><td>获凯迪股份（605288.SH）C+ 轮战略投资<sup><a href="#ref4">[4]</a></sup></td></tr>
+        <tr><td>2026年8月3日</td><td>与杭州新剑机电传动股份有限公司签署战略合作，联合开发行星滚柱丝杠自动化产线并全球首发一体化方案<sup><a href="#ref5">[5]</a></sup></td></tr>
+        <tr><td>2026年8月26日</td><td>与智平方（深圳）科技股份有限公司达成战略合作，聚焦具身机器人总装线<sup><a href="#ref6">[6]</a></sup></td></tr>
+        <tr><td>2026年10月</td><td>与中科院物理研究所签订战略协议，联合开发固态电池电芯及系统智能化制造技术<sup><a href="#ref7">[7]</a></sup></td></tr>
+      </table></div>
+
+      <h3 id="founder">1.2 创始人及核心团队</h3>
+      <p>公司由常州籍创业者赵丹创立并担任董事长。赵丹为 1985 年出生的常州"85后"企业家，本科毕业后曾短暂考取公务员、做过设计师；2011 年首次创业失败，2013 年赴浙江一家大企业学习先进制造与管理经验，2014 年回常州组建团队二次创业，2019 年底通过引入常州国资基金与中科院体系资源完成重组，成立中科摩通。<sup><a href="#ref20">[20]</a></sup>公司具身智能装备业务由具身智能装备事业部总经理<strong>严家祥</strong>牵头推进，其公开演讲主题为《具身机器人核心部件装配工艺与测试》。<sup><a href="#ref8">[8]</a></sup></p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+        <tr><td>董事长/法定代表人</td><td>赵丹</td><td>1985年生，常州籍；2007年本科毕业，曾考公务员、当设计师；2011年首次创业失败，2013年赴浙江某大企业学习，2014年回常州二次创业成立摩通机器人；2019年底推动重组创立中科摩通。主导多个新能源汽车行业首台（套）智能装备研发；2023年公司入选江苏省级潜在独角兽企业。<sup><a href="#ref20">[20]</a></sup></td></tr>
+        <tr><td>具身智能装备事业部总经理</td><td>严家祥</td><td>负责公司具身机器人零部件智能制造解决方案；在 ATC 具身机器人及一体化模组技术峰会发表《具身机器人核心部件装配工艺与测试》主题演讲。<sup><a href="#ref8">[8]</a></sup></td></tr>
+      </table></div>
+      <p style="font-size:0.8rem;color:#54595d;">注：公司公开信息以董事长赵丹为唯一明确披露的核心人物，其余高管团队构成未见于公开渠道。</p>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>轮次</th><th>时间</th><th>金额</th><th>投资方</th><th>说明</th></tr>
+        <tr><td>天使轮</td><td>2020年4月</td><td>未披露</td><td>启泰资本、常州中科智造创业投资天使基金</td><td>企业数据平台记录；另有 2020年9月"天使+"青枫投资<sup><a href="#ref16">[16]</a></sup></td></tr>
+        <tr><td>A轮</td><td>2021年11月</td><td>2000万元</td><td>常创投（独家）</td><td>—<sup><a href="#ref16">[16]</a></sup></td></tr>
+        <tr><td>B轮</td><td>2022年</td><td>超亿元</td><td>平陵集团、敦行资本、明善资本、钟楼金控集团、金投致源、瑞源创投、悦达普达母基金等</td><td>具体月份各源记载不一致（2022-09 / 2022-11）<sup><a href="#ref16">[16]</a></sup></td></tr>
+        <tr><td>B+轮</td><td>2023年11月</td><td>5000万元</td><td>民生证券投资、上海沣泉峪、无锡星源资本</td><td>—<sup><a href="#ref16">[16]</a></sup></td></tr>
+        <tr><td>C轮（部分源记作"B++轮"）</td><td>2024年10月</td><td>数千万</td><td>阳光电源领投</td><td>投后估值近10亿元人民币<sup><a href="#ref15">[15]</a></sup><sup><a href="#ref8">[8]</a></sup><sup><a href="#ref18">[18]</a></sup><sup><a href="#ref16">[16]</a></sup></td></tr>
+        <tr><td>C轮</td><td>2026年6—7月</td><td>近2亿元</td><td>金浦投资领投，武岳峰资本跟投，老股东钟楼金控、国联金投持续加码，产业方新泉股份深度参与</td><td>财务顾问：九轩资本<sup><a href="#ref12">[12]</a></sup><sup><a href="#ref14">[14]</a></sup><sup><a href="#ref18">[18]</a></sup></td></tr>
+        <tr><td>C+轮</td><td>2026年7月27日</td><td>未披露</td><td>凯迪股份（605288.SH）战略投资</td><td>产业资本战略入股，双方聚焦具身智能联合研发与欧美出海<sup><a href="#ref4">[4]</a></sup></td></tr>
+      </table></div>
+      <div class="callout">
+        <div class="callout-title">口径说明：轮次命名与估值存在多处冲突</div>
+        <p>（1）<strong>轮次命名冲突</strong>：2024 年阳光电源领投的一轮，证券之星记作"B++轮"，东方财经、扬子晚报及多数媒体报道均记作"C轮"；2026 年金浦投资领投的一轮普遍记为"C轮"，凯迪股份入股记为"C+轮"。本页按主流口径以"C轮"表述，并在表中标注差异。<sup><a href="#ref18">[18]</a></sup><sup><a href="#ref14">[14]</a></sup><sup><a href="#ref15">[15]</a></sup></p>
+        <p>（2）<strong>估值口径</strong>：公开可查的"近 10 亿元人民币"为 2024 年阳光电源领投 C 轮时的投后估值（来源：扬子晚报·紫牛号，2025-11-07）；<strong>2026 年近 2 亿元 C 轮的投后估值未披露</strong>。<sup><a href="#ref15">[15]</a></sup></p>
+        <p>（3）<strong>易混淆数据</strong>：部分平台曾出现"6.00亿元"数字，经核对，该数字实为<strong>2024年签约订单金额突破 6 亿元</strong>，并非估值或融资额。<sup><a href="#ref15">[15]</a></sup></p>
+      </div>
+      <h4>股东结构与产业协同</h4>
+      <p>公司股东呈现"地方国资 + 财务投资机构 + 产业上市公司"的混合结构。早期股东含常州本地国资背景的常创投、钟楼金控集团、金投致源，以及启泰资本、敦行资本、明善资本、武岳峰资本、金浦投资等机构；2026 年 C 轮起，产业方<strong>新泉股份</strong>（603179.SH，汽车内外饰件上市公司）深度参与，<strong>凯迪股份</strong>（605288.SH，线性驱动上市公司）以 C+ 轮战略投资入股。<sup><a href="#ref12">[12]</a></sup><sup><a href="#ref4">[4]</a></sup>据东方证券研报（转引中科摩通官网），新泉股份对中科摩通的投资额为 2000 万元，且新泉董事会已批准将子公司新泉机器人 30% 的股权转让给凯迪股份，以进一步深化双方战略合作。<sup><a href="#ref21">[21]</a></sup></p>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>维度</th><th>详情</th></tr>
+        <tr><td>总体定位</td><td>"以 AI 驱动的工业自动化"——将人工智能技术与工业装备、产线集成相结合，构建面向离散制造的智能装备整体解决方案<sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>CASMT AI 柔性自动化大模型</td><td>运用 <strong>LORA 微调、提示词工程、RAG 增强</strong>等人工智能技术构建；应用于自动化装配、性能检测、智能仓储物流等数字化智能工厂场景<sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>CASMT AI + CAX 工业仿真底座</td><td>深度打通 <strong>CAD/CAE/CAM 全链路</strong>工业软件，依托工业智能体构建"设计—仿真—制造"闭环，将传统串行工程流程重构为 AI 驱动的并行设计模式；沉淀离散制造工艺知识库，支持产线方案智能生成、虚拟仿真验证、工艺迭代优化，缩短非标自动化产线的设计与交付周期<sup><a href="#ref9">[9]</a></sup><sup><a href="#ref10">[10]</a></sup></td></tr>
+        <tr><td>天矩 IWAM 工业世界行动模型</td><td>公司自研的工业世界行动模型，打通 CAD-CAE-CAM 全链路 CAX 智能体，实现图纸智能生成、仿真自动校验、产线柔性适配，将通用大模型改造为带物理约束、无工业幻觉、可落地生产的工业专属模型<sup><a href="#ref8">[8]</a></sup></td></tr>
+        <tr><td>与西门子的协同</td><td>CASMT AI 与西门子自动化工程智能工具 Eigen 协同，形成"CAX 全链路数字中枢 + 自动化工程智能体"双轮驱动：CASMT AI 负责产线工艺仿真、机器人协同调度与数字孪生闭环管控，Eigen 承接标准化程序编写、设备组态与仿真校验<sup><a href="#ref10">[10]</a></sup></td></tr>
+        <tr><td>金属加工工艺迁移</td><td>将汽车工业领域成熟的压装、拧紧、激光焊接、气密测试、NVH 测试等工艺能力迁移至机器人零部件领域<sup><a href="#ref8">[8]</a></sup></td></tr>
+        <tr><td>技术路线特征</td><td>路线定位为"工业 AI + CAX 数字底座 + 具身智能执行"，核心是"硬件装备 + AI 算法"双轮驱动，强调<strong>非标工艺封装为可复制的标准智能工作站模块</strong>，解决工厂具身智能落地的"最后一公里"<sup><a href="#ref8">[8]</a></sup></td></tr>
+      </table></div>
+      <p>中科摩通的技术路线可概括为"<strong>从汽车/新能源智能装备的工艺 know-how 出发，向具身智能部件装备延伸，并用工业大模型做底座</strong>"。公司并非直接研发人形机器人本体，而是把在新能源汽车零部件产线中积累的精密装配工艺（压装、拧紧、焊接、气密/NVH 测试）迁移到机器人核心零部件的装配与检测上，同时以 CASMT AI 与 CAX 平台提供"设计—仿真—制造"的数字化底座。<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref8">[8]</a></sup><sup><a href="#ref10">[10]</a></sup></p>
+
+      <h3 id="product">1.5 产品形态</h3>
+      <p>公司的产品体系分为"通用工业装备/产线"与"具身机器人装备"两大板块。通用板块覆盖新能源装备（储能电池组、动力电池组、集装箱、换电站、全钒液流电池装配线等）、汽车工业（汽车电子、新能源电机、汽车内饰、充电桩、汽车底盘；扁线定子、三合一电驱、轮毂电机、电驱系统、汽车热管理、线控制动、主动悬架执行器生产线）、智能工厂（AGV、立体库）与一般工业。<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref3">[3]</a></sup></p>
+      <p>具身机器人装备板块为公司官网单列的产品线，涵盖机器人总装测试线及各类核心零部件的自动化装配/测试线：<sup><a href="#ref2">[2]</a></sup></p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>产品/产线</th><th>关键特征</th><th>说明</th></tr>
+        <tr><td>机器人总装测试线</td><td>覆盖腿部组装、胸腔组装、手臂组装、躯干组装、底盘组装等核心分体结构装配，整机集成组装与整机综合终测<sup><a href="#ref6">[6]</a></sup></td><td>与智平方合作落地具身机器人总装线<sup><a href="#ref6">[6]</a></sup></td></tr>
+        <tr><td>关节模组装配线</td><td>支持关节模组转子线、定子线、模组总成线及 EOL 测试的全流程自动化<sup><a href="#ref8">[8]</a></sup></td><td>公司具身装备核心产线之一<sup><a href="#ref2">[2]</a></sup></td></tr>
+        <tr><td>减速机装配线（RV / 谐波）</td><td>RV 减速器与谐波减速器的装配测试线<sup><a href="#ref2">[2]</a></sup><sup><a href="#ref8">[8]</a></sup></td><td>—</td></tr>
+        <tr><td>丝杠装配线（滚珠 / 滚柱）</td><td>面向 EMB 与具身机器人滚珠丝杠；行星滚柱丝杠自动化装配产线（与新剑传动联合，攻克微小零件装配、微米级精度在线检测）<sup><a href="#ref2">[2]</a></sup><sup><a href="#ref5">[5]</a></sup></td><td>行星滚柱丝杠承载能力可达滚珠丝杠 3-5 倍、疲劳寿命提升 10~15 倍（公司引述）<sup><a href="#ref5">[5]</a></sup></td></tr>
+        <tr><td>电机装配线（空心杯 / 无框力矩）</td><td>空心杯电机、无框力矩电机的定子/转子装配线<sup><a href="#ref2">[2]</a></sup><sup><a href="#ref8">[8]</a></sup></td><td>—</td></tr>
+        <tr><td>机器人本体形态（自研）</td><td>公司称围绕人形机器人全栈自研关键零部件和智能装备，其机器人产品涵盖人形双臂、轮式机器人、双足/四足机器人<sup><a href="#ref1">[1]</a></sup></td><td>官网公司概况表述<sup><a href="#ref1">[1]</a></sup></td></tr>
+      </table></div>
+      <p style="font-size:0.8rem;color:#54595d;">注：公司具身机器人装备以"产线/装备"为主，属具身智能产业链的<strong>制造装备环节</strong>。据腾讯新闻（2026-07-28）报道，"它不直接向机器人企业出售执行器，而是为执行器及其核心部件提供生产设备"。<sup><a href="#ref17">[17]</a></sup></p>
+
+      <h3 id="scenario">1.6 应用场景</h3>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>场景领域</th><th>状态</th><th>典型客户/合作方</th><th>说明</th></tr>
+        <tr><td>新能源汽车核心零部件产线</td><td><span class="tag tag-info">基本盘业务</span></td><td>红旗、比亚迪、大众、宁德时代等（服务百余家客户，公司口径）</td><td>热管理、扁线定子、三合一电驱、轮毂电机、线控制动、主动悬架执行器等智能装配检测线<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref13">[13]</a></sup></td></tr>
+        <tr><td>储能与动力电池装备</td><td><span class="tag tag-info">已交付</span></td><td>阳光电源等</td><td>软包动力电池模组装配线启运罗马尼亚；泗阳新能源产业智能装备生产基地<sup><a href="#ref15">[15]</a></sup><sup><a href="#ref9">[9]</a></sup></td></tr>
+        <tr><td>具身机器人核心零部件装配</td><td><span class="tag tag-info">推进落地</span></td><td>新剑传动（行星滚柱丝杠）、智平方（总装线）</td><td>关节模组、减速器、丝杠、空心杯电机等核心部件装配与检测产线<sup><a href="#ref5">[5]</a></sup><sup><a href="#ref6">[6]</a></sup></td></tr>
+        <tr><td>汽车减振器智能装配</td><td><span class="tag tag-info">已交付</span></td><td>河南淅减汽车减振器有限公司</td><td>2026年3月联合开发国内首条双阀 ADS 减振器智能装配线<sup><a href="#ref13">[13]</a></sup></td></tr>
+        <tr><td>海外整车/零部件产线</td><td><span class="tag tag-info">已交付</span></td><td>德国奥迪、捷克客户、日本第一实业</td><td>2026年7月交付德国奥迪油泵智能产线；2025年向捷克客户交付电驱系统生产线<sup><a href="#ref13">[13]</a></sup><sup><a href="#ref15">[15]</a></sup></td></tr>
+        <tr><td>固态电池电芯制造装备</td><td><span class="tag tag-warn">新拓展</span></td><td>中国科学院物理研究所（战略合作）</td><td>联合开展固态电池电芯及系统智能化制造技术开发，聚焦后段工艺、系统集成工艺<sup><a href="#ref7">[7]</a></sup></td></tr>
+      </table></div>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <p>中科摩通在工业智能装备领域已形成规模化收入。公司销售额从 2021 年接近 1 亿元增长至 2022 年突破 2.6 亿元、2023 年突破 5 亿元，2024 年预计突破 10 亿元；期间近三年营收复合增长率约 60%（公司口径）。2024 年签约订单超 6 亿元。<sup><a href="#ref15">[15]</a></sup><sup><a href="#ref20">[20]</a></sup></p>
+      <p>国际化方面，公司已在<strong>日本、捷克、墨西哥</strong>设立海外子公司，并深度布局出海战略；官网披露在日本站、英文站之外还曾计划设立美国子公司与新加坡全球研发中心。<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref15">[15]</a></sup>落地案例包括：携手日本第一实业亮相 AEE 2026 日本汽车工程展览会（Hairpin 扁线定子方案，节拍低于 50 秒）；与西门子联合亮相德国汉诺威工博会；2026 年 7 月向德国奥迪交付油泵智能产线；此前向捷克客户交付电驱系统生产线、软包动力电池模组装配线启运罗马尼亚。<sup><a href="#ref13">[13]</a></sup><sup><a href="#ref15">[15]</a></sup></p>
+      <p>具身智能业务方面，公司自 2026 年起密集展开产业合作：8 月与新剑传动签署战略合作并全球首发行星滚柱丝杠一体化解决方案；8 月与智平方达成战略合作，聚焦具身机器人总装线；10 月与中科院物理所签订固态电池装备战略协议；同期在 ATC 具身机器人及一体化模组技术峰会、2026 常州国际新能源博览会等集中展示具身机器人零部件智能制造方案。<sup><a href="#ref5">[5]</a></sup><sup><a href="#ref6">[6]</a></sup><sup><a href="#ref7">[7]</a></sup><sup><a href="#ref8">[8]</a></sup><sup><a href="#ref9">[9]</a></sup></p>
+      <p style="font-size:0.8rem;color:#54595d;">提示：公司具身智能业务目前仍处于"产线/装备交付 + 战略合作"阶段。参股方凯迪股份 2026 年 5 月股价异动公告曾称，其机器人业务已立项但短期暂不产生收入，双方合作仍处投入期。<sup><a href="#ref21">[21]</a></sup></p>
+
+      <h3 id="financial">1.8 财务数据</h3>
+      <p>公司未上市，未公开披露经审计的完整财务报表。以下销售额、订单等数据均为<strong>公司口径或媒体转述</strong>，非经审计数据，使用时需审慎。</p>
+      <div class="table-wrapper"><table class="wikitable">
+        <tr><th>指标</th><th>2021</th><th>2022</th><th>2023</th><th>2024</th></tr>
+        <tr><td>销售额（公司口径）</td><td>接近1亿元</td><td>突破2.6亿元</td><td>突破5亿元</td><td>预计突破10亿元</td></tr>
+        <tr><td>签约订单</td><td>—</td><td>—</td><td>—</td><td>超6亿元</td></tr>
+        <tr><td>营收复合增长率</td><td colspan="4">近三年约60%（公司口径）</td></tr>
+        <tr><td>估值</td><td>—</td><td>—</td><td>—</td><td>近10亿元（C轮投后，2024年10月）</td></tr>
+      </table></div>
+      <p style="font-size:0.8rem;color:#54595d;">来源：扬子晚报·紫牛号（2025-11-07）引述公司经营数据；另据创客公社（2024-10-29）报道，公司 2025 年销售合同目标为 15 亿元。<sup><a href="#ref15">[15]</a></sup><sup><a href="#ref20">[20]</a></sup></p>
+
+      <h3 id="others">1.9 其他信息</h3>
+      <ul>
+        <li>公司业务划分为新能源汽车装备、具身智能等板块。2026 年 8 月半年度工作会议上，董事长赵丹提出公司已形成"双层业务架构"：<strong>新能源汽车装备为基本盘</strong>（成熟业务托举稳定根基），<strong>具身智能为全新增长曲线</strong>（主攻工业行动模型、智能体、具身执行）。<sup><a href="#ref11">[11]</a></sup></li>
+        <li>与之配套，公司提出"三维一体能力架构"：以懂工业场景的生成式认知 AI 模型为"大脑"，以可感知、可决策、可实操的具身工作站为执行载体，依托高端工业装备完成落地，打通"模型—具身智能—高端装备"的工业智能闭环。<sup><a href="#ref11">[11]</a></sup></li>
+        <li>公司内部孵化工业具身智能企业"无限确定"，方向为 CASMT AI + CAX 智能体。<sup><a href="#ref13">[13]</a></sup></li>
+        <li>2026 年 10 月，公司携 CASMT AI+CAX 工业仿真底座与具身机器人工业场景落地能力参展 2026 常州国际新能源博览会，展示具身机器人在工厂精密装配、工件质检等工序的工程化应用。<sup><a href="#ref9">[9]</a></sup></li>
+        <li>公司与西门子深度共建"工业 AI 智能体 + 具身机器人"场景应用生态，共同推进人形机器人、轮式移动机器人等工业场景规模化应用。<sup><a href="#ref10">[10]</a></sup></li>
+        <li>总部基地项目（"常松地块"）规划用地约 77 亩、建筑面积约 4.34 万㎡、总投资约 1 亿元，建成预计年产值 10 亿元。<sup><a href="#ref20">[20]</a></sup></li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+      <p style="font-size:0.82rem;color:#54595d;margin-bottom:10px;">分析层数据综合来自 <span class="tag tag-info">券商研报</span>、<span class="tag tag-info">上市公司公告</span>、<span class="tag tag-info">媒体报道</span> 与 <span class="tag tag-info">公司/机构自述</span>。公司自述数据与独立验证数据已在事实层标注区分，分析层观点仅供参考。</p>
+
+      <div class="analysis-block" id="a21">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>中科摩通的团队背景与"从汽车装备向具身装备延伸"的路径高度自洽。董事长赵丹是典型的"连续创业的制造业创业者"——2011 年首次创业失败、2013 年赴浙江先进制造企业学习、2014 年回常州二次创业，最终在新能源汽车零部件产线上找到规模化收入。<sup><a href="#ref20">[20]</a></sup>这种背景决定了公司不是"从实验室技术出发找场景"的科学家创业，而是"从客户产线需求出发做装备"的工程型公司。其优势在于：懂工艺、懂交付、有真实客户与现金流，因此在切入具身智能时，选择的是自己最熟悉的"装配工艺"环节（关节模组、减速器、丝杠、电机的装配测试线），而非直接去做机器人本体或通用大模型——这是对自身能力边界的清醒判断。<sup><a href="#ref2">[2]</a></sup><sup><a href="#ref8">[8]</a></sup>与之相对，公司的短板在于：具身智能赛道需要的算法与整机理解并非其原生能力，因此其 CASMT AI、天矩 IWAM 等模型能力的实际水平，以及能否从"装备供应商"升级为"具身智能平台"，仍需时间检验。<sup><a href="#ref7">[7]</a></sup><sup><a href="#ref8">[8]</a></sup></p>
+      </div>
+
+      <div class="analysis-block" id="a22">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>公司技术路线的核心取舍是"以工业装备为本体，以工业 AI 为黏合剂"。其 CASMT AI+CAX 底座解决的是非标自动化产线"设计慢、调试难、复制成本高"的行业痛点——通过打通 CAD/CAE/CAM 全链路、用工业智能体把串行工程流程重构为并行设计，理论上可显著压缩非标产线的设计与交付周期。<sup><a href="#ref9">[9]</a></sup><sup><a href="#ref10">[10]</a></sup>这一路线与"通用大模型直接驱动机器人"的路线不同，更强调"物理约束"与"无工业幻觉"，即把通用模型改造为可直接落地生产的工业专用模型。<sup><a href="#ref8">[8]</a></sup>从适配性看，该路线在具身机器人零部件的中小批量、多型号生产中具备现实价值——当前人形机器人零部件（如行星滚柱丝杠、关节模组）正处于从样机试制迈向规模化量产的关键阶段，而"精密装配、一致性检测"正是瓶颈，装备商在此具备刚需位置。<sup><a href="#ref5">[5]</a></sup>风险则在于：工业 AI 模型的"宣称能力"与"产线实际效果"之间常存在落差，公司尚需以更多客户的量产数据来证明其 AI 底座带来的效率提升是真实且可复现的。</p>
+      </div>
+
+      <div class="analysis-block" id="a23">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>中科摩通的资本结构呈现"地方国资培育 + 产业资本卡位"的双重特征。常州本地国资（常创投、钟楼金控、金投致源等）与中科院体系资源从天使轮起介入，为公司提供了本地产业、政策与订单土壤；2026 年 C 轮起，产业资本密集进场——金浦投资领投、武岳峰资本跟投，汽车内外饰上市公司新泉股份深度参与、线性驱动上市公司凯迪股份以 C+ 轮战略入股。<sup><a href="#ref12">[12]</a></sup><sup><a href="#ref4">[4]</a></sup><sup><a href="#ref21">[21]</a></sup>这一结构的含义在于：中科摩通正被两类具身智能产业链公司视为"产能与装备的卡位点"——新泉股份（结构件、精密制造）与凯迪股份（电机、减速器、线性执行机构）都需要一个具备精密装配装备能力的伙伴，来实现"零部件开发—量产装备—整机应用"的闭环。<sup><a href="#ref4">[4]</a></sup><sup><a href="#ref21">[21]</a></sup>需要观察的是：产业方深度绑定虽带来订单与协同，但也可能使公司在"第三方中立装备商"与"特定产业方配套方"之间产生定位张力；同时，凯迪股份公开称机器人业务短期不产生收入，说明这一协同尚处投入期，兑现节奏存在不确定性。<sup><a href="#ref21">[21]</a></sup></p>
+      </div>
+
+      <div class="analysis-block" id="a24">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>公司路径演进体现为"从通用工业装备到具身智能装备"的延伸与聚焦。从 2014 年"摩通机器人"起步、2015 年靠格力博 200 万元锂电池订单站稳，到 2019 年重组、2020—2024 年连续完成天使至 C 轮融资，公司主业长期锚定新能源汽车智能装备。<sup><a href="#ref16">[16]</a></sup><sup><a href="#ref20">[20]</a></sup>关键的路径调整节点是 2024—2026 年：2024 年以"CASMT AI 柔性自动化大模型"为主线完成 C 轮并确立 AI 叙事；2026 年通过凯迪股份 C+ 轮、新剑传动、智平方、中科院物理所等一系列合作，把具身智能从"口号"落到"具体产线与具体部件"。<sup><a href="#ref15">[15]</a></sup><sup><a href="#ref4">[4]</a></sup><sup><a href="#ref5">[5]</a></sup><sup><a href="#ref6">[6]</a></sup><sup><a href="#ref7">[7]</a></sup>2026 年 8 月公司明确"新能源汽车装备为基本盘、具身智能为增长曲线"的双层架构，说明管理层对"具身智能短期难以贡献收入"有清醒认知，选择以主业现金流托举新曲线。<sup><a href="#ref11">[11]</a></sup>检验这一路径是否成功的关键，是其具身装备业务能否在 2—3 年内从"合作立项"走向"批量订单"。</p>
+      </div>
+
+      <div class="analysis-block" id="a25">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>在具身智能产业链中，中科摩通的定位是<strong>制造装备环节</strong>——它不生产机器人本体，也不直接出售执行器，而是为机器人核心零部件（关节模组、减速器、丝杠、电机）提供自动化装配与检测产线。<sup><a href="#ref17">[17]</a></sup>这一取舍的优势是：需求确定性较高（"卖铲子"逻辑，受益于整个零部件产业的扩产），且公司具备从汽车装备迁移来的成熟工艺与真实收入；风险则有三：其一，装备生意的天花板与客户资本开支周期强相关，单一客户扩张放缓会直接影响订单；其二，具身机器人零部件产业本身尚处早期，量产规模有限，装备订单的放量节奏受制于下游；其三，该赛道正吸引大量同类装备企业涌入（汽车装备、3C 装备、专业机器人装备商），中科摩通"汽车工艺迁移 + 工业 AI 底座"的差异化能否维持，取决于其 CASMT AI 平台的实际效果与客户黏性。<sup><a href="#ref5">[5]</a></sup><sup><a href="#ref8">[8]</a></sup><sup><a href="#ref17">[17]</a></sup>总体而言，这是一条"低叙事、靠交付"的路线：公司估值（近 10 亿元）显著低于通用人形/大模型赛道公司，但也因此更少泡沫成分。</p>
+      </div>
+
+      <div class="analysis-block" id="a26">
+        <h4>2.6 其他重要观察</h4>
+        <p>中科摩通是具身智能产业链中一个"非典型但重要"的样本：它不是被资本追捧的机器人本体公司，而是位于其上游的<strong>智能装备供应商</strong>，且本身是一家已有十亿级销售额体量、十余年历史（含创业前身）的成熟工业企业。<sup><a href="#ref15">[15]</a></sup><sup><a href="#ref20">[20]</a></sup>这一身份使它具备多数具身智能创业公司所没有的东西——真实现金流、成熟客户与交付体系，也因此能以"基本盘 + 增长曲线"的方式相对从容地切入具身智能。<sup><a href="#ref11">[11]</a></sup>对 Wiki 关注范围而言，中科摩通代表的是"具身智能 × 智能装备"这一交叉环节：当行业注意力集中在整机与人形本体时，真正决定机器人能否规模化量产的，往往是关节模组、减速器、丝杠这些核心零部件的装配精度与一致性，而这正是中科摩通所处的位置。<sup><a href="#ref5">[5]</a></sup><sup><a href="#ref8">[8]</a></sup>需要持续跟踪的三条线索：一是其具身装备业务的实际订单与收入占比；二是 CASMT AI 平台能否验证出可量化的效率提升；三是产业股东（新泉、凯迪）与公司之间的协同能否从"投资"走向"订单"与"联合出海"。<sup><a href="#ref4">[4]</a></sup><sup><a href="#ref21">[21]</a></sup></p>
+      </div>
+
+      <h2 id="refs">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li><a href="https://www.casmt.com/company.html" target="_blank">公司概况 — 中科摩通（常州）智能制造股份有限公司官网</a></li>
+          <li><a href="https://www.casmt.com/protype/55.html" target="_blank">产品与解决方案 · 具身机器人装备 — 中科摩通官网</a></li>
+          <li><a href="https://www.casmt.com/newstype/15.html" target="_blank">公司新闻（2026年7—10月多条，含凯迪C+轮、新剑传动、智平方、中科院物理所、ATC峰会、西门子大会、常州能博会、半年度会议等）— 中科摩通官网</a></li>
+          <li><a href="https://www.casmt.com/newsinfo/383.html" target="_blank">凯迪股份战略投资中科摩通C+轮（2026-07-31）— 中科摩通官网</a></li>
+          <li><a href="https://www.casmt.com/newsinfo/387.html" target="_blank">中科摩通：与新剑传动达成战略合作（2026-08-03）— 中科摩通官网</a></li>
+          <li><a href="https://www.casmt.com/newsinfo/390.html" target="_blank">中科摩通：与智平方达成战略合作（2026-08-26）— 中科摩通官网</a></li>
+          <li><a href="https://www.casmt.com/newsinfo/392.html" target="_blank">中科摩通：与中科院物理所签订战略协议，布局固态电芯装备新赛道（2026-10-08）— 中科摩通官网</a></li>
+          <li><a href="https://www.casmt.com/newsinfo/394.html" target="_blank">中科摩通亮相ATC具身机器人及一体化模组技术峰会（2026-10-08）— 中科摩通官网</a></li>
+          <li><a href="https://www.casmt.com/newsinfo/393.html" target="_blank">中科摩通亮相2026常州国际新能源博览会，以工业AI赋能新能源产业智造升级（2026-10-08）— 中科摩通官网</a></li>
+          <li><a href="https://www.casmt.com/newsinfo/391.html" target="_blank">数智驱动 融创未来｜中科摩通亮相西门子长三角先进制造创新发展大会（2026-10-08）— 中科摩通官网</a></li>
+          <li><a href="https://www.casmt.com/newsinfo/388.html" target="_blank">中科摩通2026半年度工作会议顺利召开（董事长赵丹提出双层业务架构，2026-08-11）— 中科摩通官网</a></li>
+          <li><a href="https://www.iyiou.com/news/202607011134161" target="_blank">中科摩通完成近2亿元C轮融资，金浦投资领投（2026-07-01）— 亿欧网</a></li>
+          <li><a href="https://www.xhby.net/content/s6a462ca6e4b0b98c2df2c0bc.html" target="_blank">中科摩通完成C轮融资、入选江苏省科技企业上市培育计划等相关报道（2026-07-02）— 新华报业网（交汇点）</a></li>
+          <li><a href="https://www.eastfi.com/finance/vc/2026/0706/48234.html" target="_blank">中科摩通获金浦投资领投近2亿元C轮融资（2026-07-06）— 东方财经网</a></li>
+          <li><a href="https://znh.yzwb.net/zncontent/4840890.html" target="_blank">中科摩通：C轮融资投后估值近10亿元、2024年签约订单超6亿元（2025-11-07）— 扬子晚报·紫牛号</a></li>
+          <li><a href="https://www.jinglingshuju.com/article/29722978576" target="_blank">中科摩通融资历史（天使轮/B轮/B+轮/C轮，投资方明细）— 精灵数据（投融湾）</a></li>
+          <li><a href="https://news.qq.com/rain/a/20260728A0AIB100" target="_blank">中科摩通的具身智能逻辑：不直接出售执行器，为执行器及其核心部件提供生产设备（2026-07-28）— 腾讯新闻</a></li>
+          <li><a href="https://stock.stockstar.com/RB2026070200036150.shtml" target="_blank">中科摩通（常州）智能制造股份有限公司C轮融资近2亿元，金浦投资、武岳峰科创等参与（2026-07-02）— 证券之星</a></li>
+          <li><a href="https://www.innohere.com/ir/104543/general.html" target="_blank">中科摩通 公司详情（全称/成立时间/注册地/法定代表人/注册资本/员工数量/专利数）— innoHere 英诺嘿呀</a></li>
+          <li><a href="https://www.163.com/dy/article/JFM8MDAJ05119LOG.html" target="_blank">中科摩通创始人赵丹创业历程（2011年首次创业失败、2014年成立摩通机器人、2015年格力博订单、2019年重组、总部基地项目等，2024-10-29）— 网易·创客公社</a></li>
+          <li><a href="http://m.hibor.net/wap_detail.aspx?id=8a1a71c819914deb2bd6f5a4fe3696f0" target="_blank">东方证券《新泉股份-603179-预计今年将是盈利的拐点，机器人业务培育新增长曲线》（2026-08-03，姜雪晴、袁俊轩）：据中科摩通官网，公司（新泉股份）与凯迪股份先后入股中科摩通，其中公司投资额为2000万元；新泉机器人30%股权拟转让给凯迪股份 — 慧博投研资讯</a></li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">本页面由具身智能Wiki项目生成 | 数据截止至2026年10月16日 | 最后更新：2026-10-16</div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

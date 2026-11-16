@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>梅卡曼德 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style></head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> <span class="breadcrumb-sep">›</span> <span>梅卡曼德</span></div>
+  <div class="wiki-header">
+    <h1>梅卡曼德</h1>
+    <div class="subtitle">梅卡曼德（雄安）机器人科技股份有限公司 · 09615.HK · 2016年成立 · 全球AI+3D视觉引导机器人组件市占率第一</div>
+  </div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#founders">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#financing">1.3 融资、股东与IPO</a></li>
+        <li class="toc-lvl3"><a href="#technology">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#products">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#applications">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercialization">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financials">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl4"><a href="#analysis1">2.1 团队背景与场景匹配度</a></li>
+        <li class="toc-lvl4"><a href="#analysis2">2.2 技术路线与场景适配性</a></li>
+        <li class="toc-lvl4"><a href="#analysis3">2.3 股东与资本结构影响</a></li>
+        <li class="toc-lvl4"><a href="#analysis4">2.4 试错与路径调整</a></li>
+        <li class="toc-lvl4"><a href="#analysis5">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl4"><a href="#analysis6">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#references">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+
+      <!-- Infobox -->
+      <aside class="infobox">
+        <div class="infobox-title">梅卡曼德</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">梅卡曼德（雄安）机器人科技股份有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">英文</div><div class="ib-value">Mech-Mind Robotics Technologies Co., Ltd.</div></div>
+        <div class="ib-row"><div class="ib-label">曾用名</div><div class="ib-value">梅卡曼德（北京）机器人科技有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2016年9月12日</div></div>
+        <div class="ib-row"><div class="ib-label">注册地/中国总部</div><div class="ib-value">河北雄安新区</div></div>
+        <div class="ib-row"><div class="ib-label">上市状态</div><div class="ib-value">港交所主板 09615.HK<br>2026年9月1日上市（18C）</div></div>
+        <div class="ib-section">财务数据（2025年）</div>
+        <div class="ib-row"><div class="ib-label">营收</div><div class="ib-value">3.89亿元（+44.7%）</div></div>
+        <div class="ib-row"><div class="ib-label">毛利率</div><div class="ib-value">64.6%</div></div>
+        <div class="ib-row"><div class="ib-label">净亏损</div><div class="ib-value">3.60亿元</div></div>
+        <div class="ib-row"><div class="ib-label">经调整净亏损</div><div class="ib-value">1.09亿元</div></div>
+        <div class="ib-row"><div class="ib-label">研发投入</div><div class="ib-value">1.13亿元（占营收29.0%）</div></div>
+        <div class="ib-section">核心数据</div>
+        <div class="ib-row"><div class="ib-label">全球市占率</div><div class="ib-value">22.1%（2025年收入计第一）</div></div>
+        <div class="ib-row"><div class="ib-label">出货量</div><div class="ib-value">2025年全球第一（未披露具体份额）</div></div>
+        <div class="ib-row"><div class="ib-label">累计部署</div><div class="ib-value">超29,000台</div></div>
+        <div class="ib-row"><div class="ib-label">客户</div><div class="ib-value">100+家《财富》世界500强</div></div>
+        <div class="ib-section">市场数据</div>
+        <div class="ib-row"><div class="ib-label">股价</div><div class="ib-value">89.35港元（2026-10-27）</div></div>
+        <div class="ib-row"><div class="ib-label">总市值</div><div class="ib-value">约111.7亿港元（约102亿元）</div></div>
+        <div class="ib-section">分类标签</div>
+        <div class="ib-row"><div class="ib-label">赛道</div><div class="ib-value">具身智能核心组件</div></div>
+        <div class="ib-row"><div class="ib-label">定位</div><div class="ib-value">"眼—脑—手"标准化组件供应商（不做整机）</div></div>
+        <div class="ib-section">官网</div>
+        <div class="ib-row"><div class="ib-label">官网</div><div class="ib-value"><a href="https://www.mech-mind.com" target="_blank">mech-mind.com</a></div></div>
+      </aside>
+
+      <!-- Lead paragraph -->
+      <p class="article-intro"><strong>梅卡曼德</strong>（全称：梅卡曼德（雄安）机器人科技股份有限公司；曾用名梅卡曼德（北京）机器人科技有限公司）是一家为机器人提供"眼—脑—手"标准化组件的中国科技企业，2016年9月由邵天兰创立，注册地及中国总部位于河北雄安新区。<sup><a href="#ref1">[1]</a></sup>公司不做机器人整机，而是向机器人整机厂、系统集成商与终端制造企业提供工业级3D相机、机器人视觉与运动规划软件、多模态大模型以及仿生五指灵巧手，产品分为<strong>智能机器人引导</strong>与<strong>智能检测与测量</strong>两条主线。<sup><a href="#ref1">[1]</a></sup>按2025年收入计，公司在全球AI+3D视觉引导通用智能机器人组件市场以约22.1%的份额排名第一（收入约3.89亿元），出货量同样位列行业第一；<sup><a href="#ref1">[1]</a></sup>2026年9月1日，公司以《上市规则》第18C章特专科技公司身份在港交所主板上市，被称为"具身智能眼脑手第一股"。<sup><a href="#ref3">[3]</a></sup></p>
+
+      <!-- SECTION 1: FACTS -->
+      <h2 id="facts">1 事实层</h2>
+      <p style="font-size:0.82rem;color:#54595d;margin-bottom:10px;">来源可靠性标注：<span class="tag tag-info">招股章程</span> = 港交所披露的法定文件 · <span class="tag tag-info">中期报告</span> = 上市公司定期报告 · <span class="tag tag-info">媒体报道</span> = 第三方独立报道 · <span class="tag tag-info">行情数据</span> = 交易所/行情接口 · <span class="tag tag-info">官网</span> = 公司官方披露 · <span class="tag tag-info">行业顾问</span> = 灼识咨询（招股章程引用）</p>
+
+      <!-- 1.1 Basic Info -->
+      <h3 id="basic">1.1 公司基本信息</h3>
+      <div class="table-wrapper">
+        <table class="wikitable infotable">
+          <tr><th>项目</th><th>内容</th></tr>
+          <tr><td>公司全称</td><td>梅卡曼德（雄安）机器人科技股份有限公司<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>英文名称</td><td>Mech-Mind Robotics Technologies Co., Ltd.<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>成立时间</td><td>2016年9月12日，初始注册资本人民币10万元，由邵天兰全资持有<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>改制时间</td><td>2025年6月17日由有限责任公司改制为股份有限公司，同时更名为"梅卡曼德（雄安）"<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>注册地及中国总部</td><td>河北省雄安新区起步区易宁大街164号创智园北区3单元210室<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>香港主要营业地点</td><td>香港铜锣湾希慎道33号利园一期19楼1919室<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>上市状态</td><td>港交所主板，股份代号09615.HK，2026年9月1日上市，适用《上市规则》第18C章（特专科技公司）<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref3">[3]</a></sup></td></tr>
+          <tr><td>联席保荐人</td><td>中信证券（香港）有限公司、中信建投（国际）融资有限公司；整体协调人另包括大和资本市场香港有限公司<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>主营业务</td><td>智能机器人引导产品（工业级3D相机+软件）、智能检测与测量产品（3D测量仪器+软件），以及新一代具身智能"眼脑手"基石组件<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>员工人数</td><td>677人（2026年6月30日）；2025年12月31日为619人。其中研发人员229人（2026年3月31日），占36.1%，超44.5%拥有硕士及以上学位<sup><a href="#ref2">[2]</a></sup><sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>知识产权</td><td>中国内地341项、海外6项注册专利；其中发明专利162项、实用新型152项、外观设计33项，另有软件著作权70项（截至最后实际可行日期）<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>官网</td><td>www.mech-mind.com<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref7">[7]</a></sup></td></tr>
+        </table>
+      </div>
+
+      <h4>发展沿革</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>时间</th><th>事件</th></tr>
+          <tr><td>2016年</td><td>公司在北京成立，邵天兰在联合创始人付翱、丁有爽支持下创立，开始研发活动<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>2017年</td><td>推出第一代 Mech-Eye 工业级3D相机、Mech-Vision 机器视觉软件与 Mech-Viz 机器人编程软件，并在德国汉诺威工业博览会首次亮相<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>2019年</td><td>Mech-Eye 工业级3D相机通过 CE、FCC、VCCI 三项认证<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>2020年</td><td>推出新一代 Mech-Eye LSR 与 Mech-Eye UHP 系列超高精度3D相机<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>2021年</td><td>自有的高标准制造工厂投产；推出深度学习软件 Mech-DLK<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>2023年</td><td>推出多模态大模型 Mech-GPT；推出 Mech-Eye LNX 激光轮廓测量仪<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>2024年</td><td>推出 Mech-MSR 3D测量与检测软件；Mech-Eye 成为全球首个平均无故障运行时间（MTBF）突破10万小时的工业3D相机品牌<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>2025年</td><td>基于 Mech-GPT 推出新一代"眼脑手"基石组件，集成 Mech-Hand 仿生五指灵巧手；牵头编制国家标准《工业机器人三维视觉引导系统通用技术要求》（GB/T 45501-2025）<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>2025年6月</td><td>改制为股份有限公司并更名，注册资本人民币4,839,698元<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>2026年8月24日</td><td>刊发招股章程，全球发售23,140,590股H股，发行价区间95.30—101.70港元<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>2026年9月1日</td><td>于港交所主板挂牌，发行价定于区间上限101.70港元；首日收报99.80港元，跌1.87%，总市值约125亿港元<sup><a href="#ref3">[3]</a></sup></td></tr>
+        </table>
+      </div>
+
+      <!-- 1.2 Founders & Team -->
+      <h3 id="founders">1.2 创始人及核心团队</h3>
+      <p>公司由三名清华大学背景的工程师联合创立，形成"算法—工业自动化—机电硬件"的互补结构。三人与员工持股平台"梅卡曼德管理"于2023年10月23日签署一致行动协议，上市后合计控制约19.11%的已发行股本，为单一最大股东集团；协议有效期至上市后60个月，并逐年自动续签。<sup><a href="#ref1">[1]</a></sup></p>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>角色</th><th>姓名</th><th>年龄</th><th>背景/履历</th></tr>
+          <tr><td>创始人/董事长/CEO</td><td>邵天兰</td><td>37</td><td>2012年7月获清华大学计算机软件学士学位，2015年8月获德国慕尼黑工业大学机器人学硕士学位。创立公司前于2015年8月起在德国 KBee AG 任工程师，负责机器人研发。2016年9月创立本公司，负责整体战略规划、运营决策及财务<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>联合创始人/执行董事/业务副总裁</td><td>付翱</td><td>35</td><td>2012年7月、2015年1月分别获清华大学微机电系统工程学士、机电一体化工程硕士学位。2015年3月至2016年10月任职于 ABB（中国）有限公司。负责推动产品应用与部署；2024年获北京市科学技术进步奖二等奖<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>联合创始人/执行董事/研发管理副总裁</td><td>丁有爽</td><td>34</td><td>2012年7月获哈尔滨工业大学电气工程学士学位，2019年7月获清华大学电气工程博士学位，研究方向涉及柔性机械臂电机驱动与柔性关节控制。负责集团产品研发；2024年获北京市科学技术进步奖二等奖<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>执行董事/销售合伙人/COO</td><td>杨培</td><td>44</td><td>2018年8月以销售经理身份加入公司，2021年12月获任董事，现负责销售及运营，是销售体系从"人海战术"转向集成商网络的组织执行者<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>非执行董事</td><td>公元</td><td>37</td><td>红杉合伙人（2019年9月加入），2020年1月获委任为非执行董事，负责就整体战略、企业管治与业务方向提供指引；此前任职于普华永道、德勤与华创资本<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>独立非执行董事</td><td>刘民、谭维佳、张秋生</td><td>—</td><td>2025年9月1日获委任，负责向董事会提供独立意见和判断<sup><a href="#ref1">[1]</a></sup></td></tr>
+        </table>
+      </div>
+      <p>团队结构的一个显著特征是"三名创始人全部为技术出身、无职业经理人空降"：CEO 负责战略与资本，付翱负责场景落地，丁有爽负责研发，COO 由内部成长起来的销售负责人担任。截至2026年3月31日，229名研发人员中有31人专门从事3D视觉与AI算法，核心研发人员在该领域平均工作经验约七年。<sup><a href="#ref1">[1]</a></sup></p>
+
+      <!-- 1.3 Financing & Shareholders -->
+      <h3 id="financing">1.3 融资、股东与IPO</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>轮次</th><th>协议日期</th><th>隐含投后估值</th><th>主要投资方</th></tr>
+          <tr><td>天使轮</td><td>2016年9月10日</td><td>1,600万元</td><td>早期个人/机构投资者<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>Pre-A轮</td><td>2017年4月28日</td><td>7,500万元</td><td>—<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>A轮</td><td>2017年10月30日</td><td>2.20亿元</td><td>—<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>A+轮</td><td>2019年3月22日</td><td>2.92亿元</td><td>—<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>A++轮</td><td>2019年8月7日</td><td>3.60亿元</td><td>—<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>B轮</td><td>2020年1月16日</td><td>7.00亿元</td><td>—<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>B+轮</td><td>2020年9月21日</td><td>11.44亿元</td><td>—<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>C轮</td><td>2021年3月25日</td><td>22.07亿元</td><td>北京酷讯科技（美团）、苏州源明（源码资本）、瀚辰（红杉）等<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>C+轮</td><td>2021年8月31日</td><td>46.56亿元</td><td>珠海进广（IDG）、北京酷讯、苏州源明、瀚辰、Coatue 等<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>D轮</td><td>2022年4月15日起</td><td>60.41亿元</td><td>—<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>Pre-IPO轮</td><td>2025年7月22日</td><td>63.67亿元</td><td>—<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>港股IPO</td><td>2026年9月1日</td><td>约119.1亿港元（发行价下限—上限对应119.1—127.1亿港元）</td><td>公开发售+9家基石投资者<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref3">[3]</a></sup></td></tr>
+        </table>
+      </div>
+
+      <h4>上市后主要股东（占总股本比例）</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>股东</th><th>持股比例</th><th>备注</th></tr>
+          <tr><td>一致行动人士（邵天兰、付翱、丁有爽、梅卡曼德管理）</td><td>19.11%</td><td>单一最大股东集团；邵天兰个人8.44%，员工持股平台8.47%<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>瀚辰（红杉中国）</td><td>13.63%</td><td>最大外部机构股东，普通合伙人为深圳红杉安泰<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>北京酷讯科技（美团）</td><td>8.52%</td><td>C轮进入<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>西藏达孜致远汇才</td><td>7.85%</td><td>—<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>启明融科</td><td>7.38%</td><td>—<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>上海钰锐投资管理</td><td>6.35%</td><td>—<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>共青城尚麒（华创资本）</td><td>6.28%</td><td>—<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>珠海进广（IDG）</td><td>5.83%</td><td>C+轮进入<sup><a href="#ref1">[1]</a></sup></td></tr>
+        </table>
+      </div>
+
+      <h4>IPO 条款与基石投资者</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>项目</th><th>内容</th></tr>
+          <tr><td>发行规模</td><td>23,140,590股H股（视超额配股权行使情况而定），其中香港公开发售1,157,040股、国际发售21,983,550股<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>发行价</td><td>区间95.30—101.70港元，最终定价101.70港元（区间上限）<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref3">[3]</a></sup></td></tr>
+          <tr><td>募资规模</td><td>募资总额约23.53亿港元，募资净额约22.00亿港元（假设超额配股权未行使）<sup><a href="#ref3">[3]</a></sup></td></tr>
+          <tr><td>认购倍数</td><td>香港公开发售超额认购约3,835倍，约25.25万人申购，刷新2026年港股机器人IPO认购纪录<sup><a href="#ref5">[5]</a></sup></td></tr>
+          <tr><td>基石投资者</td><td>9家合计认购1.86亿美元，占全球发售股份的62.02%：Baillie Gifford 6,000万美元领投，泰康人寿4,000万美元，Jane Street、Invus、Ghisallo、瑞华投资各1,500万美元，NGS Super Fund、易方达各1,000万美元，比亚迪旗下 Golden Link 600万美元；禁售期至2027年2月28日<sup><a href="#ref3">[3]</a></sup><sup><a href="#ref5">[5]</a></sup></td></tr>
+          <tr><td>募资用途</td><td>31.8%研发、29.4%全球扩张与商业化、25.2%丰富产品组合与拓宽场景、5.0%扩产能、8.6%营运资金<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>上市首日</td><td>收报99.80港元，跌1.87%，总市值约125亿港元<sup><a href="#ref3">[3]</a></sup></td></tr>
+        </table>
+      </div>
+      <p>估值层面，公司Pre-IPO轮投后估值63.67亿元，按发行价上限计算的市值约127亿港元，较 Pre-IPO 轮显著提升，招股章程将原因归结为新一代"眼脑手"组件的推出、3D相机与AI软件累计出货超29,000台、以及超过10个全球业务中心的建立。<sup><a href="#ref1">[1]</a></sup></p>
+
+      <!-- 1.4 Technology -->
+      <h3 id="technology">1.4 技术路线</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>维度</th><th>详情</th></tr>
+          <tr><td>总体架构</td><td>"眼—脑—手"三层标准化组件：眼为工业级3D相机与3D线激光轮廓测量仪，负责点云采集与空间感知；脑为 Mech-Vision（视觉）、Mech-Viz（运动规划）、Mech-DLK（深度学习）、Mech-GPT（多模态大模型），负责识别、决策与路径规划；手为 Mech-Hand 仿生五指灵巧手，负责通用抓取与操作<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>感知能力</td><td>3D视觉在随机堆叠、反光表面、透明材质、部分遮挡等复杂工业条件下实现自主识别；Mech-Eye 相机 MTBF 突破10万小时，为全球首个达到该指标的工业3D相机品牌<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>AI 与部署</td><td>基于深度学习的算法经大量工业数据训练；结合 Mech-DLK，客户仅用少量样本即可训练任务模型，许多应用场景可在30分钟内完成部署；标准化组件安装调试仅需数小时至数日，而非数周<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>智能化分级</td><td>公司自述为行业内极少数通过"L2级智能机器人"实现通用智能机器人规模化部署的企业之一；具备 L3 级（理解自然语言、解析复杂任务、更高自主性执行多步动作）的能力仍在研发中<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>自研程度</td><td>全栈独立自研三大核心组件——3D视觉、AI软件、灵巧末端执行器；不生产机器人本体，不与整机厂竞争<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>标准与专利</td><td>牵头编制国家标准 GB/T 45501-2025《工业机器人三维视觉引导系统通用技术要求》；持有162项发明专利、152项实用新型、33项外观设计、70项软件著作权<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>研发强度</td><td>2023—2025年研发开支合计3.40亿元，占同期累计收入8.38亿元的约40.6%；2025年研发开支1.127亿元，占收入29.0%<sup><a href="#ref1">[1]</a></sup></td></tr>
+        </table>
+      </div>
+      <p>技术路线的核心不是追求"通用人形"，而是把"看—想—做"拆成可复用的标准件：同一套软件覆盖数十个行业，硬件按工业防护与精度要求分档。这一选择的直接结果是研发费用可以被同一批产品摊薄——2023至2025年研发开支绝对额基本持平（1.19亿→1.09亿→1.13亿元），收入却从1.81亿增至3.89亿元，研发费用率由65.6%降至29.0%。<sup><a href="#ref1">[1]</a></sup></p>
+
+      <!-- 1.5 Products -->
+      <h3 id="products">1.5 产品形态</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>产品</th><th>所属环节</th><th>功能定位</th><th>商业化阶段</th></tr>
+          <tr><td>Mech-Eye 工业级3D相机</td><td>眼</td><td>高精度、低噪声点云采集，适应反光/透明/不平整表面；含 LSR、UHP 超高精度、LNX 线激光轮廓测量等系列</td><td>规模化创收产品<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>Mech-Vision 机器视觉软件</td><td>脑</td><td>视觉识别、定位与缺陷判别</td><td>规模化创收产品<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>Mech-Viz 机器人编程软件</td><td>脑</td><td>免示教运动规划与路径生成</td><td>规模化创收产品<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>Mech-DLK 深度学习软件</td><td>脑</td><td>小样本训练任务模型，支撑快速部署</td><td>规模化创收产品<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>Mech-MSR 3D测量与检测软件</td><td>检测</td><td>微米级视觉质量控制，覆盖电子、电芯、汽车铸件</td><td>规模化创收产品<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>Mech-GPT 多模态大模型</td><td>脑</td><td>将复杂感知输入转化为可执行动作，支持自然语言指令控制机器人</td><td>早期创收产品<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>Mech-Hand 仿生五指灵巧手</td><td>手</td><td>高自由度、非单一任务的通用抓取与精密操作</td><td>早期创收产品<sup><a href="#ref1">[1]</a></sup></td></tr>
+        </table>
+      </div>
+      <div class="callout">
+        <div class="callout-title">口径提示：Mech-GPT 与 Mech-Hand 尚未单独披露收入</div>
+        <p style="margin:0;">招股章程将 Mech-GPT 与 Mech-Hand 归入"早期创收产品"，与 Mech-Eye、Mech-Vision 等"规模化创收产品"区分，且未单独披露其收入或销量。2025年公司93.0%的收入来自"智能机器人引导"、5.9%来自"智能检测与测量"、1.1%来自服务。<sup><a href="#ref1">[1]</a></sup>因此，"具身智能眼脑手第一股"中的"手"与"大模型"部分，目前更多是产品叙事与技术储备，而非已兑现的收入结构。</p>
+      </div>
+
+      <!-- 1.6 Applications -->
+      <h3 id="applications">1.6 应用场景</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>行业</th><th>典型工序</th><th>说明</th></tr>
+          <tr><td>汽车</td><td>精密装配、在线测量、零件上料、下料码筐</td><td>公司最早、最成熟的场景之一<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>新能源/光伏</td><td>电芯搬运、电池模组装箱、AI质检、精密测量</td><td>宁德时代、比亚迪为代表性客户<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>3C/家电/半导体</td><td>AI表面检测、精密测量、零件上料、工件检测</td><td>富士康、美的为代表性客户<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>重工及物流</td><td>钢板切割下料、开坡口、工件上料、钣金折弯、纸箱拆垛、麻袋破包</td><td>无序抓取与拆垛是3D视觉的典型刚需<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>消费及其他</td><td>上下料、装配、检测等通用工序</td><td>覆盖长尾制造业客户<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>医疗保健（潜在）</td><td>精密部件处理与组装</td><td>Mech-Hand 的目标场景之一，尚处早期<sup><a href="#ref1">[1]</a></sup></td></tr>
+        </table>
+      </div>
+      <p>公司已服务超过100家《财富》世界500强企业，产品销往近50个国家和地区，并在美国、日本、德国、韩国等主要海外市场设有本地化附属公司与服务团队。<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref4">[4]</a></sup>客户结构上，截至2026年3月31日累计已有1,605家客户采购过公司产品；2025年前五大客户贡献收入39.3%，单一最大客户占15.0%。<sup><a href="#ref1">[1]</a></sup></p>
+
+      <!-- 1.7 Commercialization -->
+      <h3 id="commercialization">1.7 商业化进展</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>指标</th><th>2023年</th><th>2024年</th><th>2025年</th><th>2026年一季度</th></tr>
+          <tr><td>销量（台）</td><td>3,690</td><td>6,103</td><td>8,669</td><td>2,485</td></tr>
+          <tr><td>整体平均售价（元/台）</td><td>49,000</td><td>44,000</td><td>44,800</td><td>43,000</td></tr>
+          <tr><td>中国内地平均售价（元/台）</td><td>43,300</td><td>35,500</td><td>29,300</td><td>31,800</td></tr>
+          <tr><td>海外平均售价（元/台）</td><td>67,700</td><td>76,400</td><td>94,300</td><td>78,100</td></tr>
+          <tr><td>系统集成商渠道收入占比</td><td>93.6%</td><td>95.1%</td><td>81.5%</td><td>94.6%</td></tr>
+          <tr><td>合作系统集成商数量</td><td>—</td><td>—</td><td>—</td><td>境内633家、境外736家</td></tr>
+        </table>
+      </div>
+      <p style="font-size:0.8rem;color:#54595d;">注：2025年系统集成商渠道占比降至81.5%，主因是一名美国客户下达了直接采购的重大订单，该订单同时显著拉高了当年海外收入占比与整体毛利率，招股章程明确提示"不应被视为未来收入贡献趋势的指标"。<sup><a href="#ref1">[1]</a></sup></p>
+
+      <h4>2026年上半年经营数据</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>指标</th><th>2026年上半年</th><th>同比</th></tr>
+          <tr><td>收入</td><td>2.373亿元</td><td>+54.7%</td></tr>
+          <tr><td>新签订单</td><td>3.354亿元</td><td>+75.3%</td></tr>
+          <tr><td>在手订单</td><td>1.765亿元</td><td>+102.0%</td></tr>
+          <tr><td>海外收入</td><td>9,954万元（占41.9%）</td><td>+68.3%</td></tr>
+          <tr><td>客户复购率</td><td>93.9%</td><td>—</td></tr>
+          <tr><td>留存收入</td><td>2.230亿元</td><td>为上年同期1.72倍</td></tr>
+          <tr><td>现金及现金等价物</td><td>3.178亿元</td><td>较2025年末3.520亿元下降</td></tr>
+        </table>
+      </div>
+      <p>"客户复购率93.9%"指过往年度曾贡献收入的客户在2026年上半年产生的收入占总收入的比例，是公司衡量标准化产品价值的核心指标。同期留存收入2.230亿元，较上年同期的1.300亿元增长71.5%，为上年同期的1.72倍，显示客户在单工位验证后把方案复制到更多产线与工厂。<sup><a href="#ref2">[2]</a></sup></p>
+
+      <!-- 1.8 Financials -->
+      <h3 id="financials">1.8 财务数据</h3>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>项目（人民币千元）</th><th>2023年</th><th>2024年</th><th>2025年</th><th>2026年Q1</th></tr>
+          <tr><td>收入</td><td>180,812</td><td>268,765</td><td>388,771</td><td>106,915</td></tr>
+          <tr><td>　智能机器人引导</td><td>172,648</td><td>246,141</td><td>361,443</td><td>99,409</td></tr>
+          <tr><td>　智能检测与测量</td><td>7,977</td><td>21,837</td><td>23,072</td><td>5,974</td></tr>
+          <tr><td>　服务</td><td>187</td><td>787</td><td>4,256</td><td>1,532</td></tr>
+          <tr><td>毛利</td><td>70,644</td><td>137,398</td><td>251,117</td><td>69,274</td></tr>
+          <tr><td>毛利率</td><td>39.1%</td><td>51.1%</td><td>64.6%</td><td>64.8%</td></tr>
+          <tr><td>研发开支</td><td>(118,530)</td><td>(109,011)</td><td>(112,703)</td><td>(38,462)</td></tr>
+          <tr><td>销售开支</td><td>(185,694)</td><td>(162,265)</td><td>(168,402)</td><td>(45,357)</td></tr>
+          <tr><td>行政开支</td><td>(105,305)</td><td>(89,748)</td><td>(124,934)</td><td>(31,976)</td></tr>
+          <tr><td>经营亏损</td><td>(339,068)</td><td>(219,007)</td><td>(145,169)</td><td>(45,467)</td></tr>
+          <tr><td>赎回负债账面金额变动</td><td>(57,691)</td><td>(59,996)</td><td>(209,207)</td><td>(10,125)</td></tr>
+          <tr><td>净亏损</td><td>(400,968)</td><td>(283,332)</td><td>(360,168)</td><td>(56,827)</td></tr>
+          <tr><td>经调整净亏损</td><td>(334,432)</td><td>(214,292)</td><td>(109,019)</td><td>(33,472)</td></tr>
+          <tr><td>经营活动所用现金净额</td><td>(274,100)</td><td>(205,800)</td><td>(107,400)</td><td>(52,900)</td></tr>
+          <tr><td>年末/期末现金及等价物</td><td>388,499</td><td>222,412</td><td>351,955</td><td>345,911</td></tr>
+        </table>
+      </div>
+      <p>2025年净亏损3.60亿元较2024年的2.83亿元扩大，但亏损扩大主要来自可赎回负债公允价值变动这一非现金科目（2025年2.09亿元，2024年0.60亿元），而非经营恶化：同期经营亏损由2.19亿元收窄至1.45亿元，经调整净亏损由2.14亿元收窄至1.09亿元。<sup><a href="#ref1">[1]</a></sup>2023至2025年净亏损累计10.44亿元，经调整净亏损累计6.58亿元——媒体常用的"三年累亏超10亿"是前者口径，需与后者区分看待。<sup><a href="#ref5">[5]</a></sup></p>
+
+      <h4>2026年上半年业绩</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>项目（人民币千元）</th><th>2026年上半年</th><th>2025年上半年</th><th>同比</th></tr>
+          <tr><td>收入</td><td>237,345</td><td>153,464</td><td>+54.7%</td></tr>
+          <tr><td>　具身智能机器人引导</td><td>216,282</td><td>144,242</td><td>+49.9%</td></tr>
+          <tr><td>　AI检测与测量</td><td>21,063</td><td>9,222</td><td>+128.4%</td></tr>
+          <tr><td>毛利</td><td>154,209</td><td>94,275</td><td>+63.6%</td></tr>
+          <tr><td>毛利率</td><td>65.0%</td><td>61.4%</td><td>+3.6pp</td></tr>
+          <tr><td>研发开支</td><td>(80,097)</td><td>(46,338)</td><td>+72.9%</td></tr>
+          <tr><td>经营亏损</td><td>(77,454)</td><td>(65,225)</td><td>亏损率42.5%→32.6%</td></tr>
+          <tr><td>期内亏损</td><td>(100,327)</td><td>(103,189)</td><td>收窄2.8%</td></tr>
+          <tr><td>经调整亏损</td><td>(52,490)</td><td>(55,788)</td><td>收窄5.9%</td></tr>
+          <tr><td>经调整EBITDA</td><td>(32,957)</td><td>(39,440)</td><td>收窄16.4%</td></tr>
+        </table>
+      </div>
+      <p>上半年的关键变化是"收入加速、亏损收窄"同时发生：收入增速54.7%高于研发开支增速之外的所有费用增速，经营亏损率由42.5%降至32.6%，经调整EBITDA亏损收窄至3,296万元。检测与测量业务同比增长128.4%，收入占比由6.0%提升至8.9%，说明能力正从"机器人引导"向更多工序延伸。<sup><a href="#ref2">[2]</a></sup></p>
+
+      <!-- 1.9 Other -->
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li><strong>二级市场表现</strong>：上市首日破发，收跌1.87%至99.80港元；此后连续四个交易日走低，9月4日盘中低见75.40港元（市值约98亿港元），9月21日报80.30港元，较发行价折价超20%。<sup><a href="#ref5">[5]</a></sup>截至2026年10月27日，股价回升至89.35港元，总市值约111.7亿港元（约102亿元人民币）。<sup><a href="#ref6">[6]</a></sup></li>
+        <li><strong>估值水平</strong>：按发行价计算市值约127亿港元，对应2025年3.89亿元收入，市销率超过30倍；按2026年10月27日市值约102亿元人民币计算，市销率约26倍。<sup><a href="#ref5">[5]</a></sup><sup><a href="#ref6">[6]</a></sup></li>
+        <li><strong>海外结构</strong>：2025年海外收入1.955亿元，占比50.3%，首次超过国内；2023—2025年海外收入年复合增长率82.7%。海外毛利率2023年66.7%、2024年73.3%、2025年79.2%，同期中国内地毛利率49.8%。<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref4">[4]</a></sup></li>
+        <li><strong>关税与出口管制</strong>：往绩记录期间及直至最后实际可行日期，公司产品适用的美国301条款关税税率为25%；2025年2月中美曾互将对等关税提至125%，同年5月12日起暂降至10%（90天）并多次延长，2026年2月24日起美国改按《1974年贸易法》第122条对所有国家输美商品加征10%临时进口附加费（为期150天），第301条关税继续有效。<sup><a href="#ref1">[1]</a></sup></li>
+        <li><strong>行业荣誉</strong>：2026年度中关村独角兽企业、世界经济论坛"AI应用之星"（2026年）、2024世界独角兽企业、北京市科学技术奖（2024年）、《视觉系统设计》创新奖2024金奖、2024福布斯中国人工智能科技企业TOP 50、2023福布斯中国出海全球化品牌TOP 30。<sup><a href="#ref1">[1]</a></sup></li>
+        <li><strong>盈利指引</strong>：公司预计2026年全年仍将录得净亏损，原因是持续的重大研发开支与大额销售开支。<sup><a href="#ref1">[1]</a></sup></li>
+        <li><strong>分红限制</strong>：截至最后实际可行日期无股息政策；受累计亏损影响，在弥补累计亏损并提取法定公积金、形成可分配利润之前，公司不得宣派或派付股息。<sup><a href="#ref1">[1]</a></sup></li>
+      </ul>
+
+      <!-- SECTION 2: ANALYSIS -->
+      <h2 id="analysis">2 分析层</h2>
+      <p style="font-size:0.82rem;color:#54595d;margin-bottom:10px;">分析层以招股章程与中期报告披露的数据为基础，结合第三方报道作交叉印证；观点部分为分析判断，不构成投资建议。</p>
+
+      <div class="analysis-block" id="analysis1">
+        <h4>2.1 团队背景与场景选择的匹配度</h4>
+        <p>三名创始人的学科组合与"给工业机器人装眼睛和大脑"这件事高度吻合：邵天兰是清华计算机软件加慕尼黑工大机器人学，负责算法与战略；付翱是清华微机电与机电一体化，且在 ABB 中国工作过一年半，理解工业客户的采购与交付逻辑；丁有爽是哈工大电气加清华电气博士，研究方向正是柔性机械臂电机驱动与柔性关节控制，对应"手"的环节。这个组合解释了公司为什么能在2017年就同时拿出相机、视觉软件和运动规划软件三件套——它不是先有算法再找场景，而是从成立第一天就按"眼脑手"拆解问题。</p>
+        <p>但团队结构也暴露了两个短板。其一是缺少有规模的海外渠道管理经验：2023年销售开支1.857亿元，比当年1.808亿元的收入还高，说明早期增长是靠人力铺出来的；直到2020年后转向系统集成商网络，费用率才降下来。其二是商业化组织长期由创始人兼任，COO 杨培2018年才以销售经理身份加入、2021年才进入董事会，职业化管理层的搭建明显晚于技术团队的成型。这两点共同指向一个判断：公司的产品定义能力强于渠道运营能力，未来增长更依赖集成商生态的扩张效率，而非自身销售团队的扩张。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis2">
+        <h4>2.2 技术路线与场景的适配性</h4>
+        <p>"不做整机、只做组件"是一个刻意收窄边界的选择，其合理性建立在两个产业事实之上：一是工业场景里存量机械臂的数量远大于每年新增整机，把存量设备智能化改造的市场比卖新本体更稳定；二是3D视觉与运动规划的技术原理跨行业通用，一套软件可以覆盖数十个场景，研发投入能被反复摊薄。数据支持这个逻辑——研发开支三年基本持平，收入翻了1.15倍，研发费用率从65.6%降到29.0%，这是典型的平台型成本结构。</p>
+        <p>适配性的边界也同样清楚。公司自述其规模化部署建立在"L2级智能机器人"之上，L3（理解自然语言、自主拆解多步任务）仍在研发。这意味着当前的"脑"更接近"高质量的感知+规划工具"，而非真正意义上的通用智能体；它对场景的适配依赖工程师预先定义的工序，30分钟部署的前提是场景已被抽象成标准任务。另一个约束是价值量：组件占整机成本的比例有限，公司收入天花板在结构上受制于下游整机的出货量，这也是它必须把海外市场和检测测量两条曲线同时做起来的原因。检测与测量2026年上半年增长128.4%、占比升至8.9%，可以视为对"只做引导"天花板的主动对冲。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis3">
+        <h4>2.3 股东与资本结构对战略的影响</h4>
+        <p>股权结构呈现"创始人控制力偏弱、机构股东分散且强势"的特征。一致行动人合计19.11%，而红杉13.63%、美团8.52%、启明7.38%、IDG 5.83%，四家机构合计已超过35%。这种结构在 Pre-IPO 阶段有利于融资，但上市后意味着任何重大战略（例如是否下探做整机、是否大规模并购）都需要与多家长期基金协商。红杉与 Baillie Gifford 同时出现在股东与基石名单中，说明长线资金对"卖铲人"叙事的认可，但也意味着估值锚被定在"高增长+高毛利"的成长股框架里。</p>
+        <p>更值得关注的是可赎回负债。2025年末赎回负债账面金额高达30.56亿元，是可辨认净资产的最大单项；其公允价值变动每年直接冲击利润表（2025年2.09亿元）。IPO 完成后优先权终止、赎回负债转权益，这一科目对利润的扰动会消失——这也是为什么"经调整净亏损"（1.09亿元）比"净亏损"（3.60亿元）更能反映经营实质。对读财报的人而言，2026年之后的净亏损与经调整亏损将趋于收敛，利润表的可比性会显著改善。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis4">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>公司的主线战略近十年没有大改，但在"怎么卖"上经历过一次明确纠偏。早期依靠自有销售团队直接触达终端客户，代价是销售费用高于收入；2020年前后转向"标准化产品+系统集成商"模式，把交付与本地关系交给集成商，自己只做产品与技术支持。到2026年3月31日，公司已与境内633家、境外736家集成商合作，渠道收入占比长期在93%以上。这是一次典型的"从项目制公司转向产品型公司"的调整，也是毛利率从39.1%升到64.6%的组织基础。</p>
+        <p>产品层面的调整则是"从工具到基石组件"的上移。2023年推出 Mech-GPT、2025年推出集成 Mech-Hand 的新一代"眼脑手"组件，本质是把原来分卖的相机+软件打包成更高价值量的整体方案，并借"具身智能"的叙事进入人形机器人供应链。但招股章程把这两者列为"早期创收产品"、不单独披露收入，说明这次上移目前仍处于投入期。真正的检验点不是发布会的规格，而是何时能在报表里看到"基石组件"独立成行。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis5">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>梅卡曼德的取舍可以概括为"做整机厂的朋友，不做整机厂的对手"。在一个几乎所有公司都想讲人形整机故事的时点，主动放弃本体，换取的是三样东西：不与客户竞争带来的渠道信任、跨品牌机械臂的兼容性、以及更短的交付链条。22.1%的全球收入份额、2025年出货量第一，以及"前五大参与者合计仅约45.4%"的分散格局，说明这套定位在工业视觉引导这个细分市场已经跑通。</p>
+        <p>代价是赛道本身很小。2025年全球 AI+3D 视觉引导通用机器人组件市场约18亿元，公司3.89亿元收入已占22.1%；即便按灼识咨询预测2030年增至106亿元、2035年增至1,025亿元，当前渗透率也仅5.1%。这带来一个结构性矛盾：公司要保持高增长，必须依赖赛道整体的渗透率提升，而渗透率提升又依赖下游整机（尤其是人形机器人）真正放量——也就是说，"不做整机"让它避开了整机竞争，却也把增长β交给了整机厂。此外，国内自动化大厂与海外视觉巨头都在加速进入，价格压力已经体现在国内平均售价上：从2023年的4.33万元/台降至2025年的2.93万元/台。海外均价同期从6.77万元升至9.43万元，形成"国内降价换份额、海外高价保毛利"的双轨结构，这一结构能否持续，取决于海外本地化服务能否规模化。</p>
+      </div>
+
+      <div class="analysis-block" id="analysis6">
+        <h4>2.6 其他重要观察</h4>
+        <p>第一，增长质量存在一次性因素。2025年毛利率跳升至64.6%，招股章程明确归因于"一名美国客户为支持年内生产需求下达的重大订单"，并提示不应视为趋势；同年系统集成商渠道占比从95.1%降至81.5%，也是同一笔直销订单所致。2026年上半年毛利率65.0%、渠道占比回到94.6%，说明这笔订单的影响正在消退，但海外毛利率79.2%与国内49.8%的差距仍然巨大，容易被误读为常态。</p>
+        <p>第二，现金流仍是弱点。2026年上半年经营活动所用现金净额7,444万元，虽较上年同期的8,358万元改善，但仍为净流出；期末现金及现金等价物3.178亿元，较2025年末的3.520亿元下降。按上半年经营现金流出速度简单外推，现有现金约可支撑四个半年（两年左右）的经营性支出，而这一速度还是在销售回款改善的年份取得的。IPO 募资净额22亿港元因此是必要的缓冲，而非"锦上添花"。</p>
+        <p>第三，估值与基本面的错配需要时间消化。发行价对应市销率超过30倍，即便按2026年10月27日的约102亿元人民币市值计算仍在26倍左右，显著高于工业自动化同业。支撑这一估值的是"机器人渗透率从5.1%走向22.2%"的长期假设，而非当期盈利。基石投资者锁定期至2027年2月28日，届时解禁与业绩兑现的节奏将共同决定股价的第二轮定价。</p>
+        <p>第四，治理层面有一个容易被忽略的细节：公司注册地已迁至雄安、名称改为"梅卡曼德（雄安）"，是雄安新区首家完成 IPO 的企业。这一身份在政策资源、产业用地与政府订单上可能带来实际便利，但也意味着公司需要在雄安的产业规划与自身商业化节奏之间保持平衡。</p>
+      </div>
+
+      <!-- SECTION 3: REFERENCES -->
+      <h2 id="references">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li id="ref1"><a href="https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0824/2026082400018_c.pdf" target="_blank">梅卡曼德（雄安）机器人科技股份有限公司：招股章程（2026年8月24日，港交所披露易，共425页）</a></li>
+          <li id="ref2"><a href="https://www.hkexnews.hk/listedco/listconews/sehk/2026/0924/2026092402010_c.pdf" target="_blank">梅卡曼德（雄安）机器人科技股份有限公司：2026年中期报告（2026年9月24日，港交所披露易）</a></li>
+          <li id="ref3"><a href="https://www.bjnews.com.cn/detail/1788253613129119.html" target="_blank">新京报贝壳财经：「具身智能眼脑手第一股」梅卡曼德登陆港交所，首日报收99.8港元/股（2026年9月1日）</a></li>
+          <li id="ref4"><a href="https://m.jiemian.com/article/15040318.html" target="_blank">界面新闻：梅卡曼德登陆港交所——Baillie Gifford等9家基石力挺，不做整机，只做整机厂的好朋友（2026年9月1日）</a></li>
+          <li id="ref5"><a href="https://4g.stockstar.com/detail/IG2026092400019948" target="_blank">智通财经（证券之星转载）：3835倍认购、20%折价——透视梅卡曼德(09615)IPO热潮褪去后的真实投资价值（2026年9月24日）</a></li>
+          <li id="ref6"><a href="https://push2.eastmoney.com/api/qt/stock/get?secid=116.09615&amp;fields=f43,f57,f58,f60,f116,f117" target="_blank">东方财富行情接口：梅卡曼德（09615.HK）实时报价与总市值（读取于2026年10月27日）</a></li>
+          <li id="ref7"><a href="https://www.mech-mind.com" target="_blank">梅卡曼德官网（www.mech-mind.com，2026年10月27日连通性验证 HTTP 200）</a></li>
+        </ol>
+      </div>
+
+    </article>
+  </div>
+  <div class="page-footer">
+    <p>本页面由具身智能Wiki自动分发系统基于公开信息生成 · 数据截止日期：2026年10月27日 · 仅供参考，不构成投资建议</p>
+  </div>
+</div>
+<script>
+(function() {
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+  const headings = Array.from(document.querySelectorAll('h2[id], h3[id], h4[id], .analysis-block[id]'));
+  if (!tocLinks.length || !headings.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector('.toc-nav a[href="#' + entry.target.id + '"]');
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  headings.forEach(h => observer.observe(h));
+})();
+</script>
+</body></html>

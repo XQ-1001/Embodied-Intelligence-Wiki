@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>机器人「部署」问题研究报告 · 工作分解、成本结构与复制系数</title>
+<style>
+:root{--bg:#fff;--text:#202122;--link:#0645ad;--border:#a2a9b1;--infobox-bg:#f9f9f9;--heading:#000;--toc-bg:#f8f9fa;--table-stripe:#f8f9fa;--table-header:#eaecf0;--accent:#1a3a5c;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,'微软雅黑','Microsoft YaHei','Segoe UI',sans-serif;font-size:.875rem;line-height:1.68;color:var(--text);background:#f6f6f6;}
+.page-container{max-width:1200px;margin:0 auto;}
+.top-nav{background:#fff;border-bottom:1px solid #c8ccd1;padding:8px 20px;font-size:.8rem;color:#54595d;position:sticky;top:0;z-index:200;}
+.top-nav a{color:var(--link);text-decoration:none;}
+.wiki-header{background:#fff;border-bottom:1px solid #c8ccd1;padding:24px 20px 12px;}
+.wiki-header h1{font-family:Georgia,'Times New Roman',serif;font-size:1.7rem;font-weight:400;color:var(--heading);border-bottom:1px solid #a2a9b1;padding-bottom:6px;margin-bottom:6px;line-height:1.3;}
+.wiki-header .subtitle{font-size:.85rem;color:#54595d;font-style:italic;}
+.stats-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:0;background:#fff;border-bottom:1px solid #eaecf0;}
+.stat{padding:14px 18px;border-right:1px solid #eaecf0;}
+.stat:last-child{border-right:none;}
+.stat .num{font-size:1.45rem;font-weight:700;color:var(--accent);font-family:Georgia,serif;line-height:1.15;}
+.stat .lbl{font-size:.75rem;color:#54595d;margin-top:3px;}
+.wiki-layout{display:grid;grid-template-columns:230px minmax(0,1fr);background:#fff;min-height:100vh;}
+.toc-nav{padding:20px 12px 40px 16px;border-right:1px solid #eaecf0;background:var(--toc-bg);position:sticky;top:48px;height:calc(100vh - 48px);overflow-y:auto;font-size:.8rem;}
+.toc-nav .toc-title{font-weight:700;font-size:.85rem;margin-bottom:8px;color:#1a3a5c;}
+.toc-nav ul{list-style:none;}
+.toc-nav li{margin:2px 0;}
+.toc-nav a{color:var(--link);text-decoration:none;display:block;padding:1px 0;}
+.toc-nav a:hover{text-decoration:underline;}
+.toc-nav .toc-lvl2{font-weight:600;margin-top:6px;}
+.toc-nav .toc-lvl3{padding-left:14px;font-size:.77rem;}
+.wiki-article{padding:24px 32px 60px;min-width:0;}
+.wiki-article h2{font-family:Georgia,'Times New Roman',serif;font-size:1.32rem;font-weight:400;border-bottom:1px solid #a2a9b1;padding-bottom:5px;margin:32px 0 12px;color:var(--heading);}
+.wiki-article h3{font-size:1.05rem;margin:22px 0 8px;color:var(--accent);}
+.wiki-article h4{font-size:.93rem;margin:16px 0 6px;color:#333;}
+.wiki-article p{margin:9px 0;}
+.wiki-article ul,.wiki-article ol{margin:8px 0 8px 22px;}
+.wiki-article li{margin:3px 0;}
+a{color:var(--link);}
+sup a{font-size:.7rem;text-decoration:none;}
+.table-wrapper{overflow-x:auto;margin:12px 0;border:1px solid #eaecf0;}
+table.wikitable{border-collapse:collapse;width:100%;font-size:.78rem;}
+table.wikitable th,table.wikitable td{border:1px solid #eaecf0;padding:6px 8px;text-align:left;vertical-align:top;}
+table.wikitable th{background:var(--table-header);font-weight:700;}
+table.wikitable tbody tr:nth-child(even){background:var(--table-stripe);}
+table.wikitable td.num,table.wikitable th.num{text-align:right;font-variant-numeric:tabular-nums;}
+.article-intro{font-size:.95rem;line-height:1.72;}
+.notice{border-left:4px solid #f0ad4e;background:#fdf7ec;padding:10px 14px;margin:14px 0;font-size:.82rem;}
+.notice-red{border-left-color:#d9534f;background:#fdecea;}
+.notice-blue{border-left-color:#1a3a5c;background:#eef3f8;}
+.notice-green{border-left-color:#1f7a3a;background:#eef8f0;}
+.notice b{color:#1a3a5c;}
+.tag{display:inline-block;font-size:.7rem;padding:1px 7px;border-radius:10px;margin:1px 3px 1px 0;border:1px solid transparent;white-space:nowrap;}
+.t-fact{background:#e6f0fa;color:#14568f;border-color:#b6d2ec;}
+.t-infer{background:#fdf2e0;color:#a6731a;border-color:#f0d8a8;}
+.t-claim{background:#f3e8f7;color:#7a2f8a;border-color:#dcc0e6;}
+.t-red{background:#fde8e8;color:#b02a2a;border-color:#f2bcbc;}
+
+/* ---------- charts ---------- */
+.chart{margin:16px 0 20px;padding:14px 16px;border:1px solid #eaecf0;background:#fcfcfd;}
+.chart-title{font-size:.82rem;font-weight:700;color:#1a3a5c;margin-bottom:2px;}
+.chart-sub{font-size:.72rem;color:#72777d;margin-bottom:12px;}
+.bar-row{display:grid;grid-template-columns:190px 1fr 96px;align-items:center;gap:10px;margin:6px 0;font-size:.78rem;}
+.bar-label{color:#333;line-height:1.3;}
+.bar-track{background:#eef1f4;border-radius:3px;height:17px;position:relative;overflow:hidden;}
+.bar-fill{background:linear-gradient(90deg,#1a3a5c,#3f6d94);height:17px;border-radius:3px;}
+.bar-fill.alt{background:linear-gradient(90deg,#8a6d1a,#c9a227);}
+.bar-fill.red{background:linear-gradient(90deg,#a33,#d66);}
+.bar-fill.green{background:linear-gradient(90deg,#1f7a3a,#4caf6a);}
+.bar-fill.gray{background:linear-gradient(90deg,#7c8794,#a8b2bd);}
+.bar-val{text-align:right;color:#333;font-variant-numeric:tabular-nums;font-size:.75rem;}
+
+/* stacked */
+.stack{display:flex;height:34px;border-radius:3px;overflow:hidden;border:1px solid #dfe3e8;margin-top:8px;}
+.stack div{display:flex;align-items:center;justify-content:center;font-size:.66rem;color:#fff;overflow:hidden;white-space:nowrap;}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:10px;font-size:.72rem;color:#333;}
+.legend span{display:flex;align-items:center;gap:5px;}
+.legend i{width:11px;height:11px;border-radius:2px;display:inline-block;}
+
+/* grouped bars */
+.grp{margin:8px 0;}
+.grp-row{display:grid;grid-template-columns:180px 1fr;gap:10px;align-items:center;margin:9px 0;font-size:.78rem;}
+.grp-bars{display:flex;flex-direction:column;gap:3px;}
+.grp-line{display:flex;align-items:center;gap:6px;}
+.grp-track{flex:1;background:#eef1f4;border-radius:2px;height:12px;overflow:hidden;}
+.grp-fill{height:12px;border-radius:2px;}
+.grp-fill.now{background:#9aa8b6;}
+.grp-fill.ai{background:#1a3a5c;}
+.grp-fill.ai2{background:#3f6d94;}
+.grp-v{width:36px;text-align:right;font-size:.7rem;color:#555;font-variant-numeric:tabular-nums;}
+
+.small{font-size:.75rem;color:#54595d;}
+.mono{font-variant-numeric:tabular-nums;}
+.refs{font-size:.76rem;color:#333;}
+.refs ol{margin-left:20px;}
+.refs li{margin:4px 0;word-break:break-word;}
+.page-footer{border-top:1px solid #eaecf0;padding:14px 32px;font-size:.74rem;color:#72777d;background:#fff;}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.kv{font-size:.8rem;}
+.kv b{color:#1a3a5c;}
+.lead-num{font-family:Georgia,serif;color:#1a3a5c;font-weight:700;}
+blockquote{border-left:3px solid #1a3a5c;background:#f4f7fa;margin:12px 0;padding:10px 14px;font-size:.85rem;}
+blockquote p{margin:4px 0;}
+@media(max-width:860px){.wiki-layout{grid-template-columns:1fr;}.toc-nav{display:none;}.stats-bar{grid-template-columns:repeat(2,1fr);}.two-col{grid-template-columns:1fr;}.bar-row{grid-template-columns:120px 1fr 80px;}}
+</style></head>
+<body>
+<div class="page-container">
+
+<div class="top-nav"><a href="index.html">具身智能 Wiki</a> <span style="color:#a2a9b1">›</span> <a href="index.html">研究报告</a> <span style="color:#a2a9b1">›</span> <span>机器人部署问题研究 v1.0</span></div>
+
+<div class="wiki-header">
+  <h1>机器人「部署」问题研究：<br><span style="font-size:1rem;color:#54595d;">工作分解、成本结构与复制系数</span></h1>
+  <div class="subtitle">独立研究报告 · 首版 2026-11-12 · 数据截至 2026-11 · 覆盖工业制造 / 仓储物流 / 商业服务 / 跨场景，中欧美对比</div>
+</div>
+
+<div class="stats-bar">
+  <div class="stat"><div class="num">12</div><div class="lbl">部署工作包（WBS）</div></div>
+  <div class="stat"><div class="num">≈40%</div><div class="lbl">工程工时占集成报价比重</div></div>
+  <div class="stat"><div class="num">300–700 h</div><div class="lbl">单个工业机器人单元集成工时</div></div>
+  <div class="stat"><div class="num">18–24 月</div><div class="lbl">人形机器人进厂 POC 周期</div></div>
+</div>
+
+<div class="wiki-layout">
+
+<nav class="toc-nav">
+  <div class="toc-title">目录</div>
+  <ul>
+    <li class="toc-lvl2"><a href="#s0">摘要：七个结论</a></li>
+    <li class="toc-lvl2"><a href="#s1">一、部署是什么</a></li>
+    <li class="toc-lvl3"><a href="#s1-1">1.1 定义与颗粒度</a></li>
+    <li class="toc-lvl3"><a href="#s1-2">1.2 十二个工作包</a></li>
+    <li class="toc-lvl3"><a href="#s1-3">1.3 真实工时分解</a></li>
+    <li class="toc-lvl2"><a href="#s2">二、成本结构</a></li>
+    <li class="toc-lvl3"><a href="#s2-1">2.1 九层成本堆栈</a></li>
+    <li class="toc-lvl3"><a href="#s2-2">2.2 三个口径</a></li>
+    <li class="toc-lvl3"><a href="#s2-3">2.3 直接人工之谜</a></li>
+    <li class="toc-lvl2"><a href="#s3">三、效率与复制系数</a></li>
+    <li class="toc-lvl3"><a href="#s3-1">3.1 八项指标</a></li>
+    <li class="toc-lvl3"><a href="#s3-2">3.2 周期谱系</a></li>
+    <li class="toc-lvl3"><a href="#s3-3">3.3 复制系数 ρ</a></li>
+    <li class="toc-lvl2"><a href="#s4">四、谁在做部署</a></li>
+    <li class="toc-lvl3"><a href="#s4-1">4.1 八类主体</a></li>
+    <li class="toc-lvl3"><a href="#s4-2">4.2 中欧美结构差异</a></li>
+    <li class="toc-lvl2"><a href="#s5">五、收费模式与激励</a></li>
+    <li class="toc-lvl3"><a href="#s5-1">5.1 五种模式</a></li>
+    <li class="toc-lvl3"><a href="#s5-2">5.2 Tutor 定价拆解</a></li>
+    <li class="toc-lvl3"><a href="#s5-3">5.3 中国 RaaS 价格战</a></li>
+    <li class="toc-lvl2"><a href="#s6">六、AI 如何重构部署</a></li>
+    <li class="toc-lvl3"><a href="#s6-1">6.1 四类技术路线</a></li>
+    <li class="toc-lvl3"><a href="#s6-2">6.2 已验证案例</a></li>
+    <li class="toc-lvl3"><a href="#s6-3">6.3 能力—成本剪刀差</a></li>
+    <li class="toc-lvl2"><a href="#s7">七、失败模式</a></li>
+    <li class="toc-lvl2"><a href="#s8">八、对双业务的战略含义</a></li>
+    <li class="toc-lvl2"><a href="#s9">九、数据缺口与待验证</a></li>
+    <li class="toc-lvl2"><a href="#refs">参考资料</a></li>
+  </ul>
+</nav>
+
+<article class="wiki-article">
+
+<p class="article-intro">这份报告回答一个问题：<strong>机器人从"能演示"到"在客户现场稳定产出经济价值"，中间那段路到底由什么构成、花多少钱、由谁来做、能不能被压缩。</strong>与常见的行业综述不同，本文不按"机器人类型"分类，而按<strong>部署工作包</strong>和<strong>成本归属</strong>拆解，并以复制系数 ρ 作为贯穿全文的主指标。</p>
+
+<div class="notice notice-blue"><b>阅读约定。</b>
+<span class="tag t-fact">事实</span>有公开来源或一手披露，标 [n] 对应文末参考资料；
+<span class="tag t-infer">推断</span>基于逻辑或行业经验的判断，需进一步验证；
+<span class="tag t-claim">公司自述</span>厂商公开宣称、尚无独立第三方验证。
+所有百分比若未标注来源，均为结构性示意，不可直接引用为统计值。</div>
+
+<h2 id="s0">摘要：七个结论</h2>
+
+<ol>
+<li><strong>部署成本的本质是适配成本，不是实施劳动。</strong>一个典型工业机器人单元的集成工时约 300–700 小时，其中设计 170h、编程 120h、安装与验收 64h、文档培训 40h、项目管理 40h<sup><a href="#ref1">[1]</a></sup>。真正昂贵的是"为这个零件、这个夹具、这条产线重做一遍"的部分。</li>
+<li><strong>机器人本体只占系统总价的 25–30%</strong>（Universal Robots CTO 2018 年口径）<sup><a href="#ref1">[1]</a></sup>，工程工时约占报价 40%<sup><a href="#ref1">[1]</a></sup>。把"部署"当作硬件销售的附赠，在经济学上是不成立的。</li>
+<li><strong>但中国系统集成商的直接人工只占营业成本 4.6%–8.8%</strong>，直接材料占 65%–78%<sup><a href="#ref10">[10]</a></sup>。这说明工程能力被大量"埋在"外购材料与分包里，而不是体现为自有工程师工时——这是理解中国部署市场低价竞争的关键。</li>
+<li><strong>部署效率的差异不是"快慢"，而是"能不能复制"。</strong>建议用复制系数 ρ（第 N 站工时 ÷ 第 1 站工时）替代"部署周期缩短 X%"作为核心指标。</li>
+<li><strong>收费模式决定降本激励。</strong>项目制下部署成本可转嫁给客户，厂商没有降本动力；RaaS 下厂商自担，动力最强但现金流最脆弱。这正是"部署工具链"存在的市场空隙。</li>
+<li><strong>AI 对部署的压缩极不均匀。</strong>虚拟调试/数字孪生已有 30%–75% 的现场调试降幅实证<sup><a href="#ref4">[4]</a><a href="#ref8">[8]</a></sup>；国内厂商宣称自然语言编排可把场景部署压到 7 天甚至数分钟<sup><a href="#ref17">[17]</a><a href="#ref19">[19]</a></sup>（<span class="tag t-claim">公司自述</span>）。但安装、土建、系统集成、安全验收几乎不受影响。</li>
+<li><strong>存在"能力—成本剪刀差"。</strong>机器人越能干，越会进入更难、更非结构化的场景，而难场景的部署成本更高。<span class="tag t-infer">推断</span>未来五年 AI 对部署总成本的净降幅可能显著低于市场预期。</li>
+</ol>
+
+<h2 id="s1">一、部署是什么：从"实施阶段"到"复制成本"</h2>
+
+<h3 id="s1-1">1.1 定义与颗粒度</h3>
+
+<p>中文语境里"部署""交付""实施""集成""上线"混用严重，不同人报出的部署周期能差数倍。本报告固定如下边界：</p>
+
+<div class="table-wrapper"><table class="wikitable">
+<thead><tr><th style="width:16%">术语</th><th>边界</th></tr></thead>
+<tbody>
+<tr><td><b>交付</b></td><td>硬件到场 + 基础安装通电</td></tr>
+<tr><td><b>集成</b></td><td>与客户产线/系统（PLC、MES、WMS、上位机、安全回路）对接</td></tr>
+<tr><td><b>部署</b></td><td><b>本报告研究对象</b>：从合同签订（或 POC 立项）到客户验收通过并达到标称节拍/良率；RaaS 模式则延伸到达到稳定运营 SLA</td></tr>
+<tr><td><b>验收</b></td><td>客户签署 FAT/SAT，责任与风险转移</td></tr>
+</tbody></table></div>
+
+<p>同时必须固定<strong>部署颗粒度</strong>。同样说"部署一台机器人"，指的是单机、单工位、单条产线还是整厂，成本可差一个数量级。本报告统一使用三级：<b>L1</b> 单机/单工位、<b>L2</b> 单线/单区域、<b>L3</b> 整厂/整仓。任何成本数字不标颗粒度即不可比。</p>
+
+<h3 id="s1-2">1.2 十二个工作包（WBS）</h3>
+
+<p>把部署拆成可计量的工作包，是全部后续量化的前提。下表是本报告提出的标准分解，字段包括工时占比（结构性示意）、技能等级、可自动化度与典型失败模式。</p>
+
+<div class="table-wrapper"><table class="wikitable">
+<thead><tr><th style="width:4%">#</th><th style="width:15%">工作包</th><th style="width:22%">主要内容</th><th style="width:10%" class="num">占比（示意）</th><th style="width:7%">技能</th><th style="width:12%">可自动化度<br>当前 / AI 后</th><th>典型失败模式</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>售前可行性评估</td><td>现场勘察、工艺分析、节拍/ROI 测算</td><td class="num">4–6%</td><td>高</td><td>低 / 中</td><td>评估过于乐观，漏掉隐性约束</td></tr>
+<tr><td>2</td><td>方案设计与报价</td><td>布局、选型、节拍仿真、BOM</td><td class="num">7–9%</td><td>高</td><td>中 / 高</td><td>报价漏项，后期变更</td></tr>
+<tr><td>3</td><td>硬件到场与机械安装</td><td>底座、支架、地脚、精度</td><td class="num">4–6%</td><td>低</td><td>低 / 低</td><td>地基不平、干涉</td></tr>
+<tr><td>4</td><td>电气 / 气路 / 网络</td><td>接线、配电、气源、工业网络</td><td class="num">4–6%</td><td>中</td><td>低 / 低</td><td>现场条件与图纸不符</td></tr>
+<tr><td>5</td><td>末端执行器与工装</td><td>夹爪、吸盘、焊枪、夹具设计制作</td><td class="num">9–13%</td><td>高</td><td>低 / 中</td><td><b>工件公差导致抓取失败——最大的隐性成本</b></td></tr>
+<tr><td>6</td><td>感知与标定</td><td>手眼标定、坐标系、光照</td><td class="num">4–6%</td><td>中高</td><td>中 / 高</td><td>标定漂移、光照变化</td></tr>
+<tr><td>7</td><td>系统集成</td><td>PLC / MES / WMS / 上位机 / 安全回路</td><td class="num">12–16%</td><td>高</td><td><b>低 / 低</b></td><td>客户系统不开放、协议不标准</td></tr>
+<tr><td>8</td><td>应用配置与任务编排</td><td>SKU 主数据、流程逻辑、异常规则</td><td class="num">8–12%</td><td>中</td><td>中 / 高</td><td>SKU 长尾、异常组合爆炸</td></tr>
+<tr><td>9</td><td>现场调试与优化</td><td>节拍、良率、稳定性迭代</td><td class="num">13–17%</td><td>高</td><td>中 / 高</td><td>反复迭代，工期失控</td></tr>
+<tr><td>10</td><td>验收测试</td><td>FAT/SAT、节拍验证、安全认证</td><td class="num">4–6%</td><td>中</td><td>中 / 中</td><td>验收标准争议</td></tr>
+<tr><td>11</td><td>培训与移交</td><td>操作/维护培训、SOP 重写</td><td class="num">2–4%</td><td>低</td><td>中 / 高</td><td>客户不配合、人员流动</td></tr>
+<tr><td>12</td><td>上线后爬坡</td><td>稳定化、异常处理、持续优化</td><td class="num">10–18%</td><td>中高</td><td>中 / 高</td><td>长尾故障，客户信心崩塌</td></tr>
+</tbody></table></div>
+
+<p class="small">注：占比为自洽的结构示意（中值合计 100%），非实测统计。真实分布需按场景分别测量。</p>
+
+<p>两个结构性观察。其一，<strong>第 5、7、8、9 包合计约占一半</strong>，而它们恰好都是"非标准化适配"——这解释了为什么部署成本对场景高度敏感、难以规模摊薄。其二，<strong>AI 的作用极不均匀</strong>：第 7 包（系统集成）受制于客户 IT 系统开放度与工业协议现实，几乎不受益于 AI；第 8、9 包受益最大。若不区分这一点，会把 AI 降本高估两到三倍。</p>
+
+<h3 id="s1-3">1.3 一套真实的工时分解：466 小时</h3>
+
+<p>上述 12 包是分析框架。在"工程服务"这一侧，美国机器人集成商 Relling 公开了其自用的工时模板：一个典型的机床上下料单元合计 <b>466 小时</b><sup><a href="#ref1">[1]</a></sup>。这是目前能找到的最细颗粒度的公开分解，可作为 WBS 第 2、6、9、10、11 包的交叉校验。</p>
+
+<div class="chart">
+  <div class="chart-title">图 1 · 单个工业机器人单元的集成工时分解（466 小时）</div>
+  <div class="chart-sub">来源：Relling Systems 公开工时模板 <sup><a href="#ref1">[1]</a></sup>；该页明确标注为"规划用示例数字"，非行业统计</div>
+  <div class="bar-row"><div class="bar-label">设计与机械/控制设计</div><div class="bar-track"><div class="bar-fill" style="width:100%"></div></div><div class="bar-val">170 h · 36.5%</div></div>
+  <div class="bar-row"><div class="bar-label">机器人 + PLC 编程</div><div class="bar-track"><div class="bar-fill" style="width:70.6%"></div></div><div class="bar-val">120 h · 25.8%</div></div>
+  <div class="bar-row"><div class="bar-label">安装与现场验收（SAT）</div><div class="bar-track"><div class="bar-fill alt" style="width:37.6%"></div></div><div class="bar-val">64 h · 13.7%</div></div>
+  <div class="bar-row"><div class="bar-label">文档与培训</div><div class="bar-track"><div class="bar-fill alt" style="width:23.5%"></div></div><div class="bar-val">40 h · 8.6%</div></div>
+  <div class="bar-row"><div class="bar-label">项目管理</div><div class="bar-track"><div class="bar-fill alt" style="width:23.5%"></div></div><div class="bar-val">40 h · 8.6%</div></div>
+  <div class="bar-row"><div class="bar-label">工厂验收（FAT）</div><div class="bar-track"><div class="bar-fill green" style="width:18.8%"></div></div><div class="bar-val">32 h · 6.9%</div></div>
+</div>
+
+<p>三个可直接用于产品设计的结论：</p>
+<ul>
+<li><strong>"异常路径"吃掉一半编程工时。</strong>Relling 明确写道，happy path（正常取放）一天能写完，而"处理一个循环出错的十种方式、且不让人每次都走过去"占掉一半编程时间<sup><a href="#ref1">[1]</a></sup>。这与 WBS 第 8 包"异常规则组合爆炸"的判断一致。</li>
+<li><strong>FAT/SAT 合计不到 20% 工时，却是现金流节点。</strong>行业常见付款节奏为下单 30%、FAT 后 +40%、SAT 后 +20%<sup><a href="#ref1">[1]</a></sup>。部署做得好不好，直接决定 90% 的款什么时候能收回来。</li>
+<li><strong>编程 80–200 小时是单独可定价的服务</strong>，按典型集成商费率折合 1 万–3.5 万美元<sup><a href="#ref1">[1]</a></sup>。这是"部署工具链"最直接的可替代对象。</li>
+</ul>
+
+<h2 id="s2">二、部署成本的结构</h2>
+
+<h3 id="s2-1">2.1 九层成本堆栈</h3>
+
+<p>把"部署"只理解为工程服务费是低估。客户为一个自动化单元实际支付的成本分九层，其中至少五层常被漏算。</p>
+
+<div class="chart">
+  <div class="chart-title">图 2 · 工业机器人单元的成本堆栈（中值示意）</div>
+  <div class="chart-sub">区间取自 Relling、AMD Machines、Five West 等集成商公开口径 <sup><a href="#ref1">[1]</a><a href="#ref2">[2]</a><a href="#ref3">[3]</a></sup>；中值为本报告取整，仅用于展示结构</div>
+  <div class="stack">
+    <div style="width:32%;background:#1a3a5c">本体 32%</div>
+    <div style="width:15%;background:#3f6d94">末端执行器 15%</div>
+    <div style="width:10%;background:#6f93b5">视觉 10%</div>
+    <div style="width:12%;background:#9db4c9">控制电气 12%</div>
+    <div style="width:20%;background:#c9a227">集成工程 20%</div>
+    <div style="width:8%;background:#d9b95c">安装 8%</div>
+    <div style="width:3%;background:#bfc7d0"></div>
+  </div>
+  <div class="legend">
+    <span><i style="background:#1a3a5c"></i>机器人本体与控制器 25–40%</span>
+    <span><i style="background:#3f6d94"></i>末端执行器与工装 10–20%</span>
+    <span><i style="background:#6f93b5"></i>视觉与传感器 5–15%</span>
+    <span><i style="background:#9db4c9"></i>控制柜与电气 10–15%</span>
+    <span><i style="background:#c9a227"></i>集成工程 10–33%</span>
+    <span><i style="background:#d9b95c"></i>安装调试培训 5–10%</span>
+    <span><i style="background:#bfc7d0"></i>备件与首年服务 约 3%</span>
+  </div>
+</div>
+
+<div class="notice">
+<b>把结构读成一句话：</b>标准品（本体 + 控制 + 视觉）约 54%，<b>为这一个客户定制的部分（末端执行器 + 集成工程 + 安装调试）约 43%</b>。后者正是"部署"的经济学本体。行业里"40% 机器人、60% 集成"的说法，与这组区间是相容的。
+</div>
+
+<p>还有两层不在图里，但对客户 TCO 影响巨大：<strong>场地改造</strong>（地坪、供电、网络、气路、围栏）与<strong>首年备件维保</strong>。移动类与多机集群场景中，场地改造常常超过机器人本体价格——这是人形/移动操作类产品部署成本被系统性低估的原因之一。<span class="tag t-infer">推断</span></p>
+
+<h3 id="s2-2">2.2 「部署占比」必须先固定口径</h3>
+
+<p>"部署占多少"是本领域最容易被误用的数字，因为分母有三个，结果可差 2–3 倍。</p>
+
+<div class="table-wrapper"><table class="wikitable">
+<thead><tr><th style="width:12%">口径</th><th style="width:38%">分母</th><th style="width:20%">用途</th><th>典型误用</th></tr></thead>
+<tbody>
+<tr><td><b>A</b></td><td>部署服务费 ÷ 机器人本体价格</td><td>厂商视角：判断硬件毛利与服务毛利的关系</td><td>被用来论证"部署很贵"，但忽略了本体已被加价</td></tr>
+<tr><td><b>B</b></td><td>部署相关全部支出 ÷ 自动化项目总金额</td><td>客户视角：判断预算结构</td><td>与口径 A 混用，得出"部署占 100%"的荒谬结论</td></tr>
+<tr><td><b>C</b></td><td>部署支出 ÷ 客户 3–5 年 TCO</td><td>投资视角：判断 ROI 与决策门槛</td><td>漏算运维与停机损失，低估部署对回收期的影响</td></tr>
+</tbody></table></div>
+
+<p>按口径 B，本报告的读数是：<strong>集成工程 + 安装调试 + 为部署而生的末端执行器 ≈ 43%</strong>（图 2）。按口径 A，工程工时约占集成报价 40%，而本体只占系统总价 25–30%<sup><a href="#ref1">[1]</a></sup>——这意味着部署服务费与本体价格在同一个量级，而不是"零头"。</p>
+
+<h3 id="s2-3">2.3 直接人工之谜：中国集成商的成本结构</h3>
+
+<p>一个反直觉的公开数据。多家科创板/创业板系统集成与智能装备企业的招股书披露，其系统集成业务的成本结构中：<strong>直接材料 64.99%–77.80%、直接人工仅 4.56%–8.77%、制造费用 14.94%–26.24%</strong><sup><a href="#ref10">[10]</a></sup>。</p>
+
+<p>这与"集成占项目 40%"并不矛盾，但揭示了一个关键机制：<strong>客户支付的"集成费"里，集成商自有工程师的工时只占很小一块，大头是外购设备、外协加工与分包</strong>。<span class="tag t-infer">推断</span>由此可推出三个后果：</p>
+
+<ul>
+<li><strong>中国集成商的"部署能力"大量外包化</strong>，因此人均产值低、可复制性差、价格战惨烈——因为差异化不在自有能力，而在采购与关系。</li>
+<li><strong>部署工具链切进去的价值主张必须落在"减少外购/外协"或"减少返工"上</strong>，而不是"让工程师更快"。后者只对应 5%–9% 的成本池。</li>
+<li><strong>报价里最贵的不是人，是"为这个项目单独买的东西"</strong>。这解释了为什么标准化硬件平台、可复用夹具库、预集成外设生态的降本效果，可能优于任何软件工具。</li>
+</ul>
+
+<div class="notice notice-red"><b>口径警告。</b>招股书的"直接人工"通常只含生产/实施人员的直接薪酬，不含计入期间费用的研发与售前工程投入。因此 4.56%–8.77% 不能等同于"部署人力成本占比"，只能作为成本结构的相对指示。引用时须同时给出分母定义。</div>
+
+<h2 id="s3">三、效率与复制系数</h2>
+
+<h3 id="s3-1">3.1 八项指标</h3>
+
+<p>"部署效率"至少包含八个互不等价的量。研究或对外沟通时若不指定，讨论必然失焦。</p>
+
+<div class="table-wrapper"><table class="wikitable">
+<thead><tr><th style="width:16%">指标</th><th style="width:34%">定义</th><th>为什么重要</th></tr></thead>
+<tbody>
+<tr><td><b>部署周期 T</b></td><td>签约 → SAT 通过（日历天）</td><td>客户最直观感受；直接决定回款节奏</td></tr>
+<tr><td><b>部署工时 H</b></td><td>人·天，须区分厂商/客户/第三方</td><td>最硬的成本代理变量</td></tr>
+<tr><td><b>单位部署工时 h</b></td><td>H ÷ 部署单元数（L1/L2/L3）</td><td>消除规模影响，唯一可比的量</td></tr>
+<tr><td><b>一次验收通过率</b></td><td>首次 SAT 通过项目数 ÷ 总项目数</td><td>隐性返工成本的主要来源</td></tr>
+<tr><td><b>爬坡期</b></td><td>SAT → 稳定达到标称节拍/良率</td><td>客户真实体感的"到底能不能用"</td></tr>
+<tr><td><b>复制系数 ρ</b></td><td>第 N 站 h ÷ 第 1 站 h</td><td><b>本报告主指标</b>；决定规模化可能性</td></tr>
+<tr><td><b>人力结构</b></td><td>高级工程师占部署人力的比例</td><td>决定成本水平与可扩张性</td></tr>
+<tr><td><b>90 天干预率</b></td><td>需人工介入次数 / 千运行小时</td><td>RaaS 模式的生死指标</td></tr>
+</tbody></table></div>
+
+<h3 id="s3-2">3.2 周期谱系：四个数量级</h3>
+
+<p>不同载体的部署周期不在一个数量级上。把它们放在同一张图里，比任何"效率提升 X%"都更能说明问题。</p>
+
+<div class="chart">
+  <div class="chart-title">图 3 · 部署周期谱系（横轴为对数刻度，条形长度 ∝ log 天数）</div>
+  <div class="chart-sub">数据来源：AI 工具目标见 <sup><a href="#ref17">[17]</a><a href="#ref18">[18]</a></sup>；单单元见 <sup><a href="#ref1">[1]</a></sup>；整线见招股书披露 <sup><a href="#ref10">[10]</a></sup>；人形见《财经》<sup><a href="#ref15">[15]</a></sup></div>
+  <div class="bar-row"><div class="bar-label">AI 编排工具目标<br><span class="small">新场景 0→1 验证</span></div><div class="bar-track"><div class="bar-fill green" style="width:30%"></div></div><div class="bar-val">7 天</div></div>
+  <div class="bar-row"><div class="bar-label">成熟协作机器人单工位<br><span class="small">标准化方案复用</span></div><div class="bar-track"><div class="bar-fill green" style="width:45%"></div></div><div class="bar-val">1–2 周</div></div>
+  <div class="bar-row"><div class="bar-label">工业机器人单单元<br><span class="small">300–700 工时</span></div><div class="bar-track"><div class="bar-fill" style="width:62%"></div></div><div class="bar-val">4–12 周</div></div>
+  <div class="bar-row"><div class="bar-label">系统集成整线<br><span class="small">自动化产线</span></div><div class="bar-track"><div class="bar-fill alt" style="width:91%"></div></div><div class="bar-val">2 月–2 年</div></div>
+  <div class="bar-row"><div class="bar-label">人形机器人进厂 POC<br><span class="small">含仿真训练 + 真实验证</span></div><div class="bar-track"><div class="bar-fill red" style="width:100%"></div></div><div class="bar-val">18–24 月</div></div>
+</div>
+
+<div class="notice"><b>这张图最重要的信息不是"人形慢"，而是"跨度大"。</b>从 7 天到 24 个月，差 100 倍以上。任何把"机器人部署"当作单一品类的市场测算都会失效——必须按载体与颗粒度分层。</div>
+
+<h3 id="s3-3">3.3 复制系数 ρ：把"效率"换成"可复制性"</h3>
+
+<p>对一家要规模化的公司，部署的本质不是"服务"，而是<strong>每复制一个站点必须再付一次的固定成本</strong>。ρ 衡量这笔成本随部署次数下降的速度。</p>
+
+<div class="chart">
+  <div class="chart-title">图 4 · 复制系数 ρ 的三种形态（示意模型，非实测）</div>
+  <div class="chart-sub">纵轴：第 N 站单位部署工时相对第 1 站的百分比。曲线为机制示意，用于说明"项目制 / 半产品化 / 产品化"三种成本命运</div>
+  <svg viewBox="0 0 720 320" style="width:100%;height:auto;max-height:320px" role="img" aria-label="复制系数示意图">
+    <line x1="80" y1="280" x2="680" y2="280" stroke="#a2a9b1" stroke-width="1"/>
+    <line x1="80" y1="40" x2="80" y2="280" stroke="#a2a9b1" stroke-width="1"/>
+    <line x1="80" y1="160" x2="680" y2="160" stroke="#eaecf0" stroke-width="1" stroke-dasharray="4 4"/>
+    <line x1="80" y1="100" x2="680" y2="100" stroke="#eaecf0" stroke-width="1" stroke-dasharray="4 4"/>
+    <line x1="80" y1="220" x2="680" y2="220" stroke="#eaecf0" stroke-width="1" stroke-dasharray="4 4"/>
+    <text x="70" y="44" text-anchor="end" font-size="11" fill="#72777d">100%</text>
+    <text x="70" y="164" text-anchor="end" font-size="11" fill="#72777d">50%</text>
+    <text x="70" y="104" text-anchor="end" font-size="11" fill="#72777d">75%</text>
+    <text x="70" y="224" text-anchor="end" font-size="11" fill="#72777d">25%</text>
+    <text x="70" y="284" text-anchor="end" font-size="11" fill="#72777d">0%</text>
+    <polyline fill="none" stroke="#b03a3a" stroke-width="2.5" points="80,40 146.7,59.2 213.3,73.6 280,83.2 346.7,90.4 413.3,95.2 480,100 546.7,102.4 613.3,104.8 680,107.2"/>
+    <polyline fill="none" stroke="#c9a227" stroke-width="2.5" points="80,40 146.7,92.8 213.3,124 280,145.6 346.7,162.4 413.3,174.4 480,184 546.7,191.2 613.3,196 680,200.8"/>
+    <polyline fill="none" stroke="#1a3a5c" stroke-width="2.5" points="80,40 146.7,136 213.3,179.2 280,208 346.7,224.8 413.3,236.8 480,244 546.7,248.8 613.3,253.6 680,256"/>
+    <text x="684" y="111" font-size="11" fill="#b03a3a">项目制 ρ≈0.7</text>
+    <text x="684" y="205" font-size="11" fill="#a6731a">半产品化 ρ≈0.33</text>
+    <text x="684" y="260" font-size="11" fill="#1a3a5c">产品化 ρ≈0.10</text>
+    <text x="380" y="304" text-anchor="middle" font-size="11" fill="#72777d">同类站点部署序号 N（第 1 站 = 100%）</text>
+    <text x="14" y="160" font-size="11" fill="#72777d" transform="rotate(-90 14,160)" text-anchor="middle">单位部署工时（相对值）</text>
+  </svg>
+  <div class="legend">
+    <span><i style="background:#b03a3a"></i>项目制：每站重做一遍，规模不经济</span>
+    <span><i style="background:#c9a227"></i>半产品化：有复用，仍需大量适配</span>
+    <span><i style="background:#1a3a5c"></i>产品化：配置化交付，边际成本趋零</span>
+  </div>
+</div>
+
+<p>ρ 决定的不只是效率，而是<strong>公司的形态与估值逻辑</strong>：</p>
+
+<div class="table-wrapper"><table class="wikitable">
+<thead><tr><th style="width:18%">ρ 档位（示意）</th><th style="width:30%">含义</th><th style="width:26%">公司形态</th><th>资本市场的读法</th></tr></thead>
+<tbody>
+<tr><td>≈ 1.0</td><td>每站重做一遍</td><td>系统集成商 / 项目制</td><td>按利润与现金流定价，增长 = 加人</td></tr>
+<tr><td>0.5–0.7</td><td>有复用但仍是项目</td><td>半产品化解决方案商</td><td>混合定价，故事取决于 ρ 的斜率</td></tr>
+<tr><td>0.2–0.3</td><td>配置化交付</td><td>产品公司</td><td>按收入倍数定价</td></tr>
+<tr><td>&lt; 0.1</td><td>一次开发、无限复制</td><td>软件/平台</td><td>按经常性收入定价</td></tr>
+</tbody></table></div>
+
+<p class="small">档位为概念分界，非统计阈值；实际取值需用样本校准。</p>
+
+<h4>一个真实的复制效率跃迁</h4>
+
+<p>上海新松公开披露的一组对照，能直观说明 ρ 可以被压到什么程度：2010 年前后，<strong>28 台工业机器人的部署调试需要 30 多人、约一个月</strong>；采用 PDPS 数字孪生方案后，<strong>约 14 人、3 天完成约 100 台</strong>的部署调试<sup><a href="#ref5">[5]</a></sup>。</p>
+
+<p>换算成单位工时（按 22 工作日/月、8 小时/日粗算）：前者约 <b>21 人日/台</b>，后者约 <b>0.42 人日/台</b>，相差约 50 倍。<span class="tag t-infer">推断</span>这不是纯粹的 ρ——两代项目的载体、工艺、自动化程度都不同——但它证明<strong>现场调试环节的可压缩空间远大于多数人的直觉</strong>，前提是把工作前移到仿真与离线编程。</p>
+
+<p>产品化路径上还有两组可参考的证据。其一，优艾智合把"一次研发、多场景部署"落到 MAIC 模型与 CBB 模块化架构上，毛利率从 <b>11.2% 升至 38.1%</b><sup><a href="#ref23">[23]</a></sup>——<span class="tag t-infer">推断</span>毛利率跃升是 ρ 下降的财务投影，虽然公司未单独披露部署工时数据，也无法分离 AI 模型与规模效应各自的贡献。其二，节卡机器人以图形化拖拽编程与"10 分钟产品换线"为卖点，全球部署近 <b>3 万台</b><sup><a href="#ref22">[22]</a></sup>——<span class="tag t-claim">公司自述</span>"换线"不等于"部署"，但它说明把编程动作降级为配置动作，是协作机器人能走到万台量级的前提。</p>
+
+<h2 id="s4">四、谁在做部署</h2>
+
+<h3 id="s4-1">4.1 八类主体与五个分析维度</h3>
+
+<p>讨论"谁做部署"容易变成罗列。真正有分析价值的是五个维度：谁承担风险、谁拥有客户关系、谁拿走毛利、能力是否可复制、单位经济学如何。</p>
+
+<div class="table-wrapper"><table class="wikitable">
+<thead><tr><th style="width:15%">主体</th><th style="width:26%">典型角色</th><th style="width:15%">承担的风险</th><th style="width:14%">毛利来源</th><th>可复制性</th></tr></thead>
+<tbody>
+<tr><td><b>A 本体厂商</b></td><td>标准交付；非标甩给集成商</td><td>低（交付即转移）</td><td>硬件 + 软件授权</td><td>高（标准品）</td></tr>
+<tr><td><b>B 系统集成商</b></td><td><b>中国部署的实际主力</b>，非标项目制</td><td><b>高</b>（延期/超支/验收）</td><td>设备差价 + 工程费</td><td>低（靠人）</td></tr>
+<tr><td><b>C 第三方部署/运维商</b></td><td>专业承接安装调试、远程运维</td><td>中</td><td>服务费</td><td>中（可标准化）</td></tr>
+<tr><td><b>D 客户自有团队</b></td><td>大型制造/物流企业的自动化部门</td><td>自担</td><td>不外付</td><td>取决于组织能力</td></tr>
+<tr><td><b>E 上游软件/部件商</b></td><td>视觉、力控、夹具厂商实质承担部分部署</td><td>低-中</td><td>部件 + 调试服务</td><td>中-高</td></tr>
+<tr><td><b>F 部署工具链/平台</b></td><td>卖能力而非卖工时</td><td>低（不背验收）</td><td>软件订阅/授权</td><td><b>高</b></td></tr>
+<tr><td><b>G 设计院/工程总包</b></td><td>整厂规划层，决定设备选型</td><td>低</td><td>设计费/总包管理费</td><td>高</td></tr>
+<tr><td><b>H RaaS 运营商</b></td><td>自担部署成本，按结果收费</td><td><b>最高</b>（资产 + 运营）</td><td>机时/按件/分成</td><td>取决于 ρ</td></tr>
+</tbody></table></div>
+
+<p>一个容易被忽略的事实：<strong>上游部件商正在悄悄吃掉部署工作。</strong>视觉引导、力控、快换夹具等环节的调试，越来越由部件供应商的工程团队完成，而不是整机集成商。这意味着"部署"的价值链正在<strong>向上游解耦</strong>——对工具链公司是机会（可切入的缝隙更多），对整机厂商是威胁（客户关系被切走）。<span class="tag t-infer">推断</span></p>
+
+<h3 id="s4-2">4.2 中欧美结构差异</h3>
+
+<div class="table-wrapper"><table class="wikitable">
+<thead><tr><th style="width:14%">维度</th><th style="width:28%">中国</th><th style="width:29%">美国</th><th>欧洲</th></tr></thead>
+<tbody>
+<tr><td>SI 市场结构</td><td>数量极多、集中度低、非标为主 <span class="tag t-infer">推断</span></td><td>相对成熟，有 CSIA 等行业认证体系 <span class="tag t-fact">事实</span><sup><a href="#ref26">[26]</a></sup></td><td>中等集中，工程规范与文档要求强 <span class="tag t-infer">推断</span></td></tr>
+<tr><td>部署定价</td><td>常被硬件销售补贴，难独立收费 <span class="tag t-infer">推断</span></td><td>服务单独计价；集成商费率 <b>$110–175/小时</b> <span class="tag t-fact">事实</span><sup><a href="#ref1">[1]</a></sup></td><td>服务计价明确，合规成本前置 <span class="tag t-infer">推断</span></td></tr>
+<tr><td>成本结构特征</td><td>直接材料 65–78%，直接人工 &lt;9% <span class="tag t-fact">事实</span><sup><a href="#ref10">[10]</a></sup></td><td>工程工时约占报价 40% <span class="tag t-fact">事实</span><sup><a href="#ref1">[1]</a></sup></td><td>工时占比高于中国，低于或接近美国 <span class="tag t-infer">推断</span></td></tr>
+<tr><td>驱动力</td><td>人力成本低 → 自动化 ROI 门槛高</td><td>人力成本高 → 部署自动化 ROI 更易成立</td><td>同美国，叠加能源与合规成本</td></tr>
+<tr><td>主要瓶颈</td><td>价格战、非标、客户成熟度</td><td>工程师供给、项目周期</td><td>合规认证周期（CE / ISO 10218 / ISO/TS 15066）</td></tr>
+</tbody></table></div>
+
+<div class="notice notice-blue"><b>这张表是整份报告里对商业模式最有解释力的一页。</b>美国集成商按小时计费、费率高，因此"把工时压下来"本身就是可直接变现的价值——这是部署工具链在美欧先成立的结构性原因。中国集成商的人工成本池只占 5%–9%，工具链若只卖"省工程师时间"，价值主张会被严重稀释。<b>在中国，工具链必须卖"减少外购/外协/返工"，或直接与 RaaS 绑定分享运营收益。</b><span class="tag t-infer">推断</span></div>
+
+<h2 id="s5">五、收费模式与激励</h2>
+
+<h3 id="s5-1">5.1 五种模式，成本归属决定降本动力</h3>
+
+<div class="table-wrapper"><table class="wikitable">
+<thead><tr><th style="width:17%">模式</th><th style="width:15%">部署成本承担方</th><th style="width:13%">厂商降本激励</th><th style="width:15%">现金流</th><th>适用条件</th></tr></thead>
+<tbody>
+<tr><td>项目制打包（CapEx）</td><td>客户（内含报价）</td><td><b>弱</b>——可转嫁，甚至做成利润中心</td><td>好（进度款）</td><td>客户有资本预算、项目非标</td></tr>
+<tr><td>硬件 + 服务分离</td><td>客户（单独付费）</td><td>中</td><td>好</td><td>客户认可服务价值</td></tr>
+<tr><td>订阅 / 软件</td><td>厂商（onboarding 成本）</td><td>强</td><td>差（前期投入）</td><td>边际复制成本低</td></tr>
+<tr><td><b>RaaS</b></td><td><b>厂商（资本化）</b></td><td><b>最强</b></td><td><b>最差</b>（重资产）</td><td>场景标准化、单站模型成立</td></tr>
+<tr><td>结果分成</td><td>厂商</td><td>最强</td><td>最差</td><td>效果可精确计量</td></tr>
+</tbody></table></div>
+
+<p>核心推论：<strong>项目制下厂商没有降低部署工时的内在激励</strong>。微亿智造招股书披露其项目定价机制为"人工成本 + 预设利润率"<sup><a href="#ref21">[21]</a></sup>——这是成本加成定价，不是价值定价。在这种机制下，工时越多、报价越高，与客户利益直接冲突。</p>
+
+<p>而 RaaS 把这张表翻转过来：部署成本由厂商资本化，直接进入单站经济模型。<strong>这正是"部署工具链"的市场空隙——把 RaaS 运营商被迫习得的降本能力，卖给仍在项目制里没有降本动力的人。</strong></p>
+
+<h3 id="s5-2">5.2 案例：Tutor Intelligence 把部署费写进了价目表</h3>
+
+<p>美国仓储 RaaS 公司 Tutor Intelligence 是目前少见的、把部署相关费用逐项公开的厂商。其官网定价页披露<sup><a href="#ref12">[12]</a></sup>：</p>
+
+<div class="table-wrapper"><table class="wikitable">
+<thead><tr><th style="width:30%">项目</th><th style="width:26%">价格</th><th>性质</th></tr></thead>
+<tbody>
+<tr><td>码垛/卸垛机时费</td><td class="num">$14–18 / 机器人小时</td><td>运营收入，含 80 小时/月下限</td></tr>
+<tr><td><b>一次性实施费</b></td><td class="num"><b>$10,000</b></td><td><b>与起订台数无关的固定部署成本</b></td></tr>
+<tr><td>可退还押金</td><td class="num">$8,000</td><td>信用风险对冲</td></tr>
+<tr><td>运费</td><td class="num">$1,000–3,500</td><td>从马萨诸塞州沃特敦发货</td></tr>
+<tr><td>产线末端就绪组件</td><td class="num">$50–300 / 线</td><td>场地侧适配</td></tr>
+<tr><td>整箱/单件拣选</td><td>按件计价</td><td>报价比客户现有单件成本低 10%–50%</td></tr>
+</tbody></table></div>
+
+<p>这个价目表有三层信息价值：</p>
+
+<ul>
+<li><strong>部署成本被显性化为一个固定项（$10,000）</strong>，而不是隐含在机时费里。这让客户能直接比较"自己买 + 自己部署"与"RaaS"的总成本。</li>
+<li><strong>实施费不随台数变化</strong>——意味着对多台部署，单台摊薄。这是典型的产品化定价逻辑，也是 ρ 低的信号。</li>
+<li><strong>公司把自己定义为"机器人研究与部署公司"</strong>，并把"先部署、后自主"（deploy ahead of autonomy）作为核心路线：先用远程人类导师补位产生经济价值，同时把作业过程转化为训练数据<sup><a href="#ref13">[13]</a></sup>。这是"用运营成本换部署可靠性"的典型解法。</li>
+</ul>
+
+<p>但代价同样清晰：按小时收费意味着公司自己持有机器人资产，<strong>每新增一台部署都要先占用现金</strong>（制造、运输、部署、押金退还风险），而客户是零资本开支入场<sup><a href="#ref13">[13]</a></sup>。这正是 RaaS "降本动力最强、现金流最差"的具体形态。</p>
+
+<h3 id="s5-3">5.3 中国 RaaS：价格战先于部署能力成熟</h3>
+
+<p>中国市场的路径不同。据界面新闻与证券时报报道，机器人租赁在 2025 年经历了从"日租 1 万–3 万元（全包）"到"主流 1000–3000 元、部分基础机型低于 1000 元"的断崖式下跌；2025 年租赁市场规模约 10 亿元，新成立租赁公司超 1500 家，机构预测 2026 年突破 100 亿元<sup><a href="#ref24">[24]</a><a href="#ref25">[25]</a></sup>。</p>
+
+<div class="notice notice-red"><b>一个值得警惕的结构。</b>当租金跌到接近设备折旧 + 运维成本时，<b>部署能力就不再是竞争要素，资本与规模才是</b>。这对"以部署能力为差异化"的初创公司是坏消息——除非能把部署能力转化为可见的单位经济优势（更低的干预率、更高的有效机时率），否则会被拖进价格战。行业里被反复提到的关键指标"有效机时率"，本质就是部署质量的财务表达。<span class="tag t-infer">推断</span></div>
+
+<h2 id="s6">六、AI 如何重构部署</h2>
+
+<h3 id="s6-1">6.1 按"降低哪一段成本"分类的四类路线</h3>
+
+<p>按技术名词分类（VLA、模仿学习、Sim2Real）无法评估影响。正确的方法是问：它降低的是 WBS 里的哪几个包？</p>
+
+<div class="table-wrapper"><table class="wikitable">
+<thead><tr><th style="width:11%">类别</th><th style="width:16%">作用对象（WBS）</th><th style="width:28%">技术路线</th><th style="width:16%">证据强度</th><th>隐性代价</th></tr></thead>
+<tbody>
+<tr><td><b>A 工艺适配</b></td><td>5 末端执行器、8 应用配置</td><td>模仿学习/示教、VLA 基础模型、技能库、自然语言任务编排</td><td>演示充分，长时稳定运行数据少</td><td>可靠性不足需兜底；数据采集成本转移</td></tr>
+<tr><td><b>B 现场调试</b></td><td>6 标定、9 调试</td><td>仿真 + Sim2Real、虚拟调试/数字孪生、自动标定、远程调试</td><td><b>较强</b>，工业界有量化案例</td><td>建模成本前置；模型与现实偏差</td></tr>
+<tr><td><b>C 复制</b></td><td>全局，决定 ρ</td><td>Fleet learning、OTA 与配置管理、标准接口、模块化硬件生态</td><td>强（UR+ 生态是最好案例）</td><td><b>需要规模前提</b>——鸡生蛋问题</td></tr>
+<tr><td><b>D 成本转移</b></td><td>12 爬坡与运营</td><td>先部署后自主、远程操作中心、客户自助部署</td><td>商业上已验证（Tutor 等）</td><td>未降低总成本，只是换了承担方</td></tr>
+</tbody></table></div>
+
+<h3 id="s6-2">6.2 已被量化验证的部分：虚拟调试</h3>
+
+<p>这是四类路线中证据最硬的一类。多个独立来源给出了同向的降幅区间：</p>
+
+<div class="table-wrapper"><table class="wikitable">
+<thead><tr><th style="width:26%">主体</th><th style="width:30%">量化结果</th><th style="width:14%">性质</th><th>来源</th></tr></thead>
+<tbody>
+<tr><td>迈赫股份（汽车制造）</td><td>现场调试周期缩短 <b>40% 以上</b></td><td>上市公司披露</td><td><sup><a href="#ref6">[6]</a></sup></td></tr>
+<tr><td>埃斯顿 &amp; 西门子</td><td>现场调试时间缩短 <b>30%</b>，综合调试成本降低 <b>20%</b></td><td>企业案例</td><td><sup><a href="#ref4">[4]</a></sup></td></tr>
+<tr><td>新时达 STEPStudio</td><td>机器人工作站调试周期缩短 <b>50%</b></td><td>企业自述</td><td><sup><a href="#ref28">[28]</a></sup></td></tr>
+<tr><td>上海新松 PDPS</td><td>14 人 3 天完成约 100 台（对比 2010 年 28 台需 30 多人约一个月）</td><td>媒体报道</td><td><sup><a href="#ref5">[5]</a></sup></td></tr>
+<tr><td>FASTSUITE 白车身焊装</td><td>现场停机减少约 80%，总工时缩短约 70%，示教 7 天→约 2 天</td><td>企业案例</td><td><sup><a href="#ref7">[7]</a></sup></td></tr>
+<tr><td>慕尼黑工大 Zäh / Wünsch 研究</td><td>虚拟调试可缩短实际调试时间最多 <b>75%</b>；"一次即正确"比例由 37% 升至 <b>84%</b></td><td>学术研究</td><td><sup><a href="#ref8">[8]</a></sup></td></tr>
+<tr><td>罗克韦尔 Emulate3D（巴西 Falcare）</td><td>项目执行速度提升 <b>60%</b></td><td>企业案例</td><td><sup><a href="#ref9">[9]</a></sup></td></tr>
+</tbody></table></div>
+
+<p class="small">口径提示：上述降幅均以"现场调试/停机时间"为分母，不含设计、制造、运输周期，也不等于项目总成本降幅。跨案例直接平均无统计意义，但<b>30%–50% 是多数企业案例落点，75% 是可引用的上限</b>。</p>
+
+<p>同期，Sim2Real 路线的代表案例是 Ambi Robotics：公司称在仿真中训练模型，使系统"上线第一天即可作业"，并于 2022 年前后为 Pitney Bowes 完成 <b>80 余套</b> A-Series 安装；截至 2026 年中自称累计部署 100 套系统<sup><a href="#ref14">[14]</a></sup>。<span class="tag t-claim">公司自述</span>这组数字的价值不在绝对量，而在于它展示了"同一产品形态在单一客户内连续复制"的部署曲线——这正是 ρ 可被观测的场景。</p>
+
+<h3 id="s6-3">6.3 尚未独立验证的部分：AI 编排把部署压到"天"级</h3>
+
+<p>2026 年国内出现了一批把大模型接入部署流程的产品，均宣称把场景部署从"数周"压缩到"数天"甚至"数分钟"。以下均为公司自述，尚无第三方复现。</p>
+
+<div class="table-wrapper"><table class="wikitable">
+<thead><tr><th style="width:18%">产品</th><th style="width:36%">宣称的部署效果</th><th style="width:20%">机制</th><th>来源</th></tr></thead>
+<tbody>
+<tr><td>墨影科技 百川平台</td><td>新设备接入周期 <b>3 个月 → 最快 7 天</b>；成熟产线方案 45 天落地</td><td>自然语言生成行为树 → 仿真校验 → 一键下发真机</td><td><sup><a href="#ref17">[17]</a></sup></td></tr>
+<tr><td>智元 Genie Studio 2.0</td><td>全新作业场景 <b>最快 7 天</b>完成 0→1 部署验证；仿真评测与真机误差 &lt;10%</td><td>Agent 可视化编排 + Flywheel 模型迭代 + Monitor 多机运维</td><td><sup><a href="#ref18">[18]</a></sup></td></tr>
+<tr><td>具识智能 insightOS</td><td>拆码垛场景部署 <b>数分钟</b>，对比传统数周，效率提升约 20 倍</td><td>自然语言指挥多机协同，无需代码构建任务流</td><td><sup><a href="#ref19">[19]</a></sup></td></tr>
+<tr><td>潜空间 潜擎</td><td>1–2 秒生成 10–20 秒动作序列；传统动作开发"以周计"</td><td>文本/语音/图像/视频直接生成动作</td><td><sup><a href="#ref20">[20]</a></sup></td></tr>
+<tr><td>微亿智造（快思考 + 人类在环）</td><td>传统工业机器人部署"数月示教编程"，快思考可将交付周期压缩至"天级"</td><td>云端人类专家在部署初期快速注入工艺知识</td><td><sup><a href="#ref21">[21]</a></sup></td></tr>
+<tr><td>苹果 AMP1</td><td>不依赖 VLA 预训练，由通用大模型实时看图、写代码、下发轨迹；真机成功率 <b>96.3%</b>（含错误恢复）</td><td>Agentic manipulation：代码即策略</td><td><sup><a href="#ref27">[27]</a></sup></td></tr>
+</tbody></table></div>
+
+<div class="notice"><b>如何读这组数字。</b>"数分钟"与"数周"的对比，分母往往只包含<b>任务编排</b>这一段（WBS 第 8 包），不含末端执行器、系统集成、安全验收与爬坡。把这类宣称直接等同于"部署周期缩短 20 倍"，会犯与"AI 让部署归零"相同的错误。<b>正确的用法是：它们证明第 8 包确实可被大幅压缩，而不是证明部署整体可被压缩。</b></div>
+
+<h3 id="s6-3b">6.4 各工作包的 AI 影响：不均匀</h3>
+
+<div class="chart">
+  <div class="chart-title">图 5 · 十二个工作包的"可自动化度"：当前 vs AI 后（0–100 主观刻度）</div>
+  <div class="chart-sub"><span class="tag t-infer">推断</span>本图为结构化判断，用于显示相对差异，不是实测数据；判据见 6.2 / 6.3 的案例</div>
+  <div class="grp">
+    <div class="grp-row"><div class="bar-label">5 末端执行器与工装</div><div class="grp-bars">
+      <div class="grp-line"><span class="small" style="width:28px">当前</span><div class="grp-track"><div class="grp-fill now" style="width:20%"></div></div><span class="grp-v">20</span></div>
+      <div class="grp-line"><span class="small" style="width:28px">AI 后</span><div class="grp-track"><div class="grp-fill ai" style="width:40%"></div></div><span class="grp-v">40</span></div>
+    </div></div>
+    <div class="grp-row"><div class="bar-label">7 系统集成</div><div class="grp-bars">
+      <div class="grp-line"><span class="small" style="width:28px">当前</span><div class="grp-track"><div class="grp-fill now" style="width:20%"></div></div><span class="grp-v">20</span></div>
+      <div class="grp-line"><span class="small" style="width:28px">AI 后</span><div class="grp-track"><div class="grp-fill ai" style="width:25%"></div></div><span class="grp-v">25</span></div>
+    </div></div>
+    <div class="grp-row"><div class="bar-label">8 应用配置与编排</div><div class="grp-bars">
+      <div class="grp-line"><span class="small" style="width:28px">当前</span><div class="grp-track"><div class="grp-fill now" style="width:45%"></div></div><span class="grp-v">45</span></div>
+      <div class="grp-line"><span class="small" style="width:28px">AI 后</span><div class="grp-track"><div class="grp-fill ai" style="width:85%"></div></div><span class="grp-v">85</span></div>
+    </div></div>
+    <div class="grp-row"><div class="bar-label">9 现场调试与优化</div><div class="grp-bars">
+      <div class="grp-line"><span class="small" style="width:28px">当前</span><div class="grp-track"><div class="grp-fill now" style="width:40%"></div></div><span class="grp-v">40</span></div>
+      <div class="grp-line"><span class="small" style="width:28px">AI 后</span><div class="grp-track"><div class="grp-fill ai" style="width:75%"></div></div><span class="grp-v">75</span></div>
+    </div></div>
+    <div class="grp-row"><div class="bar-label">6 感知与标定</div><div class="grp-bars">
+      <div class="grp-line"><span class="small" style="width:28px">当前</span><div class="grp-track"><div class="grp-fill now" style="width:45%"></div></div><span class="grp-v">45</span></div>
+      <div class="grp-line"><span class="small" style="width:28px">AI 后</span><div class="grp-track"><div class="grp-fill ai" style="width:80%"></div></div><span class="grp-v">80</span></div>
+    </div></div>
+    <div class="grp-row"><div class="bar-label">3/4 机械安装与电气</div><div class="grp-bars">
+      <div class="grp-line"><span class="small" style="width:28px">当前</span><div class="grp-track"><div class="grp-fill now" style="width:15%"></div></div><span class="grp-v">15</span></div>
+      <div class="grp-line"><span class="small" style="width:28px">AI 后</span><div class="grp-track"><div class="grp-fill ai" style="width:20%"></div></div><span class="grp-v">20</span></div>
+    </div></div>
+  </div>
+  <div class="legend">
+    <span><i style="background:#9aa8b6"></i>当前可自动化度</span>
+    <span><i style="background:#1a3a5c"></i>AI 后可自动化度</span>
+  </div>
+</div>
+
+<p>把图 1 的工时权重和图 5 的压缩幅度乘起来，可以得到一个粗略的净效应估算：<span class="tag t-infer">推断</span>若第 8、9 包（合计约 28% 工时）压缩 40%–50%，第 6 包（约 5%）压缩 40%，第 3、4、7 包几乎不变，则<strong>部署总工时的理论降幅约为 12%–17%</strong>——远低于"AI 让部署效率翻倍"的市场叙事。</p>
+
+<blockquote>
+<p><b>能力—成本剪刀差。</b>AI 会降低单次部署的边际工时，但不一定降低"部署这件事的总成本占比"。因为能力提升同时打开了更难的场景（移动、非结构化、人机共融），而难场景的部署成本更高。</p>
+</blockquote>
+
+<p>这个判断对融资叙事的含义很直接：<strong>不要论证"AI 让部署归零"，要论证"AI 让部署从手艺变成工程，工程可以被工具化，工具化可以被出售"</strong>。前者投资人不会信，后者才是可辩护的商业逻辑。</p>
+
+<h2 id="s7">七、失败模式：部署研究里信息密度最高的部分</h2>
+
+<p>成功案例说明"能做什么"，失败案例说明"成本藏在哪"。</p>
+
+<div class="table-wrapper"><table class="wikitable">
+<thead><tr><th style="width:18%">失败形态</th><th style="width:26%">典型表现</th><th style="width:26%">高频根因</th><th>可观测信号</th></tr></thead>
+<tbody>
+<tr><td>延期</td><td>交付拖过合同节点，进度款收不回</td><td>信息层：隐性约束未识别（最常见）</td><td>售前勘察不足、样件未到位、客户系统未开放</td></tr>
+<tr><td>超支</td><td>变更累积，毛利转负</td><td>商业层：报价漏项、变更管理失控</td><td>合同无变更条款、验收标准模糊</td></tr>
+<tr><td>验收不通过</td><td>节拍/良率达不到标称值</td><td>技术层 + 商业层：标称值与实际工况脱节</td><td>FAT 用理想件、SAT 用真实件</td></tr>
+<tr><td>上线后不可稳定运行</td><td>爬坡期无限延长，需人长期盯守</td><td>技术层：长尾异常未覆盖</td><td>90 天干预率居高不下</td></tr>
+<tr><td>客户组织不接受</td><td>设备装了但不用，SOP 未改</td><td>组织层：人员配合、绩效与流程未调整</td><td>客户方无专职对接人</td></tr>
+<tr><td>项目取消/退货</td><td>POC 后不转量产订单</td><td>综合：ROI 不成立或竞品替代</td><td>POC 指标与量产指标不一致</td></tr>
+</tbody></table></div>
+
+<h4>三个真实信号</h4>
+
+<ul>
+<li><strong>POC 周期本身成为风险。</strong>行业普遍认为人形机器人进厂的 POC 需要 <b>18–24 个月</b>，流程为"工位契合度沟通 → 仿真训练 → 真实工厂 POC → 达标才签约量产"<sup><a href="#ref15">[15]</a></sup>。这意味着 2024–2025 年启动的一批 POC 在 2026 下半年集中到期，<strong>拿不到正式订单的项目会同时暴露技术问题与现金流问题</strong>。</li>
+<li><strong>"能演示"与"能生产"之间存在数量级差距。</strong>有报道称某头部具身公司与国际 Tier 1 车企合作，DEMO 表现亮眼，但上线后"几十秒的节拍要几分钟才能完成"，最终被撤下产线、客户改用传统自动化设备补位<sup><a href="#ref16">[16]</a></sup>。<span class="tag t-red">未独立证实</span>该细节来自媒体转述，但方向与"POC 到期"的整体判断一致。</li>
+<li><strong>整机经济性尚未跨过门槛。</strong>据虎嗅报道，人形整机实际总成本约 50–60 万元、回本约 5 年，故障率与返修期令制造业难以接受；2026 年被判断为"伪需求出清、真场景分层"之年，复购采购单稀缺<sup><a href="#ref16">[16]</a></sup>。</li>
+</ul>
+
+<div class="notice notice-blue"><b>方法论建议。</b>做部署研究时，10–15 个失败/延期案例的结构化复盘，价值高于 50 个成功案例的宣传稿。每个案例应记录：场景、载体、合同金额、计划 vs 实际周期、超支幅度、根因归类（技术/信息/组织/商业）、最终结局。这份数据库本身就是资产。</div>
+
+<h2 id="s8">八、对"工具链 + RaaS"双业务的战略含义</h2>
+
+<h3>8.1 协同是真实的，但成立条件苛刻</h3>
+
+<p>自营 RaaS 是唯一能持续获得"真实部署工时 + 真实运营成本 + 真实失败模式"的渠道。这类数据无法从公开市场买到，也无法靠访谈获得，构成工具链最难复制的壁垒——<strong>不是算法壁垒，是标注数据与工作流知识壁垒</strong>。</p>
+
+<p>飞轮：自营部署 → 积累真实成本数据 → 反哺工具链 → 工具链卖给集成商/本体商 → 获取更多场景数据。Tutor Intelligence 的 DF1（100 台同构机器人并行采数据）是这个逻辑的极端形态：把数据采集从"项目制"变成"工厂制"<sup><a href="#ref13">[13]</a></sup>。</p>
+
+<h3>8.2 冲突也是真实的</h3>
+
+<p>系统集成商是工具链的天然客户，而 RaaS 与集成商在终端是竞争关系。集成商会合理担心：把部署方法论和数据交给你，等于培养一个竞争对手。三种可能的解法：</p>
+
+<div class="table-wrapper"><table class="wikitable">
+<thead><tr><th style="width:16%">解法</th><th style="width:34%">做法</th><th>代价</th></tr></thead>
+<tbody>
+<tr><td><b>分层</b></td><td>工具链卖给集成商做提效工具；RaaS 只做集成商做不了的标准化场景，边界写清楚</td><td>需要极强的战略纪律，销售端容易越界</td></tr>
+<tr><td><b>品牌隔离</b></td><td>两块业务不同品牌、不同销售体系、不同客户名单</td><td>组织成本高，数据协同变弱</td></tr>
+<tr><td><b>只卖工具</b></td><td>放弃 RaaS，换取渠道信任</td><td>失去唯一的一手数据源，工具链失去差异化</td></tr>
+</tbody></table></div>
+
+<h3>8.3 最危险的中间态</h3>
+
+<p>既不完全是产品、也不完全是服务，两边都做不深、都不规模。判断标准仍然是 ρ：</p>
+
+<ul>
+<li>如果自营业务的 ρ 降不下来，工具链就没有可产品化的方法论——你卖的是"某个项目的经验"，不是"可复用的能力"。</li>
+<li>如果工具链无法独立售出，RaaS 就永远只是重资产项目制，融资故事退化为"更贵的集成商"。</li>
+</ul>
+
+<p><strong>建议把"ρ 的下降曲线"作为公司层面的一号指标</strong>——它同时是产品成熟度、工具链有效性、以及融资叙事说服力的唯一硬证据。它比任何"部署周期缩短 X%"都更难伪造，也更容易被尽调。</p>
+
+<h2 id="s9">九、数据缺口与待验证事项</h2>
+
+<div class="table-wrapper"><table class="wikitable">
+<thead><tr><th style="width:5%">#</th><th style="width:42%">待验证命题</th><th style="width:10%">优先级</th><th>验证方法</th></tr></thead>
+<tbody>
+<tr><td>H1</td><td>部署工时高度集中，第 5/7/8/9 包合计约占一半</td><td>高</td><td>WBS 实测 + 集成商访谈</td></tr>
+<tr><td>H2</td><td>项目制下 ρ ≈ 0.7–1.0，产品化下 ρ &lt; 0.3</td><td>高</td><td>招股书"工程/交付人员数 ÷ 营收"趋势 + 案例</td></tr>
+<tr><td>H3</td><td>部署相关支出占自动化项目总额约 40%（口径 B）</td><td>高</td><td>集成商招股书项目成本结构</td></tr>
+<tr><td>H4</td><td>AI 对部署总工时的净降幅五年内约 12%–17%，显著低于市场预期</td><td>高</td><td>逐包评估 + 客户实测</td></tr>
+<tr><td>H5</td><td>客户成熟度对部署工时的解释力 &gt; 硬件类型</td><td>高</td><td>对数工时方差分解</td></tr>
+<tr><td>H6</td><td>中国部署服务难以独立定价，普遍被硬件补贴</td><td>中</td><td>报价单 + 集成商访谈</td></tr>
+<tr><td>H7</td><td>移动/人形载体的部署成本主要不在调试，而在场地改造 + 安全 + 运营兜底</td><td>中</td><td>案例拆解</td></tr>
+<tr><td>H8</td><td>部署成本上升 10% 会导致成交率显著下降（存在回收期阈值）</td><td>中</td><td>客户访谈 + 成交数据</td></tr>
+<tr><td>H9</td><td>fleet learning 在 &lt;1000 台规模下不产生可测量的 ρ 下降</td><td>低</td><td>需长期数据，可能无法验证</td></tr>
+</tbody></table></div>
+
+<h4>本报告明确未能回答的问题</h4>
+
+<ul>
+<li><strong>中国集成商的人均产值与项目周期分布</strong>：公开披露碎片化，无法给出可信中位数。需要从招股书"人均创收"字段逐家提取（如节卡问询回复中的分业务人均创收口径<sup><a href="#ref11">[11]</a></sup>）。</li>
+<li><strong>客户侧投入的工时</strong>：几乎无公开数据，但它是客户 TCO 的真实组成部分，也可能是"客户成熟度"解释力的来源。</li>
+<li><strong>部署后的运营成本占比</strong>：对 RaaS 是生死线，但厂商普遍不披露。</li>
+<li><strong>中美欧的部署工时直接可比数据</strong>：现有资料只能支撑定性差异，无法做定量对标。这是后续最值得投入访谈资源的方向。</li>
+</ul>
+
+<div class="notice notice-green"><b>如果整份报告只保留一个判断：</b>把"部署效率"换成"复制系数 ρ"，把"部署成本"换成"约束数量 × 单约束适配成本"。前者让研究可量化，后者让战略可选择。</div>
+
+<h2 id="refs">参考资料</h2>
+<div class="refs">
+<ol>
+<li id="ref1">Relling Systems, <i>Robot Integration Cost (2026): What Integrators Charge For, and Why It Beats the Robot Price</i>，页面标注数据核查日 2026-10-24。含工时分解模板（466 h）、集成商费率 $110–175/小时、本体占系统总价 25–30%（引 Universal Robots CTO, 2018）、付款节奏 30/40/20。<a href="https://rellingsystems.com/resources/robot-cost/robot-integration-cost">链接</a></li>
+<li id="ref2">AMD Machines, <i>True Cost of a Robot: 5-Phase TCO Breakdown</i>。<a href="https://amdmachines.com/blog/total-cost-of-ownership-for-robotic-systems/">链接</a></li>
+<li id="ref3">Five West, <i>Robot cell financing: the arm is 25%</i>。<a href="https://www.fivewestfinancial.com/blog/robotics-automation-financing-cash-flow.html">链接</a></li>
+<li id="ref4">e-works，《埃斯顿 &amp; 西门子：从虚拟调试到离线编程，打造产线数字孪生》（现场调试时间缩短 30%、综合调试成本降低 20%）。<a href="https://articles.e-works.net.cn/dt/article153402.htm">链接</a></li>
+<li id="ref5">中新网辽宁，《从虚拟调试到智慧生产 沈阳新松拓展智能制造应用》（14 人 3 天约 100 台；2010 年 28 台需 30 多人约一个月），2026-08-03。<a href="http://www.ln.chinanews.com.cn/news/2026/0803/356645.html">链接</a></li>
+<li id="ref6">证券日报，《迈赫股份：公司自主研发的数字孪生系统在客户项目中成功部署并投入运行》（现场调试周期缩短 40% 以上），2026-05-14。<a href="http://www.zqrb.cn/gscy/ggkx/2026-05-14/A1778759775789.html">链接</a></li>
+<li id="ref7">FASTSUITE 飞思德，《白车身多机器人焊接：数字孪生让 120 个焊点一次编完》（停机减少约 80%、总工时缩短约 70%、示教 7 天→约 2 天）。<a href="https://www.fastsuite.cn/case-studies/body-in-white/">链接</a></li>
+<li id="ref8">realvirtual.io，《虚拟调试软件 – 开源 &amp; AI-ready》，引慕尼黑工业大学 Zäh / Wünsch 研究（调试时间最多缩短 75%，一次即正确比例 37%→84%）。<a href="https://realvirtual.io/zh/virtuelle-inbetriebnahme/">链接</a></li>
+<li id="ref9">CIMdata, <i>Rockwell Automation Digital Twin Technology Accelerates Project Delivery and Cuts Costs for Brazil-based Falcare</i>（项目执行速度提升 60%），2026-02。<a href="https://www.cimdata.com/de/industry-summary-articles/item/29434-rockwell-automation-digital-twin-technology-accelerates-project-delivery-and-cuts-costs-for-brazil-based-falcare-industrial-equipment">链接</a></li>
+<li id="ref10">上交所 / 巨潮资讯网 科创板与创业板机器人及智能装备企业招股说明书、审核问询回复（系统集成实施周期 2 个月–2 年；成本结构直接材料 64.99%–77.80%、直接人工 4.56%–8.77%、制造费用 14.94%–26.24%）。检索入口：<a href="https://www.sse.com.cn/">上交所</a>、<a href="http://www.cninfo.com.cn/">巨潮资讯</a></li>
+<li id="ref11">节卡机器人股份有限公司 第二轮审核问询回复（分业务"人均创收"披露口径，2021–2024）。</li>
+<li id="ref12">Tutor Intelligence 官网定价页（$14–18/机器人小时、80 小时/月下限、$10,000 一次性实施费、$8,000 可退还押金、运费 $1,000–3,500、产线末端组件 $50–300/线），访问日期 2026-11-11。<a href="https://tutorintelligence.com/">链接</a></li>
+<li id="ref13">Tutor Intelligence 实体页（本 Wiki，含 a16z 领投 B 轮 $7,500 万、"先部署后自主"、DF1 数据工厂、资产与现金流结构分析）。<a href="entities/Tutor-Intelligence.html">链接</a></li>
+<li id="ref14">Ambi Robotics 实体页（本 Wiki，含 Sim2Real、Pitney Bowes 80 余套 A-Series 安装、RaaS 协议）。<a href="entities/Ambi-Robotics.html">链接</a></li>
+<li id="ref15">《财经》，《人形机器人厂商上演"生死时速"》（POC 需 18–24 个月；流程为工位契合度沟通→仿真训练→真实工厂 POC→达标签约）。<a href="https://news.caijingmobile.com/article/detail/539573">链接</a></li>
+<li id="ref16">虎嗅，《2026 年人形机器人行业将面临商业化分层与伪需求出清》（整机实际总成本 50–60 万元、回本约 5 年、复购单稀缺；含某头部公司被撤线的媒体转述，未经独立证实）。<a href="https://www.huxiu.com/article/4846986.html">链接</a></li>
+<li id="ref17">墨影科技，《工业具身智能底座》（新设备接入 3 个月→最快 7 天；成熟产线方案 45 天落地）。<a href="https://moyingrobotics.com/News/info_itemid_53.html">链接</a></li>
+<li id="ref18">智元机器人，《Genie Studio 2.0 打通机器人"上岗"最后一公里》（最快 7 天完成新场景 0→1 部署验证；仿真与真机误差 &lt;10%），2026-10。<a href="https://www.agibot.com.cn/article/315/detail/254.html">链接</a></li>
+<li id="ref19">中国日报，《"一句话指挥机器人干活"，WAIC 2026 具识智能发布具身语义智能体系统》（拆码垛部署数分钟 vs 传统数周，效率提升约 20 倍）。<a href="http://ex.chinadaily.com.cn/exchange/partners/82/rss/channel/cn/columns/6ldgif/stories/WS6a5f0ebda310d709c2fbebf7.html">链接</a></li>
+<li id="ref20">湖北省人民政府网，《说句话、给张图，机器人就能自己"编动作" 潜空间"运控小脑"亮相链博会》（1–2 秒生成 10–20 秒动作序列）。<a href="https://www.hubei.gov.cn/zhuanti/2025/dsjlbh/202606/t20260623_5963577.shtml">链接</a></li>
+<li id="ref21">微亿智造 实体页（本 Wiki，含招股书口径：EIIR 市占率 31.0%、300+ 工业现场部署、23TB 数据、快思考将交付周期压缩至天级、项目定价"人工成本 + 预设利润率"）。<a href="entities/微亿智造.html">链接</a></li>
+<li id="ref22">节卡机器人 实体页（本 Wiki，含 2024 年整机销量 7,462 台、全球部署近 3 万台、JAKA EVO"10 分钟产品换线"）。<a href="entities/节卡机器人.html">链接</a></li>
+<li id="ref23">优艾智合 实体页（本 Wiki，含员工约 416 人、研发 144 人、毛利率 35.2%/38.1%、300+ 客户）。<a href="entities/优艾智合.html">链接</a></li>
+<li id="ref24">界面新闻，《机器人租赁：百亿 RaaS 新物种》（2025 年租赁市场规模约 10 亿元、新成立租赁公司超 1500 家、预测 2026 年破 100 亿元）。<a href="https://www.jiemian.com/article/14454499.html">链接</a></li>
+<li id="ref25">证券时报，《日租金从 3 万元跌至 3000 元！机器人租赁冰火两重天》。<a href="https://h5.stcn.com/pages/detail/detail?id=3746490">链接</a></li>
+<li id="ref26">CSIA / Morgan Stanley 系统集成商调查（2025 周期）：67% 集成商过去 12 个月收入增长、85% 预期未来 12 个月增长、82% 订单出货比 ≥1x；CSIA 基准指标体系含人均收入、利用率、劳动乘数等。<a href="https://reportify.cn/reports/1290527317755564032">摘要链接</a>、<a href="https://www.csiaexchange.com/224100/not%20initialized">CSIA 基准项目</a></li>
+<li id="ref27">36 氪，《苹果给 Claude、Gemini 装上机械臂……》（AMP1，真机成功率 96.3%，含错误恢复）。<a href="https://36kr.com/p/4066126159401864">链接</a></li>
+<li id="ref28">上海新时达，《让工人从"操作员"变为"指挥官"》（STEPStudio 平台将机器人工作站调试周期缩短 50%）。<a href="https://www.stepelectric.com/news_detail/137.html">链接</a></li>
+</ol>
+</div>
+
+<div class="notice" style="margin-top:18px">
+<b>版本说明。</b>v1.0（2026-11-12）。本报告为框架落地首版，重点在建立可复用的分析坐标系（WBS、成本堆栈、ρ、四类 AI 路线），而非给出全量统计。凡标注 <span class="tag t-infer">推断</span> 的判断均需在后续版本中以一手数据替换；凡标注 <span class="tag t-claim">公司自述</span> 的降幅均未获第三方复现。
+</div>
+
+</article>
+</div>
+
+<div class="page-footer">
+机器人「部署」问题研究 v1.0 · 2026-11-12 · 具身智能 Wiki 研究报告 · 本页所有外部数据均标注来源，未标注者为结构性示意
+</div>
+
+</div>
+</body>
+</html>

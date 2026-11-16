@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>黄仁勋论物理 AI（Physical AI）· 观点辑录 2024–2026</title>
+<style>
+:root{
+  --bg:#f6f6f6; --paper:#ffffff; --text:#202122; --muted:#54595d;
+  --link:#0645ad; --border:#a2a9b1; --line:#e2e7ef;
+  --accent:#76b900; --accent2:#1a3a5c; --toc-bg:#f8f9fa;
+  --infobox-bg:#f9f9f9; --stripe:#f8f9fa; --head:#eaecf0;
+  --qbg:#f7faf0; --qline:#c9dd9a;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  font-size:0.9rem;line-height:1.72;color:var(--text);background:var(--bg)}
+a{color:var(--link);text-decoration:none}
+a:hover{text-decoration:underline}
+
+.top-nav{background:#fff;border-bottom:1px solid #c8ccd1;padding:8px 20px;font-size:0.8rem;color:var(--muted);
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.page-container{max-width:1220px;margin:0 auto;background:#fff;box-shadow:0 0 12px rgba(0,0,0,.05)}
+.page-title{padding:26px 32px 14px;border-bottom:1px solid var(--line)}
+.page-title h1{font-family:Georgia,'Times New Roman',serif;font-size:1.72rem;font-weight:400;color:#000;margin-bottom:4px;letter-spacing:-.3px}
+.page-title .subtitle{font-size:0.85rem;color:var(--muted)}
+.page-title .meta{font-size:0.75rem;color:#8492a6;margin-top:6px}
+
+.content-wrapper{display:flex;gap:22px;padding:22px 32px 40px;align-items:flex-start}
+.main-content{flex:1;min-width:0}
+
+/* infobox */
+.right-col{width:290px;flex-shrink:0;position:sticky;top:12px}
+.infobox{border:1px solid var(--border);background:var(--infobox-bg);font-size:0.76rem;line-height:1.5;margin-bottom:16px}
+.infobox-title{background:var(--accent2);color:#fff;text-align:center;padding:7px 10px;font-weight:600;font-size:0.86rem}
+.infobox-subtitle{background:#e8f0fe;color:var(--accent2);font-size:0.7rem;text-align:center;padding:3px 10px}
+.infobox-section-title{background:#e8f0fe;color:var(--accent2);text-align:center;padding:4px 10px;font-weight:600;font-size:0.74rem;border-top:1px solid var(--border)}
+.infobox-row{display:flex;padding:3px 10px;border-bottom:1px solid #e8e8e8}
+.infobox-label{width:78px;color:var(--muted);flex-shrink:0}
+.infobox-value{flex:1}
+
+/* toc */
+.toc{border:1px solid var(--border);background:var(--toc-bg);padding:10px 14px;font-size:0.78rem}
+.toc-title{font-weight:600;text-align:center;margin-bottom:6px;color:var(--accent2)}
+.toc ol{padding-left:18px}
+.toc li{margin:2px 0}
+
+h2{font-family:Georgia,'Times New Roman',serif;font-size:1.3rem;font-weight:400;border-bottom:1px solid var(--border);
+  padding-bottom:4px;margin:30px 0 12px;color:#000}
+h3{font-size:1rem;font-weight:600;margin:20px 0 8px;color:var(--accent2)}
+p{margin:9px 0}
+b,strong{font-weight:600}
+ul,ol{padding-left:22px;margin:8px 0}
+li{margin:4px 0}
+
+.wikitable{border-collapse:collapse;margin:10px 0 18px;font-size:0.8rem;width:100%;border:1px solid var(--border)}
+.wikitable th{background:var(--head);border:1px solid var(--border);padding:6px 8px;text-align:center;font-weight:600;font-size:0.75rem}
+.wikitable td{border:1px solid var(--border);padding:6px 8px;vertical-align:top}
+.wikitable tr:nth-child(even) td{background:var(--stripe)}
+
+sup a{color:#0645ad;text-decoration:none;font-size:0.7rem}
+
+/* quote cards */
+.quote{background:var(--qbg);border-left:4px solid var(--accent);padding:12px 16px;margin:12px 0;border-radius:0 4px 4px 0}
+.quote .orig{font-family:Georgia,'Times New Roman',serif;font-size:0.92rem;color:#1b2a10;line-height:1.6}
+.quote .zh{color:#2b3a1e;font-size:0.86rem;margin-top:5px}
+.quote .src{font-size:0.72rem;color:var(--muted);margin-top:7px}
+
+.quote.n{background:#f4f7fb;border-left-color:#3b6ea5}
+.quote.n .orig{color:#16283d}
+.quote.n .zh{color:#2b3f57}
+
+.note{background:#fff8e6;border:1px solid #f0d99a;padding:10px 14px;margin:14px 0;font-size:0.82rem;border-radius:4px}
+.note b{color:#8a6100}
+.warn{background:#fdf2f2;border:1px solid #f0b8b8;padding:10px 14px;margin:14px 0;font-size:0.82rem;border-radius:4px}
+.warn b{color:#a12b2b}
+
+.tag{display:inline-block;background:#eaf3f8;color:var(--accent2);padding:1px 7px;border-radius:3px;font-size:0.7rem;margin:1px 2px;border:1px solid #c8d9e8;white-space:nowrap}
+.chip{display:inline-block;background:#eef7e0;color:#3d5a12;padding:1px 7px;border-radius:10px;font-size:0.68rem;margin:1px 2px;border:1px solid #cfe6a6;white-space:nowrap}
+
+/* timeline */
+.timeline{border-left:3px solid #d5dce6;padding-left:22px;margin:14px 0 14px 6px}
+.timeline-entry{margin-bottom:16px;position:relative}
+.timeline-entry::before{content:'';position:absolute;left:-28px;top:6px;width:10px;height:10px;background:var(--accent);
+  border:2px solid #fff;outline:1px solid var(--accent);border-radius:50%}
+.timeline-date{font-weight:700;color:var(--accent2);font-size:0.82rem}
+.timeline-title{font-weight:600;margin:1px 0;font-size:0.85rem}
+.timeline-desc{color:var(--muted);font-size:0.79rem}
+
+.refs{font-size:0.8rem;line-height:1.7}
+.refs ol{padding-left:26px}
+.refs li{margin-bottom:5px}
+.refs a{color:var(--link);word-break:break-all}
+
+.page-footer{border-top:1px solid var(--border);padding:16px 32px 26px;font-size:0.78rem;color:var(--muted);text-align:center}
+@media(max-width:860px){.content-wrapper{flex-direction:column}.right-col{width:100%;position:static}}
+</style>
+</head>
+<body>
+<div class="page-container">
+<div class="top-nav"><a href="index.html">具身智能Wiki</a> <span>›</span> <span>人物 · 观点辑录</span> <span>›</span> 黄仁勋论物理 AI</div>
+
+<div class="page-title">
+<h1>黄仁勋论物理 AI（Physical AI）</h1>
+<div class="subtitle">NVIDIA 创始人兼 CEO 黄仁勋（Jensen Huang）关于「物理 AI」的公开观点、论述与金句辑录</div>
+<div class="meta">覆盖 2024.03 – 2026.10 · 来源类型：GTC/CES 主题演讲、媒体专访与播客、财报电话会、公开对谈 · 整理日期：2026-10-16</div>
+</div>
+
+<div class="content-wrapper">
+<div class="main-content">
+
+<h2 id="s0">0 导言</h2>
+<p>「物理 AI」（Physical AI，中文亦译作「实体 AI」「具身 AI」）是黄仁勋自 2024 年起反复强化的核心概念。他在多个场合把 AI 的发展划分为若干「浪潮」，并断言<strong>继感知 AI、生成式 AI、代理式 AI 之后，下一波就是物理 AI</strong>。这一提法既是技术叙事，也是 NVIDIA 面向机器人、自动驾驶与工业自动化的商业战略总纲。</p>
+<p>本页按<strong>主题</strong>与<strong>时间</strong>两条线索，辑录黄仁勋 2024–2026 年关于物理 AI 的公开表述。每条语录标注原话（英文原文附中文翻译）与来源编号；凡属媒体转述而非直接引语者，均予以标注。</p>
+<div class="note"><b>阅读提示：</b>本页仅收录<strong>可追溯到公开来源</strong>的表述。个别网络流传的「金句」在原始出处中无法核实（例如「物理 AI 是 6 万亿美元市场」实为投行/研究机构测算，非黄仁勋原话），这类内容已在「审慎提示」中说明，不作为黄仁勋本人的引用。</div>
+
+<h2 id="s1">1 核心命题总览</h2>
+<p>黄仁勋关于物理 AI 的论述可归纳为七个相互支撑的命题。下表列出命题、代表性表述、首次系统提出的大致场合：</p>
+<table class="wikitable">
+<tr><th style="width:16%">命题</th><th style="width:46%">代表性表述</th><th style="width:20%">首次提出场合</th><th style="width:18%">关键词</th></tr>
+<tr><td><b>浪潮论</b></td><td>AI 经历感知 → 生成式 → 代理式 → <b>物理 AI</b> 四波浪潮，物理 AI 是下一波</td><td>2024.06 Computex / 2025.01 CES</td><td><span class="chip">Perception→Generative→Agentic→Physical</span></td></tr>
+<tr><td><b>定义论</b></td><td>物理 AI = 理解物理世界（三维世界、重力、摩擦、惯性、因果关系、物体恒存）的 AI</td><td>2025.03 GTC</td><td><span class="chip">laws of physics</span></td></tr>
+<tr><td><b>身体论</b></td><td>「物理 AI 就是有身体的 AI」，其生成能力从生成图像/文字变为生成动作</td><td>2025.06 GTC Paris</td><td><span class="chip">AI with a body</span></td></tr>
+<tr><td><b>三台计算机</b></td><td>物理 AI 需要三台计算机：训练、仿真（数字孪生）、运行；又称「三体问题」</td><td>2024.07 SIGGRAPH</td><td><span class="chip">three-computer problem</span></td></tr>
+<tr><td><b>ChatGPT 时刻</b></td><td>通用机器人的「ChatGPT 时刻」近在咫尺 / 已经到来</td><td>2025.01 CES</td><td><span class="chip">ChatGPT moment for robotics</span></td></tr>
+<tr><td><b>万亿市场</b></td><td>物理 AI 将重塑价值 50 万亿美元的制造与物流业；将是「史上最大的技术产业」</td><td>2025.01 CES</td><td><span class="chip">$50 trillion</span></td></tr>
+<tr><td><b>全员机器人</b></td><td>「每一家工业公司都将成为机器人公司」「所有移动的东西都将是自主的」</td><td>2024.06 Computex / 2026.03 GTC</td><td><span class="chip">every industrial company</span></td></tr>
+</table>
+
+<h2 id="s2">2 定义：什么是物理 AI</h2>
+
+<h3 id="s2-1">2.1 四波浪潮论</h3>
+<p>黄仁勋最常被引用的框架，是把 AI 的发展划分为四个阶段。在 CES 2025 主题演讲中，英伟达官方博客记录了他的原话：</p>
+<div class="quote">
+<div class="orig">"It started with perception AI — understanding images, words and sounds. Then generative AI — creating text, images and sound." Now, we're entering the era of "physical AI, AI that can proceed, reason, plan and act."</div>
+<div class="zh">「它始于感知 AI——理解图像、文字和声音；然后是生成式 AI——创造文本、图像和声音。」现在，我们正进入「物理 AI」时代——「能够感知、推理、规划并行动的 AI。」</div>
+<div class="src">—— CES 2025 主题演讲（2025-01-07）｜来源 <sup><a href="#ref1">[1]</a></sup>（英伟达官方博客）</div>
+</div>
+<p>在 GTC 2025 上，他进一步把物理 AI 与「机器人」直接绑定，并解释了「理解物理世界」的含义：</p>
+<div class="quote">
+<div class="orig">"The ability to understand the physical world, the three-dimensional world, is what's going to enable a new era of AI, which we call Physical AI, and it's going to enable robotics."</div>
+<div class="zh">「理解物理世界、理解三维世界的能力，将开启一个我们称之为『物理 AI』的 AI 新时代，而这将赋能机器人技术。」</div>
+<div class="src">—— GTC 2025 主题演讲（2025-03-18）｜来源 <sup><a href="#ref2">[2]</a></sup><sup><a href="#ref3">[3]</a></sup></div>
+</div>
+<p>多家媒体归纳，黄仁勋所说的物理 AI 需要理解的具体物理概念包括：<strong>摩擦（friction）、惯性（inertia）、因果关系（cause and effect）、物体恒存（object permanence）</strong>——即「一个物体转到墙后依然存在」这类常识。这一「物理常识」正是他认为自回归大模型所欠缺、而物理 AI 必须补齐的能力<sup><a href="#ref2">[2]</a></sup>。</p>
+
+<h3 id="s2-2">2.2 「有身体的 AI」</h3>
+<p>在 2025 年 6 月的 GTC Paris（配合 VivaTech）主题演讲中，黄仁勋给出物理 AI 最凝练的一个比喻：</p>
+<div class="quote">
+<div class="orig">"The next big thing is Physical AI, AI with a body. Robots, autonomous machines, industrial systems… It's all coming."</div>
+<div class="zh">「下一个大事件是物理 AI——有身体的 AI。机器人、自主机器、工业系统……这一切都在到来。」</div>
+<div class="src">—— GTC Paris 2025 主题演讲（2025-06）｜来源 <sup><a href="#ref6">[6]</a></sup></div>
+</div>
+<p>同场演讲中，他还从「生成什么」的角度重新定义了这一代 AI 与上一代的区别：</p>
+<div class="quote">
+<div class="orig">"In the physical implementation of agentic AI, the generative capability is generating motion, instead of images, videos, and texts … The ability to embody AI in a physical form, is basically robotics."</div>
+<div class="zh">「在代理式 AI 的物理实现中，生成能力生成的是『动作』，而不是图像、视频和文本……把 AI 具身到物理形态中，基本上就是机器人技术。」</div>
+<div class="src">—— GTC Paris 2025 主题演讲（2025-06）｜来源 <sup><a href="#ref5">[5]</a></sup>（Digital Engineering 24/7 现场报道）</div>
+</div>
+<p>换句话说，生成式 AI 生成 token，物理 AI 生成 <strong>动作（motion）</strong>。这是他用来统一「大模型」与「机器人」两套话语的关键一句。</p>
+
+<h3 id="s2-3">2.3 中文语境下的表述</h3>
+<p>2025 年 7 月 17 日，在北京第三届链博会（中国国际供应链促进博览会）先进制造主题活动上，黄仁勋与之江实验室主任、阿里云创始人王坚进行炉边对谈。多家媒体发布了整理版全文，其核心表述是：</p>
+<div class="quote n">
+<div class="orig">「下一波浪潮是物理 AI，所有的能力都能够融入我们的物理世界，比方说机器人。」</div>
+<div class="zh">对谈主题被多家媒体概括为「黄仁勋与王坚预言物理 AI 浪潮」；黄仁勋称「人工智能的下个浪潮是物理 AI（Physical AI）」，AI 可以进入物理机器（如机器人）。</div>
+<div class="src">—— 第三届链博会 黄仁勋 × 王坚 炉边谈话（2025-07-17）｜来源 <sup><a href="#ref7">[7]</a></sup><sup><a href="#ref8">[8]</a></sup></div>
+</div>
+
+<h2 id="s3">3 方法论：三台计算机与「三体问题」</h2>
+<p>「三台计算机」是黄仁勋解释物理 AI 如何落地的工程框架，也是外界引用最多、最完整的一段论述之一。其最早的系统表述出现在 2024 年 SIGGRAPH 大会与《连线》（Wired）记者 Lauren Goode 的炉边对话中：</p>
+<div class="quote">
+<div class="orig">"This is where we're going to need three computers. One computer, to create the AI, another computer to simulate the AI … And then, of course, the third is the computer that actually runs the AI. So it's a three-computer problem. It's a three-body problem."</div>
+<div class="zh">「这正是我们需要三台计算机的地方。一台计算机用来创建 AI，另一台计算机用来模拟 AI……当然，第三台是真正运行 AI 的计算机。所以这是一个『三台计算机』问题，也是一个『三体问题』。」</div>
+<div class="src">—— SIGGRAPH 2024 炉边对话（2024-07）｜来源 <sup><a href="#ref4">[4]</a></sup></div>
+</div>
+<p>「三体问题」取自刘慈欣同名科幻小说，黄仁勋用它来形容三台计算机相互耦合、难以精确求解的复杂性。</p>
+<p>在 CES 2025 上，他把这一框架具体落到自动驾驶上，并点名了对应产品：</p>
+<div class="quote">
+<div class="orig">"The autonomous vehicle revolution is here. Building autonomous vehicles, like all robots, requires three computers: NVIDIA DGX to train AI models, Omniverse to test drive and generate synthetic data, and DRIVE AGX, a supercomputer in the car."</div>
+<div class="zh">「自动驾驶革命已经到来。构建自动驾驶汽车——就像所有机器人一样——需要三台计算机：用 NVIDIA DGX 训练 AI 模型，用 Omniverse 试跑并生成合成数据，以及 DRIVE AGX——车里的超级计算机。」</div>
+<div class="src">—— CES 2025 主题演讲（2025-01-07）｜来源 <sup><a href="#ref1">[1]</a></sup>（英伟达官方博客）</div>
+</div>
+<table class="wikitable">
+<tr><th>计算机</th><th>角色</th><th>对应产品（CES 2025）</th><th>对应产品（CES 2026 表述）</th></tr>
+<tr><td><b>第一台</b></td><td>创建 / 训练 AI</td><td>NVIDIA DGX</td><td>DGX（训练「大脑」）</td></tr>
+<tr><td><b>第二台</b></td><td>仿真 / 数字孪生 / 合成数据</td><td>Omniverse</td><td>Omniverse（模拟世界）</td></tr>
+<tr><td><b>第三台</b></td><td>在物理世界运行 AI</td><td>DRIVE AGX（车端）</td><td>Jetson（在真实世界行动）</td></tr>
+</table>
+<p>「第二台计算机」——仿真与合成数据——被他反复强调为物理 AI 的<strong>瓶颈环节</strong>。原因是现实世界的机器人操作数据极度稀缺：</p>
+<div class="quote">
+<div class="orig">"There's only so much data and so much human demonstration we can perform."</div>
+<div class="zh">「我们能采集的数据、能进行的人类演示是有限的。」</div>
+<div class="src">—— CES 2025 主题演讲（2025-01）｜来源 <sup><a href="#ref2">[2]</a></sup>（媒体转述）</div>
+</div>
+<p>为破解数据瓶颈，NVIDIA 相继推出 <strong>Cosmos</strong>（世界基础模型，生成符合物理规律的合成视频）、<strong>Isaac GR00T</strong>（人形机器人基础模型）、<strong>Newton</strong>（开源物理引擎）等，用 Omniverse 生成海量合成动作数据来训练机器人<sup><a href="#ref1">[1]</a></sup>。</p>
+
+<h2 id="s4">4 「ChatGPT 时刻」</h2>
+<p>黄仁勋习惯用一个「时刻」来判断某项技术何时走向大众。在机器人问题上，他 2025 年初在 CES 给出的判断是「近在咫尺」：</p>
+<div class="quote">
+<div class="orig">"The ChatGPT moment for general robotics is just around the corner."</div>
+<div class="zh">「通用机器人的 ChatGPT 时刻近在咫尺。」</div>
+<div class="src">—— CES 2025 主题演讲（2025-01-07）｜来源 <sup><a href="#ref1">[1]</a></sup>（英伟达官方博客）</div>
+</div>
+<p>同场他还预告了「通用机器人」领域将出现意外突破：</p>
+<div class="quote">
+<div class="orig">"All of the enabling technologies that I've been talking about are going to make it possible for us in the next several years to see very rapid breakthroughs, surprising breakthroughs, in general robotics."</div>
+<div class="zh">「我一直在谈论的所有使能技术，将使我们在未来几年内看到通用机器人领域非常迅速、甚至令人惊讶的突破。」</div>
+<div class="src">—— CES 2025 主题演讲（2025-01-07）｜来源 <sup><a href="#ref1">[1]</a></sup></div>
+</div>
+<p>值得注意的是，他对这一「时刻」的判断在一年内发生了<strong>从「即将到来」到「已经发生」的转变</strong>：</p>
+<table class="wikitable">
+<tr><th>时间</th><th>场合</th><th>表述</th><th>判断</th></tr>
+<tr><td>2025.01</td><td>CES 2025</td><td>"The ChatGPT moment for general robotics is <b>just around the corner</b>."</td><td>即将到来</td></tr>
+<tr><td>2026.01</td><td>CES 2026</td><td>机器人领域迎来了自己的「ChatGPT 时刻」</td><td>已经到来</td></tr>
+<tr><td>2026（YC Startup School）</td><td>对谈 Garry Tan</td><td>"the ChatGPT moment of robots <b>happened a couple of years ago already</b>."</td><td>回溯性判定：数年前即已发生</td></tr>
+</table>
+<p>后两条来源分别为 CES 2026 中文报道<sup><a href="#ref13">[13]</a></sup>与 YC Startup School 对谈的英文报道<sup><a href="#ref17">[17]</a></sup>。</p>
+
+<h2 id="s5">5 市场规模与产业判断</h2>
+<p>黄仁勋关于物理 AI 的「规模」论述有两个层次：一是被重塑的<strong>存量产业盘子</strong>（约 50 万亿美元），二是机器人本身的<strong>产业潜力</strong>（万亿级）。</p>
+
+<h3 id="s5-1">5.1 「50 万亿美元的制造与物流业」</h3>
+<div class="quote">
+<div class="orig">"Physical AI will revolutionize the $50 trillion manufacturing and logistics industry. From cars and trucks to factories and warehouses, everything that moves will be robotic and embodied by AI."</div>
+<div class="zh">「物理 AI 将彻底改变价值 50 万亿美元的制造与物流业。从汽车、卡车到工厂与仓库，所有会移动的东西都将由机器人承担、由 AI 赋予实体。」</div>
+<div class="src">—— CES 2025 主题演讲（2025-01）｜来源 <sup><a href="#ref15">[15]</a></sup></div>
+</div>
+<div class="note"><b>口径提醒：</b>这里的「50 万亿美元」指的是物理 AI <b>将要改造的实体经济总盘子</b>（全球制造 + 物流 + 相关体力劳动），并非物理 AI 自身的市场规模或 NVIDIA 的收入。黄仁勋本人在不同场合把它作为一个「被颠覆的产业空间」来使用。</div>
+
+<h3 id="s5-2">5.2 机器人是「万亿级产业」</h3>
+<p>在 2025 年 1 月的 CES 及同期播客中，他把机器人与自动驾驶、人形机器人合起来，称为「史上最大的技术产业」：</p>
+<div class="quote">
+<div class="orig">"This will likely be the first multitrillion-dollar robotics industry … probably the next robotics industry, and likely to be a multitrillion-dollar opportunity."</div>
+<div class="zh">「这很可能是第一个万亿美元级的机器人产业……很可能是一个万亿美元级的机会。」</div>
+<div class="src">—— CES 2025 及同期播客（2025-01）｜来源 <sup><a href="#ref17">[17]</a></sup></div>
+</div>
+<p>他把机器人产业与劳动力短缺直接挂钩：</p>
+<div class="quote">
+<div class="orig">"The world is short of workers, and birth rates are declining, so the world needs a lot of workers. The first application of humanoid robots will be manufacturing, and robotics is one of the best ways to close this gap."</div>
+<div class="zh">「世界劳动力短缺、出生率下降，因此世界需要大量工人。人形机器人的第一个应用场景将是制造业，而机器人技术是弥补这一缺口的最佳方式之一。」</div>
+<div class="src">—— 2025 年公开访谈｜来源 <sup><a href="#ref16">[16]</a></sup>（媒体转述）</div>
+</div>
+<p>在 2026 年的公开对话中，他进一步把物理 AI 描述为「科技业第一次触达一个 50 万亿美元、此前几乎完全没有被技术渗透的行业」<sup><a href="#ref18">[18]</a></sup>。</p>
+
+<h3 id="s5-3">5.3 「每一家工业公司都将成为机器人公司」</h3>
+<p>这是黄仁勋在 GTC 2026 上给出的标志性论断，也是「全员机器人」命题的最新版本：</p>
+<div class="quote">
+<div class="orig">"Physical AI is here. Every industrial company will become a robotics company."</div>
+<div class="zh">「物理 AI 已经到来。每一家工业公司都将成为机器人公司。」</div>
+<div class="src">—— GTC 2026 主题演讲（2026-03-17）｜来源 <sup><a href="#ref11">[11]</a></sup><sup><a href="#ref12">[12]</a></sup></div>
+</div>
+<p>其更早的雏形见于 2024 年 6 月 Computex：</p>
+<div class="quote">
+<div class="orig">"Everything is going to be robotic. All of the factories will be robotic. The factories will orchestrate robots, and those robots will be building products that are robotic."</div>
+<div class="zh">「一切都会机器人化。所有工厂都将机器人化。工厂将调度机器人，而机器人将制造机器人化的产品。」</div>
+<div class="src">—— Computex 2024 主题演讲（2024-06）｜来源 <sup><a href="#ref9">[9]</a></sup><sup><a href="#ref10">[10]</a></sup></div>
+</div>
+<p>以及同场的：</p>
+<div class="quote">
+<div class="orig">"The era of robotics has arrived. Everything that moves will one day be autonomous."</div>
+<div class="zh">「机器人时代已经到来。所有会移动的东西，终有一天都将是自主的。」</div>
+<div class="src">—— Computex 2024 主题演讲（2024-06）｜来源 <sup><a href="#ref10">[10]</a></sup></div>
+</div>
+
+<h2 id="s6">6 关于人形机器人</h2>
+<p>黄仁勋是人形机器人路线的高调支持者，认为「下一代机器人很可能是人形机器人」，原因是人类世界的设施（工位、制造、物流）本就是为人类身形设计的：</p>
+<div class="quote">
+<div class="orig">"The next generation of robotics will likely be humanoid robotics. We now have the necessary technology to imagine generalized human robotics."</div>
+<div class="zh">「下一代机器人很可能就是人形机器人。我们现在已经拥有所需的技术，去构想『通用人形机器人』。」</div>
+<div class="src">—— GTC 2024 Project GR00T 发布（2024-03-18）｜来源 <sup><a href="#ref25">[25]</a></sup></div>
+</div>
+<p>需要说明：GTC 2024 时黄仁勋的用词是「具身 AI / 通用人形机器人（embodied AI / general humanoid robotics）」，<strong>尚未使用「物理 AI」这一说法</strong>——「物理 AI」这一术语的系统使用始于 2024 年年中<sup><a href="#ref26">[26]</a></sup>。</p>
+<p>2026 年 GTC Taipei 上，他把人形机器人称为「AI 的下一个大飞跃」：</p>
+<div class="quote">
+<div class="orig">"Humanoid robots are AI's next big leap. We have built an open platform so that researchers around the world can develop their own robots on top of it."</div>
+<div class="zh">「人形机器人是 AI 的下一个大飞跃。我们构建了一个开放平台，让全世界的研究人员都能在此基础上开发属于自己的机器人。」</div>
+<div class="src">—— GTC Taipei 2026（2026-06）｜来源 <sup><a href="#ref23">[23]</a></sup></div>
+</div>
+<p>在 GTC Paris 2025 上他还判断，人形机器人将成长为「最大的产业之一」<sup><a href="#ref5">[5]</a></sup>。</p>
+
+<h2 id="s7">7 数据与训练方法论</h2>
+<p>黄仁勋对物理 AI 的技术判断集中在一句话：<strong>难点在数据，而数据的解法在仿真</strong>。2026 年 GTC Taipei 上他的表述是：</p>
+<div class="quote">
+<div class="orig">"Physical AI is currently the most challenging field; the core difficulty lies in the scarcity of data … To teach a robot to move, you must obtain data from the robot's first-person perspective."</div>
+<div class="zh">「物理 AI 是目前最具挑战性的领域，核心困难在于数据的稀缺……要让机器人学会动作，必须从机器人的第一人称视角获得数据。」</div>
+<div class="src">—— GTC Taipei 2026（2026-06）｜来源 <sup><a href="#ref23">[23]</a></sup></div>
+</div>
+<p>对应的方法论是「真实数据 + 合成数据」的混合训练：用 Omniverse 生成符合物理规律的合成动作数据，用 Cosmos 世界基础模型预测多种未来场景并挑选最优动作，再用强化学习在仿真中迭代<sup><a href="#ref1">[1]</a></sup>。这一思路被他概括为物理 AI 的「第二台计算机」——数字孪生与合成数据工厂。</p>
+
+<h2 id="s8">8 商业化：财报电话会与收入披露</h2>
+<p>物理 AI 不只是叙事，也已进入 NVIDIA 财报口径。黄仁勋在财报电话会上的相关表述与已披露的数字如下：</p>
+<table class="wikitable">
+<tr><th>时间</th><th>场合</th><th>核心表述 / 数字</th><th>来源</th></tr>
+<tr><td>2026.02</td><td>FY2026 财报电话会</td><td>首次单列「物理 AI」相关业务收入约 <b>60 亿美元</b>（含机器人、自动驾驶、物理 AI 应用）</td><td><sup><a href="#ref19">[19]</a></sup><sup><a href="#ref20">[20]</a></sup></td></tr>
+<tr><td>2026（滚动 12 个月）</td><td>媒体引述</td><td>物理 AI 收入约 <b>90 亿美元</b>，较上年的 60 亿增长；其中大部分来自自动驾驶与工厂自动化，而非人形机器人</td><td><sup><a href="#ref17">[17]</a></sup><sup><a href="#ref21">[21]</a></sup><sup><a href="#ref28">[28]</a></sup></td></tr>
+<tr><td>2026（All-In 播客）</td><td>播客对谈</td><td>物理 AI 年收入「接近 <b>100 亿美元</b>」且「呈指数级增长」</td><td><sup><a href="#ref18">[18]</a></sup></td></tr>
+<tr><td>2026.05</td><td>FY2027 Q1 财报电话会</td><td>"The world is rebuilding computing for agentic AI and robotic physical AI."（世界正在为代理式 AI 与机器人化的物理 AI 重建计算）</td><td><sup><a href="#ref21">[21]</a></sup></td></tr>
+<tr><td>2026</td><td>财报电话会</td><td>称公司「已全面覆盖物理 AI 这一领域」</td><td><sup><a href="#ref19">[19]</a></sup></td></tr>
+</table>
+<div class="warn"><b>口径审慎提示：</b>上述 60 亿 / 90 亿 / 近 100 亿美元三个数字口径不同（FY2026 单年、滚动 12 个月、年化），且均属媒体转述，具体数字应以 NVIDIA 官方财报与电话会实录为准。另有分析指出，物理 AI 相关收入占 NVIDIA 总收入比重仍不足 <b>3%</b>（FY2026 汽车 + 机器人业务线约 23 亿美元，几乎全部来自自动驾驶），即「叙事很大、当下收入占比仍小」<sup><a href="#ref21">[21]</a></sup>。</div>
+
+<h2 id="s9">9 分场合语录辑录</h2>
+<p>以下按时间顺序汇总各主要场合的核心表述。每条标注语言的原始性（原文引语 / 媒体转述）。</p>
+
+<h3 id="s9-1">2024.03 · GTC 2024（Project GR00T 发布）</h3>
+<div class="quote">
+<div class="orig">"Building foundation models for general humanoid robots is one of the most exciting problems to solve in AI today. The enabling technologies are coming together for leading roboticists around the world to take giant leaps towards artificial general robotics."</div>
+<div class="zh">「为通用人形机器人构建基础模型，是当今 AI 领域最令人兴奋、最值得解决的课题之一。各种使能技术正在汇聚，让全球领先的机器人研究者向『通用机器人』迈出巨大一步。」</div>
+<div class="src">—— GTC 2024（2024-03-18）｜来源 <sup><a href="#ref25">[25]</a></sup></div>
+</div>
+<p><b>语境：</b>NVIDIA 发布人形机器人通用基础模型 <b>Project GR00T</b>（Generalist Robot 00 Technology）与机器人计算平台 <b>Jetson Thor</b>。此阶段主词是「embodied AI / general humanoid robotics」，尚未启用「Physical AI」<sup><a href="#ref26">[26]</a></sup>。</p>
+
+<h3 id="s9-2">2024.06 · Computex 2024</h3>
+<div class="quote">
+<div class="orig">"The next wave of AI is physical AI. AI that understands the laws of physics, AI that can work among us."</div>
+<div class="zh">「AI 的下一波浪潮是物理 AI——理解物理定律的 AI，能与我们一起工作的 AI。」</div>
+<div class="src">—— Computex 2024（2024-06-02，台北）｜来源 <sup><a href="#ref9">[9]</a></sup><sup><a href="#ref25">[25]</a></sup></div>
+</div>
+<p>这一句被普遍视为「物理 AI」这一说法正式进入公众视野的标志。同场他还说「未来台湾将制造会走路的计算机」（"In the future, Taiwan will build computers that walk."）。</p>
+
+<h3 id="s9-3">2024.07 · SIGGRAPH 2024</h3>
+<div class="quote">
+<div class="orig">"This is where we're going to need three computers. One computer, to create the AI, another computer to simulate the AI … And then, of course, the third is the computer that actually runs the AI. So it's a three-computer problem. It's a three-body problem."</div>
+<div class="zh">「这正是我们需要三台计算机的地方……一台创建 AI，一台模拟 AI，第三台真正运行 AI。所以这是一个『三台计算机』问题，也是一个『三体问题』。」</div>
+<div class="src">—— SIGGRAPH 2024 与 Wired 炉边对话（2024-07）｜来源 <sup><a href="#ref4">[4]</a></sup></div>
+</div>
+
+<h3 id="s9-4">2025.01 · CES 2025</h3>
+<div class="quote">
+<div class="orig">"The next frontier of AI is physical AI." … "The ChatGPT moment for general robotics is just around the corner."</div>
+<div class="zh">「AI 的下一个前沿是物理 AI。」……「通用机器人的 ChatGPT 时刻近在咫尺。」</div>
+<div class="src">—— CES 2025 主题演讲（2025-01-07）｜来源 <sup><a href="#ref1">[1]</a></sup></div>
+</div>
+<p><b>语境：</b>发布首个世界基础模型平台 <b>Cosmos</b>、<b>Isaac GR00T Blueprint</b>、基于 AGX Thor 的 <b>DRIVE Hyperion</b> 自动驾驶平台；现场展示 14 家人形机器人企业（含 6 家中国企业）。提出「物理 AI 将重塑 50 万亿美元制造与物流业」<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref15">[15]</a></sup>。中文媒体对 CES 2025 的完整解读另见<sup><a href="#ref22">[22]</a></sup>。</p>
+
+<h3 id="s9-5">2025.03 · GTC 2025</h3>
+<div class="quote">
+<div class="orig">"The ability to understand the physical world, the three-dimensional world, is what's going to enable a new era of AI, which we call Physical AI, and it's going to enable robotics."</div>
+<div class="zh">「理解物理世界、理解三维世界的能力，将开启一个我们称之为『物理 AI』的新时代，并将赋能机器人技术。」</div>
+<div class="src">—— GTC 2025 主题演讲（2025-03-18）｜来源 <sup><a href="#ref2">[2]</a></sup><sup><a href="#ref3">[3]</a></sup></div>
+</div>
+<p><b>语境：</b>发布开源人形机器人基础模型 <b>Isaac GR00T N1</b>、开源物理引擎 <b>Newton</b>（与 Google DeepMind、Disney Research 合作）、更新版 <b>Cosmos</b>（Transfer / Predict / Reason）、开源物理 AI 数据集；提出「通用机器人时代已经到来」（"the age of generalist robotics is here"）<sup><a href="#ref2">[2]</a></sup>。</p>
+
+<h3 id="s9-6">2025.06 · GTC Paris（VivaTech）</h3>
+<div class="quote">
+<div class="orig">"The next big thing is Physical AI, AI with a body. Robots, autonomous machines, industrial systems… It's all coming."</div>
+<div class="zh">「下一个大事件是物理 AI——有身体的 AI。机器人、自主机器、工业系统……这一切都在到来。」</div>
+<div class="src">—— GTC Paris 2025（2025-06）｜来源 <sup><a href="#ref6">[6]</a></sup></div>
+</div>
+
+<h3 id="s9-7">2025.07 · 第三届链博会（黄仁勋 × 王坚）</h3>
+<div class="quote n">
+<div class="orig">「下一波浪潮是物理 AI，所有的能力都能够融入我们的物理世界，比方说机器人。」</div>
+<div class="zh">对谈主题：黄仁勋与王坚「预言物理 AI 浪潮」。他称「人工智能的下个浪潮是物理 AI（Physical AI）」，AI 可以进入物理机器（如机器人）。</div>
+<div class="src">—— 链博会炉边谈话（2025-07-17，北京）｜来源 <sup><a href="#ref7">[7]</a></sup><sup><a href="#ref8">[8]</a></sup></div>
+</div>
+<p>同场他谈到 AI 与人类智慧的关系：「AI 激发人的创造力，增加人的智慧。就如同飞机能够让我们到更远的地方，AI 能够让我们想得更多、思考得更聪明。」「我有点嫉妒年轻人，他们将成为 AI 的原住民，从出生到离开世界，有 AI 全程陪伴。」<sup><a href="#ref7">[7]</a></sup><sup><a href="#ref8">[8]</a></sup></p>
+
+<h3 id="s9-8">2025.10 · APEC 企业领袖峰会</h3>
+<div class="quote n">
+<div class="orig">「实体 AI（physical AI）是下一波发展浪潮。」（把 AI 应用于机器人、机械、自动驾驶汽车等实体设备）</div>
+<div class="zh">他称韩国具备「软体、科技、制造」三大要素，有望在实体 AI 领域领先全球。</div>
+<div class="src">—— APEC 企业领袖峰会（2025-10-31，韩国庆州）｜来源 <sup><a href="#ref27">[27]</a></sup></div>
+</div>
+
+<h3 id="s9-9">2026.01 · CES 2026</h3>
+<div class="quote">
+<div class="orig">"The ChatGPT moment for robotics has arrived." / 「物理 AI 重塑制造业，未来十年很多汽车将是自动驾驶。」</div>
+<div class="zh">黄仁勋以物理 AI 定调年度演讲，称机器人领域迎来了自己的「ChatGPT 时刻」，并预测未来十年「世界上很大一部分汽车将是自动驾驶或高度自动驾驶的」。</div>
+<div class="src">—— CES 2026 主题演讲（2026-01-06）｜来源 <sup><a href="#ref13">[13]</a></sup><sup><a href="#ref24">[24]</a></sup></div>
+</div>
+<p><b>语境：</b>CES 2026 上他重申「三台计算机」框架（训练 / 仿真 / 运行），并发布/更新 Nemotron、Cosmos、Alpamayo（开源 VLA 自动驾驶模型）、Clara 等模型矩阵<sup><a href="#ref13">[13]</a></sup>。</p>
+
+<h3 id="s9-10">2026.01 · 达沃斯世界经济论坛</h3>
+<p>2026 年 1 月 21 日，黄仁勋在瑞士达沃斯年会上总结过去一年 AI 模型的「三大突破」，物理 AI 位列其一：</p>
+<ul>
+<li><b>代理式 AI 突破：</b>模型从「幻觉」阶段进化到逻辑推理，能拆解复杂问题、规划并执行任务；</li>
+<li><b>开源推理模型突破：</b>首个开源推理模型 DeepSeek 出现后，开源生态繁荣；</li>
+<li><b>物理 AI 突破：</b>AI 不仅能理解语言和代码，还能理解物理世界与自然规律（蛋白质、化学、流体力学、量子物理等），并开始与传感器、机器人、工业系统融合。</li>
+</ul>
+<div class="quote n">
+<div class="orig">「物理 AI 可以理解蛋白质、化学、流体力学、量子物理……现在甚至能做到像与 ChatGPT 对话一样与蛋白质『交互』。」</div>
+<div class="zh">他把物理 AI 视为具身智能以及制造业、机器人技术升级的基石，并举与礼来（Lilly）的合作为例说明 AI 在理解蛋白质结构上的进展。</div>
+<div class="src">—— 达沃斯世界经济论坛（2026-01-21）｜来源 <sup><a href="#ref14">[14]</a></sup></div>
+</div>
+
+<h3 id="s9-11">2026.03 · GTC 2026</h3>
+<div class="quote">
+<div class="orig">"Physical AI is here. Every industrial company will become a robotics company." / "The ChatGPT moment for autonomous driving has arrived."</div>
+<div class="zh">「物理 AI 已经到来。每一家工业公司都将成为机器人公司。」「自动驾驶的 ChatGPT 时刻已经到来。」</div>
+<div class="src">—— GTC 2026 主题演讲（2026-03-17）｜来源 <sup><a href="#ref11">[11]</a></sup><sup><a href="#ref12">[12]</a></sup></div>
+</div>
+<p><b>语境：</b>发布/预览 GR00T N2、Cosmos 3、Isaac Lab 3.0、Newton 1.0 等；宣布 ABB、Universal Robots、KUKA 等工业机器人厂商与 NVIDIA 合作；比亚迪、现代、日产、吉利加入 Robotaxi-Ready 平台。演讲尾声展示《冰雪奇缘》雪宝机器人，黄仁勋称「迪士尼乐园的未来，将是所有这一切机器人与角色在四周游走」<sup><a href="#ref11">[11]</a></sup><sup><a href="#ref12">[12]</a></sup>。</p>
+
+<h3 id="s9-12">2026 · 对谈与播客</h3>
+<div class="quote">
+<div class="orig">"I would say the ChatGPT moment of robots happened a couple of years ago already."</div>
+<div class="zh">「我想说，机器人的 ChatGPT 时刻其实在几年前就已经发生了。」</div>
+<div class="src">—— YC Startup School 与 Garry Tan 对谈（2026）｜来源 <sup><a href="#ref17">[17]</a></sup></div>
+</div>
+<p>他回溯称，这一判断源于 NVIDIA 实验室内部：当生成式视频能生成「一只手拿起玻璃杯」的画面时，他意识到「既然我能生成这个动作，为什么不能让机器人做同样的动作？」——这成为 NVIDIA 转向世界基础模型（Cosmos、GR00T、DRIVE Hyperion）的起点<sup><a href="#ref17">[17]</a></sup>。</p>
+<div class="quote">
+<div class="orig">"Physical AI is the first time the tech industry has touched an industry worth $50 trillion that was previously almost entirely untouched by technology … annual revenue is approaching $10 billion and growing exponentially."</div>
+<div class="zh">「物理 AI 是科技业第一次触达一个价值 50 万亿美元、此前几乎完全没有被技术渗透的行业……年收入正接近 100 亿美元，并以指数级增长。」</div>
+<div class="src">—— All-In Podcast（2026）｜来源 <sup><a href="#ref18">[18]</a></sup></div>
+</div>
+
+<h2 id="s10">10 观点演变时间线</h2>
+<div class="timeline">
+<div class="timeline-entry">
+<div class="timeline-date">2024.03 · GTC 2024</div>
+<div class="timeline-title">Project GR00T 与「通用人形机器人」</div>
+<div class="timeline-desc">发布人形机器人基础模型 GR00T 与 Jetson Thor。此阶段话语体系是「具身 AI / 通用机器人」，尚未出现「物理 AI」一词。<sup><a href="#ref25">[25]</a></sup><sup><a href="#ref26">[26]</a></sup></div>
+</div>
+<div class="timeline-entry">
+<div class="timeline-date">2024.06 · Computex</div>
+<div class="timeline-title">首次系统提出「AI 的下一波是物理 AI」</div>
+<div class="timeline-desc">「物理 AI」正式进入公众叙事；「一切都会机器人化」。<sup><a href="#ref9">[9]</a></sup><sup><a href="#ref10">[10]</a></sup></div>
+</div>
+<div class="timeline-entry">
+<div class="timeline-date">2024.07 · SIGGRAPH</div>
+<div class="timeline-title">提出「三台计算机 / 三体问题」</div>
+<div class="timeline-desc">为物理 AI 的工程落地给出框架：训练、仿真、运行。 <sup><a href="#ref4">[4]</a></sup></div>
+</div>
+<div class="timeline-entry">
+<div class="timeline-date">2025.01 · CES 2025</div>
+<div class="timeline-title">「通用机器人的 ChatGPT 时刻近在咫尺」＋ Cosmos 发布</div>
+<div class="timeline-desc">给出「50 万亿美元制造与物流业」规模判断；发布世界基础模型 Cosmos。 <sup><a href="#ref1">[1]</a></sup><sup><a href="#ref15">[15]</a></sup></div>
+</div>
+<div class="timeline-entry">
+<div class="timeline-date">2025.03 · GTC 2025</div>
+<div class="timeline-title">物理 AI 的定义与「通用机器人时代已到来」</div>
+<div class="timeline-desc">Isaac GR00T N1 开源、Newton 物理引擎、Cosmos 更新；明确物理 AI 需理解摩擦、惯性、因果等物理概念。 <sup><a href="#ref2">[2]</a></sup></div>
+</div>
+<div class="timeline-entry">
+<div class="timeline-date">2025.06 · GTC Paris</div>
+<div class="timeline-title">「物理 AI 就是有身体的 AI」</div>
+<div class="timeline-desc">把物理 AI 的生成对象定义为「动作（motion）」。 <sup><a href="#ref6">[6]</a></sup><sup><a href="#ref5">[5]</a></sup></div>
+</div>
+<div class="timeline-entry">
+<div class="timeline-date">2025.07 · 链博会</div>
+<div class="timeline-title">中文语境下的「物理 AI 浪潮」</div>
+<div class="timeline-desc">与王坚炉边对谈，面向中国听众重申「下一波浪潮是物理 AI」。 <sup><a href="#ref7">[7]</a></sup><sup><a href="#ref8">[8]</a></sup></div>
+</div>
+<div class="timeline-entry">
+<div class="timeline-date">2025.10 · APEC</div>
+<div class="timeline-title">「实体 AI 是下一波」</div>
+<div class="timeline-desc">在韩国庆州称实体 AI 是下一波浪潮，并称韩国具备领先要素。 <sup><a href="#ref27">[27]</a></sup></div>
+</div>
+<div class="timeline-entry">
+<div class="timeline-date">2026.01 · CES 2026</div>
+<div class="timeline-title">「机器人的 ChatGPT 时刻已经到来」</div>
+<div class="timeline-desc">以物理 AI 定调年度演讲，重申三台计算机框架。 <sup><a href="#ref13">[13]</a></sup></div>
+</div>
+<div class="timeline-entry">
+<div class="timeline-date">2026.01 · 达沃斯</div>
+<div class="timeline-title">把物理 AI 列为「过去一年 AI 三大突破」之一</div>
+<div class="timeline-desc">与代理式 AI、开源推理模型并列。 <sup><a href="#ref14">[14]</a></sup></div>
+</div>
+<div class="timeline-entry">
+<div class="timeline-date">2026.03 · GTC 2026</div>
+<div class="timeline-title">「每一家工业公司都将成为机器人公司」</div>
+<div class="timeline-desc">物理 AI 全家桶发布；工业机器人与车企大规模加入生态。 <sup><a href="#ref11">[11]</a></sup><sup><a href="#ref12">[12]</a></sup></div>
+</div>
+<div class="timeline-entry">
+<div class="timeline-date">2026.02–05 · 财报与播客</div>
+<div class="timeline-title">物理 AI 收入的量化披露</div>
+<div class="timeline-desc">FY2026 物理 AI 收入约 60 亿美元，滚动 12 个月约 90 亿；播客中称「近 100 亿美元、指数级增长」。 <sup><a href="#ref19">[19]</a></sup><sup><a href="#ref18">[18]</a></sup><sup><a href="#ref21">[21]</a></sup></div>
+</div>
+</div>
+
+<h2 id="s11">11 审慎提示：易被误传的「黄仁勋语录」</h2>
+<div class="warn">
+<p><b>1.「物理 AI 是 6 万亿美元市场」——不是黄仁勋原话。</b>该数字源自机构（如 Coatue 等）对物理 AI 潜在市场规模的测算，常被冠以「黄仁勋称」而误传。黄仁勋本人使用的是「50 万亿美元<strong>被重塑的产业</strong>」这一口径。</p>
+<p><b>2.「50 万亿美元」≠ 物理 AI 收入或市场规模。</b>指其将改造的实体经济总盘，非 NVIDIA 收入，也不是物理 AI 自身产值。</p>
+<p><b>3.「2 万亿美元机器人市场」——非直接引语。</b>该数字多见于第三方对「若 5% 家庭购买 2 万美元机器人」的测算，黄仁勋的直接表述是「第一个万亿美元级机器人产业」。</p>
+<p><b>4. 分场次需核对。</b>部分报道把 CES 2025 与 CES 2026、GTC 2025 与 GTC 2026 的表述混用；引用时应以其原始场次为准。</p>
+<p><b>5.「物理 AI」术语时间线。</b>GTC 2024（2024.03）时黄仁勋尚未使用「物理 AI」，当时用词为「具身 AI / 通用人形机器人」；「物理 AI」的系统使用始于 2024 年年中（Computex、SIGGRAPH）。</p>
+</div>
+
+<h2 id="s12">12 参考资料</h2>
+<div class="refs">
+<ol>
+<li id="ref1">NVIDIA Blog, "CES 2025: AI Advancing at 'Incredible Pace,' NVIDIA CEO Says"（英伟达官方博客，CES 2025 主题演讲实录）<br><a href="https://blogs.nvidia.com/blog/ces-2025-jensen-huang/">https://blogs.nvidia.com/blog/ces-2025-jensen-huang/</a></li>
+<li id="ref2">The Indian Express, "NVIDIA CEO Jensen Huang's GTC 2025 keynote: Physical AI, Rubin chips, and more"<br><a href="https://indianexpress.com/article/technology/artificial-intelligence/nvidia-ceo-jensen-huangs-gtc-2025-keynote-physical-ai-rubin-chips-and-more-9894083/">https://indianexpress.com/article/technology/artificial-intelligence/nvidia-ceo-jensen-huangs-gtc-2025-keynote-physical-ai-rubin-chips-and-more-9894083/</a></li>
+<li id="ref3">InvestingLive, "Jensen Huang: The ability to understand the physical world, will enable robotics"<br><a href="https://investinglive.com/news/jensen-huang-the-ability-to-understand-the-physical-world-will-enable-robotics-20250318/">https://investinglive.com/news/jensen-huang-the-ability-to-understand-the-physical-world-will-enable-robotics-20250318/</a></li>
+<li id="ref4">TweakTown, "NVIDIA CEO Jensen Huang on next wave of AI: physical AI, has a 'three-body problem'"<br><a href="https://www.tweaktown.com/news/99632/nvidia-ceo-jensen-huang-on-next-wave-of-ai-physical-has-three-body-problem/index.html">https://www.tweaktown.com/news/99632/nvidia-ceo-jensen-huang-on-next-wave-of-ai-physical-has-three-body-problem/index.html</a></li>
+<li id="ref5">Digital Engineering 24/7, "NVIDIA GTC Paris: Jensen Huang Talks Physical AI, Fuels AI Enthusiasm and Investment Across Europe"<br><a href="https://www.digitalengineering247.com/article/nidia-gtc-paris-investment-in-automotive-partnerships-with-siemens-and-mercedes/robotics">https://www.digitalengineering247.com/article/nidia-gtc-paris-investment-in-automotive-partnerships-with-siemens-and-mercedes/robotics</a></li>
+<li id="ref6">RS Online / DesignSpark, "From Perception to Physical AI: What Jensen Huang's GTC Paris Keynote Means for Design Engineers"<br><a href="https://www.rs-online.com/designspark/from-perception-to-physical-ai-what-jensen-huangs-gtc-paris-keynote-means-for-design-engineers">https://www.rs-online.com/designspark/from-perception-to-physical-ai-what-jensen-huangs-gtc-paris-keynote-means-for-design-engineers</a></li>
+<li id="ref7">新京报 / 贝壳财经,「这场对话藏着万亿市场（全文）！黄仁勋与王坚预言物理 AI 浪潮」（第三届链博会）<br><a href="https://m.bjnews.com.cn/detail/1752741082129273.html">https://m.bjnews.com.cn/detail/1752741082129273.html</a></li>
+<li id="ref8">21 世纪经济报道,「黄仁勋、王坚对谈全文：一场关于 AI、算力与未来的炸裂『预言』」<br><a href="https://www.21jingji.com/article/20250717/herald/e357ac20a85de56df5e4ed0628d5d4c6.html">https://www.21jingji.com/article/20250717/herald/e357ac20a85de56df5e4ed0628d5d4c6.html</a></li>
+<li id="ref9">Quartz (qz.com), "This is AI's 'next wave,' according to Nvidia CEO Jensen Huang"<br><a href="https://qz.com/ai-next-wave-robots-nvidia-jensen-huang-blackwell-rubin-1851515953">https://qz.com/ai-next-wave-robots-nvidia-jensen-huang-blackwell-rubin-1851515953</a></li>
+<li id="ref10">钛媒体 TMTPost, "The Era of Robotics Has Arrived, Says Nvidia CEO Jensen Huang"<br><a href="https://www.tmtpost.com/7114110.html">https://www.tmtpost.com/7114110.html</a></li>
+<li id="ref11">量子位,「黄仁勋：每一家工业企业都将成为机器人公司！连发物理 AI 全家桶」（GTC 2026）<br><a href="https://www.qbitai.com/2026/03/389569.html">https://www.qbitai.com/2026/03/389569.html</a></li>
+<li id="ref12">TechOrange 科技报橘,「【GTC 2026】黃仁勳：每一家工業公司都將成為機器人公司，自動駕駛的 ChatGPT 時刻已經到來」<br><a href="https://techorange.com/2026/03/17/nvidia-gtc-2026-physical-ai/">https://techorange.com/2026/03/17/nvidia-gtc-2026-physical-ai/</a></li>
+<li id="ref13">新浪财经,「英伟达黄仁勋：物理 AI 迎来『ChatGPT』时刻」（CES 2026）；另见网易科技,「黄仁勋：迎接物理 AI（万字实录）」<br><a href="https://finance.sina.com.cn/roll/2026-01-06/doc-inhfiqwu6131723.shtml">https://finance.sina.com.cn/roll/2026-01-06/doc-inhfiqwu6131723.shtml</a><br><a href="https://www.163.com/dy/article/KJ91512D05568W0A.html">https://www.163.com/dy/article/KJ91512D05568W0A.html</a></li>
+<li id="ref14">证券时报 STCN,「黄仁勋谈过去一年 AI 模型的三大突破」（达沃斯 2026）<br><a href="https://stcn.com/article/detail/3605507.html">https://stcn.com/article/detail/3605507.html</a></li>
+<li id="ref15">盖世汽车 Gasgoo,「黄仁勋：Physical AI 将彻底改变价值 50 万亿美元的制造和物流行业」<br><a href="https://auto.gasgoo.com/news/202501/7I70415655C601.shtml">https://auto.gasgoo.com/news/202501/7I70415655C601.shtml</a></li>
+<li id="ref16">凤凰网科技,「黄仁勋表示，类人机器人——一个 50 万亿美元的产业」<br><a href="https://travel.ifeng.com/c/8jPgSOaHdQS">https://travel.ifeng.com/c/8jPgSOaHdQS</a></li>
+<li id="ref17">Yahoo Finance / 24/7 Wall St., "NVIDIA CEO Jensen Huang Says the 'ChatGPT Moment' Has Already Happened for the Next $50 Trillion Trend"<br><a href="https://finance.yahoo.com/technology/ai/articles/nvidia-ceo-jensen-huang-says-161058898.html">https://finance.yahoo.com/technology/ai/articles/nvidia-ceo-jensen-huang-says-161058898.html</a></li>
+<li id="ref18">TheBlockBeats, "Huang Renxun: NVIDIA's Physical AI Annual Revenue Approaching $10 Billion, 'Digital Biology is About to Enter the ChatGPT Moment'"（All-In 播客）<br><a href="https://en.theblockbeats.news/flash/337219">https://en.theblockbeats.news/flash/337219</a></li>
+<li id="ref19">智通财经,「英伟达(NVDA.US)业绩『常态化 beat』难消投资者质疑！黄仁勋放话：正推进业务多元化 已全面覆盖物理 AI 领域」<br><a href="https://m.zhitongcaijing.com/article/share.html?content_id=1444365">https://m.zhitongcaijing.com/article/share.html?content_id=1444365</a></li>
+<li id="ref20">ETNews,「[해설]엔비디아, '학습' 넘어 '추론·에이전트'로 수익 구조 재편」<br><a href="https://www.etnews.com/20260226000299">https://www.etnews.com/20260226000299</a></li>
+<li id="ref21">AInvest, "Physical AI Is Real - But It's Not The $5 Trillion Story Yet"<br><a href="https://www.ainvest.com/news/physical-ai-real-5-trillion-story-2606/">https://www.ainvest.com/news/physical-ai-real-5-trillion-story-2606/</a></li>
+<li id="ref22">界面新闻,「2025 年，黄仁勋画了个更大的饼」（CES 2025 解读）<br><a href="https://www.jiemian.com/article/12231646.html">https://www.jiemian.com/article/12231646.html</a></li>
+<li id="ref23">OFweek 电子工程网,「黄仁勋 GTC Taipei 2026 Taipei 完整解密：科普 Agent、升级物理 AI 基座模型 Cosmos 3、重构 PC」<br><a href="https://ee.ofweek.com/2026-06/ART-8110-2801-30689346.html">https://ee.ofweek.com/2026-06/ART-8110-2801-30689346.html</a></li>
+<li id="ref24">腾讯云开发者社区,「黄仁勋 CES 2026 主旨演讲【完整中文实录】」<br><a href="https://cloud.tencent.com.cn/developer/article/2615309">https://cloud.tencent.com.cn/developer/article/2615309</a></li>
+<li id="ref25">COMPUTEX Daily / 台湾中央社等, "Generative AI is the 'New Industrial Revolution' says NVIDIA CEO Jensen Huang"（Computex 2024 及 GTC 2024 GR00T 报道）<br><a href="https://computexdaily.com/2024/06/03/generative-ai-is-the-new-industrial-revolution-says-nvidia-ceo-jensen-huang-in-nvidia-ceo-keynote/">https://computexdaily.com/2024/06/03/generative-ai-is-the-new-industrial-revolution-says-nvidia-ceo-jensen-huang-in-nvidia-ceo-keynote/</a></li>
+<li id="ref26">证券时报 STCN / 界面新闻,「英伟达发布人形机器人通用基础模型，黄仁勋：这是 AI 领域中最令人兴奋的课题之一」（GTC 2024，含英文原话）<br><a href="https://www.stcn.com/article/detail/1150335.html">https://www.stcn.com/article/detail/1150335.html</a></li>
+<li id="ref27">中时新闻网 / 中央社,「黄仁勋讚南韩罕见齐备 3 要素 『实体 AI』可望领先全球」（APEC 2025）<br><a href="https://www.chinatimes.com/cn/realtimenews/20251031003734-260408">https://www.chinatimes.com/cn/realtimenews/20251031003734-260408</a></li>
+<li id="ref28">24/7 Wall St., "Nvidia is betting on a trillion-dollar robotics boom. Here is the hidden way to trade it."（物理 AI 收入 90 亿美元口径）<br><a href="https://247wallst.com/investing/2026/07/28/nvidia-ceo-jensen-huang-says-the-chatgpt-moment-has-already-happened-for-the-next-50-trillion-trend/">https://247wallst.com/investing/2026/07/28/nvidia-ceo-jensen-huang-says-the-chatgpt-moment-has-already-happened-for-the-next-50-trillion-trend/</a></li>
+</ol>
+</div>
+
+</div><!-- /main-content -->
+
+<div class="right-col">
+<div class="infobox">
+<div class="infobox-title">黄仁勋 · 物理 AI 观点辑录</div>
+<div class="infobox-subtitle">Jensen Huang on Physical AI</div>
+<div class="infobox-section-title">人物信息</div>
+<div class="infobox-row"><div class="infobox-label">姓名</div><div class="infobox-value">黄仁勋（Jensen Huang）</div></div>
+<div class="infobox-row"><div class="infobox-label">职务</div><div class="infobox-value">NVIDIA 创始人、总裁兼 CEO</div></div>
+<div class="infobox-row"><div class="infobox-label">公司</div><div class="infobox-value">NVIDIA（NASDAQ: NVDA）</div></div>
+<div class="infobox-section-title">主题信息</div>
+<div class="infobox-row"><div class="infobox-label">主题</div><div class="infobox-value">物理 AI（Physical AI）/ 具身智能 / 机器人</div></div>
+<div class="infobox-row"><div class="infobox-label">时间跨度</div><div class="infobox-value">2024.03 – 2026.10</div></div>
+<div class="infobox-row"><div class="infobox-label">核心命题</div><div class="infobox-value">物理 AI 是继感知、生成式、代理式 AI 之后的下一波浪潮</div></div>
+<div class="infobox-section-title">关键概念</div>
+<div class="infobox-row"><div class="infobox-label">四波浪潮</div><div class="infobox-value">感知 → 生成式 → 代理式 → 物理</div></div>
+<div class="infobox-row"><div class="infobox-label">三台计算机</div><div class="infobox-value">训练 · 仿真 · 运行（三体问题）</div></div>
+<div class="infobox-row"><div class="infobox-label">规模口径</div><div class="infobox-value">50 万亿美元（被重塑的制造/物流业）</div></div>
+<div class="infobox-row"><div class="infobox-label">ChatGPT 时刻</div><div class="infobox-value">通用机器人 / 自动驾驶</div></div>
+<div class="infobox-section-title">资料来源</div>
+<div class="infobox-row"><div class="infobox-label">来源类型</div><div class="infobox-value">GTC/CES 演讲 · 专访播客 · 财报电话会 · 公开对谈</div></div>
+<div class="infobox-row"><div class="infobox-label">整理日期</div><div class="infobox-value">2026-10-16</div></div>
+</div>
+
+<div class="toc">
+<div class="toc-title">目录</div>
+<ol>
+<li><a href="#s0">导言</a></li>
+<li><a href="#s1">核心命题总览</a></li>
+<li><a href="#s2">定义：什么是物理 AI</a></li>
+<li><a href="#s3">三台计算机与三体问题</a></li>
+<li><a href="#s4">「ChatGPT 时刻」</a></li>
+<li><a href="#s5">市场规模与产业判断</a></li>
+<li><a href="#s6">关于人形机器人</a></li>
+<li><a href="#s7">数据与训练方法论</a></li>
+<li><a href="#s8">商业化：财报与收入</a></li>
+<li><a href="#s9">分场合语录辑录</a></li>
+<li><a href="#s10">观点演变时间线</a></li>
+<li><a href="#s11">审慎提示</a></li>
+<li><a href="#s12">参考资料</a></li>
+</ol>
+</div>
+</div>
+
+</div><!-- /content-wrapper -->
+
+<div class="page-footer">
+黄仁勋论物理 AI（Physical AI）· 观点辑录 2024–2026 ｜ 整理日期 2026-10-16 ｜ 具身智能 Wiki<br>
+本页所有引语均标注来源编号；媒体转述内容已注明。数字口径请以 NVIDIA 官方财报与演讲实录为准。
+</div>
+</div>
+</body>
+</html>

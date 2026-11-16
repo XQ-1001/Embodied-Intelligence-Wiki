@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>道翼资本 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 288px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article ol { padding-left: 1.8em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .t-vc { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .t-cvc { background: #fce4ec; color: #c62828; border-color: #f8bbd0; }
+  .t-gov-fund { background: #fff3e0; color: #e65100; border-color: #ffe0b2; }
+  .t-national-fund { background: #f3e5f5; color: #7b1fa2; border-color: #e1bee7; }
+  .t-overseas-fund { background: #e0f2f1; color: #00695c; border-color: #b2dfdb; }
+  .t-academic-fund { background: #e8f5e9; color: #2e7d32; border-color: #c5e1a5; }
+  .t-embodied-active { background: #e8f5e9; color: #2e7d32; border-color: #a5d6a7; }
+  .t-lead-investor { background: #fff8e1; color: #f57f17; border-color: #ffecb3; }
+  .t-follow-investor { background: #f5f5f5; color: #616161; border-color: #e0e0e0; }
+  .t-fa { background: #ede7f6; color: #5e35b1; border-color: #d1c4e9; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../../index.html">具身智能Wiki</a> <span class="breadcrumb-sep">›</span> <a href="../../index.html#investors">投资机构</a> <span class="breadcrumb-sep">›</span> <span>道翼资本</span></div>
+  <div class="wiki-header"><h1>道翼资本</h1><div class="subtitle">DOY Capital · 2023年组建 · 券商系硬科技早期人民币基金（AMAC登记 P1074416）<sup><a href="#ref1">[1]</a></sup> · 战略合作伙伴覆盖半导体/战略资源/新能源/先进制造/生命健康<sup><a href="#ref2">[2]</a></sup> · 具身智能领域：领投人形机器人关节企业恒璇科技<sup><a href="#ref5">[5]</a></sup></div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实与分析</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#team">1.2 核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funds">1.3 基金结构与LP</a></li>
+        <li class="toc-lvl3"><a href="#philosophy">1.4 投资哲学与偏好</a></li>
+        <li class="toc-lvl3"><a href="#tracks">1.5 主要投资赛道</a></li>
+        <li class="toc-lvl3"><a href="#embodied">1.6 具身智能领域布局</a></li>
+        <li class="toc-lvl3"><a href="#cases">1.7 典型投资案例</a></li>
+        <li class="toc-lvl3"><a href="#performance">1.8 基金业绩</a></li>
+        <li class="toc-lvl3"><a href="#other">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#references">2 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">道翼资本</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">海南道翼私募股权投资基金管理合伙企业（有限合伙）<sup><a href="#ref1">[1]</a></sup></div></div>
+        <div class="ib-row"><div class="ib-label">英文名</div><div class="ib-value">DOY Capital<sup><a href="#ref2">[2]</a></sup></div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2023年2月2日<sup><a href="#ref1">[1]</a></sup></div></div>
+        <div class="ib-row"><div class="ib-label">注册地</div><div class="ib-value">海南省澄迈县（办公：上海市浦东新区）<sup><a href="#ref1">[1]</a></sup></div></div>
+        <div class="ib-row"><div class="ib-label">机构类型</div><div class="ib-value"><span class="tag t-vc">财务投资机构</span></div></div>
+        <div class="ib-row"><div class="ib-label">管理规模</div><div class="ib-value">未公开披露（AMAC在管基金11只）<sup><a href="#ref1">[1]</a></sup></div></div>
+        <div class="ib-section">核心人物</div>
+        <div class="ib-row"><div class="ib-label">法定代表人/实控人</div><div class="ib-value">凌洁（执行事务合伙人）<sup><a href="#ref1">[1]</a></sup></div></div>
+        <div class="ib-section">登记与合规</div>
+        <div class="ib-row"><div class="ib-label">AMAC登记号</div><div class="ib-value">P1074416（登记日期2023-03-17）<sup><a href="#ref1">[1]</a></sup></div></div>
+        <div class="ib-row"><div class="ib-label">注册资本</div><div class="ib-value">1000万元人民币（实缴300万元）<sup><a href="#ref4">[4]</a></sup></div></div>
+        <div class="ib-section">投资偏好</div>
+        <div class="ib-row"><div class="ib-label">投资领域</div><div class="ib-value">半导体、先进制造、战略资源、新能源、核能/可控核聚变、生命健康、具身智能<sup><a href="#ref2">[2]</a></sup></div></div>
+        <div class="ib-row"><div class="ib-label">投资阶段</div><div class="ib-value">早期为主（Pre-A/A轮为主，亦参与天使/种子）</div></div>
+        <div class="ib-row"><div class="ib-label">币种</div><div class="ib-value">人民币</div></div>
+        <div class="ib-section">具身智能</div>
+        <div class="ib-row"><div class="ib-label">暴露程度</div><div class="ib-value"><span class="tag t-embodied-active">1家（领投）</span></div></div>
+        <div class="ib-row"><div class="ib-label">代表被投</div><div class="ib-value">恒璇科技（人形机器人旋转关节/谐波减速器）<sup><a href="#ref5">[5]</a></sup></div></div>
+        <div class="ib-section">官网</div>
+        <div class="ib-row"><div class="ib-label">网址</div><div class="ib-value">登记邮箱域名为 doycapital.com（实测无法访问，疑为官网）<sup><a href="#ref4">[4]</a></sup></div></div>
+      </aside>
+
+      <p class="article-intro"><strong>道翼资本</strong>（DOY Capital），基金管理人主体为<strong>海南道翼私募股权投资基金管理合伙企业（有限合伙）</strong>，成立于2023年2月2日，2023年3月17日在中国证券投资基金业协会完成私募基金管理人登记（编号P1074416），办公地位于上海市浦东新区<sup><a href="#ref1">[1]</a></sup>。据机构自述，道翼资本"系由大型券商核心业务团队联合创立"，创始团队长期从事投行、投资和海外资本市场服务工作，平均证券从业经验十五年以上，战略合作伙伴覆盖生命健康、新能源、战略资源、先进制造及半导体等行业<sup><a href="#ref2">[2]</a></sup>。其投资组合以硬科技与关键材料为主，2026年通过领投人形机器人核心关节企业<strong>恒璇科技</strong>切入具身智能赛道<sup><a href="#ref5">[5]</a></sup>。</p>
+
+      <h2 id="facts">1 事实与分析</h2>
+      <p style="font-size:0.82rem;color:#54595d;margin-bottom:10px;">来源可靠性标注：<span class="tag tag-info">AMAC登记</span> = 基金业协会法定公示信息 · <span class="tag tag-info">机构自述</span> = 官网/公众号/官方演讲 · <span class="tag tag-info">媒体报道</span> = 第三方独立报道 · <span class="tag tag-info">工商登记</span> = 企业信用信息公示系统</p>
+
+      <h3 id="basic">1.1 基本信息</h3>
+      <p><strong>道翼资本</strong>（DOY Capital）是2023年新组建的硬科技早期人民币基金管理机构，基金管理人主体为<strong>海南道翼私募股权投资基金管理合伙企业（有限合伙）</strong>，注册于海南省澄迈县，实际办公地位于上海市浦东新区世纪大道1589号长泰国际金融大厦<sup><a href="#ref1">[1]</a></sup>。机构成立于2023年2月2日，同年3月17日完成中基协私募基金管理人登记（P1074416），登记类型为"私募股权、创业投资基金管理人"，截至2026年10月在中基协备案的在管基金为11只<sup><a href="#ref1">[1]</a></sup>。道翼资本自述由大型券商核心业务团队联合创立，以"投行思维与投资实践的融合"为投资方法论<sup><a href="#ref2">[2]</a></sup>。2023年8月，其首支聚焦国家战略的"芯动能私募股权投资基金"完成备案，投向战略资源、航空航天、半导体等产业链<sup><a href="#ref3">[3]</a></sup>。</p>
+
+      <div class="table-wrapper">
+        <table class="wikitable infotable">
+          <tr><th>项目</th><th>内容</th></tr>
+          <tr><td>机构全称</td><td>海南道翼私募股权投资基金管理合伙企业（有限合伙）（品牌：道翼资本 / DOY Capital）<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref2">[2]</a></sup></td></tr>
+          <tr><td>成立时间</td><td>2023年2月2日（AMAC登记日期2023年3月17日）<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>注册地址</td><td>海南省澄迈县老城镇老城经济开发区南一环路南侧海南生态软件园C地块二期工程C16栋A202房<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>办公地址</td><td>上海市浦东新区世纪大道1589号长泰国际金融大厦15层01-02单元<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>机构类型</td><td>财务投资机构（vc-pe）—— 私募股权、创业投资基金管理人<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>注册资本</td><td>1000万元人民币（实缴300万元）<sup><a href="#ref4">[4]</a></sup></td></tr>
+          <tr><td>法定代表人 / 实控人</td><td>凌洁（执行事务合伙人委派代表）<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>在管基金</td><td>11只（中基协备案）<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>登记编号</td><td>P1074416（非会员机构）<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>投资阶段</td><td>早期项目为主（Pre-A/A轮为主，亦参与天使/种子轮）</td></tr>
+          <tr><td>币种</td><td>人民币</td></tr>
+          <tr><td>官网</td><td>机构登记邮箱域名为 <code>doycapital.com</code>（<span class="tag tag-warn">实测 http(s) 连接被关闭，无法访问</span>），页面未确认其是否为在用官网<sup><a href="#ref4">[4]</a></sup></td></tr>
+        </table>
+      </div>
+
+      <h3 id="team">1.2 核心团队</h3>
+      <p>道翼资本的公开团队信息较少。中基协登记信息显示，其法定代表人、执行事务合伙人委派代表及实际控制人均为<strong>凌洁</strong><sup><a href="#ref1">[1]</a></sup>。机构自述其创始团队"由大型券商核心业务团队联合创立""长期从事投行、投资和海外资本市场服务工作，平均证券从业经验十五年以上"<sup><a href="#ref2">[2]</a></sup>，但未在公开渠道披露各合伙人姓名与分工。投资团队中，<strong>唐皓</strong>曾以"道翼资本"名义出现在上市公司（安徽芯瑞达）投资者关系活动记录中，可视为其投资条线成员<sup><a href="#ref6">[6]</a></sup>。</p>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>角色</th><th>姓名</th><th>背景/履历</th></tr>
+          <tr><td>法定代表人 / 执行事务合伙人 / 实控人</td><td>凌洁</td><td>中基协登记的海南道翼私募基金管理合伙企业法定代表人、执行事务合伙人委派代表及实际控制人<sup><a href="#ref1">[1]</a></sup></td></tr>
+          <tr><td>创始团队（整体）</td><td>未具名</td><td>机构自述"系由大型券商核心业务团队联合创立"，团队长期从事投行、投资与海外资本市场服务，平均证券从业经验十五年以上<sup><a href="#ref2">[2]</a></sup></td></tr>
+          <tr><td>投资团队成员（已披露）</td><td>唐皓</td><td>以道翼资本名义参与安徽芯瑞达科技投资者关系活动<sup><a href="#ref6">[6]</a></sup></td></tr>
+        </table>
+      </div>
+      <p style="font-size:0.8rem;color:#54595d;margin:4px 0 10px;"><strong>关联主体说明</strong>：上海另有一家"上海道翼投资管理有限公司"（成立于2006年10月25日，曾用名"上海创翼创业投资管理有限公司"，法定代表人宗晔，注册资本3000万元且全额实缴，股东含宗晔900万元、陈发树800万元、上海道合翼腾企业管理合伙企业660万元、夏晓辉300万元等，参保6人），与海南道翼同址办公于世纪大道1589号<sup><a href="#ref7">[7]</a></sup>。公开信息未确认两主体是否属同一"道翼资本"品牌，本页面将其列为需审慎对待的关联主体，不作等同处理。</p>
+      <div class="callout"><span class="tag tag-info">简评</span> 道翼资本是典型"券商系"新锐基金：以投行/资本市场背景的团队切入一级市场，机构成立与中基协登记时间（2023年）较晚，规模仍处于起步阶段。其核心决策人凌洁同时担任法定代表人、执行事务合伙人与实际控制人，治理结构高度集中，符合小型人民币基金的特征；但公开渠道缺乏合伙人履历、投资分工与团队规模信息，外部难以评估其投研深度。同名同址的"上海道翼投资管理有限公司"（2006年成立、股东含知名投资人陈发树）与其关系未被官方澄清，读者不宜将两者直接合并理解。</div>
+
+      <h3 id="funds">1.3 基金结构与LP</h3>
+      <p>道翼资本的基金管理人为海南道翼私募股权投资基金管理合伙企业（有限合伙），截至2026年10月在中基协备案在管基金11只，覆盖私募股权投资基金与创业投资基金<sup><a href="#ref1">[1]</a></sup>。其机构自述与工商信息显示，道翼系以"海南+嘉兴"双基地搭建多支基金/合伙企业平台。已公开可查的基金/合伙企业包括：</p>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>基金/合伙企业名称</th><th>设立/备案时间</th><th>规模</th><th>备注</th></tr>
+          <tr><td>芯动能私募股权投资基金</td><td>2023年8月2日完成中基协备案</td><td>未披露</td><td>道翼资本首支战略主题基金，投向战略资源、航空航天、半导体等产业链<sup><a href="#ref3">[3]</a></sup></td></tr>
+          <tr><td>海南道翼中芯投资合伙企业（有限合伙）</td><td>2023年3月6日成立</td><td>未披露</td><td>GP为海南道翼私募（持0.0981%权益），拥有32名有限合伙人；对外持股含新芯航途（苏州）等<sup><a href="#ref8">[8]</a></sup><sup><a href="#ref14">[14]</a></sup></td></tr>
+          <tr><td>海南道翼中恩投资合伙企业（有限合伙）</td><td>基金编号 SAQR84</td><td>未披露</td><td>创业投资基金，基金管理人为海南道翼私募，运作状态"正在运作"<sup><a href="#ref9">[9]</a></sup></td></tr>
+          <tr><td>嘉兴道翼恒灵创业投资合伙企业（有限合伙）</td><td>2025年11月28日成立</td><td>注册资本1.2亿元</td><td>执行事务合伙人为海南道翼私募，位于嘉兴南湖基金小镇<sup><a href="#ref9">[9]</a></sup></td></tr>
+          <tr><td>其他道翼系合伙企业</td><td>2023–2025年</td><td>未披露</td><td>嘉兴道翼智行、嘉兴道翼立德、嘉兴道翼信远、嘉兴道翼利天、嘉兴道翼扬途、嘉兴道翼海和、嘉兴道翼长盈、海南道翼中海等<sup><a href="#ref4">[4]</a></sup><sup><a href="#ref7">[7]</a></sup></td></tr>
+        </table>
+      </div>
+      <div class="callout"><span class="tag tag-info">简评</span> 道翼资本的LP结构未公开披露，从"海南道翼中芯投资合伙企业"设有32名有限合伙人、以及嘉兴平台落地嘉兴南湖基金小镇的工商特征看，其资金来源可能以高净值个人与区域基金小镇/地方政府配套为主，属于典型的小型市场化人民币基金组合，与头部VC的机构化LP（养老金、母基金）结构差异明显。其基金以"单项目/小规模载体"形式大量存在（嘉兴道翼系合伙企业多为单一或少数项目载体），11只在管基金对应的实际可投资金体量料小于同等基金只数的机构，管理规模"未公开披露"也侧面反映其募资体量有限。</div>
+
+      <h3 id="philosophy">1.4 投资哲学与偏好</h3>
+      <p>道翼资本公开的投资理念表述集中在其机构简介与芯动能基金设立说明中。其核心方法论是<strong>"投行思维与投资实践的融合"</strong>：创始团队以投行与海外资本市场的服务经验为基础，强调在投资中<strong>寻求相对确定性的投资机会</strong>，为投资人创造收益<sup><a href="#ref2">[2]</a></sup>。</p>
+      <p>从芯动能基金的定位可观察到其赛道选择逻辑：在"国家安全大背景"下，基金专注于<strong>战略资源、航空航天、半导体</strong>等重要产业链，挖掘符合国家战略及经济规律的"芯"、"动"、"能"投资标的<sup><a href="#ref3">[3]</a></sup>。其战略合作伙伴覆盖生命健康、新能源、战略资源、先进制造及半导体等行业<sup><a href="#ref2">[2]</a></sup>。</p>
+      <p>从投资行为归纳，道翼资本呈现以下可观察模式（基于投资案例分析）：<strong>偏好硬科技上游与关键材料/器件环节</strong>（光电晶体材料、无线芯片、高温超导带材、核能功能陶瓷、机器人关节模组）；<strong>以早期轮次参与为主</strong>（Pre-A/A轮及天使/种子轮）；<strong>多为跟投/参投，少量领投</strong>（如恒璇科技 Pre-A 为联合领投，其余如飞锐特、速通半导体、安东聚变、旌晟超导、禾材高科多为参投/跟投）；<strong>单笔金额多在数千万元级别</strong>。</p>
+      <div class="callout"><span class="tag tag-info">简评</span> 道翼资本的投资哲学带有鲜明的"主题驱动"与"确定性偏好"色彩：以国家战略（芯/动/能、可控核聚变、半导体材料）为选股线索，规避赛道过热环节，偏好有国产替代刚需、技术源头清晰的上游材料与器件。这一取向与其券商系背景相匹配——更擅长基于政策与产业趋势做自上而下的判断，而非纯技术尽调驱动的早期下注。但"寻求相对确定性"的一端，也意味着其在人形机器人等高不确定性前沿方向上的敞口天然有限，具身智能布局更可能以"零部件视角"而非"本体+模型"视角切入（恒璇科技即为机器人核心关节零部件）。</div>
+
+      <h3 id="tracks">1.5 主要投资赛道</h3>
+      <p>道翼资本官网未公开，其可识别的被投项目主要来自融资事件披露。下表按赛道归纳其公开投资案例<sup><a href="#ref6">[6]</a></sup><sup><a href="#ref8">[8]</a></sup><sup><a href="#ref10">[10]</a></sup><sup><a href="#ref11">[11]</a></sup><sup><a href="#ref12">[12]</a></sup>。</p>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>赛道</th><th>代表性被投公司</th><th>赛道投资逻辑</th><th>布局时间</th></tr>
+          <tr><td>具身智能 / 机器人</td><td>恒璇科技（人形机器人旋转关节/谐波减速器）</td><td>人形机器人量产拐点下，关节模组是整机规模化量产的最大产能瓶颈，押注国产高端谐波/摆线关节供应商</td><td>2026年</td></tr>
+          <tr><td>半导体 / 芯片</td><td>速通半导体（Wi-Fi 6/6E/7 芯片）</td><td>高端无线芯片国产化，与产业方泰凌微电子联合投资</td><td>2024年</td></tr>
+          <tr><td>光电材料 / 元器件</td><td>飞锐特（法拉第旋磁片、毫米波铁氧体单晶）</td><td>磁-光-电晶体材料国产替代，下游为光通信与毫米波</td><td>2024年</td></tr>
+          <tr><td>可控核聚变</td><td>安东聚变（Z箍缩聚变）、旌晟超导（双面高温超导带材）</td><td>国家战略级前沿能源，横跨聚变装置与上游超导材料</td><td>2025–2026年</td></tr>
+          <tr><td>核能功能材料</td><td>禾材高科（中子功能陶瓷材料）</td><td>裂变核能/核医疗/可控核聚变用中子慢化、吸收、屏蔽材料国产替代</td><td>2026年</td></tr>
+        </table>
+      </div>
+
+      <h3 id="embodied">1.6 具身智能领域布局【重点】</h3>
+      <div class="callout">
+        <div class="callout-title">具身智能投资概况</div>
+        <p>已投具身智能/机器人项目：<strong>1个</strong>（恒璇科技）｜ 投资金额：<strong>数千万元级（联合领投）</strong> ｜ 最早进入时间：<strong>2026年8月</strong> ｜ 投资角色：<strong>联合领投（与九号资本共同领投）</strong></p>
+      </div>
+
+      <h4>A. 布局概览</h4>
+      <p>截至2026年10月，道翼资本在具身智能赛道的公开投资仅<strong>1家</strong>——人形机器人核心关节企业<strong>恒璇科技</strong>。2026年8月，恒璇机器人关节科技（深圳）有限公司完成数千万元Pre-A轮融资，由<strong>九号资本与道翼资本共同领投</strong>，深担创投（深圳担保）及深圳天使母基金共同投资，多维资本担任独家财务顾问<sup><a href="#ref5">[5]</a></sup>。这是道翼资本首次公开出现在具身智能产业链的投资方名单中。与其整体"硬科技材料/半导体/核能"的组合相比，具身智能是其2026年新拓展的方向，且切入点选择的是机器人产业链上游的<strong>核心零部件（旋转关节/精密减速器）</strong>而非整机本体。</p>
+
+      <h4>B. 具身智能投资组合</h4>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>被投公司</th><th>投资时间</th><th>轮次</th><th>金额</th><th>角色</th><th>后续参与</th><th>核心方向</th></tr>
+          <tr>
+            <td>恒璇科技（恒璇机器人关节科技（深圳）有限公司）</td>
+            <td>2026年8月</td>
+            <td>Pre-A轮</td>
+            <td>数千万元（联合）</td>
+            <td><span class="tag t-lead-investor">联合领投</span>（与九号资本）</td>
+            <td>暂未见公开后续轮次</td>
+            <td>人形机器人旋转关节、谐波/摆线关节模组、精密谐波减速器</td>
+          </tr>
+        </table>
+      </div>
+      <p style="font-size:0.8rem;color:#54595d;margin:4px 0 10px;"><strong>确认度说明</strong>：恒璇科技Pre-A轮"九号资本与道翼资本领投"经36氪（多维资本官方发布）明确表述<sup><a href="#ref5">[5]</a></sup>，并被猎云网、亿欧、智东西等其他媒体报道<sup><a href="#ref6">[6]</a></sup>交叉印证，角色确认度较高；但具体出资金额与持股比例未公开披露。恒璇科技天使轮（2025年12月）投资方为英诺天使基金、万物为资本，道翼资本未参与。</p>
+
+      <h4>C. 投资逻辑与观点</h4>
+      <p>在恒璇科技本轮融资中，道翼资本给出了其对具身智能赛道的明确投资逻辑<sup><a href="#ref5">[5]</a></sup>：</p>
+      <ul>
+        <li><strong>产业阶段判断</strong>：认为"现阶段人形机器人产业从概念迈入量产的关键阶段"，即行业正处于从实验室走向规模化的拐点。</li>
+        <li><strong>价值环节选择</strong>：认为"关节模组作为整机核心组成部分，是整机迈向规模化量产的最大产能瓶颈"——将投资机会锚定在制约量产的核心零部件环节，而非整机。</li>
+        <li><strong>标的核心标准</strong>：看重团队的技术源头与全链路能力，评价恒璇创始团队"以日本精密传动体系为技术源头，具备从减速器正向研发、模组产品定义到产业化落地的完整经验"，是"国内稀缺的兼具底层部件自制能力和整机应用理解的核心供应商"。</li>
+        <li><strong>回报预期</strong>：期望被投企业"成为人形机器人旋转关节标准的定义者与核心平台"，即追求细分环节的龙头地位。</li>
+      </ul>
+      <p>除恒璇科技外，道翼资本未见公开阐述更系统的具身智能赛道观点；其对人形机器人本体、具身大模型等方向尚无公开投资或表态。</p>
+
+      <h4>D. 布局特征分析</h4>
+      <p>综合道翼资本在具身智能领域的数据，可归纳以下特征<sup><a href="#ref5">[5]</a></sup>：</p>
+      <ul>
+        <li><strong>精准下注而非广撒网</strong>：仅1家公开投资，不同于头部VC在具身智能本体/大脑/零部件全链条的铺开式布局，道翼选择单点重仓核心零部件。</li>
+        <li><strong>赛道偏好——上游零部件</strong>：押注"旋转关节/谐波减速器"这一国产替代刚需、技术源头清晰的环节，与其整体"关键材料/器件"的投资偏好一脉相承，规避了人形本体高估值、同质化竞争。</li>
+        <li><strong>联合领投、产业+国资协同</strong>：与产业资本（九号资本）、地方国资（深担创投、深圳天使母基金）联合出手，而非独立大额领投，符合其基金体量与"跟投为主、少量领投"的一贯风格。</li>
+        <li><strong>进入时机偏晚</strong>：2026年8月才首次进入具身智能赛道，晚于2023–2025年布局的头部机构；但选择零部件国产替代的"确定性"窗口，与其"寻求相对确定性投资收益"的定位一致。</li>
+      </ul>
+
+      <div class="callout"><span class="tag tag-info">简评</span> 道翼资本在具身智能赛道属于"后来者、单点下注"型选手：其唯一公开标的恒璇科技聚焦人形机器人旋转关节，是其"关键材料/器件国产替代"叙事向机器人产业的自然延伸，而非对人形机器人本体或具身智能大模型的系统性布局。这一策略的优点是与基金体量、团队背景（投行/资本市场而非机器人技术）匹配、风险敞口可控；代价则是难以分享具身智能最核心的本体与"大脑"环节的成长红利，且若恒璇科技量产兑现不及预期，其具身智能敞口将集中于单一标的。此外，道翼资本对具身智能尚无成体系的公开观点，其后续是否会在该赛道持续加注，将主要取决于恒璇科技的产业化进展。</div>
+
+      <h3 id="cases">1.7 典型投资案例</h3>
+      <p>道翼资本公开投资案例以硬科技材料、半导体与前沿能源为主，目前尚无公开的退出（IPO/并购）案例。下表汇总其可识别的投资案例<sup><a href="#ref5">[5]</a></sup><sup><a href="#ref8">[8]</a></sup><sup><a href="#ref10">[10]</a></sup><sup><a href="#ref11">[11]</a></sup><sup><a href="#ref12">[12]</a></sup><sup><a href="#ref15">[15]</a></sup>。</p>
+      <div class="table-wrapper">
+        <table class="wikitable">
+          <tr><th>被投公司</th><th>所属赛道</th><th>投资时间</th><th>轮次</th><th>道翼角色</th><th>退出方式</th></tr>
+          <tr><td>恒璇科技</td><td>具身智能 / 机器人关节</td><td>2026年8月</td><td>Pre-A轮</td><td><span class="tag t-lead-investor">联合领投</span>（与九号资本）</td><td>未退出<sup><a href="#ref5">[5]</a></sup></td></tr>
+          <tr><td>禾材高科</td><td>核能功能材料</td><td>2026年10月</td><td>天使+轮</td><td><span class="tag t-follow-investor">跟投</span></td><td>未退出<sup><a href="#ref11">[11]</a></sup></td></tr>
+          <tr><td>旌晟超导（成都）</td><td>高温超导带材</td><td>2026年9月</td><td>天使轮</td><td><span class="tag t-follow-investor">参投</span></td><td>未退出<sup><a href="#ref12">[12]</a></sup></td></tr>
+          <tr><td>安东聚变（北京）</td><td>可控核聚变</td><td>2025年10月</td><td>首轮（近亿元）</td><td><span class="tag t-follow-investor">参投</span></td><td>未退出<sup><a href="#ref10">[10]</a></sup></td></tr>
+          <tr><td>飞锐特（成都）</td><td>光电晶体材料</td><td>2024年10月（Pre-A）/2024年12月（A）</td><td>Pre-A轮、A轮</td><td><span class="tag t-follow-investor">参投</span>（连续两轮）</td><td>未退出<sup><a href="#ref15">[15]</a></sup></td></tr>
+          <tr><td>速通半导体（苏州）</td><td>Wi-Fi 6/6E/7 芯片</td><td>2024年8月</td><td>A+轮（工商变更）</td><td><span class="tag t-follow-investor">参投</span></td><td>未退出<sup><a href="#ref8">[8]</a></sup></td></tr>
+        </table>
+      </div>
+      <p style="font-size:0.8rem;color:#54595d;margin:4px 0 10px;"><strong>说明</strong>：上述案例均来自融资事件披露，道翼资本均为2023年机构成立后的投资。速通半导体本轮轮次存在"A+轮"与"新一轮数亿元战略融资"两种口径，以工商变更披露为准<sup><a href="#ref8">[8]</a></sup>。此外，道翼系基金平台对外持股还包括新芯航途（苏州），因缺乏道翼资本直接出资的明确披露，未列入上表。</p>
+      <div class="callout"><span class="tag tag-info">简评</span> 道翼资本的投资案例呈现"广覆盖、轻仓位、以参投为主"的特征：六个可识别案例横跨机器人关节、核能材料、超导带材、聚变、光电材料、Wi-Fi芯片，赛道分散而单笔金额小，尚未形成聚焦的"旗舰组合"，也尚无任何退出案例。其唯一的领投案例（恒璇科技）属于2026年新进入方向，退出周期尚早。对一家2023年才登记的年轻基金而言，现在评估其回报为时尚早，但其"参投为主"的姿态可能限制其在项目中的话语权与超额收益获取。</div>
+
+      <h3 id="performance">1.8 基金业绩</h3>
+      <p>该机构未公开披露基金业绩数据（IRR/DPI/TVPI）。作为2023年新登记的小型私募股权投资基金管理人，其基金业绩指标通常仅向LP报告，不对外公开；公开渠道亦未见其LP或所投基金净值披露。<sup><a href="#ref1">[1]</a></sup>由于机构成立时间短、被投项目均处早期阶段，尚无公开可查的退出记录可供评估。</p>
+
+      <h3 id="other">1.9 其他信息</h3>
+      <ul>
+        <li><strong>首支战略主题基金</strong>：2023年8月2日，道翼资本设立的"芯动能私募股权投资基金"在中国证券投资基金业协会完成备案登记，专注战略资源、航空航天、半导体等产业链，挖掘"芯""动""能"投资标的<sup><a href="#ref3">[3]</a></sup>。</li>
+        <li><strong>海南+嘉兴双重平台</strong>：基金管理人主体注册于海南（澄迈），同时在浙江嘉兴南湖基金小镇设有"嘉兴道翼"系列创业投资合伙企业平台，形成"海南注册+上海办公+嘉兴基金"的空间布局<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref9">[9]</a></sup>。</li>
+        <li><strong>与"上海道翼投资管理有限公司"的同名关联</strong>：另有一家成立于2006年的"上海道翼投资管理有限公司"（曾用名上海创翼创业投资管理有限公司），与海南道翼同址办公于世纪大道1589号长泰国际金融大厦，其股东包括自然人宗晔（900万元）、知名投资人陈发树（800万元）、夏晓辉（300万元）等；两者是否属同一"道翼资本"体系未见官方澄清，需审慎对待<sup><a href="#ref7">[7]</a></sup>。</li>
+        <li><strong>上市公司调研参与</strong>：道翼资本以机构身份参与调研过安徽芯瑞达科技、合肥晶合集成电路（688249.SH）等上市公司，反映其对半导体显示/晶圆代工产业链的关注，但调研不等于投资<sup><a href="#ref6">[6]</a></sup><sup><a href="#ref13">[13]</a></sup>。</li>
+      </ul>
+
+      <h2 id="references">2 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li id="ref1">中国证券投资基金业协会 — 私募基金管理人公示：海南道翼私募股权投资基金管理合伙企业（有限合伙）（登记编号 P1074416，法定代表人凌洁，登记日期2023-03-17，在管基金11只，办公地址上海市浦东新区世纪大道1589号长泰国际金融大厦15层01-02单元）<span class="tag tag-info">AMAC登记</span>（经 gs.amac.org.cn 管理人公示接口查询，2026-10-15）</li>
+          <li id="ref2"><a href="https://www.jinglingshuju.com/data/org/2fc5dff313a1bb9192aa3078bfba964f" target="_blank">精灵数据 — 道翼资本机构页（机构简介：券商核心业务团队联合创立、战略合作伙伴覆盖生命健康/新能源/战略资源/先进制造/半导体）</a><span class="tag tag-info">机构自述</span>（2026-10-15访问）</li>
+          <li id="ref3"><a href="https://m.pedaily.cn/news/518819" target="_blank">投资界（PEdaily）— 道翼资本芯动能基金完成备案（2023-08-02，芯动能私募股权投资基金完成中基协备案，投向战略资源/航空航天/半导体）</a><span class="tag tag-info">媒体报道</span>（2026-10-15访问）</li>
+          <li id="ref4"><a href="https://www.tianyancha.com/company/5893908705" target="_blank">天眼查/启信宝 — 海南道翼私募股权投资基金管理合伙企业（有限合伙）工商信息（成立2023-02-02，注册资本1000万元、实缴300万元，登记邮箱 contact@doycapital.com；嘉兴道翼系合伙企业）</a><span class="tag tag-info">工商登记</span>（2026-10-15访问）</li>
+          <li id="ref5"><a href="https://eu.36kr.com/zh/p/3937357830618505" target="_blank">36氪（多维资本官方发布）— 产业资本和国资联手押注，恒璇科技半年内再获融资，加速人形机器人旋转关节产业化（2026-08-14，九号资本与道翼资本领投Pre-A轮，含道翼资本投资逻辑表述）</a><span class="tag tag-info">媒体报道</span>（2026-10-15访问）</li>
+          <li id="ref6"><a href="http://static.cninfo.com.cn/finalpage/2023-12-14/1218620865.PDF" target="_blank">巨潮资讯网 — 安徽芯瑞达科技股份有限公司投资者关系活动记录表（2023-12-14，参会单位含"道翼资本：唐皓"）</a><span class="tag tag-info">媒体报道</span>（2026-10-15访问）</li>
+          <li id="ref7"><a href="https://www.tianyancha.com/company/659468563" target="_blank">天眼查 — 上海道翼投资管理有限公司工商信息（成立2006-10-25，曾用名上海创翼创业投资管理有限公司，法定代表人宗晔，注册资本3000万元，股东宗晔/陈发树/上海道合翼腾/夏晓辉等，地址世纪大道1589号1501室-A）</a><span class="tag tag-info">工商登记</span>（2026-10-15访问）</li>
+          <li id="ref8"><a href="https://www.chinastarmarket.cn/detail/1774119" target="_blank">科创板日报（财联社）— 道翼资本、泰凌微电子A+轮投资速通半导体（2024-08-23，工商变更显示苏州速通半导体新增投资方为道翼资本和泰凌微电子）</a><span class="tag tag-info">媒体报道</span>（2026-10-15访问）</li>
+          <li id="ref9"><a href="https://k1wave.com/company/dao-yi-si-mu-gu-quan-tou-zi-ji-jin-guan-li-you-xian-he-huo" target="_blank">风潮数据（k1wave）— 道翼系基金信息（海南道翼中恩投资合伙企业 基金编号SAQR84；嘉兴道翼恒灵创业投资合伙企业注册资本1.2亿元、成立2025-11-28，GP为海南道翼私募）</a><span class="tag tag-info">工商登记</span>（2026-10-15访问）</li>
+          <li id="ref10"><a href="https://m.36kr.com/p/3519795488480390" target="_blank">36氪 — 院士领衔，获联想等机构投资，「安东聚变」完成近亿元首轮融资（2025-10-29，投资方含联想之星、啟赋资本、盘古创富、道翼资本、水木清华校友基金）</a><span class="tag tag-info">媒体报道</span>（2026-10-15访问）</li>
+          <li id="ref11"><a href="https://www.sohu.com/a/1087266074_122014422" target="_blank">新浪财经（搜狐转载）— 这家企业获数千万元融资！布局中子功能陶瓷材料赛道（2026-10-13，禾材高科天使+轮由捷创资本领投，深创投、万联广生、道翼资本共同投资）</a><span class="tag tag-info">媒体报道</span>（2026-10-15访问）</li>
+          <li id="ref12"><a href="https://m.jiemian.com/article/15069230.html" target="_blank">界面新闻 — 千乘资本连续两轮领投旌晟超导 助力聚变产业高速发展（旌晟超导种子轮、天使轮近亿元融资，天使轮由千乘资本、武岳峰鼎峰科创、道翼资本、普华资本、捷创资本共同参与）</a><span class="tag tag-info">媒体报道</span>（2026-10-15访问）</li>
+          <li id="ref13"><a href="https://basic.10jqka.com.cn/688249/" target="_blank">同花顺 — 合肥晶合集成电路（688249.SH）调研活动参与方（含道翼资本）</a><span class="tag tag-info">媒体报道</span>（2026-10-15访问）</li>
+          <li id="ref14"><a href="https://www.tianyancha.com/annualReport/5953759827/2025" target="_blank">天眼查 — 海南道翼中芯投资合伙企业（有限合伙）2025年报（对外投资企业含新芯航途（苏州）科技股份有限公司等）</a><span class="tag tag-info">工商登记</span>（2026-10-15访问）</li>
+          <li id="ref15"><a href="https://www.sohu.com/a/840816797_439726" target="_blank">搜狐（投资界转载）— 飞锐特完成数千万元人民币A轮融资，川流投资领投（2024-12-23，道翼资本参投；飞锐特由电子科技大学电子薄膜与集成器件国家重点实验室孵化，产品含法拉第旋转片、毫米波环形器、磁光检测晶圆）</a><span class="tag tag-info">媒体报道</span>（2026-10-15访问）</li>
+        </ol>
+      </div>
+    </article>
+  </div>
+  <div class="page-footer">最新更新于 2026-10-15 · 数据来源见「2 参考资料」 · 道翼资本基金管理人为私募基金管理人（P1074416）· 官网 doycapital.com 实测无法访问，被投案例来自融资事件披露 · 部分数据来自机构自述与媒体报道口径，请审慎参考</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>具身智能模型路线研究报告 v2.0 · Astra 冲击与路线重估（2026-10-15）</title>
+<style>
+:root{
+  --bg:#e9edf3; --slide:#ffffff; --ink:#0e1626; --ink2:#4a5568; --ink3:#8492a6;
+  --line:#e2e7ef; --line2:#eef1f6;
+  --astra:#e5484d; --astra2:#f76808;        /* 通用基座 / 认知层冲击 */
+  --cog:#8b5cf6;                            /* 认知层 */
+  --exec:#0d9488;                           /* 物理执行 / 小脑 */
+  --data:#2563eb;                           /* 数据 / 场景 */
+  --gold:#a16207; --ok:#15803d;
+  --dark:#0b1220; --dark2:#141d31;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.72;font-size:15px;-webkit-font-smoothing:antialiased;
+}
+/* ---------- 进度条 & 导航 ---------- */
+#progress{position:fixed;top:0;left:0;height:3px;width:0;background:linear-gradient(90deg,var(--astra),var(--exec));z-index:120;transition:width .15s}
+#decknav{position:fixed;right:14px;top:50%;transform:translateY(-50%);z-index:110;display:flex;flex-direction:column;gap:7px}
+#decknav button{width:9px;height:9px;border-radius:50%;border:0;padding:0;background:#c3ccdb;cursor:pointer;transition:.2s}
+#decknav button:hover{transform:scale(1.5)}
+#decknav button.on{background:var(--ink);transform:scale(1.5)}
+#pager{position:fixed;right:14px;bottom:14px;z-index:110;background:rgba(11,18,32,.86);color:#fff;font-size:12px;padding:6px 11px;border-radius:99px;font-variant-numeric:tabular-nums;letter-spacing:.4px}
+#pager b{color:#7fd1c8}
+@media(max-width:820px){#decknav{display:none}}
+/* ---------- 版式 ---------- */
+.slide{min-height:100vh;padding:56px 24px 72px;display:flex;flex-direction:column;justify-content:center;scroll-snap-align:start;position:relative}
+.slide+.slide{border-top:1px solid #d8dfea}
+.inner{max-width:1080px;width:100%;margin:0 auto}
+.kicker{font-size:12.5px;letter-spacing:2.5px;text-transform:uppercase;color:var(--astra);font-weight:700;margin-bottom:10px}
+.slide h2{font-size:30px;line-height:1.28;margin:0 0 8px;letter-spacing:-.4px}
+.slide h2 .tnum{font-variant-numeric:tabular-nums}
+.sub{color:var(--ink2);font-size:15.5px;margin:0 0 26px;max-width:900px}
+h3{font-size:18.5px;margin:26px 0 10px;letter-spacing:-.2px}
+h4{font-size:14.5px;margin:16px 0 6px;color:var(--ink);font-weight:700}
+.snum{position:absolute;top:22px;right:26px;font-size:13px;color:var(--ink3);font-variant-numeric:tabular-nums;letter-spacing:1px}
+.snum b{color:var(--ink);font-size:17px}
+p{margin:9px 0}
+ul,ol{padding-left:20px;margin:8px 0}
+li{margin:5px 0}
+a{color:var(--data)}
+sup a{text-decoration:none;font-size:10.5px;color:var(--astra);font-weight:700}
+.mono{font-variant-numeric:tabular-nums}
+/* ---------- 卡片 ---------- */
+.grid{display:grid;gap:14px}
+.g2{grid-template-columns:repeat(2,1fr)}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g4{grid-template-columns:repeat(4,1fr)}
+@media(max-width:820px){.g2,.g3,.g4{grid-template-columns:1fr}}
+.card{background:var(--slide);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+.card.tight{padding:13px 15px}
+.card h4{margin-top:0}
+.card .cap{font-size:12px;color:var(--ink3);letter-spacing:1px;text-transform:uppercase;font-weight:700;margin-bottom:6px}
+.kpi{font-size:26px;font-weight:800;letter-spacing:-.6px;font-variant-numeric:tabular-nums;line-height:1.1}
+.kpi.s{font-size:20px}
+.kpi.red{color:var(--astra)} .kpi.teal{color:var(--exec)} .kpi.blue{color:var(--data)} .kpi.violet{color:var(--cog)}
+.lbl{font-size:12.5px;color:var(--ink2);margin-top:5px;line-height:1.5}
+.note{background:#fffbeb;border:1px solid #fde68a;border-left:4px solid #f0b429;border-radius:10px;padding:12px 15px;font-size:14px;margin:14px 0}
+.risk{background:#fef2f2;border:1px solid #fecaca;border-left:4px solid var(--astra);border-radius:10px;padding:12px 15px;font-size:14px;margin:14px 0}
+.verify{background:#f0fdf4;border:1px solid #bbf7d0;border-left:4px solid var(--ok);border-radius:10px;padding:12px 15px;font-size:14px;margin:14px 0}
+.pill{display:inline-block;font-size:11.5px;font-weight:700;padding:2px 9px;border-radius:99px;letter-spacing:.3px;vertical-align:middle}
+.p-astra{background:#fde8e9;color:#b91c1c}
+.p-cog{background:#f1e9fe;color:#6d28d9}
+.p-exec{background:#d9f4f1;color:#0f766e}
+.p-data{background:#e3edff;color:#1d4ed8}
+.p-dark{background:#20293c;color:#cbd5e1}
+/* ---------- 表格 ---------- */
+table{width:100%;border-collapse:collapse;font-size:13.5px;margin:12px 0;background:var(--slide)}
+th,td{border:1px solid var(--line);padding:9px 11px;text-align:left;vertical-align:top;line-height:1.6}
+th{background:#f2f5fa;font-weight:700;font-size:13px}
+tbody tr:nth-child(even) td{background:#fafbfd}
+td.hi{background:#fff5f5!important;font-weight:600}
+/* ---------- 封面 / 结论（深色） ---------- */
+.dark{background:radial-gradient(1200px 600px at 78% -8%,#1e2b45 0%,var(--dark) 62%);color:#eef2f8}
+.dark .kicker{color:#ff8a80}
+.dark h2,.dark h3,.dark h4{color:#fff}
+.dark .sub,.dark p{color:#b9c4d6}
+.dark .snum{color:#61708c}.dark .snum b{color:#eef2f8}
+.dark .card{background:rgba(255,255,255,.045);border-color:rgba(255,255,255,.12)}
+.dark .cap{color:#8ea0bd}
+.dark .lbl{color:#93a3bd}
+.dark kbd{background:#20293c;border:1px solid #33415a;color:#dbe4f0}
+/* ---------- 封面专属 ---------- */
+.hero{padding:0 24px}
+.hero .eyebrow{font-size:13px;letter-spacing:5px;color:#ff8a80;font-weight:700;text-transform:uppercase}
+.hero h1{font-size:52px;line-height:1.12;margin:18px 0 10px;letter-spacing:-1.6px;color:#fff;font-weight:800}
+.hero h1 .em{background:linear-gradient(92deg,#ff8a80,#f76808);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.hero .tag{font-size:18px;color:#9fb0c9;max-width:760px;margin:6px 0 0}
+.hero .meta{margin-top:30px;font-size:13px;color:#7d8ca8;display:flex;gap:22px;flex-wrap:wrap}
+.hero .rule{width:64px;height:4px;background:linear-gradient(90deg,#ff8a80,#f76808);border-radius:4px;margin:26px 0}
+/* ---------- 结论块 ---------- */
+.qbox{border-left:3px solid rgba(255,138,128,.6);padding:2px 0 2px 16px;margin:16px 0}
+.qbox .q{color:#ff9e94;font-weight:700;font-size:14.5px}
+.qbox .a{color:#c4cfe0;font-size:14px;margin-top:3px}
+.conf{display:inline-block;font-size:11px;padding:1px 8px;border-radius:99px;background:rgba(255,255,255,.1);color:#9fb0c9;margin-left:6px}
+/* ---------- 时间线 ---------- */
+.tl{position:relative;margin:18px 0 8px 6px;padding-left:26px;border-left:2px solid #cdd6e4}
+.tl .ev{position:relative;margin:16px 0}
+.tl .ev:before{content:"";position:absolute;left:-33px;top:6px;width:12px;height:12px;border-radius:50%;background:#fff;border:3px solid var(--data)}
+.tl .ev.astra:before{border-color:var(--astra)}
+.tl .ev.exec:before{border-color:var(--exec)}
+.tl .d{font-weight:800;color:var(--ink);margin-right:9px;font-variant-numeric:tabular-nums}
+.tl .ev.astra .d{color:var(--astra)}
+/* ---------- 条形对比 ---------- */
+.bars{display:flex;flex-direction:column;gap:9px;margin:12px 0}
+.bar{display:grid;grid-template-columns:150px 1fr 92px;align-items:center;gap:12px;font-size:13px}
+.bar .nm{font-weight:600;text-align:right;color:var(--ink2)}
+.bar .track{display:block;background:#eef1f7;border-radius:6px;height:22px;position:relative;overflow:hidden}
+.bar .fill{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,#7cb0ff,#2563eb)}
+.bar.astra .fill{background:linear-gradient(90deg,#ffb199,#e5484d)}
+.bar.teal .fill{background:linear-gradient(90deg,#7dd3c8,#0d9488)}
+.bar .val{font-variant-numeric:tabular-nums;font-weight:700;font-size:12.5px}
+@media(max-width:820px){.bar{grid-template-columns:104px 1fr 78px;font-size:12px}}
+/* ---------- 图注 ---------- */
+.figcap{font-size:12.5px;color:var(--ink3);margin-top:8px}
+.src{font-size:12.5px;color:var(--ink2);margin-top:14px;line-height:1.7}
+.src a{color:#3b6fd4;text-decoration:none}
+.kbdhint{font-size:12px;color:#7d8ca8;margin-top:26px}
+kbd{font-family:inherit;font-size:11px;background:#f2f5fa;border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;padding:1px 6px}
+footer.doc{background:var(--dark);color:#8b9ab5;text-align:center;padding:34px 20px;font-size:12.5px}
+/* SVG 通用 */
+svg{display:block;width:100%;height:auto}
+.svgwrap{background:var(--slide);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<div id="decknav"></div>
+<div id="pager"><b id="pgcur">1</b> / <span id="pgtot">16</span></div>
+
+<!-- ============ 00 封面 ============ -->
+<section class="slide dark hero" id="s0">
+  <div class="inner">
+    <div class="eyebrow">Embodied Model Route · Research Report v2.0</div>
+    <h1>当大脑成为公共品<br>具身模型的<span class="em">价值重估</span></h1>
+    <div class="rule"></div>
+    <p class="tag">GPT-6 Astra 零训练接管机器人"系统 2"之后：<br>从"谁的模型更强"，到"护城河还剩下什么"。</p>
+    <div class="meta">
+      <span>编制日期 2026-10-15</span>
+      <span>接替 v1.0（2026-06-11）</span>
+      <span>关键事实逐条回源，未能核验处明示标注</span>
+    </div>
+    <p class="kbdhint">用 <kbd>←</kbd> <kbd>→</kbd> / <kbd>PgUp</kbd> <kbd>PgDn</kbd> 翻页 · 右侧圆点跳转 · 共 16 页</p>
+  </div>
+</section>
+
+<!-- ============ 01 执行摘要 ============ -->
+<section class="slide dark" id="s1">
+  <div class="snum"><b>01</b> / 16</div>
+  <div class="inner">
+    <div class="kicker">Executive Summary</div>
+    <h2>六个判断：Astra 之后，具身模型的钱该押在哪一层</h2>
+    <p class="sub">本页是全篇结论。后续每一页都在为这六条提供证据链。</p>
+    <div class="qbox"><div class="q">① 冲击落在"认知层"，不是"执行层"。</div><div class="a">GPT-6 Astra 把具身智能的系统 2（理解环境、拆解任务、纠错重规划）变成了通用大模型的公共品——它并不直接控制关节，而是"想"。这正是过去三年被当作具身护城河的那一层。<span class="conf">置信度 高</span></div></div>
+    <div class="qbox"><div class="q">② 价值向两端迁移：端侧高频物理执行 + 场景暗数据。</div><div class="a">Astra 的硬伤是成本（按 token 计费）、时延（秒级）、精度（米级）。50Hz 控制环、力/触觉接触、现场磨出来的暗数据——这三样通用基座打不到，成为新的护城河候选。<span class="conf">置信度 高</span></div></div>
+    <div class="qbox"><div class="q">③ 旧分类（按架构分）失效，新分类按"护城河建在哪一层"。</div><div class="a">v1.0 的六维度（架构/数据/范式/本体/自研深度/场景）在 Astra 之后不再是区分变量的主轴。v2.0 提出四类新路线：认知外借、小脑自研、双基模闭环、统一一条式。<span class="conf">置信度 中高</span></div></div>
+    <div class="qbox"><div class="q">④ RoboDojo 取代"自主发布 Demo"成为新标尺，且中国模型已反超 Astra。</div><div class="a">统一体、统一协议的"具身高考"上，星动纪元 VPP2（14B、无额外数据、开源）以 39.26 分登顶，把 Astra 的 28.97 分、π0.5 的 14.67 分甩开；原力灵机 DM0.5 记忆维度断层第一。<span class="conf">置信度 中高</span></div></div>
+    <div class="qbox"><div class="q">⑤ "VLA vs 世界模型"之争基本结束，收敛为"分层 + 融合"。</div><div class="a">宇树的命名史 WMA→VLA→WLA、智元 GO-3（WRAM）、Figure Helix 2.5——2026 年 9 月 8 天 5 款模型，落点一致：世界模型并进 VLA / 认知与执行解耦协同。竞争重心从架构转向数据与量产。<span class="conf">置信度 高</span></div></div>
+    <div class="qbox"><div class="q">⑥ 对创业者：窗口期 1–2 年；对投资人：重估"模型期权"。</div><div class="a">纯认知层公司的估值溢价面临重定价；护城河可验证的（端侧物理基模、独占场景数据、有利润锚的整机）相对受益。定价最贵的恰是"只有认知叙事"的标的。<span class="conf">置信度 中</span></div></div>
+  </div>
+</section>
+
+<!-- ============ 02 事件 ============ -->
+<section class="slide" id="s2">
+  <div class="snum"><b>02</b> / 16</div>
+  <div class="inner">
+    <div class="kicker">The Event</div>
+    <h2>事件：一个"不为机器人而生"的模型，接管了机器人的大脑</h2>
+    <p class="sub">2026 年 9 月初，OpenAI 发布 GPT-6 Astra。随后几周，三组来自不同机构、不同本体的实机证据把它从"演示"推到了"行业冲击"的级别。</p>
+
+    <div class="grid g3">
+      <div class="card"><div class="cap">证据一 · RoboCurve 实机</div><div class="kpi red">95%</div><div class="lbl">双臂机械臂"抓方块放入碗中"成功率。同任务 Claude Fable 5.1 仅 40%。零额外训练、直接输出夹爪位姿。</div></div>
+      <div class="card"><div class="cap">证据二 · Stanford/Caltech HomeBody</div><div class="kpi red">换厨房不重训</div><div class="lbl">GPT-6 Astra 驱动宇树 G1 进陌生厨房：探索建图→收拾物品→把不在视野里的药找出来递给用户。</div></div>
+      <div class="card"><div class="cap">证据三 · 银河通用 RoboDojo 亲测</div><div class="kpi red">28.97<span style="font-size:14px;color:var(--ink3)"> 分</span></div><div class="lbl">50 分制具身高考，Astra 以 22.48% 成功率断档式登顶，把当时主流具身模型甩开一倍以上。</div></div>
+    </div>
+
+    <h3>为什么这三组证据比"又一个更强的 VLA"严重得多</h3>
+    <div class="card">
+      <p><b>① 它是跨界降维，不是同赛道升级。</b>过去每发一代大模型，具身团队接进本体试一下都"不过尔尔"——因为通用模型的输出是"视网膜级"的语言/图像，落不到动作。这一次，Astra 在<b>从未见过机器人数据</b>的前提下，完成了"看懂环境→做决策→调度动作"的完整链路，跨环境、靠上下文自我纠错。<sup><a href="#r1">[1]</a><a href="#r2">[2]</a></sup></p>
+      <p><b>② 它的短板恰好圈定了"打不到的地方"。</b>把三段实机数据摆在一起，Astra 的三道坎清晰可见——<b>成本</b>（控制真车跑 134.7 米烧掉约 660 万 token、约 $7.74）、<b>时延</b>（反应周期以秒计，均速仅 0.42 m/s）、<b>精度</b>（导航以米级 2D 目标点为基准，做不了厘米级高精接触）。这三道坎，正是量产具身必须跨过的坎。<sup><a href="#r3">[3]</a></sup></p>
+      <p><b>③ 它把"要不要自研大脑"从信念问题变成了经济学问题。</b>当一个免费/低边际成本、且持续升级的通用基座能干"想"的活，继续自研同等认知层的 ROI 急剧恶化——除非你能证明你的认知层相对通用基座有可守住的超额能力。</p>
+    </div>
+    <p class="src">来源：机器人大讲堂（2026-09-17）<a href="#r1">[1]</a> · 澎湃/中国青年报（2026-09-14，外滩大会圆桌）<a href="#r2">[2]</a> · 电子工程专辑/autocarweekly（2026-10-09）<a href="#r3">[3]</a> · 雷锋网/36氪（2026-10-09）<a href="#r4">[4]</a> · 量子位（2026-10）<a href="#r5">[5]</a></p>
+  </div>
+</section>
+
+<!-- ============ 03 能力边界 ============ -->
+<section class="slide" id="s3">
+  <div class="snum"><b>03</b> / 16</div>
+  <div class="inner">
+    <div class="kicker">Capability Boundary</div>
+    <h2>边界：Astra 强在"认得出、走得对"，弱在"摸得准"</h2>
+    <p class="sub">破壳机器人创始人许华哲在 Astra 可用当天做了测试，把具身任务拆成三个维度。这个拆分比"能不能抓"更有解释力——它直接指出通用基座打不到的地方在哪。</p>
+
+    <div class="grid g2">
+      <div class="card">
+        <h4>三维泛化：Astra 的水位</h4>
+        <div class="bars">
+          <div class="bar astra"><span class="nm">语义泛化</span><span class="track"><span class="fill" style="width:92%"></span></span><span class="val">强</span></div>
+          <div class="bar astra"><span class="nm">空间泛化</span><span class="track"><span class="fill" style="width:80%"></span></span><span class="val">较强</span></div>
+          <div class="bar"><span class="nm">物理泛化</span><span class="track"><span class="fill" style="width:22%;background:linear-gradient(90deg,#cbd5e1,#94a3b8)"></span></span><span class="val">弱</span></div>
+        </div>
+        <p class="figcap">条形为定性示意（强/较强/弱），非定量基准分。依据许华哲在外滩大会的公开表述。<sup><a href="#r2">[2]</a></sup></p>
+      </div>
+      <div class="card">
+        <h4>一句话说清能做与不能做</h4>
+        <p><b style="color:var(--ok)">能：</b>认出桌面上的物体、走到正确位置、完成抓取；连筷子这类细小物体，也能拿起、旋转、递送——"它认识桌面上的东西，也会往正确的位置走"。</p>
+        <p><b style="color:var(--astra)">不能：</b>用筷子拨动物体、堆叠盒子、折叠衣服等<b>涉及复杂物理接触</b>的任务。它不等于真正理解物体如何受力、如何变化。</p>
+        <p class="figcap">"复杂物理交互仍是具身智能公司的最后阵地。"——许华哲</p>
+      </div>
+    </div>
+
+    <h3>把短板翻译成工程语言：三道坎都是量产落地的前置条件</h3>
+    <table>
+      <thead><tr><th style="width:92px">维度</th><th>Astra 实测表现</th><th style="width:270px">为什么通用基座短期跨不过去</th></tr></thead>
+      <tbody>
+        <tr><td><b>成本</b></td><td>控制真车跑完 134.7 米封闭道路，单次约 <b class="mono">660 万 token ≈ $7.74</b>，单公里大几十美元</td><td>动作是连续、稠密的，按 token 计费的云端推理在量产成本结构里算不过来</td></tr>
+        <tr><td><b>时延</b></td><td>平均车速 <b class="mono">0.42 m/s</b>，反应周期以<b>秒</b>计；技能切换之间会停顿</td><td>物理世界需要 50Hz 以上的控制频率（每 20ms 一次反馈），云端往返做不到</td></tr>
+        <tr><td><b>精度</b></td><td>导航以地图坐标的<b>米级</b> 2D 目标点为基准；高精度接触、稳定抓取成功率断崖下降</td><td>米级意味着只知"大概到哪"，做不了厘米级高精接触与稳定抓取</td></tr>
+      </tbody>
+    </table>
+    <div class="note"><b>关键推论</b>：Astra 抬高的只是"大脑"。云端大脑相对端侧具身模型，在<b>实时性、成本、物理空间精细感知与操作</b>上全面落后——因此"云端通用基座直接当机器人大脑"不会成为量产主流，但它会重组整个模型栈的分工。</div>
+    <p class="src">来源：autocarweekly/电子工程专辑（2026-10-09）<a href="#r3">[3]</a> · 澎湃（2026-09-14）<a href="#r2">[2]</a> · 量子位（2026-10）<a href="#r5">[5]</a></p>
+  </div>
+</section>
+
+<!-- ============ 04 冲击本质 ============ -->
+<section class="slide" id="s4">
+  <div class="snum"><b>04</b> / 16</div>
+  <div class="inner">
+    <div class="kicker">Anatomy of the Shock</div>
+    <h2>本质：被商品化的不是"模型"，是整个<b>认知层</b></h2>
+    <p class="sub">把具身模型栈自上而下拆成五层，Astra 只精准击中了最上面那一层——但那一层恰好是过去三年一级市场定价的主要依据。</p>
+
+    <div class="svgwrap">
+      <svg viewBox="0 0 960 470" role="img" aria-label="具身模型栈五层与 Astra 冲击示意">
+        <defs>
+          <linearGradient id="gra" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#f76808"/><stop offset="1" stop-color="#e5484d"/></linearGradient>
+          <marker id="arw" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 z" fill="#e5484d"/></marker>
+          <marker id="arw2" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 z" fill="#0d9488"/></marker>
+        </defs>
+        <!-- 层 -->
+        <g font-size="14">
+          <rect x="60" y="30" width="640" height="64" rx="10" fill="#fde8e9" stroke="#e5484d" stroke-width="2"/>
+          <text x="82" y="58" font-weight="700" fill="#b91c1c">L4 · 认知 / 规划层</text>
+          <text x="82" y="79" fill="#7f1d1d" font-size="12.5">System 2：理解环境 · 拆解任务 · 长程规划 · 纠错重规划</text>
+          <text x="672" y="68" text-anchor="end" font-weight="700" fill="#e5484d">← 被通用基座商品化</text>
+
+          <rect x="60" y="104" width="640" height="64" rx="10" fill="#f1e9fe" stroke="#8b5cf6" stroke-width="1.6"/>
+          <text x="82" y="132" font-weight="700" fill="#6d28d9">L3 · 世界模型 / 预测层</text>
+          <text x="82" y="153" fill="#4c1d95" font-size="12.5">WAM：预演"动作做完后世界会变成什么样"</text>
+          <text x="672" y="142" text-anchor="end" font-weight="700" fill="#8b5cf6">← 争夺中，仍可差异化</text>
+
+          <rect x="60" y="178" width="640" height="64" rx="10" fill="#e3edff" stroke="#2563eb" stroke-width="1.6"/>
+          <text x="82" y="206" font-weight="700" fill="#1d4ed8">L2 · 动作策略层</text>
+          <text x="82" y="227" fill="#1e3a8a" font-size="12.5">System 1 / VLA：从感知直接映射到动作</text>
+          <text x="672" y="216" text-anchor="end" font-weight="700" fill="#2563eb">← 被开源与榜单持续压缩</text>
+
+          <rect x="60" y="252" width="640" height="64" rx="10" fill="#d9f4f1" stroke="#0d9488" stroke-width="1.8"/>
+          <text x="82" y="280" font-weight="700" fill="#0f766e">L1 · 高频控制 / 物理执行层</text>
+          <text x="82" y="301" fill="#134e4a" font-size="12.5">小脑 · 运控 · 力控 · 触觉：50Hz 闭环的身体</text>
+          <text x="672" y="290" text-anchor="end" font-weight="700" fill="#0d9488">← 端侧硬约束，防御性最强</text>
+
+          <rect x="60" y="326" width="640" height="64" rx="10" fill="#0b1220" stroke="#0b1220"/>
+          <text x="82" y="354" font-weight="700" fill="#e2e8f0">L0 · 数据 / 场景层</text>
+          <text x="82" y="375" fill="#94a3b8" font-size="12.5">现场暗数据 · 独占场景回流 · 客户与 Know-How</text>
+          <text x="672" y="364" text-anchor="end" font-weight="700" fill="#94a3b8">← 最持久的壁垒</text>
+        </g>
+        <!-- Astra 冲击箭头 -->
+        <path d="M 500 8 L 500 28" stroke="#e5484d" stroke-width="3" marker-end="url(#arw)"/>
+        <text x="512" y="16" font-size="13.5" font-weight="800" fill="#e5484d">GPT-6 Astra 冲击方向</text>
+        <!-- 价值迁移箭头 -->
+        <path d="M 40 62 L 40 358" stroke="#0d9488" stroke-width="2.5" stroke-dasharray="6 5" marker-end="url(#arw2)"/>
+        <text x="30" y="215" font-size="13" font-weight="800" fill="#0d9488" transform="rotate(-90 30 215)" text-anchor="middle">价值迁移：认知 → 身体与数据</text>
+      </svg>
+      <p class="figcap">五层模型栈与 Astra 冲击方向示意。Astra 商品化 L4，迫使 L1/L0 的权重上升。</p>
+    </div>
+
+    <div class="grid g2" style="margin-top:16px">
+      <div class="card tight"><h4 style="color:var(--astra)">冲击为什么"大"</h4><p style="margin:0;font-size:14px">过去三年，一级市场的"模型期权"溢价主要买的是 L4 的想象空间。当 L4 变成人人可调用的公共品，这部分溢价失去支撑——这正是创业者口中"现在具身智能没有什么真正的护城河"的由来。</p></div>
+      <div class="card tight"><h4 style="color:var(--exec)">但它没有宣告具身终结</h4><p style="margin:0;font-size:14px">Astra 抬高的只是大脑。L1 的高频控制、L0 的暗数据天然不可被云端替代，且需要"一天天站在现场"才能积累。冲击是结构性的重定价，不是清零。</p></div>
+    </div>
+    <p class="src">来源：机器人大讲堂<a href="#r1">[1]</a> · 澎湃（外滩大会圆桌）<a href="#r2">[2]</a> · 电子工程专辑<a href="#r3">[3]</a> · 观察者网/凤凰网 WAIC 2026 观察<a href="#r10">[10]</a></p>
+  </div>
+</section>
+
+<!-- ============ 05 旧框架失效 ============ -->
+<section class="slide" id="s5">
+  <div class="snum"><b>05</b> / 16</div>
+  <div class="inner">
+    <div class="kicker">Why v1.0 Fails</div>
+    <h2>旧框架为何失效：v1.0 的六维度，已不再是区分变量的主轴</h2>
+    <p class="sub">v1.0（2026-06-11）用"架构 / 数据 / 训练范式 / 本体 / 自研深度 / 场景"六维度拆解公司，并给出结论"世界模型+VLA+RL 三件套融合"。三个月后，这个框架仍然正确地描述了技术现状，却不再能区分赢家与输家。</p>
+
+    <table>
+      <thead><tr><th style="width:150px">v1.0 维度</th><th>Astra 之后的现实</th><th style="width:210px">判别力变化</th></tr></thead>
+      <tbody>
+        <tr><td>① 架构路线<br><span class="lbl" style="margin:0">端到端 / 分层 / 世界模型</span></td><td>架构正在趋同：8 天 5 款模型落点一致（世界模型并进 VLA / 认知与执行解耦），"VLA 降级为器官"。</td><td><span class="pill p-astra">↓ 大幅下降</span> 大家都往一个方向收敛</td></tr>
+        <tr><td>② 数据策略</td><td>反而更重要——竞争重心从"架构之争"转向"数据战争"（暗数据 vs 公开数据）。</td><td><span class="pill p-exec">↑ 上升</span> 但需换口径：看独占性而非绝对量</td></tr>
+        <tr><td>③ 训练范式</td><td>预训练-后训练分工已成常识；"自回归是否收敛方向"成为新焦点（智元/诺因/智谱）。</td><td><span class="pill p-dark">→ 中性</span> 从"差异点"变"及格线"</td></tr>
+        <tr><td>④ 本体策略</td><td>与 Astra 冲击解耦，仍影响单位经济性（轮式 vs 双足）。</td><td><span class="pill p-dark">→ 中性</span></td></tr>
+        <tr><td>⑤ 自研深度</td><td>被 Astra 直接改写：自研"认知层"的溢价被压缩，货币从"自研多深"变成"哪一层自研"。<span class="pill p-astra">核心变量</span></td><td><span class="pill p-astra">⚠ 语义已变</span> 需按层重估</td></tr>
+        <tr><td>⑥ 场景与数据飞轮</td><td>上升为第一性问题：场景暗数据是 Astra 唯一买不到、爬不到的东西。</td><td><span class="pill p-exec">↑ 大幅上升</span></td></tr>
+      </tbody>
+    </table>
+
+    <div class="note"><b>结论</b>：v1.0 回答的是"这家公司的技术栈长什么样"；Astra 之后投资人真正要回答的是<b>"这家公司的超额能力建在哪一层、能守多久、会不会被通用基座或开源吃掉"</b>。分类标准需要从"技术路线"迁移到"护城河路线"。</div>
+    <p class="src">来源：WAIC 2026 观察（观察者网/凤凰网）<a href="#r10">[10]</a> · OFweek（8 天 5 模型）<a href="#r11">[11]</a> · 机器人大讲堂<a href="#r1">[1]</a></p>
+  </div>
+</section>
+
+<!-- ============ 06 新路线分类 ============ -->
+<section class="slide" id="s6">
+  <div class="snum"><b>06</b> / 16</div>
+  <div class="inner">
+    <div class="kicker">New Taxonomy</div>
+    <h2>新路线分类：按"护城河建在哪一层"重画具身模型版图</h2>
+    <p class="sub">Astra 之后，判别一家公司的模型路线不再问"架构怎么搭"，而问两个问题：<b>认知层（大脑）从哪来？</b> · <b>物理执行层（身体）做到多深？</b> 由此得到四类新路线。</p>
+
+    <div class="grid g2">
+      <div class="card" style="border-left:4px solid var(--astra)">
+        <div class="cap" style="color:var(--astra)">路线 A · 认知外借型</div>
+        <h4>Borrowed Brain + Skill Library</h4>
+        <p style="font-size:14px"><b>认知：</b>外借 GPT / Claude / Qwen 等通用基座。<b>执行：</b>传统技能库 + 经典控制（MPC / 视觉伺服 / 预训练控制策略）。</p>
+        <p style="font-size:13.5px;margin-bottom:2px"><b>代表：</b>Stanford/Caltech HomeBody（GPT 当 System2 直接调技能库、跳过学习型 VLA）；波士顿动力 × Gemini Robotics。</p>
+        <p style="font-size:13.5px"><b>逻辑：</b>承认大脑是公共品，资源全押本体、场景与技能工程——成本最低、随模型升级直接获益。</p>
+        <p style="font-size:13.5px;color:var(--astra)"><b>风险：</b>认知命脉握在别人手里；技能库泛化靠人工堆；被通用基座厂商"顺手吞掉"。</p>
+      </div>
+
+      <div class="card" style="border-left:4px solid var(--exec)">
+        <div class="cap" style="color:var(--exec)">路线 B · 小脑自研型</div>
+        <h4>Own the Cerebellum</h4>
+        <p style="font-size:14px"><b>认知：</b>可外借也可自研。<b>执行：</b>自研端侧高频物理执行基模——运控 / 力控 / 触觉，即"小脑 GPT"。</p>
+        <p style="font-size:13.5px;margin-bottom:2px"><b>代表：</b>银河通用 AstraBrain-WBC 0.5（8040 万参数·20 亿帧·0.39ms·50Hz）；千寻智能力控；帕西尼触觉；星动纪元 VPP2 的 WAM。</p>
+        <p style="font-size:13.5px"><b>逻辑：</b>端侧算力与频率的硬约束使"小脑"不可被云端替代——这是 Astra 结构上打不到的层。</p>
+        <p style="font-size:13.5px;color:var(--exec)"><b>风险：</b>运控/力控/触觉数据采集成本高；脱离认知层难单独变现，易沦为"部件供应商"。</p>
+      </div>
+
+      <div class="card" style="border-left:4px solid var(--cog)">
+        <div class="cap" style="color:var(--cog)">路线 C · 双基模闭环型</div>
+        <h4>GPT × WAM（认知与执行解耦协同）</h4>
+        <p style="font-size:14px"><b>认知：</b>自研或协同通用基座。<b>执行：</b>自研世界-动作模型（WAM），形成"预测—行动—反馈"闭环。</p>
+        <p style="font-size:13.5px;margin-bottom:2px"><b>代表：</b>星动纪元 VPP2 + GPT（论文实测：加 GPT 规划器，5 任务成功率 27.6%→57.6%）；智元 GO-3（WRAM）；诺因 GLOW。</p>
+        <p style="font-size:13.5px"><b>逻辑：</b>认知与物理执行各自规模化、再闭环协同——"通用认知 × 通用物理执行"。星动自述为该范式首提者。</p>
+        <p style="font-size:13.5px;color:var(--cog)"><b>风险：</b>两套基模算力与数据双高；工程整合复杂；一旦通用基座直接吃下"做"，中间层被夹击。</p>
+      </div>
+
+      <div class="card" style="border-left:4px solid var(--data)">
+        <div class="cap" style="color:var(--data)">路线 D · 统一一条式型</div>
+        <h4>Unified / One Model</h4>
+        <p style="font-size:14px"><b>认知 + 执行：</b>单一端到端模型同时扛理解与动作。</p>
+        <p style="font-size:13.5px;margin-bottom:2px"><b>代表：</b>它石智航 AWE 3.0（"不 VLA、不仿真、不遥操"）；自变量 WALL-A / 世界统一模型；Skild Brain。</p>
+        <p style="font-size:13.5px"><b>逻辑：</b>赌端到端上限，避免分层链路的级联误差放大。</p>
+        <p style="font-size:13.5px;color:var(--data)"><b>风险：</b><b>在 Astra 冲击下最承压</b>——认知部分被通用基座降维，物理部分又不聚焦端侧高频，两头不靠。</p>
+      </div>
+    </div>
+    <div class="note">四条路线并非互斥。真实公司往往是"主路线 + 副路线"（如智元 = C + B，宇树 = A 起步转向 C）。分类的价值在于判断<b>它的估值溢价到底押在哪一层、那一层是否可守</b>。另注：横跨四条路线之上的<b>数据/场景层（L0）</b>不是"路线"而是底座，决定前四者的持久性。</div>
+    <p class="src">来源：本报告综合。路线 C 的代表性证据见星动纪元 VPP2 论文<a href="#r4">[4]</a><a href="#r6">[6]</a>；银河通用小脑 GPT 见<a href="#r7">[7]</a>；路线之争分野见 WAIC 2026 观察<a href="#r10">[10]</a>。</p>
+  </div>
+</section>
+
+<!-- ============ 07 新路线地图 ============ -->
+<section class="slide" id="s7">
+  <div class="snum"><b>07</b> / 16</div>
+  <div class="inner">
+    <div class="kicker">Route Map</div>
+    <h2>新路线地图：认知越外借，越要往身体里扎</h2>
+    <p class="sub">横轴＝认知层来源（左：外借通用基座 ⇢ 右：完全自研）；纵轴＝物理执行层深度（下：技能库/应用 ⇢ 上：端侧物理基模）。气泡颜色为四类新路线。</p>
+    <div class="svgwrap">
+      <svg viewBox="0 0 960 560" role="img" aria-label="具身公司新路线定位图">
+        <rect x="70" y="40" width="820" height="460" fill="#fbfcfe" stroke="#e2e7ef"/>
+        <line x1="480" y1="40" x2="480" y2="500" stroke="#dbe2ec" stroke-dasharray="4 4"/>
+        <line x1="70" y1="270" x2="890" y2="270" stroke="#dbe2ec" stroke-dasharray="4 4"/>
+        <!-- 象限标签 -->
+        <text x="86" y="62" font-size="13" font-weight="700" fill="#0d9488">路线 B · 小脑自研</text>
+        <text x="874" y="62" text-anchor="end" font-size="13" font-weight="700" fill="#8b5cf6">路线 C · 双基模闭环</text>
+        <text x="86" y="492" font-size="13" font-weight="700" fill="#e5484d">路线 A · 认知外借</text>
+        <text x="874" y="492" text-anchor="end" font-size="13" font-weight="700" fill="#2563eb">路线 D · 统一一条式</text>
+        <!-- 轴 -->
+        <text x="480" y="524" text-anchor="middle" font-size="13" fill="#4a5568">认知层：外借通用基座 ⟵——————⟶ 完全自研</text>
+        <text x="34" y="270" text-anchor="middle" font-size="13" fill="#4a5568" transform="rotate(-90 34 270)">物理执行：技能库 ⟵——————⟶ 端侧基模</text>
+        <!-- 公司点 -->
+        <g font-size="12.5">
+          <!-- A -->
+          <circle cx="180" cy="430" r="10" fill="#e5484d" fill-opacity=".78"/><text x="196" y="434" fill="#0e1626">HomeBody (GPT+技能库)</text>
+          <circle cx="150" cy="470" r="10" fill="#e5484d" fill-opacity=".78"/><text x="166" y="474" fill="#0e1626">波士顿动力</text>
+          <!-- B -->
+          <circle cx="275" cy="90" r="11" fill="#0d9488" fill-opacity=".82"/><text x="291" y="94" fill="#0e1626">银河通用</text>
+          <circle cx="330" cy="140" r="10" fill="#0d9488" fill-opacity=".82"/><text x="346" y="144" fill="#0e1626">千寻智能</text>
+          <circle cx="255" cy="165" r="10" fill="#0d9488" fill-opacity=".82"/><text x="190" y="169" fill="#0e1626">帕西尼</text>
+          <!-- C -->
+          <circle cx="700" cy="85" r="13" fill="#8b5cf6" fill-opacity=".85"/><text x="716" y="89" fill="#0e1626">星动纪元 VPP2</text>
+          <circle cx="775" cy="120" r="13" fill="#8b5cf6" fill-opacity=".85"/><text x="700" y="124" fill="#0e1626">智元 GO-3</text>
+          <circle cx="645" cy="150" r="10" fill="#8b5cf6" fill-opacity=".85"/><text x="561" y="154" fill="#0e1626">诺因 GLOW</text>
+          <circle cx="700" cy="205" r="10" fill="#8b5cf6" fill-opacity=".85"/><text x="716" y="209" fill="#0e1626">1X</text>
+          <!-- D -->
+          <circle cx="820" cy="330" r="11" fill="#2563eb" fill-opacity=".85"/><text x="742" y="316" fill="#0e1626">它石 AWE</text>
+          <circle cx="775" cy="380" r="11" fill="#2563eb" fill-opacity=".85"/><text x="696" y="366" fill="#0e1626">自变量 WALL</text>
+          <circle cx="700" cy="360" r="11" fill="#2563eb" fill-opacity=".85"/><text x="716" y="364" fill="#0e1626">Skild</text>
+          <circle cx="860" cy="420" r="13" fill="#2563eb" fill-opacity=".85"/><text x="790" y="406" fill="#0e1626">特斯拉</text>
+          <circle cx="700" cy="430" r="10" fill="#8b5cf6" fill-opacity=".85"/><text x="716" y="434" fill="#0e1626">Figure</text>
+          <circle cx="820" cy="250" r="12" fill="#8b5cf6" fill-opacity=".85"/><text x="836" y="254" fill="#0e1626">Physical Intelligence</text>
+          <!-- 宇树 straddle -->
+          <circle cx="470" cy="215" r="12" fill="#475467" fill-opacity=".85"/><text x="486" y="219" fill="#0e1626">宇树</text>
+        </g>
+        <!-- 迁移箭头 -->
+        <path d="M 300 430 L 470 250" stroke="#0d9488" stroke-width="2.6" stroke-dasharray="7 5"/>
+        <path d="M 470 250 L 660 150" stroke="#8b5cf6" stroke-width="2.6" stroke-dasharray="7 5"/>
+        <text x="330" y="360" font-size="12.5" font-style="italic" fill="#0d9488" transform="rotate(-36 330 360)">Astra 冲击下的典型迁移路径</text>
+      </svg>
+      <p class="figcap">本图为报告基于公开信息的<b>定性定位</b>，非定量坐标；气泡大小未编码估值。灰色为跨路线样本（宇树：硬件现金流起步、向双基模闭环迁移）。</p>
+    </div>
+    <p class="src">来源：本报告综合各公司公开技术资料与榜单表现。</p>
+  </div>
+</section>
+
+<!-- ============ 08 RoboDojo ============ -->
+<section class="slide" id="s8">
+  <div class="snum"><b>08</b> / 16</div>
+  <div class="inner">
+    <div class="kicker">The New Yardstick</div>
+    <h2>新标尺：RoboDojo 让"自主发布 Demo"时代结束</h2>
+    <p class="sub">过去两年各家具身公司各发 Demo、各报成功率，硬件不同、评分不同，横向比较无从谈起。RoboDojo 试图终结这种状态——真机与仿真双轨、统一硬件、统一协议、公开题库，任务未完整走完即计 0 分。</p>
+
+    <div class="grid g4" style="margin-bottom:6px">
+      <div class="card tight"><div class="cap">牵头</div><div class="kpi s">港大 MMLab</div><div class="lbl">联合 UC Berkeley、清华、北大等近 20 所机构，RoboTwin 原班人马</div></div>
+      <div class="card tight"><div class="cap">考卷</div><div class="kpi s">42 + 18</div><div class="lbl">42 个双臂仿真任务 + 18 个真机任务；五维度：泛化/记忆/精度/长程/开放词汇</div></div>
+      <div class="card tight"><div class="cap">人类专家（VR 遥操）</div><div class="kpi s" style="color:var(--ink)">76.03%</div><div class="lbl">成功率 / 80.42 分——人类仍是天花板</div></div>
+      <div class="card tight"><div class="cap">Astra 的位置</div><div class="kpi s red">22.48%</div><div class="lbl">断档式登顶当时榜单，但离"毕业"仍远</div></div>
+    </div>
+
+    <h3>榜单正在被中国模型改写（平均成功率 / 平均得分）</h3>
+    <div class="bars">
+      <div class="bar teal"><span class="nm">VPP2 · 星动纪元</span><span class="track"><span class="fill" style="width:32.26%"></span></span><span class="val">32.26% / 39.26</span></div>
+      <div class="bar"><span class="nm">PatchWAM</span><span class="track"><span class="fill" style="width:23.6%"></span></span><span class="val">23.60% / 29.39</span></div>
+      <div class="bar astra"><span class="nm">GPT-6 Astra</span><span class="track"><span class="fill" style="width:22.48%"></span></span><span class="val">22.48% / 28.97</span></div>
+      <div class="bar"><span class="nm">DM0.5 · 原力灵机</span><span class="track"><span class="fill" style="width:19.34%"></span></span><span class="val">19.34% / 24.90</span></div>
+      <div class="bar"><span class="nm">π0.5 · Physical Intelligence</span><span class="track"><span class="fill" style="width:8.31%"></span></span><span class="val">8.31% / 14.67</span></div>
+      <div class="bar" style="opacity:.75"><span class="nm">人类专家（参考）</span><span class="track"><span class="fill" style="width:76.03%;background:linear-gradient(90deg,#cbd5e1,#475467)"></span></span><span class="val">76.03% / 80.42</span></div>
+    </div>
+    <p class="figcap">同榜不同口径提示：诺因 GLOW 报告另称其 RoboDojo 18 项任务自测 62.2%/71.1%（企业自测，未见第三方复现，故未并入本图）<a href="#r15">[15]</a>。DM0.5 记忆维度 47.74 分断层第一（第二名 13.37）。<b>PatchWAM</b> 是"路线 D · 统一一条式"的学术形态——论文主张视觉预测与动作生成不必是两条计算通路（Action-as-Patch），单一生成过程同时输出"机器人怎么动"与"场景怎么变"<a href="#r12">[12]</a>。</p>
+    <div class="note"><b>榜单的三层证据纪律</b>：① <b>官方亲测</b>（GPT-6 Astra 的 22.48% 由 RoboDojo 官方实测，含金量最高）；② <b>可复现的第三方/自研</b>（VPP2 开源、无额外数据、无 agent RSI，属"裸考"）；③ <b>企业自测</b>（需打折扣，如 GLOW、Figure Helix 2.5）。本报告全篇沿用此分级。</div>
+    <p class="src">来源：RoboDojo 榜单与解读见雷锋网·AI 科技评论（2026-10）<a href="#r4">[4]</a> · 量子位（2026-10）<a href="#r5">[5]</a> · PatchWAM 论文（arXiv:2609.25961，2026-09-22）<a href="#r12">[12]</a> · 人民网重庆（2026-08-26）<a href="#r8">[8]</a></p>
+  </div>
+</section>
+
+<!-- ============ 09 中国回应 I ============ -->
+<section class="slide" id="s9">
+  <div class="snum"><b>09</b> / 16</div>
+  <div class="inner">
+    <div class="kicker">China's Answer · I</div>
+    <h2>中国模型的回应（一）：14B 开源模型登顶，物理执行层不是"降维"能拿下的</h2>
+    <p class="sub">Astra 登顶 RoboDojo 后不到一个月，榜首换成了中国名字。这两个案例恰好分别对应"路线 C（双基模闭环）"和"路线 B（小脑/执行深耕）"。</p>
+
+    <div class="grid g2">
+      <div class="card" style="border-left:4px solid var(--cog)">
+        <div class="cap" style="color:var(--cog)">路线 C · 双基模闭环</div>
+        <h4>星动纪元 VPP2（Video Prediction Policy 2）</h4>
+        <p style="font-size:14px"><b>成绩：</b>RoboDojo 平均成功率 <b class="mono">32.26%</b>、平均得分 <b class="mono">39.26</b>，登顶；同时拿下泛化、精度、记忆三项单项第一，超越 GPT-6 Astra（22.48%/28.97）。</p>
+        <p style="font-size:14px"><b>三大细节：</b>① 仅 <b>14B 参数</b>；② <b>未用任何额外数据、未用 agent RSI</b>——按官方 baseline 协议"裸考"；③ <b>开源可复现</b>。没有场外信息辅助，成绩不可能是过拟合堆出来的，证明的是预训练沉淀的原生能力（即泛化性）。</p>
+        <p style="font-size:14px"><b>技术核心＝"解耦 + 排序"：</b>视频预测的质量决定动作的上限，两者必须拆开——先"脑内"预演物理变化，再输出动作。管线四步：事件级视频预训练 → 语言条件化视频预测 → 基于视频模型 KV cache 训动作专家 → 专项后训练。<b>0.2 秒推理输出 0.8 秒动作块。</b></p>
+        <p style="font-size:14px"><b>GPT+WAM 的实证：</b>给 VPP2 加一个 GPT 类"子任务规划器"，5 个任务平均成功率从 27.6% 跳到 <b>57.6%</b>，井字棋类任务 0→38 分。GPT 管"想"，WAM 管"做"。</p>
+      </div>
+
+      <div class="card" style="border-left:4px solid var(--exec)">
+        <div class="cap" style="color:var(--exec)">路线 B · 执行深耕（记忆维度）</div>
+        <h4>原力灵机 DM0.5（重庆两江新区）</h4>
+        <p style="font-size:14px"><b>成绩：</b>RoboDojo 综合 <b class="mono">24.90</b> 分 / 平均成功率 <b class="mono">19.34%</b>；<b>记忆维度 47.74 分，第二名仅 13.37 分，领先逾 3 倍</b>——登顶的关键优势。</p>
+        <p style="font-size:14px"><b>架构：</b>VLA 路线，<b>40 亿参数"大脑" + 6.8 亿参数"动作教练"</b>，经 SFT 迁移通用能力；精细操作达亚毫米级（0.1–1mm），失误后自主感知纠错。"盖积木"记忆任务多次 100% 成功。</p>
+        <p style="font-size:14px"><b>背景与信号：</b>2026-07-09 发布，一个月内拿下第五个第一；模型权重、训练框架、下游工作流<b>全开源</b>。创始团队为旷视核心（唐文斌等），获智谱、阶跃星辰、商汤、阿里等资方及产业资本投资。它证明：<b>记忆/长程执行这类"系统能力"仍有独立于通用基座的可攻空间。</b></p>
+        <div class="verify" style="margin-top:12px"><b>判别要点</b>：这两个案例的共同点是——<b>它们的价值都不在"认知层"</b>。VPP2 在"物理预演与执行"，DM0.5 在"记忆与长程闭环"。这正是 Astra 打不到、且通用基座短期补不上的层。</div>
+      </div>
+    </div>
+    <p class="src">来源：雷锋网/AI 科技评论<a href="#r4">[4]</a> · 36氪<a href="#r6">[6]</a> · 开源代码 github.com/roboterax/video-prediction-policy-2<a href="#r4">[4]</a> · 人民网重庆/重庆市政府（2026-08-26/27）<a href="#r8">[8]</a></p>
+  </div>
+</section>
+
+<!-- ============ 10 中国回应 II ============ -->
+<section class="slide" id="s10">
+  <div class="snum"><b>10</b> / 16</div>
+  <div class="inner">
+    <div class="kicker">China's Answer · II · The September Wave</div>
+    <h2>8 天 5 款模型：路线之争悄悄结束，数据战争开始</h2>
+    <p class="sub">2026 年 9 月第二、三周，具身赛道密集发布至少五款模型，落点惊人一致——把世界模型并进 VLA 体系，或把认知与执行解耦协同。竞争焦点从"架构"转向"数据与量产"。</p>
+
+    <table>
+      <thead><tr><th style="width:96px">日期</th><th style="width:140px">公司 / 模型</th><th>要点</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">9-08</td><td><b>松延动力</b><br>HERON-World Model</td><td>动作条件世界模型，预测"不同动作后环境如何变化"；训练混用真机、仿真与第一视角人类操作视频</td></tr>
+        <tr><td class="mono">9-09</td><td><b>智元</b><br>AGILE 2.0</td><td>感控一体模型：环境观测、地形理解、全身运控、末端操作拧成闭环</td></tr>
+        <tr><td class="mono">9-09</td><td><b>智元</b><br>GE-Act 2.0</td><td>原生世界-动作模型，从头训练；数据 300 小时→<b class="mono">3 万小时</b>（100×），零样本成功率 G1-OP <b class="mono">17.1%→44.1%</b>，解锁折叠毛巾/嵌套纸杯/插花</td></tr>
+        <tr><td class="mono">9-10</td><td><b>宇树</b><br>UnifoLM-WLA-1.0</td><td>6B 参数、约 2500 小时真机数据、单模型统筹 64 项任务；<b>代码/模型/数据集全开源</b></td></tr>
+        <tr><td class="mono">9-15</td><td><b>松延动力</b><br>HERON-CRA</td><td>情境强化行动模型，主打记忆、强化学习、跨本体泛化</td></tr>
+        <tr><td class="mono">9-17</td><td><b>Figure</b><br>Helix 2.5</td><td>湾区 30 个陌生家庭、420 次试验，零样本成功率 <b class="mono">56%</b>（随机初始化 9%）；铺床 67%、叠毛巾 62%；依托自建 Index 数据平台</td></tr>
+      </tbody>
+    </table>
+
+    <div class="grid g3">
+      <div class="card tight"><div class="cap" style="color:var(--cog)">收敛信号</div><p style="margin:0;font-size:13.5px">宇树命名史最直观：<b>WMA-0（2025.09）→ VLA-0（2026.01）→ WLA-1.0（2026.09）</b>。Gartner 高挺：短期 VLA 仍是动作模型主体，世界模型逐步融入提供物理理解与预演，长期融合而非替代。</p></div>
+      <div class="card tight"><div class="cap" style="color:var(--data)">数据战争的证据</div><p style="margin:0;font-size:13.5px">Figure 自建付费众包数据引擎（累计支付 $15M、上传视频超 1600 万条），并验证数据缩放律；智元用实验证明"数据堆到一定量会堆出原本不会的能力"。</p></div>
+      <div class="card tight"><div class="cap" style="color:var(--astra)">必须打的折扣</div><p style="margin:0;font-size:13.5px">伯恩斯坦（9-24）：Helix 2.5 只跨过"场景"，未跨过"任务"——机器人仍需为铺床、叠毛巾分别训练。56% 意味着约一半失败（420 次中 237 成/183 败），且为公司自评。</p></div>
+    </div>
+    <p class="src">来源：OFweek 机器人网《一周五款模型密集发布》<a href="#r11">[11]</a> · 搜狐/火星比特《8 天 5 个模型》<a href="#r11">[11]</a> · 智元 2026 合作伙伴大会（unwire.hk）<a href="#r13">[13]</a> · Figure Helix 2.5 报道<a href="#r11">[11]</a></p>
+  </div>
+</section>
+
+<!-- ============ 11 时间线 ============ -->
+<section class="slide" id="s11">
+  <div class="snum"><b>11</b> / 16</div>
+  <div class="inner">
+    <div class="kicker">Timeline</div>
+    <h2>三年脉络：从"造大脑"到"大脑变公共品"</h2>
+    <p class="sub">红点为 Astra 事件，绿点为中国模型给出回应的节点。可以看到：2026 年下半年，行业主线从"架构创新"切换到"数据与量产"。</p>
+
+    <div class="grid g2">
+      <div class="tl">
+        <div class="ev"><span class="d">2023</span>RT-2 提出 VLA 概念，具身智能"大脑自研"叙事起步。</div>
+        <div class="ev"><span class="d">2024.11</span>星动纪元 HiRT——最早提出"GPT 管想、世界模型管做"的分工雏形。</div>
+        <div class="ev"><span class="d">2025.09</span>宇树开源 WMA-0（世界模型先行）；湾区具身融资潮起。</div>
+        <div class="ev"><span class="d">2025.11</span>Physical Intelligence B 轮 $600M，投后 $5.6B。</div>
+        <div class="ev"><span class="d">2026.01</span>Skild C 轮 $1.4B、投后 &gt;$14B；宇树 VLA-0 登顶 LIBERO；Google DeepMind × 波士顿动力发布 Gemini 驱动 Atlas。</div>
+        <div class="ev"><span class="d">2026.04</span>PI 发布 π0.7（可指令化、组合泛化）；它石智航 Pre-A $455M 创中国具身单笔纪录。</div>
+        <div class="ev"><span class="d">2026.05</span>PI C 轮约 $1.05B、投后 $11.19B；OpenAI 确认重启机器人硬件自研（OpenAI Robotics）。</div>
+      </div>
+      <div class="tl">
+        <div class="ev"><span class="d">2026.06</span>银河通用发布全球首个通用小脑 GPT（AstraBrain-WBC 0.5，8040 万参数、50Hz、0.39ms）；宇树科创板过会。</div>
+        <div class="ev"><span class="d">2026.07</span>原力灵机 DM0.5 发布并全开源。</div>
+        <div class="ev astra"><span class="d">2026.09 初 ★</span><b>GPT-6 Astra 发布</b>——零机器人训练接管"系统 2"，行业冲击起点。</div>
+        <div class="ev astra"><span class="d">2026.09.08–17</span>8 天 5 款模型密集发布（松延、智元、宇树、Figure）——路线之争收敛于"分层 + 融合"。</div>
+        <div class="ev astra"><span class="d">2026.09.14</span>外滩大会：学界给出 Astra 能力的三维分解（语义/空间强、物理弱）。</div>
+        <div class="ev"><span class="d">2026.09.24</span>诺因 GLOW 技术报告（自测口径）。</div>
+        <div class="ev exec"><span class="d">2026.09.27–30</span>Stanford/Caltech HomeBody 展示"GPT 直调技能库"；<b>星动 VPP2 登顶 RoboDojo</b>——中国模型首次在统一标尺上反超 Astra。</div>
+        <div class="ev exec"><span class="d">2026.10.09</span>媒体密集复盘 Astra 成本结构，产业界转向"数据与量产"竞争。</div>
+      </div>
+    </div>
+    <p class="src">来源：各公司官方发布与权威媒体报道汇总；具体见本页脚注与第 16 页参考资料<a href="#r4">[4]</a><a href="#r5">[5]</a><a href="#r7">[7]</a><a href="#r8">[8]</a><a href="#r9">[9]</a><a href="#r11">[11]</a><a href="#r14">[14]</a></p>
+  </div>
+</section>
+
+<!-- ============ 12 价值栈重估 ============ -->
+<section class="slide" id="s12">
+  <div class="snum"><b>12</b> / 16</div>
+  <div class="inner">
+    <div class="kicker">Value Re-Rating</div>
+    <h2>被忽略的物理约束：为什么"云端大脑"注定只能干低频的活</h2>
+    <p class="sub">价值迁移不是叙事选择，而是算力与带宽的硬约束决定的。云端可以跑万亿参数但延迟以秒计；端侧实时但只能跑几十亿参数。这道"蒸馏鸿沟"划定了通用基座的上限。</p>
+
+    <div class="svgwrap">
+      <svg viewBox="0 0 960 400" role="img" aria-label="端云分工与蒸馏鸿沟">
+        <rect x="60" y="26" width="840" height="132" rx="16" fill="#eef2ff" stroke="#c7d2fe"/>
+        <text x="88" y="60" font-size="16" font-weight="800" fill="#3730a3">☁ 云端 · 通用认知层（System 2）</text>
+        <text x="88" y="88" font-size="13.5" fill="#4c51bf">万亿参数级 · 反应周期以秒计 · 按 token 计费</text>
+        <text x="88" y="112" font-size="13.5" fill="#4c51bf">能力：理解环境、拆解任务、跨场景自我纠错 → <tspan font-weight="800" fill="#b91c1c">已被 Astra 商品化</tspan></text>
+        <text x="88" y="138" font-size="13" fill="#6366f1">承担不了：厘米级接触、力/触觉闭环、毫秒级重规划、离线运行</text>
+
+        <path d="M 480 168 L 480 216" stroke="#94a3b8" stroke-width="2.5" marker-end="url(#ar)"/>
+        <defs><marker id="ar" markerWidth="9" markerHeight="9" refX="6" refY="4.5" orient="auto"><path d="M0 0 L9 4.5 L0 9 z" fill="#94a3b8"/></marker></defs>
+        <rect x="330" y="168" width="300" height="48" rx="10" fill="#fff7ed" stroke="#fdba74"/>
+        <text x="480" y="190" text-anchor="middle" font-size="13" font-weight="800" fill="#b45309">蒸馏鸿沟 · 跨约 2 个数量级</text>
+        <text x="480" y="208" text-anchor="middle" font-size="11.5" fill="#c2410c">万亿 → 百亿；一次成功的压缩已属激进</text>
+
+        <rect x="60" y="232" width="840" height="132" rx="16" fill="#e6fffb" stroke="#99f6e4"/>
+        <text x="88" y="266" font-size="16" font-weight="800" fill="#0f766e">⛭ 端侧 · 物理执行层（System 1 / 0）</text>
+        <text x="88" y="294" font-size="13.5" fill="#0d9488">50–100 亿参数 · 10–50Hz 高频控制环 · 离线可运行</text>
+        <text x="88" y="318" font-size="13.5" fill="#0d9488">能力：力控/触觉接触、实时平衡、失败瞬间纠偏 → <tspan font-weight="800" fill="#0f766e">护城河候选</tspan></text>
+        <text x="88" y="344" font-size="13" fill="#0f766e">数据来源：真机高频数据、现场"暗数据"、客户 Know-How —— Astra 买不到、爬不到</text>
+      </svg>
+      <p class="figcap">本图为工程约束示意，非某一公司架构图。</p>
+    </div>
+
+    <div class="grid g3">
+      <div class="card tight"><div class="cap">蒸馏的现实上限</div><div class="kpi s red">×7</div><div class="lbl">小鹏汽车 720 亿 → 百亿端侧模型，压缩约 7 倍已是行业激进案例；智谱 GM-5.3 → Flash 仅 2.3 倍。</div></div>
+      <div class="card tight"><div class="cap">端侧芯片的天花板</div><div class="kpi s">50–100 亿</div><div class="lbl">当前最先进车规/机器人端侧芯片能实时推理的参数规模，频率约 10Hz 量级。</div></div>
+      <div class="card tight"><div class="cap">直接后果</div><div class="kpi s teal">分层是必然</div><div class="lbl">云端低频认知 + 端侧高频执行，不是过渡方案，而是长期架构。这也解释了 HomeBody 为何让 GPT 只做"技能调度"而非直接输出关节角。<a href="#r9">[9]</a></div></div>
+    </div>
+    <div class="note"><b>对 v1.0 的修正</b>：v1.0 把"世界模型 + VLA 融合"当作终局架构。Astra 之后更准确的描述是——<b>认知层可以外包给通用基座，但"把认知翻译成高频物理动作"这一段必须留在端侧、且必须是自研的</b>。这就是"VLA 降级为器官"的真实含义<a href="#r10">[10]</a>。</div>
+    <p class="src">来源：端云分工与蒸馏比例为公开技术讨论综述<a href="#r10">[10]</a><a href="#r3">[3]</a> · HomeBody 技能调度机制<a href="#r9">[9]</a> · 银河通用端侧小脑<a href="#r7">[7]</a></p>
+  </div>
+</section>
+
+<!-- ============ 13 估值与资本 ============ -->
+<section class="slide" id="s13">
+  <div class="snum"><b>13</b> / 16</div>
+  <div class="inner">
+    <div class="kicker">Capital Re-Pricing</div>
+    <h2>资本含义：谁的估值锚被 Astra 动摇了</h2>
+    <p class="sub">下表在 v1.0（2026-06 快照）基础上更新至 2026-10。核心观察：<b>估值锚正在从"模型能力"切向"模型能力之外的东西"</b>——端侧执行、独占数据、现金流、生态卡位。</p>
+
+    <table>
+      <thead><tr><th style="width:132px">公司</th><th style="width:150px">最新估值</th><th style="width:150px">轮次 / 时间</th><th>估值锚（本报告归因）与 Astra 后的变化</th></tr></thead>
+      <tbody>
+        <tr><td><b>Physical Intelligence</b></td><td>$11.19B（投后）</td><td>C 轮约 $1.05B，2026.05.21</td><td>纯认知层"范式领先"（π0.7）。<span class="pill p-astra">承压</span> 其能力与通用基座重叠度最高；市传曾被洽购<a href="#r14">[14]</a></td></tr>
+        <tr><td><b>Figure AI</b></td><td>$39B（投后）</td><td>C 轮 &gt;$1B，2025.09</td><td>软硬一体 + 自建数据引擎（Index）。<span class="pill p-exec">相对占优</span> 数据资产是可守部分</td></tr>
+        <tr><td><b>Skild AI</b></td><td>&gt;$14B</td><td>C 轮 $1.4B，2026.01</td><td>跨本体大脑 + 软银体系卡位。<span class="pill p-astra">承压</span> 技术披露少、生态叙事占比高</td></tr>
+        <tr><td><b>宇树科技</b></td><td>≥420 亿元（发行市值下限）</td><td>科创板 2026.06.01 过会</td><td><b>唯一利润定价标的</b>（约 70× 2025 扣非 PE）。<span class="pill p-exec">相对占优</span> 本体保有量是潜在数据网络</td></tr>
+        <tr><td><b>银河通用</b></td><td>≈$3B / 200 亿+</td><td>25 亿元轮，2026.03</td><td>仿真数据方法论 + 自研小脑 GPT + 国家队背书。<span class="pill p-exec">相对占优</span> 含"小脑自研"实质资产</td></tr>
+        <tr><td><b>智元机器人</b></td><td>约 270 亿<span class="pill p-dark">待核验</span></td><td>历史轮次</td><td>万台量产 + 开源生态。<span class="pill p-exec">相对占优</span> 数据 300h→3 万 h 的缩放证据<a href="#r13">[13]</a></td></tr>
+        <tr><td><b>星动纪元</b></td><td>100 亿+</td><td>战略轮 10 亿元，2026.03</td><td>端到端 + 国际产业资本通道。<span class="pill p-cog">重新定价↑</span> VPP2 登顶 RoboDojo 提供可验证能力证据<a href="#r5">[5]</a></td></tr>
+        <tr><td><b>星海图 / 千寻 / 它石 / 自变量 / 帕西尼</b></td><td>100–200 亿元区间</td><td>2026 上半年密集成形</td><td>叙事锚：真机数据资产（GOD）、力控、团队溢价、触觉模态。<span class="pill p-data">数据的独占性成为分水岭</span></td></tr>
+      </tbody>
+    </table>
+
+    <div class="grid g2">
+      <div class="card"><h4>唯一模型外的变量：通用基座厂商亲自下场</h4><p style="font-size:14px">OpenAI 于 2026 年年中重启硬件自研（Aditya Ramesh 领导，Altman 公开确认人形方向）。这意味着"Astra 只做大脑"可能只是阶段策略——一旦基座厂商同时做本体，纯认知层与纯本体两端都被挤压，<b>"端侧执行 + 独占数据"的中间层价值反而更稳</b>。<a href="#r14">[14]</a></p></div>
+      <div class="risk"><b>三点尽调提示</b>：① 自研认知层的"超额能力"若无法在统一榜单上与通用基座拉开可复现差距，其估值溢价缺乏支撑；② "模型期权"占估值 60–80% 的标的（v1.0 口径）在重估中最脆弱；③ 只有"有利润/有订单/有独家数据"的标的具备下行保护。</div>
+    </div>
+    <p class="src">来源：各公司融资公告与权威媒体报道汇总；v1.0 已核验估值总表（2026-06 快照）为基准，本次更新 PI C 轮、智元数据缩放等条目<a href="#r4">[4]</a><a href="#r5">[5]</a><a href="#r13">[13]</a><a href="#r14">[14]</a></p>
+  </div>
+</section>
+
+<!-- ============ 14 核心判断 ============ -->
+<section class="slide dark" id="s14">
+  <div class="snum"><b>14</b> / 16</div>
+  <div class="inner">
+    <div class="kicker">Bottom Line</div>
+    <h2>核心判断：Astra 不是终点，是把行业打回"该挣的钱"</h2>
+    <p class="sub">以下为报告作者判断，非事实陈述；每条附置信度与主要不确定来源。</p>
+
+    <div class="qbox"><div class="q">① 认知层不再值得单独押注。</div><div class="a">除非能证明"相对通用基座有可复现、可守 18 个月以上的超额能力"，否则继续自研同等认知层的 ROI 急剧恶化。<b>不确定来源</b>：通用基座是否持续开源/降价的商业策略。<span class="conf">置信度 高</span></div></div>
+
+    <div class="qbox"><div class="q">② 护城河在两个地方：端侧物理基模，和现场暗数据。</div><div class="a">前者受"蒸馏鸿沟 + 高频控制环"保护，后者受"独占性 + 时间"保护。二者共同点是<b>通用基座在成本与物理上都进不来</b>。<span class="conf">置信度 高</span></div></div>
+
+    <div class="qbox"><div class="q">③ 新分类不是"更强 vs 更弱"，而是"护城河建在哪一层"。</div><div class="a">路线 A 认知外借最快落地但最易被替代；路线 D 统一一条式最有想象空间但最难验证；路线 B 与 C（小脑自研 / 双基模闭环）是当前证据链最强的两条路径——VPP2 与 DM0.5 分别给出了实证。<span class="conf">置信度 中高</span></div></div>
+
+    <div class="qbox"><div class="q">④ "VLA 还是世界模型"是个伪命题，真正的问题是"数据从哪来、由谁独占"。</div><div class="a">架构已收敛为分层 + 融合，差异化回归到数据来源、数量与独占性。Figure 的付费众包、智元的 100× 数据扩张、银河通用的仿真合成，本质是三种数据成本曲线的竞争。<span class="conf">置信度 高</span></div></div>
+
+    <div class="qbox"><div class="q">⑤ 未来 12 个月的决定性事件：RoboDojo 类统一榜单的扩散，与通用基座厂商是否做本体。</div><div class="a">前者决定"自研能力"能否被外部验证（进而决定估值），后者决定认知层被压缩的速度。<b>两者都会让"说不出自己护城河在哪一层"的公司被快速重定价。</b><span class="conf">置信度 中</span></div></div>
+  </div>
+</section>
+
+<!-- ============ 15 参考资料与信息质量 ============ -->
+<section class="slide" id="s15">
+  <div class="snum"><b>15</b> / 16</div>
+  <div class="inner">
+    <div class="kicker">References &amp; Data Quality</div>
+    <h2>参考资料与信息质量声明</h2>
+    <p class="sub">本报告所有数据均回溯至公开来源；三类证据（官方亲测 / 第三方复现 / 企业自测）在正文中已逐条标注区分。</p>
+
+    <div class="grid g2">
+      <div class="card tight">
+        <h4>参考资料</h4>
+        <ol style="font-size:12.5px;line-height:1.75;margin:6px 0 0">
+          <li id="r1">机器人大讲堂（2026-09-17）：GPT-6 Astra 驱动双机械臂 RoboCurve 实机测试（95% vs Claude Fable 5.1 的 40%）。</li>
+          <li id="r2">澎湃新闻 / 中国青年报（2026-09-14）：外滩大会圆桌，许华哲（破壳机器人）对 Astra 能力的三维分解（语义/空间泛化强、物理泛化弱）。</li>
+          <li id="r3">电子工程专辑 / autocarweekly（2026-10-09）：Astra 控制真车的成本与速度实测（134.7m ≈ 660 万 token ≈ $7.74；均速 0.42 m/s）。</li>
+          <li id="r4">雷锋网《GPT-6 下场之后，RoboDojo 榜首换上了中国名字》（2026-10，leiphone.com/category/industrynews/nxgmickU9IgouEOn.html）、36氪（2026-10，eu.36kr.com/zh/p/4018046813065349）：RoboDojo 榜单解读（42 仿真 + 18 真机任务、五维度评分、人类专家 76.03%/80.42 分参照）与 VPP2 开源复现。</li>
+          <li id="r5">量子位《清华具身模型登顶全球第一！突围 GPT-6、英伟达，不靠外挂和额外数据》（2026-10，qbitai.com/2026/10/502125.html）：星动纪元 VPP2 以平均成功率 32.26%、得分 39.26 登顶 RoboDojo，并获泛化/精细操作/记忆三项第一。</li>
+          <li id="r6">星动纪元 VPP2 技术报告与开源仓库（github.com/roboterax/video-prediction-policy-2）：14B 参数、无额外数据、无 agent RSI。</li>
+          <li id="r7">银河通用（2026-06-19）：AstraBrain-WBC 0.5 通用小脑 GPT（8040 万参数、2 万小时数据、50Hz、0.39ms；CVPR 2026 "Humanoid-GPT"）。<b>注意</b>：此"Astra"与 OpenAI GPT-6 Astra 无关。</li>
+          <li id="r8">人民网重庆频道 / 重庆市政府网（2026-08-26/27）：原力灵机 DM0.5（4B 大脑 + 6.8 亿动作教练；RoboDojo 24.90 分，记忆维度 47.74 断层第一）。</li>
+        </ol>
+      </div>
+      <div class="card tight">
+        <h4>参考资料（续）</h4>
+        <ol start="9" style="font-size:12.5px;line-height:1.75;margin:6px 0 0">
+          <li id="r9">Stanford / Caltech HomeBody（2026-09-27/30）：GPT-6 Astra 驱动机器人"把技能当工具调用"，跳过学习型 VLA；含延迟与过热局限。</li>
+          <li id="r10">观察者网 / 凤凰网（WAIC 2026 观察）："VLA 降级为器官"、VLA（肌肉记忆）与 WAM（先想后做）的融合讨论。</li>
+          <li id="r11">OFweek 机器人网 / 搜狐·火星比特（2026-09）：2026 年 9 月"8 天 5 款模型"盘点（松延 HERON-World/HERON-CRA、智元 AGILE 2.0/GE-Act 2.0、宇树 UnifoLM-WLA-1.0、Figure Helix 2.5）。</li>
+          <li id="r12">PatchWAM 论文《An Action Is Worth One Patch: Unified World-Action Modeling with PatchWAM》（arXiv:2609.25961，2026-09-22）：提出 Action-as-Patch，单一生成过程同时输出动作与场景预测，无需独立动作专家；LIBERO-Plus 91.8%、RoboTwin 2.0 96.12%（全量数据 + 增广示范设定）。</li>
+          <li id="r13">智元机器人 2026 合作伙伴大会（unwire.hk 报道）：GE-Act 2.0 数据 300h→3 万 h（100×）、G1-OP 零样本成功率 17.1%→44.1%；GO-3 规划。</li>
+          <li id="r14">各公司官方融资公告与科技媒体报道（TechCrunch / Bloomberg / 财新等）：估值与融资条目；OpenAI Robotics 重启硬件自研。</li>
+          <li id="r15">诺因（Knowin）GLOW 技术报告（2026-09-24）：RoboDojo 18 任务<b>自测</b> 62.2%/71.1%——企业自测口径，未见第三方复现。</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="note" style="margin-top:16px"><b>信息质量三级标注（全篇沿用）</b>：<b>① 官方亲测</b>——由评测方（如 RoboDojo）实测，含金量最高，例：GPT-6 Astra 22.48%；<b>② 第三方复现/开源可复现</b>——例：VPP2（开源、无额外数据、无 RSI）；<b>③ 企业自测</b>——需打折扣，例：诺因 GLOW 62.2%、Figure Helix 2.5 的 56%。<b>跨榜单数字不可直接比较</b>（任务集、本体、评分协议不同）。</div>
+
+    <div class="risk"><b>命名消歧提示</b>：本报告中的 "Astra" 指 OpenAI 发布的通用模型 GPT-6 Astra（冲击事件主体）；银河通用的"银河星脑 AstraBrain"及其小脑模型 "AstraBrain-WBC 0.5" 是<u>同名但无关</u>的另一条产品线，请勿混淆<a href="#r7">[7]</a>。</div>
+
+    <div class="note"><b>信源可靠性说明</b>：GPT-6 Astra 的中文权威媒体（澎湃、量子位、机器人大讲堂、雷锋网、36氪）报道一致且数据具体（含 RoboDojo 官方实测成绩）；部分英文站点质疑其"可验证官方公告"，甚至与 Google Project Astra 混淆。本报告按<b>已发生的行业事件</b>处理，但保留该争议提示，供读者判断。</div>
+
+    <p class="src">编制：2026-10-15 · 接替 v1.0（2026-06-11）· 未核验项已在正文以 <span class="pill p-dark">待核验</span> 标注。</p>
+  </div>
+</section>
+
+<footer class="doc">具身智能模型路线研究报告 v2.0 · Astra 冲击与路线重估 · 2026-10-15 · 全篇数据回溯公开来源，判断与事实分列</footer>
+
+<script>
+(function(){
+  var slides=[].slice.call(document.querySelectorAll('.slide'));
+  var nav=document.getElementById('decknav');
+  var bar=document.getElementById('progress');
+  var cur=document.getElementById('pgcur');
+  var tot=document.getElementById('pgtot');
+  tot.textContent=slides.length;
+  var i=0;
+
+  slides.forEach(function(s,idx){
+    var b=document.createElement('button');
+    b.title=(idx+1)+' · '+(s.querySelector('h1,h2')?s.querySelector('h1,h2').textContent.slice(0,22):'');
+    b.addEventListener('click',function(){go(idx);});
+    nav.appendChild(b);
+  });
+  var dots=[].slice.call(nav.children);
+
+  function go(n){
+    i=Math.max(0,Math.min(slides.length-1,n));
+    slides[i].scrollIntoView({behavior:'smooth',block:'start'});
+  }
+  function sync(){
+    var mid=window.innerHeight*0.4, best=0, bd=1e9;
+    slides.forEach(function(s,idx){
+      var r=s.getBoundingClientRect();
+      var d=Math.abs(r.top-mid*0.0)+Math.abs(r.top);
+      var dd=Math.abs(r.top);
+      if(r.top<=window.innerHeight*0.35 && Math.abs(r.top)<bd){bd=Math.abs(r.top);best=idx;}
+    });
+    i=best;
+    dots.forEach(function(d,k){d.classList.toggle('on',k===i);});
+    cur.textContent=(i+1);
+    var h=document.documentElement.scrollHeight-window.innerHeight;
+    bar.style.width=(h>0?(window.scrollY/h*100):0)+'%';
+  }
+  window.addEventListener('scroll',sync,{passive:true});
+  window.addEventListener('resize',sync);
+  document.addEventListener('keydown',function(e){
+    if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' '){e.preventDefault();go(i+1);}
+    else if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();go(i-1);}
+    else if(e.key==='Home'){e.preventDefault();go(0);}
+    else if(e.key==='End'){e.preventDefault();go(slides.length-1);}
+  });
+  sync();
+})();
+</script>
+</body>
+</html>
