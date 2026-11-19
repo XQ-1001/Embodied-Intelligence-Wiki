@@ -107,7 +107,7 @@ blockquote p{margin:4px 0;}
 
 <div class="wiki-header">
   <h1>机器人「部署」问题研究：<br><span style="font-size:1rem;color:#54595d;">工作分解、成本结构与复制系数</span></h1>
-  <div class="subtitle">独立研究报告 · 首版 2026-11-12 · 数据截至 2026-11 · 覆盖工业制造 / 仓储物流 / 商业服务 / 跨场景，中欧美对比</div>
+  <div class="subtitle">独立研究报告 · 首版 2026-11-12 · 修订 2026-11-17 · 数据截至 2026-11 · 覆盖工业制造 / 仓储物流 / 商业服务 / 跨场景，中欧美对比</div>
 </div>
 
 <div class="stats-bar">
@@ -145,7 +145,8 @@ blockquote p{margin:4px 0;}
     <li class="toc-lvl2"><a href="#s6">六、AI 如何重构部署</a></li>
     <li class="toc-lvl3"><a href="#s6-1">6.1 四类技术路线</a></li>
     <li class="toc-lvl3"><a href="#s6-2">6.2 已验证案例</a></li>
-    <li class="toc-lvl3"><a href="#s6-3">6.3 能力—成本剪刀差</a></li>
+    <li class="toc-lvl3"><a href="#s6-3">6.3 尚未独立验证：AI 编排宣称</a></li>
+    <li class="toc-lvl3"><a href="#s6-3b">6.4 各工作包的 AI 影响与剪刀差</a></li>
     <li class="toc-lvl2"><a href="#s7">七、失败模式</a></li>
     <li class="toc-lvl2"><a href="#s8">八、对双业务的战略含义</a></li>
     <li class="toc-lvl2"><a href="#s9">九、数据缺口与待验证</a></li>
@@ -511,27 +512,85 @@ blockquote p{margin:4px 0;}
 
 <p>同期，Sim2Real 路线的代表案例是 Ambi Robotics：公司称在仿真中训练模型，使系统"上线第一天即可作业"，并于 2022 年前后为 Pitney Bowes 完成 <b>80 余套</b> A-Series 安装；截至 2026 年中自称累计部署 100 套系统<sup><a href="#ref14">[14]</a></sup>。<span class="tag t-claim">公司自述</span>这组数字的价值不在绝对量，而在于它展示了"同一产品形态在单一客户内连续复制"的部署曲线——这正是 ρ 可被观测的场景。</p>
 
-<h3 id="s6-3">6.3 尚未独立验证的部分：AI 编排把部署压到"天"级</h3>
+<h3 id="s6-3">6.3 尚未独立验证的部分：AI 把部署压到"天"级</h3>
 
-<p>2026 年国内出现了一批把大模型接入部署流程的产品，均宣称把场景部署从"数周"压缩到"数天"甚至"数分钟"。以下均为公司自述，尚无第三方复现。</p>
+<p>把大模型接进部署流程，并不是 2026 年才出现的事。2023 年，Google 旗下的 Intrinsic 推出 Flowstate，用可复用的"技能"拼装成行为树，替代逐行编程；2024 年 7 月，伯克利的 Jacobi Robotics 以运动规划算法创业，直接打出"部署时间减少 95%"；2025 年 3 月，德国的 Wandelbots 发布硬件无关的机器人操作系统 NOVA，并在大众德累斯顿工厂做试点。国内的分水岭出现在 <b>2025 年 9 月</b>——节卡在工博会全球首发 JAKA EVO，第一次把"数据采集 → 增广 → 训练 → 部署"打包成一个可对外销售的工业具身智能平台。此后 2026 年 6 月至 11 月的五个月内，国内至少 5 家公司集中发布同类产品，"数周 → 数天/数分钟"由此变成行业标准话术。</p>
+
+<p>下面两张表按<b>国内</b>与<b>海外</b>分开排列。每一行都注明宣布时间、宣称的周期、对比基线、技术方案与证据等级；本报告未能找到第三方复现的，一律标为"公司自述"。</p>
 
 <div class="table-wrapper"><table class="wikitable">
-<thead><tr><th style="width:18%">产品</th><th style="width:36%">宣称的部署效果</th><th style="width:20%">机制</th><th>来源</th></tr></thead>
+<thead><tr><th style="width:14%">产品 / 公司</th><th style="width:11%">宣布时间</th><th style="width:24%">宣称的部署周期</th><th style="width:12%">对比基线</th><th style="width:25%">技术方案</th><th>证据等级</th></tr></thead>
 <tbody>
-<tr><td>墨影科技 百川平台</td><td>新设备接入周期 <b>3 个月 → 最快 7 天</b>；成熟产线方案 45 天落地</td><td>自然语言生成行为树 → 仿真校验 → 一键下发真机</td><td><sup><a href="#ref17">[17]</a></sup></td></tr>
-<tr><td>智元 Genie Studio 2.0</td><td>全新作业场景 <b>最快 7 天</b>完成 0→1 部署验证；仿真评测与真机误差 &lt;10%</td><td>Agent 可视化编排 + Flywheel 模型迭代 + Monitor 多机运维</td><td><sup><a href="#ref18">[18]</a></sup></td></tr>
-<tr><td>具识智能 insightOS</td><td>拆码垛场景部署 <b>数分钟</b>，对比传统数周，效率提升约 20 倍</td><td>自然语言指挥多机协同，无需代码构建任务流</td><td><sup><a href="#ref19">[19]</a></sup></td></tr>
-<tr><td>潜空间 潜擎</td><td>1–2 秒生成 10–20 秒动作序列；传统动作开发"以周计"</td><td>文本/语音/图像/视频直接生成动作</td><td><sup><a href="#ref20">[20]</a></sup></td></tr>
-<tr><td>微亿智造（快思考 + 人类在环）</td><td>传统工业机器人部署"数月示教编程"，快思考可将交付周期压缩至"天级"</td><td>云端人类专家在部署初期快速注入工艺知识</td><td><sup><a href="#ref21">[21]</a></sup></td></tr>
-<tr><td>苹果 AMP1</td><td>不依赖 VLA 预训练，由通用大模型实时看图、写代码、下发轨迹；真机成功率 <b>96.3%</b>（含错误恢复）</td><td>Agentic manipulation：代码即策略</td><td><sup><a href="#ref27">[27]</a></sup></td></tr>
+<tr><td><b>节卡 JAKA EVO</b></td><td>2025-09<br>工博会首发</td><td>复杂抓取训练 <b>7 天 → 6 小时</b>；"部署效率提升约 2 倍"</td><td>传统点位示教</td><td>数据采集—增广—训练—部署一体；3B 分层控制模型；FreeCalib 免手眼标定（省约 20 分钟现场时间）</td><td><span class="tag t-claim">公司自述</span>12 个标杆项目<sup><a href="#ref22">[22]</a></sup><sup><a href="#ref29">[29]</a></sup></td></tr>
+<tr><td><b>节卡 JAKA EVO</b>（年度更新）</td><td>2026-09<br>工博会</td><td>新场景部署周期 <b>12 个月 → 57 天</b></td><td>传统集成 12 个月</td><td>云端 + 边缘分层智能体；约 200 组样本训练 2 分钟长程任务，成功率 &gt;85%</td><td><span class="tag t-claim">公司自述</span>媒体转述<sup><a href="#ref30">[30]</a></sup></td></tr>
+<tr><td><b>越疆 × 腾讯 Robotics X</b></td><td>2026-07<br>WAIC</td><td><b>分钟级 SKU 换线</b>、"一次部署、多品适配"；真实产线任务成功率 <b>&gt;95%</b></td><td>未给传统基线</td><td>腾讯自研 VLA 大模型 + 越疆 X-Trainer 双臂；训练→真机测试→量产部署闭环</td><td>客户产线实测（美妆龙头工厂），<b>但 95% 是能力指标不是周期指标</b><sup><a href="#ref31">[31]</a></sup></td></tr>
+<tr><td><b>智元 Genie Studio 2.0</b></td><td>2026-10</td><td>全新作业场景 <b>最快 7 天</b>完成 0→1 部署验证；仿真与真机误差 &lt;10%</td><td>未给基线</td><td>Agent 可视化编排 + Flywheel 模型迭代 + Monitor 多机运维</td><td><span class="tag t-claim">公司自述</span><sup><a href="#ref18">[18]</a></sup></td></tr>
+<tr><td><b>墨影科技 百川平台</b></td><td>2026<br>（页面未标月）</td><td>新设备接入周期 <b>3 个月 → 最快 7 天</b>；成熟产线方案 <b>45 天</b>落地</td><td>传统集成 3 个月</td><td>单脑一体化控制架构，一套软件适配多品牌多构型；自然语言 → 行为树 → 仿真校验 → 一键下发真机</td><td><span class="tag t-claim">公司自述</span><sup><a href="#ref17">[17]</a></sup></td></tr>
+<tr><td><b>具识智能 insightOS Semantic</b></td><td>2026-07<br>WAIC</td><td>拆码垛部署 <b>数分钟</b>，对比传统 <b>数周</b>，约 20 倍</td><td>传统集成数周</td><td>自然语言指挥多机协同，无需代码构建任务流</td><td><span class="tag t-claim">公司自述</span>中国日报报道<sup><a href="#ref19">[19]</a></sup></td></tr>
+<tr><td><b>潜空间 潜擎</b></td><td>2026-06<br>链博会</td><td><b>1–2 秒</b>生成 10–20 秒动作序列；传统动作开发"以周计"</td><td>动作开发以周计</td><td>文本 / 语音 / 图像 / 视频直接生成动作；"一次创作、多本体复用"</td><td><span class="tag t-claim">公司自述</span><sup><a href="#ref20">[20]</a></sup></td></tr>
+<tr><td><b>微亿智造 快思考</b></td><td>2026<br>（递表期）</td><td>传统示教编程"数月" → 交付周期压缩至<b>"天级"</b></td><td>传统数月</td><td>云端人类专家在部署初期注入工艺知识（人类在环）</td><td>招股书 + 300+ 工业现场<sup><a href="#ref21">[21]</a></sup></td></tr>
+<tr><td><b>梅卡曼德 Mech-Viz</b></td><td>2026<br>（港股上市）</td><td>部署周期自"数月"缩短至<b>"数小时至数日"</b></td><td>传统数月</td><td>图形化无代码编程 + 一键仿真 + 内置轨迹规划 / 碰撞检测 / 抓取规划</td><td>产品资料；<b>公司自认 L3（自然语言、多步任务）仍在研发，2026Q4 量产、2027H2 才形成商业规模</b><sup><a href="#ref36">[36]</a></sup></td></tr>
 </tbody></table></div>
 
-<div class="notice"><b>如何读这组数字。</b>"数分钟"与"数周"的对比，分母往往只包含<b>任务编排</b>这一段（WBS 第 8 包），不含末端执行器、系统集成、安全验收与爬坡。把这类宣称直接等同于"部署周期缩短 20 倍"，会犯与"AI 让部署归零"相同的错误。<b>正确的用法是：它们证明第 8 包确实可被大幅压缩，而不是证明部署整体可被压缩。</b></div>
+<div class="table-wrapper"><table class="wikitable">
+<thead><tr><th style="width:14%">产品 / 公司</th><th style="width:11%">宣布时间</th><th style="width:24%">宣称的部署周期</th><th style="width:12%">对比基线</th><th style="width:25%">技术方案</th><th>证据等级</th></tr></thead>
+<tbody>
+<tr><td><b>Wandelbots NOVA</b>（德）</td><td>2025-03 发布<br>VW 案例 2026</td><td>新装配方案开发 <b>数月 → 不足 1 天</b>；复杂任务编程 <b>数周 → 数分钟</b></td><td>传统示教编程</td><td>硬件无关机器人 OS + Isaac Sim / OpenUSD 数字孪生；程序跨产线、跨品牌复用</td><td>NVIDIA 案例研究；<b>明确为试点，未进入量产</b><sup><a href="#ref32">[32]</a></sup></td></tr>
+<tr><td><b>Formic</b>（美，RaaS）</td><td>2023–2026</td><td>交付周期"<b>数月 → 数周</b>"；托盘机器人租赁交期 <b>≤10 周</b></td><td>传统集成 4–6 个月</td><td>标准化模块 + 自有 OS + 租赁；CEO 指出最大耗时在场地工程（地坪、末端工具、安全），而非机器人智能</td><td><span class="tag t-claim">公司自述</span>营销口径与新闻稿<sup><a href="#ref33">[33]</a></sup></td></tr>
+<tr><td><b>Jacobi Robotics</b>（美）</td><td>2024-07<br>成立并发布</td><td>部署 / 调试时间 <b>−95%</b>（数周 → 数小时；<b>&lt;1 天</b> vs 传统约 1 个月）；编程快 <b>20 倍</b>；项目成本 <b>−24%</b>；换箱型 <b>5 分钟</b></td><td>传统编程工具</td><td>基于 2020 年 Science Robotics 的 AI 运动规划，无碰撞轨迹生成 &lt;1 ms；远程编程可减少现场支持最多 50%</td><td>合作方 Formic 称 SAT 时间 −95%；$500 万种子轮<sup><a href="#ref34">[34]</a></sup></td></tr>
+<tr><td><b>Intrinsic Flowstate</b>（Google，美）</td><td>2023 推出</td><td>用"技能块"拼装替代"数百小时"手工编码；部署前完成仿真验证</td><td>数百小时手工编程</td><td>Web 端工作单元布局 + 可复用技能（感知 / 运动规划 / 力控）组合为行为树</td><td>无明确周期宣称；2026-02 并入 Google<sup><a href="#ref35">[35]</a></sup></td></tr>
+<tr><td><b>Apple AMP1</b></td><td>2026-11</td><td>真机成功率 <b>96.3%</b>（含错误恢复）</td><td>——</td><td>不依赖 VLA 预训练，通用大模型实时看图、写代码、下发轨迹</td><td>能力宣称，<b>非周期宣称</b><sup><a href="#ref27">[27]</a></sup></td></tr>
+</tbody></table></div>
+
+<p class="small">说明：节卡在 2025 与 2026 各发布过一次更新，本表分列两行；Formic 按最新公开口径计入 2026，故样本合计 14 个产品 / 案例。Wandelbots 在 2018 年曾用 TracePen 传感衣在 VW 做过早期试点（当时口径为"3 个月 → 10 分钟"），与 NOVA 的案例不是同一代产品，不应混用。</p>
+
+<div class="chart">
+  <div class="chart-title">图 5 · 宣称的发布时间分布：2026 年下半年集中爆发</div>
+  <div class="chart-sub"><span class="tag t-fact">事实</span>按本报告收录的 14 个产品 / 案例的首次公开宣称时间统计；2026 年的 10 个中有 7 个落在 6–11 月</div>
+  <div class="bar-row"><div class="bar-label">2023</div><div class="bar-track"><div class="bar-fill gray" style="width:10%"></div></div><div class="bar-val">1 · 海外</div></div>
+  <div class="bar-row"><div class="bar-label">2024</div><div class="bar-track"><div class="bar-fill gray" style="width:10%"></div></div><div class="bar-val">1 · 海外</div></div>
+  <div class="bar-row"><div class="bar-label">2025</div><div class="bar-track"><div class="bar-fill alt" style="width:20%"></div></div><div class="bar-val">2 · 国内1/海外1</div></div>
+  <div class="bar-row"><div class="bar-label">2026</div><div class="bar-track"><div class="bar-fill red" style="width:100%"></div></div><div class="bar-val">10 · 国内8/海外2</div></div>
+</div>
+
+<p><b>口径拆解：这些数字在量什么。</b>把 14 条宣称放在一起，第一个发现不是"AI 有多快"，而是<b>它们量的根本不是同一件事</b>。按分母可以分成三类，折算到全项目周期后的合理影响相差一个数量级。</p>
+
+<div class="table-wrapper"><table class="wikitable">
+<thead><tr><th style="width:20%">分母类型</th><th style="width:20%">覆盖的工作包</th><th style="width:30%">代表宣称</th><th>折算到全周期的合理幅度</th></tr></thead>
+<tbody>
+<tr><td><b>① 编程 / 编排时间</b></td><td>WBS 第 8 包（应用配置与任务编排）</td><td>具识"数分钟"、潜空间"1–2 秒"、Jacobi"5 分钟换箱型"、节卡"7 天→6 小时"</td><td>该段可压缩 <b>80%–95%</b>；对应全周期约 <b>5%–10%</b></td></tr>
+<tr><td><b>② 调试 / 验收时间</b></td><td>WBS 第 9–10 包（现场调试、验收测试）</td><td>Jacobi"部署 −95%"、Wandelbots"数周→数分钟"、节卡"12 个月→57 天"</td><td>该段可压缩 <b>50%–95%</b>；对应全周期约 <b>15%–25%</b></td></tr>
+<tr><td><b>③ 全项目交付周期</b></td><td>WBS 第 1–12 包（含方案设计、硬件到场、末端工具、安全验收、爬坡）</td><td>Formic"数月→数周"、墨影"45 天"、微亿"天级"</td><td>可压缩 <b>30%–60%</b>，且受硬件交期与现场施工的硬约束</td></tr>
+</tbody></table></div>
+
+<p class="small">折算方法：以图 1 的工时权重为骨架，用 6.2 / 6.3 各案例给出的单段降幅乘以其对应工作包权重，再求和。<span class="tag t-infer">推断</span>该方法假设各段可独立压缩、且压缩后不产生新的返工，属于上限估计。</p>
+
+<p>三类分母的差别，正好印证 6.2 的判断：<b>AI 能压缩的是"信息处理"环节，压不动"物理施工"环节。</b>Formic 管理层给出的解释值得直接引用——部署里最耗时的不是机器人不够聪明，而是地坪、末端工具、安全围栏这些"每来一个新场地就要重做一遍"的工程，它们与模型能力无关。</p>
+
+<p><b>第二个发现：国内宣称普遍缺少对"基线"的定义。</b>越疆、智元、墨影、具识都没有说明"数周"是多大规模的场景、几台设备、什么验收标准、是否含末端执行器与安全验收。海外案例反而更谨慎：Wandelbots 的 VW 案例明确标注为试点（未进入量产），Jacobi 的 −95% 有合作方 Formic 的 SAT 数据背书，Intrinsic 干脆不给周期数字。这构成了一个可操作的判断——<b>宣称越模糊、越接近"数分钟"的，可验证性越低</b>。</p>
+
+<p><b>第三个发现：反证比宣称更值得读。</b>梅卡曼德是这批公司中唯一已上市的（2026 年 9 月港股），其招股书明确写着 L3 能力（理解自然语言、执行多步任务）"仍处于开发阶段"，Mech-GPT 与 Mech-Hand 要到 2026Q4 量产、2027H2 才形成实际商业规模；而它当前在售的 Mech-Viz 给出的口径是"数月 → 数小时至数日"，比同行的"数分钟"保守两个数量级。一家已经上市、需要为披露真实性负责的头部公司，对自身能力边界的描述，比任何发布会都更接近真实进度。</p>
+
+<div class="notice"><b>如何读这组数字。</b>"数分钟"与"数周"的对比，分母往往只包含<b>任务编排</b>这一段（WBS 第 8 包），不含末端执行器、系统集成、安全验收与爬坡。把这类宣称直接等同于"部署周期缩短 20 倍"，会犯与"AI 让部署归零"相同的错误。<b>正确的用法是：它们证明第 8 包确实可被大幅压缩，而不是证明部署整体可被压缩。</b>本报告据此给出的净效应判断仍是第 6.4 节的 12%–17%——两者并不矛盾，差别只在分母。</div>
+
+<p><b>拿到一个新宣称时，按下面五条判据核一遍，基本可以判断它属于哪一档。</b></p>
+
+<div class="table-wrapper"><table class="wikitable">
+<thead><tr><th style="width:14%">判据</th><th style="width:40%">要看什么</th><th>为什么关键</th></tr></thead>
+<tbody>
+<tr><td><b>1 分母定义</b></td><td>"数周"是多大规模、几台设备、什么验收标准、从哪天算到哪天</td><td>没有分母的压缩比无法横向比较，也无法折算成项目成本</td></tr>
+<tr><td><b>2 覆盖工作包</b></td><td>压缩的是第 8 包、第 9 包，还是第 1–12 包全周期</td><td>决定它对项目总成本的真实影响，差别可达 5 倍</td></tr>
+<tr><td><b>3 是否含硬件与施工</b></td><td>末端执行器、地坪、安全围栏、备件、爬坡期是否计入</td><td>这部分 AI 几乎压不动，漏算会系统性高估效果</td></tr>
+<tr><td><b>4 是否可复制</b></td><td>第 2 个、第 10 个同类站点的工时曲线（即 ρ）</td><td>单点演示与规模化部署是两回事；只有 ρ 下降才是真效率</td></tr>
+<tr><td><b>5 谁背书</b></td><td>第三方复现、客户 SAT 数据、招股书 / 审计口径</td><td>公司自述、媒体同源转载、可审计披露，可信度依次递增</td></tr>
+</tbody></table></div>
+
+<p>用这五条去量，本报告收录的 14 个案例里，能同时满足"覆盖第 9–10 包 + 有客户侧数据 + 给出基线定义"的只有 Jacobi 与 Wandelbots 两家；能覆盖到第 1–12 包全周期的，只有 Formic 一家的"数月 → 数周"。国内的多数宣称目前停在第一档——<b>它们是真的进展，但还不是可比的数字</b>。这也是为什么第 6.4 节仍用 12%–17% 而不是"部署效率翻倍"来估算净效应。</p>
 
 <h3 id="s6-3b">6.4 各工作包的 AI 影响：不均匀</h3>
 
 <div class="chart">
-  <div class="chart-title">图 5 · 十二个工作包的"可自动化度"：当前 vs AI 后（0–100 主观刻度）</div>
+  <div class="chart-title">图 6 · 十二个工作包的"可自动化度"：当前 vs AI 后（0–100 主观刻度）</div>
   <div class="chart-sub"><span class="tag t-infer">推断</span>本图为结构化判断，用于显示相对差异，不是实测数据；判据见 6.2 / 6.3 的案例</div>
   <div class="grp">
     <div class="grp-row"><div class="bar-label">5 末端执行器与工装</div><div class="grp-bars">
@@ -565,7 +624,7 @@ blockquote p{margin:4px 0;}
   </div>
 </div>
 
-<p>把图 1 的工时权重和图 5 的压缩幅度乘起来，可以得到一个粗略的净效应估算：<span class="tag t-infer">推断</span>若第 8、9 包（合计约 28% 工时）压缩 40%–50%，第 6 包（约 5%）压缩 40%，第 3、4、7 包几乎不变，则<strong>部署总工时的理论降幅约为 12%–17%</strong>——远低于"AI 让部署效率翻倍"的市场叙事。</p>
+<p>把图 1 的工时权重和图 6 的压缩幅度乘起来，可以得到一个粗略的净效应估算：<span class="tag t-infer">推断</span>若第 8、9 包（合计约 28% 工时）压缩 40%–50%，第 6 包（约 5%）压缩 40%，第 3、4、7 包几乎不变，则<strong>部署总工时的理论降幅约为 12%–17%</strong>——远低于"AI 让部署效率翻倍"的市场叙事。</p>
 
 <blockquote>
 <p><b>能力—成本剪刀差。</b>AI 会降低单次部署的边际工时，但不一定降低"部署这件事的总成本占比"。因为能力提升同时打开了更难的场景（移动、非结构化、人机共融），而难场景的部署成本更高。</p>
@@ -687,18 +746,26 @@ blockquote p{margin:4px 0;}
 <li id="ref26">CSIA / Morgan Stanley 系统集成商调查（2025 周期）：67% 集成商过去 12 个月收入增长、85% 预期未来 12 个月增长、82% 订单出货比 ≥1x；CSIA 基准指标体系含人均收入、利用率、劳动乘数等。<a href="https://reportify.cn/reports/1290527317755564032">摘要链接</a>、<a href="https://www.csiaexchange.com/224100/not%20initialized">CSIA 基准项目</a></li>
 <li id="ref27">36 氪，《苹果给 Claude、Gemini 装上机械臂……》（AMP1，真机成功率 96.3%，含错误恢复）。<a href="https://36kr.com/p/4066126159401864">链接</a></li>
 <li id="ref28">上海新时达，《让工人从"操作员"变为"指挥官"》（STEPStudio 平台将机器人工作站调试周期缩短 50%）。<a href="https://www.stepelectric.com/news_detail/137.html">链接</a></li>
+<li id="ref29">节卡机器人官网新闻，《JAKA EVO 工业具身智能平台》（2025 年 9 月中国国际工业博览会全球首发；复杂抓取训练由 7 天缩短至 6 小时；部署效率提升约 2 倍；FreeCalib 免手眼标定节省约 20 分钟现场时间）。<a href="http://www.jakapro.com/show/news-52.html">链接</a></li>
+<li id="ref30">TheRoboRadar，《节卡机器人发布 Zu50 协作机器人与 Kargo50 轮式人形机器人》（含 2026 年工博会 JAKA EVO 更新：新场景部署周期由 12 个月压缩至 57 天；约 200 组样本训练 2 分钟长程任务，成功率 &gt;85%）。<a href="https://theroboradar.com/news/jaka-zu50-kargo50-industrial-embodied-ai-84608d">链接</a></li>
+<li id="ref31">新浪财经，《腾讯、越疆科技联手跑出 Physical AI"深圳方案"》（WAIC 2026，2026-07-17；腾讯自研 VLA 模型 + 越疆 X-Trainer，美妆龙头工厂真实产线，任务成功率 &gt;95%，分钟级 SKU 换线）。<a href="https://finance.sina.com.cn/jjxw/2026-07-17/doc-iniicqkx8258432.shtml">链接</a>；另见 <a href="https://www.ithome.com/0/978/106.htm">IT之家同题报道</a></li>
+<li id="ref32">NVIDIA 案例研究，<i>Volkswagen Sachsen Streamlines Robotics Deployment With Wandelbots NOVA and NVIDIA Isaac Sim</i>（新装配方案开发"数月→不足 1 天"、复杂任务编程"数周→数分钟"；明确为 Gläserne Manufaktur 车顶内衬装配试点，未进入量产）。<a href="https://www.nvidia.com/en-gb/case-studies/volkswagen-with-wandelbots-nova-and-isaac-sim/">链接</a></li>
+<li id="ref33">Formic 官网，<i>Robotic Automation Software</i>（Formic FAST 将系统部署周期"从数月缩短到数周"；Core OS 支持"不到一天完成部署"）。<a href="https://formic.co/robotic-automation-software">链接</a>；交期 ≤10 周见 Formic 托盘机器人租赁新闻稿 <a href="https://formic.co/resources/press/land-o-frost-reduces-daily-labor-expenses-by-20-while-upskilling-its-workforce-wi">Land O'Frost 案例</a></li>
+<li id="ref34">The Robot Report, <i>Jacobi Robotics raises $5M for motion planning software</i>（2024-07；部署时间减少 95%、编程速度 20 倍、项目成本节省 24%、融资 $500 万）。<a href="https://www.therobotreport.com/jacobi-robotics-raises-5m-for-motion-planning-software/">链接</a>；产品页"95% faster commissioning""5 minutes per pattern"见 <a href="https://jacobirobotics.com/solutions/palletizer">Jacobi Palletizer</a></li>
+<li id="ref35">CNBC, <i>Former Alphabet 'moonshot' robotics company Intrinsic is folding into Google</i>（2026-02-25；Flowstate 于 2023 年推出，以可复用"技能"与行为树替代逐行编程；机器人编程"往往需要数百小时手工编码"）。<a href="https://www.cnbc.com/amp/2026/02/25/alphabet-robotics-software-intrinsic-google-ai.html">链接</a></li>
+<li id="ref36">梅卡曼德（雄安）机器人科技股份有限公司 港交所招股说明书及上市研究（Mech-Viz 图形化无代码编程与一键仿真；L3 级"自然语言理解 + 多步任务"仍在开发，Mech-GPT / Mech-Hand 预计 2026Q4 量产、2027H2 形成商业规模）。招股书口径另见 <a href="https://www.eet-china.com/mp/a518245.html">EET-China 解读</a>、<a href="http://mp.weixin.qq.com/s?__biz=MzI3MDczOTU0MA==&mid=2247485947&idx=1&sn=29e9eea06987be0efc47f4159a175c2a">上市研究</a></li>
 </ol>
 </div>
 
 <div class="notice" style="margin-top:18px">
-<b>版本说明。</b>v1.0（2026-11-12）。本报告为框架落地首版，重点在建立可复用的分析坐标系（WBS、成本堆栈、ρ、四类 AI 路线），而非给出全量统计。凡标注 <span class="tag t-infer">推断</span> 的判断均需在后续版本中以一手数据替换；凡标注 <span class="tag t-claim">公司自述</span> 的降幅均未获第三方复现。
+<b>版本说明。</b>v1.1（2026-11-17）。在 v1.0（2026-11-12）基础上，将 6.3 节由 5 个案例扩写为国内 9 家 + 海外 5 家共 14 个产品 / 案例的完整清单（含宣布时间、对比基线、技术方案与证据等级），新增"口径拆解"分类法、发布时间分布图与五条验证判据。本报告重点在建立可复用的分析坐标系（WBS、成本堆栈、ρ、四类 AI 路线），而非给出全量统计。凡标注 <span class="tag t-infer">推断</span> 的判断均需在后续版本中以一手数据替换；凡标注 <span class="tag t-claim">公司自述</span> 的降幅均未获第三方复现。
 </div>
 
 </article>
 </div>
 
 <div class="page-footer">
-机器人「部署」问题研究 v1.0 · 2026-11-12 · 具身智能 Wiki 研究报告 · 本页所有外部数据均标注来源，未标注者为结构性示意
+机器人「部署」问题研究 v1.1 · 2026-11-17 · 具身智能 Wiki 研究报告 · 本页所有外部数据均标注来源，未标注者为结构性示意
 </div>
 
 </div>

@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>猿声科技 — 具身智能Wiki</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;1,400&display=swap');
+  :root { --bg: #ffffff; --text: #202122; --link: #0645ad; --link-visited: #0b0080; --border: #a2a9b1; --infobox-bg: #f9f9f9; --heading: #000000; --toc-bg: #f8f9fa; --toc-border: #a2a9b1; --table-stripe: #f8f9fa; --table-header: #eaecf0; --accent: #1a3a5c; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, '微软雅黑', 'Microsoft YaHei', 'Segoe UI', sans-serif; font-size: 0.875rem; line-height: 1.6; color: var(--text); background: #f6f6f6; }
+  .page-container { max-width: 1200px; margin: 0 auto; padding: 0; }
+  .top-nav { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 8px 20px; font-size: 0.8rem; color: #54595d; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 200; }
+  .top-nav a { color: var(--link); text-decoration: none; }
+  .top-nav a:hover { text-decoration: underline; }
+  .top-nav .breadcrumb-sep { color: #a2a9b1; }
+  .wiki-header { background: #fff; border-bottom: 1px solid #c8ccd1; padding: 24px 20px 8px; }
+  .wiki-header h1 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.8rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 6px; margin-bottom: 4px; }
+  .wiki-header .subtitle { font-size: 0.85rem; color: #54595d; font-style: italic; }
+  .wiki-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); grid-template-areas: "toc article"; gap: 0; background: #fff; min-height: 100vh; }
+  .toc-nav { grid-area: toc; padding: 20px 12px 40px 16px; border-right: 1px solid #eaecf0; background: var(--toc-bg); position: sticky; top: 48px; height: calc(100vh - 48px); overflow-y: auto; font-size: 0.8rem; }
+  .toc-nav .toc-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 8px; color: #1a3a5c; }
+  .toc-nav ul { list-style: none; padding-left: 0; }
+  .toc-nav li { margin: 2px 0; }
+  .toc-nav a { color: var(--link); text-decoration: none; display: block; padding: 1px 0; }
+  .toc-nav a:hover { text-decoration: underline; }
+  .toc-nav a.active { color: #1a3a5c; font-weight: 700; }
+  .toc-nav .toc-lvl2 { font-weight: 600; }
+  .toc-nav .toc-lvl3 { padding-left: 14px; font-size: 0.78rem; }
+  .toc-nav .toc-lvl4 { padding-left: 14px; font-size: 0.74rem; color: #54595d; }
+  .wiki-article { grid-area: article; padding: 20px 28px 40px 24px; min-width: 0; }
+  .infobox { float: right; width: 280px; margin: 0 0 20px 24px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; shape-outside: margin-box; }
+  .infobox-title { background: var(--accent); color: #fff; text-align: center; padding: 6px 8px; font-size: 0.95rem; font-weight: 700; border-radius: 4px 4px 0 0; }
+  .ib-row { display: flex; border-top: 1px solid #ddd; }
+  .ib-label { width: 40%; padding: 3px 6px; font-weight: 600; background: #eaf3f8; color: #1a3a5c; font-size: 0.74rem; }
+  .ib-value { width: 60%; padding: 3px 6px; font-size: 0.74rem; }
+  .ib-section { background: var(--accent); color: #fff; text-align: center; padding: 3px 8px; font-weight: 700; font-size: 0.76rem; border-top: 1px solid var(--border); }
+  h2 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.35rem; font-weight: 400; color: var(--heading); border-bottom: 1px solid #a2a9b1; padding-bottom: 4px; margin: 28px 0 12px; }
+  h3 { font-family: 'Georgia', 'Times New Roman', serif; font-size: 1.1rem; font-weight: 600; color: #1a3a5c; margin: 20px 0 10px; }
+  h4 { font-size: 0.95rem; font-weight: 600; color: #333; margin: 14px 0 6px; }
+  p { margin: 8px 0; }
+  .article-intro { font-size: 0.92rem; color: #333; line-height: 1.8; margin-bottom: 16px; }
+  .wiki-article ul { padding-left: 1.6em; margin: 8px 0; }
+  .wiki-article li { margin: 3px 0; line-height: 1.7; }
+  .wikitable { border-collapse: collapse; margin: 12px 0; font-size: 0.84rem; width: 100%; border: 1px solid #a2a9b1; }
+  .wikitable.infotable { width: auto; min-width: 320px; }
+  .table-wrapper { overflow: hidden; }
+  .wikitable td:first-child, .wikitable th:first-child { white-space: nowrap; }
+  .wikitable th { background: var(--table-header); border: 1px solid #a2a9b1; padding: 5px 8px; text-align: center; font-weight: 600; }
+  .wikitable td { border: 1px solid #a2a9b1; padding: 4px 8px; vertical-align: top; }
+  .wikitable tr:nth-child(even) { background: var(--table-stripe); }
+  .tag { display: inline-block; background: #eaf3f8; color: #1a3a5c; padding: 1px 6px; border-radius: 3px; font-size: 0.78rem; margin: 1px 2px; border: 1px solid #c8d9e8; }
+  .tag-info { background: #e8f0fe; color: #1a5096; border-color: #b8d4f0; }
+  .tag-warn { background: #fef6e7; color: #7a5d00; border-color: #e8d5a0; }
+  .callout { border-left: 4px solid #1a3a5c; background: #f0f4f8; padding: 10px 14px; margin: 12px 0; font-size: 0.85rem; }
+  .callout-title { font-weight: 700; color: #1a3a5c; margin-bottom: 4px; }
+  .analysis-block { border: 1px solid #ddd; background: #fafafa; padding: 14px 18px; margin: 12px 0; border-radius: 4px; }
+  .analysis-block h4 { color: #1a3a5c; margin-top: 0; font-size: 0.92rem; }
+  .references { font-size: 0.82rem; margin-top: 24px; }
+  .references ol { padding-left: 2.2em; }
+  .references li { margin: 3px 0; }
+  .references a { color: var(--link); word-break: break-all; }
+  .page-footer { border-top: 1px solid #a2a9b1; padding: 10px 0 20px; margin-top: 30px; font-size: 0.78rem; color: #54595d; background: #fff; text-align: center; }
+  @media (max-width: 992px) { .wiki-layout { grid-template-columns: 1fr; grid-template-areas: "article"; } .toc-nav { display: none; } .infobox { float: none; width: 100%; margin: 0 0 20px 0; } }
+</style>
+</head>
+<body>
+<div class="page-container">
+  <div class="top-nav"><a href="../index.html">具身智能Wiki</a> <span class="breadcrumb-sep">›</span> <span>猿声科技</span></div>
+  <div class="wiki-header"><h1>猿声科技</h1><div class="subtitle">猿声先达科技（深圳）有限公司 · Ensuring Technology · 成立于2025年1月 · 具身智能触觉感知与接触数据基础设施 · 车规级多维压阻触觉传感器</div></div>
+  <div class="wiki-layout">
+    <nav class="toc-nav" id="tocNav">
+      <div class="toc-title">目录</div>
+      <ul>
+        <li class="toc-lvl2"><a href="#facts">1 事实层</a></li>
+        <li class="toc-lvl3"><a href="#basic">1.1 基本信息</a></li>
+        <li class="toc-lvl3"><a href="#founder">1.2 创始人及核心团队</a></li>
+        <li class="toc-lvl3"><a href="#funding">1.3 融资与股东</a></li>
+        <li class="toc-lvl3"><a href="#tech">1.4 技术路线</a></li>
+        <li class="toc-lvl3"><a href="#product">1.5 产品形态</a></li>
+        <li class="toc-lvl3"><a href="#scenario">1.6 应用场景</a></li>
+        <li class="toc-lvl3"><a href="#commercial">1.7 商业化进展</a></li>
+        <li class="toc-lvl3"><a href="#financial">1.8 财务数据</a></li>
+        <li class="toc-lvl3"><a href="#others">1.9 其他信息</a></li>
+        <li class="toc-lvl2"><a href="#analysis">2 分析层</a></li>
+        <li class="toc-lvl3"><a href="#a21">2.1 团队背景与场景选择匹配度</a></li>
+        <li class="toc-lvl3"><a href="#a22">2.2 技术路线与场景适配性</a></li>
+        <li class="toc-lvl3"><a href="#a23">2.3 股东/资本结构对战略的影响</a></li>
+        <li class="toc-lvl3"><a href="#a24">2.4 试错过程与路径调整</a></li>
+        <li class="toc-lvl3"><a href="#a25">2.5 竞争定位与取舍</a></li>
+        <li class="toc-lvl3"><a href="#a26">2.6 其他重要观察</a></li>
+        <li class="toc-lvl2"><a href="#refs">3 参考资料</a></li>
+      </ul>
+    </nav>
+    <article class="wiki-article">
+      <aside class="infobox">
+        <div class="infobox-title">猿声科技 Ensuring</div>
+        <div class="ib-row"><div class="ib-label">全称</div><div class="ib-value">猿声先达科技（深圳）有限公司</div></div>
+        <div class="ib-row"><div class="ib-label">品牌 / 英文</div><div class="ib-value">猿声科技 / Ensuring Technology</div></div>
+        <div class="ib-row"><div class="ib-label">成立时间</div><div class="ib-value">2025年1月20日（工商注册）</div></div>
+        <div class="ib-row"><div class="ib-label">注册地</div><div class="ib-value">深圳市南山区</div></div>
+        <div class="ib-row"><div class="ib-label">办公地址</div><div class="ib-value">南山区高新科技园北区朗山路11号清华同方信息港F栋9楼</div></div>
+        <div class="ib-row"><div class="ib-label">创始人 / CEO</div><div class="ib-value">侯宁喆（1999年生，牛津大学机器人方向博士）</div></div>
+        <div class="ib-row"><div class="ib-label">联合创始人 / CTO</div><div class="ib-value">程逸钧（前华为高级算法工程师）</div></div>
+        <div class="ib-row"><div class="ib-label">研发人员占比</div><div class="ib-value">70%+（公司自述）</div></div>
+        <div class="ib-row"><div class="ib-label">定位</div><div class="ib-value">具身智能触觉感知与接触数据基础设施</div></div>
+        <div class="ib-section">融资信息</div>
+        <div class="ib-row"><div class="ib-label">最新轮次</div><div class="ib-value">2026年11月新一轮（11月6日工商变更）</div></div>
+        <div class="ib-row"><div class="ib-label">本轮金额</div><div class="ib-value">超亿元（媒体口径）</div></div>
+        <div class="ib-row"><div class="ib-label">累计融资</div><div class="ib-value">数亿元（公司官网口径）</div></div>
+        <div class="ib-row"><div class="ib-label">估值</div><div class="ib-value">未披露</div></div>
+        <div class="ib-row"><div class="ib-label">主要股东</div><div class="ib-value">侯宁喆及员工持股平台、华业纳星（纳芯微系）、柯力传感、速腾聚创（星睿投资）、拓普集团、上富电技、五源资本、线性资本等</div></div>
+        <div class="ib-section">核心产品</div>
+        <div class="ib-row"><div class="ib-label">触觉器件</div><div class="ib-value">Tacta 多维触觉传感器、HexSkin 柔性电子皮肤</div></div>
+        <div class="ib-row"><div class="ib-label">数据终端</div><div class="ib-value">Magic Glove 模块化触觉数据采集手套</div></div>
+        <div class="ib-row"><div class="ib-label">数据与模型</div><div class="ib-value">UTLS 统一触觉表征空间、E-Tac Expert 触觉专家模型</div></div>
+        <div class="ib-section">官网</div>
+        <div class="ib-row"><div class="ib-label">官网</div><div class="ib-value">www.ensuringtech.com（实测 HTTP 200）</div></div>
+      </aside>
+
+      <p class="article-intro">猿声科技（猿声先达科技（深圳）有限公司，品牌 ENSURING）成立于2025年1月，总部位于深圳南山，是一家专注<strong>具身智能触觉感知与接触数据基础设施</strong>的硬科技公司。公司由1999年出生的牛津大学机器人方向博士侯宁喆创办，围绕“<strong>SENSE（触觉零部件）—CAPTURE（数据采集终端）—LEARN（触觉数据与模型）</strong>”构建全栈产品：Tacta 高密度多维触觉传感器、HexSkin 复杂曲面柔性电子皮肤、Magic Glove 模块化触觉数据采集手套，以及 UTLS 触觉表征与 E-Tac Expert 触觉模型。<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref2">[2]</a></sup><sup><a href="#ref5">[5]</a></sup></p>
+
+      <p class="article-intro">公司成立不到两年完成多轮融资，2026年11月工商变更新增9名股东、注册资本增长约18.8%，五源资本、线性资本、拓普集团、速腾聚创、上富电技等同时入局，股东结构高度市场化、无地方国资。<sup><a href="#ref5">[5]</a></sup><sup><a href="#ref11">[11]</a></sup>制造端，公司与珠海上富电技合资成立珠海上猿传感科技，2026年8月投产“全球首条车规级多维压阻触觉传感器量产线”，首期规划年产500万颗，远期规划40条产线、总产能1.2亿颗。<sup><a href="#ref3">[3]</a></sup><sup><a href="#ref8">[8]</a></sup><sup><a href="#ref9">[9]</a></sup>公司自述2026年内传感器订单规模达数十万颗，已获智元机器人万套批量订单，并进入国内外多家灵巧手、人形机器人及数据采集客户的定点批量出货阶段。<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref9">[9]</a></sup></p>
+
+      <h2 id="facts">1 事实层</h2>
+
+      <h3 id="basic">1.1 基本信息</h3>
+      <table class="wikitable">
+        <tr><th>项目</th><th>内容</th><th>来源/说明</th></tr>
+        <tr><td>公司全称</td><td>猿声先达科技（深圳）有限公司</td><td>官网、工商登记<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref15">[15]</a></sup></td></tr>
+        <tr><td>品牌</td><td>猿声科技 / ENSURING TECHNOLOGY</td><td>官网<sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>成立日期</td><td>2025年1月20日</td><td>innoHere 工商数据<sup><a href="#ref15">[15]</a></sup></td></tr>
+        <tr><td>法定代表人</td><td>侯宁喆</td><td>工商登记<sup><a href="#ref15">[15]</a></sup></td></tr>
+        <tr><td>注册资本</td><td>172.435998万元人民币（2026年11月变更后）</td><td>天眼查数据经证券之星报道<sup><a href="#ref13">[13]</a></sup></td></tr>
+        <tr><td>注册地址</td><td>深圳市南山区西丽街道兴科一路创智云城二期5A栋05层（工商登记）</td><td>innoHere<sup><a href="#ref15">[15]</a></sup></td></tr>
+        <tr><td>办公地址</td><td>深圳市南山区高新科技园北区朗山路11号清华同方信息港F栋9楼</td><td>公司官网<sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>企业性质</td><td>有限责任公司（自然人投资或控股）</td><td>工商登记<sup><a href="#ref15">[15]</a></sup></td></tr>
+        <tr><td>经营范围（摘）</td><td>人工智能应用软件开发、智能机器人研发与销售、人工智能硬件销售、数据处理和存储支持服务、电子元器件零售、技术及货物进出口等</td><td>innoHere<sup><a href="#ref15">[15]</a></sup></td></tr>
+        <tr><td>员工结构</td><td>研发人员占比70%+（具体员工总数未披露）</td><td>公司官网<sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>官网</td><td>https://www.ensuringtech.com</td><td>实测访问 HTTP 200，中英文双语<sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>ICP备案</td><td>粤ICP备2025463138号</td><td>官网页脚<sup><a href="#ref1">[1]</a></sup></td></tr>
+      </table>
+
+      <h3 id="founder">1.2 创始人及核心团队</h3>
+      <p><strong>侯宁喆（创始人、CEO）</strong>：1999年生，本科毕业于北京大学，获帝国理工学院硕士学位，随后在牛津大学机器人研究中心（Oxford Robotics Institute）攻读博士，研究方向为机器人触觉感知。<sup><a href="#ref24">[24]</a></sup><sup><a href="#ref5">[5]</a></sup>2024年国内具身智能创业潮起，他于当年9月回国，在走访国内创业生态后选择落地深圳科创学院（李泽湘教授创办的硬件创业孵化体系）；据其自述，选择原因是“深圳科创学院是为数不多把资金、方法论、供应链和社群全都给齐的地方”。<sup><a href="#ref14">[14]</a></sup></p>
+      <p><strong>程逸钧（联合创始人、CTO）</strong>：曾任华为高级算法工程师，持有海外机器人相关领域硕士学历；在早期工商主体中与侯宁喆同为股东及主要人员。<sup><a href="#ref24">[24]</a></sup><sup><a href="#ref15">[15]</a></sup></p>
+      <p>公司称核心团队具有<strong>牛津大学机器人研究中心、帝国理工学院生物工程系、UCL（伦敦大学学院）、浙江大学</strong>等教育与研究背景，并将这些研究积累延伸至触觉器件、感算一体硬件与数据采集系统。<sup><a href="#ref1">[1]</a></sup>团队呈现“科研＋工程”复合结构，研发人员占比70%以上。<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref19">[19]</a></sup></p>
+      <p>财务顾问方面，明论资本自天使轮起担任公司独家财务顾问。<sup><a href="#ref16">[16]</a></sup></p>
+
+      <h3 id="funding">1.3 融资与股东</h3>
+      <p>公司成立后融资节奏密集。可核实的轮次如下（轮次名称沿用媒体报道口径，公司未发布统一融资公告）：</p>
+      <table class="wikitable">
+        <tr><th>时间</th><th>轮次</th><th>金额</th><th>主要投资方</th><th>来源/备注</th></tr>
+        <tr><td>2025-01</td><td>出资设立</td><td>未披露</td><td>深圳科创学院（李泽湘体系）</td><td>innoHere 工商融资记录<sup><a href="#ref15">[15]</a></sup></td></tr>
+        <tr><td>2025-03</td><td>天使轮</td><td>未披露</td><td>启高资本</td><td>innoHere<sup><a href="#ref15">[15]</a></sup></td></tr>
+        <tr><td>2025-06</td><td>Pre-A轮</td><td>未披露</td><td>柯力传感（战略投资）</td><td>innoHere；公司称成立四个月内完成第三轮融资<sup><a href="#ref15">[15]</a></sup><sup><a href="#ref16">[16]</a></sup></td></tr>
+        <tr><td>2026-05 至 07</td><td>Pre-A 系列（Pre-A / Pre-A+ / Pre-A++）</td><td>合计超亿元</td><td>恒信华业、上富电技、拓普集团分别领投；曦晨资本等跟投</td><td>36氪、科创板日报<sup><a href="#ref6">[6]</a></sup><sup><a href="#ref10">[10]</a></sup></td></tr>
+        <tr><td>2026-11</td><td>新一轮（工商变更 11-06）</td><td>超亿元</td><td>五源资本、线性资本领投；厚雪资本、曦晨资本跟投；拓普集团、速腾聚创（星睿投资）、上富电技等产业方入股；赵悦凯（思灵机器人CFO）个人参投</td><td>36氪、21财经、雷峰网<sup><a href="#ref5">[5]</a></sup><sup><a href="#ref11">[11]</a></sup><sup><a href="#ref22">[22]</a></sup></td></tr>
+      </table>
+      <p>截至2026年11月，公司官网披露<strong>累计融资规模为“数亿元”</strong>，年内传感器订单规模“数十万颗”。<sup><a href="#ref1">[1]</a></sup>公司<strong>未披露任何一轮的投后估值</strong>；36氪以“靠什么消化高估值”设问，但也未给出估值数字。<sup><a href="#ref5">[5]</a></sup></p>
+
+      <h4>主要股东结构（2026年11月工商变更后）</h4>
+      <table class="wikitable">
+        <tr><th>股东</th><th>持股比例</th><th>背景</th><th>来源</th></tr>
+        <tr><td>侯宁喆及员工持股平台（猿声共创等）</td><td>未披露（创始团队为第一大股东群体）</td><td>创始人、员工激励</td><td>工商信息<sup><a href="#ref12">[12]</a></sup></td></tr>
+        <tr><td>华业纳星（纳芯微旗下投资基金）</td><td>10.98%</td><td>国产模拟芯片/磁传感器龙头纳芯微关联基金，第二大股东</td><td>电子发烧友/传感器专家网<sup><a href="#ref12">[12]</a></sup></td></tr>
+        <tr><td>柯力传感（603662.SH）</td><td>5.6293%</td><td>国产力学传感器龙头，第五大股东</td><td>同上<sup><a href="#ref12">[12]</a></sup></td></tr>
+        <tr><td>星睿投资（速腾聚创关联方）</td><td>3.5283%</td><td>激光雷达龙头速腾聚创（02498.HK）关联方，第六大股东</td><td>同上<sup><a href="#ref12">[12]</a></sup></td></tr>
+        <tr><td>拓普集团（601689.SH）</td><td>1.76%</td><td>汽车 Tier 1、机器人执行器/灵巧手总成供应商</td><td>证券之星引天眼查<sup><a href="#ref13">[13]</a></sup></td></tr>
+        <tr><td>上富电技</td><td>1.4026%</td><td>汽车智驾传感器企业、车规产线合资方</td><td>电子发烧友<sup><a href="#ref12">[12]</a></sup></td></tr>
+        <tr><td>五源资本、线性资本、厚雪资本、曦晨资本、启高资本、恒信华业等</td><td>未逐家披露</td><td>财务投资机构</td><td>36氪、21财经<sup><a href="#ref5">[5]</a></sup><sup><a href="#ref11">[11]</a></sup></td></tr>
+      </table>
+      <p>多家媒体强调，公司股东阵容<strong>全部由市场化财务VC与上下游产业资本构成，没有地方国资或政府引导基金</strong>；在2026年下半年具身智能融资趋冷的背景下，这一结构被视为“纯市场化定价”的样本。<sup><a href="#ref5">[5]</a></sup><sup><a href="#ref22">[22]</a></sup>本轮资金用途，媒体口径为下一代触觉产品与底层模型研发、车规产线扩产及国际市场拓展。<sup><a href="#ref5">[5]</a></sup><sup><a href="#ref21">[21]</a></sup></p>
+
+      <h3 id="tech">1.4 技术路线</h3>
+      <p><strong>压阻式多维触觉＋空间编码。</strong>公司技术路线为“空间编码的多维压阻”方案：通过自研的 TPU 多维空间编码技术，把多维力感知与计算集成于超薄器件，在单指尖实现高密度感知阵列，并输出接触位置、法向力、切向力与动态受力信息，支持六维合力解耦。<sup><a href="#ref2">[2]</a></sup>据创始人披露，该路线在学界已存在二十余年，但此前从未商业化与量产；公司把触觉传感器的各条技术路径摊开比较后，选择了“参数最优”的一条。<sup><a href="#ref14">[14]</a></sup></p>
+      <p><strong>感算一体与工程化。</strong>Tacta 采用“超薄感算一体”结构，把感知与计算集成在器件内，以降低灵巧手内部空间占用与走线复杂度。<sup><a href="#ref2">[2]</a></sup>量产的关键工艺难点是结构编码层需要做成<strong>40微米精度的三维结构层</strong>；公司最初试图寻找可量产的设备厂商未果，最终选择自研并改装设备，经过约半年反复试错才解决。<sup><a href="#ref14">[14]</a></sup></p>
+      <p><strong>大面积电子皮肤。</strong>HexSkin 采用柔性、模块化阵列与去中心化分布式读取架构，每个模块负责局部数据读取再协同，以降低大面积高密度触觉集中扫描带来的速度与通信压力；支持压力、滑动等多维感知与双曲面贴合，输出协议为 CAN FD。<sup><a href="#ref2">[2]</a></sup><sup><a href="#ref19">[19]</a></sup></p>
+      <p><strong>触觉数据与模型。</strong>公司提出“触觉同构”思路，让数据采集端与机器人执行端在触觉点位和物理量表达上尽量对应，减少数据迁移的信息损失；软件层通过 <strong>UTLS（统一触觉表征空间）</strong>将多源触觉信号映射到统一表征，并以 <strong>E-Tac Expert（触觉专家模型）</strong>结合接触几何与交互信息，连接视觉、语言与动作模型。<sup><a href="#ref19">[19]</a></sup><sup><a href="#ref12">[12]</a></sup>更早的展会资料中，对应的软件工具链名为 <strong>RealTSense</strong>，用于触觉模态建模、可视化与遥操作。<sup><a href="#ref16">[16]</a></sup><sup><a href="#ref17">[17]</a></sup></p>
+      <p><strong>车规级制造体系。</strong>公司判断人形机器人将高度复用汽车产业的制造与质量体系，因此在行业标准尚未形成时，率先按车规标准建线：与上富电技合建的产线参考 <strong>IATF 16949</strong> 质量管理要求，引入可靠性工程、过程控制、批次一致性与全流程质量追溯。<sup><a href="#ref3">[3]</a></sup><sup><a href="#ref8">[8]</a></sup>创始人明确表示，这并非为了“让传感器上车”，而是预判行业标准走向、主动参与标准制定。<sup><a href="#ref8">[8]</a></sup></p>
+
+      <h3 id="product">1.5 产品形态</h3>
+      <table class="wikitable">
+        <tr><th>产品</th><th>类别</th><th>关键参数</th><th>定位 / 状态</th></tr>
+        <tr><td><strong>Tacta</strong></td><td>高密度多维触觉传感器</td><td>多维感知单元密度 361 点/cm²；最高采样频率 1000 Hz；整体厚度 &lt;2.1 mm；单手感知单元 1,956 个；六维合力解耦；输出接触位置、法向力、切向力与动态受力</td><td>面向复杂灵巧手、夹爪与机械臂的精细抓取、精密装配、插拔旋拧、滑移检测；官网产品中心在列<sup><a href="#ref2">[2]</a></sup></td></tr>
+        <tr><td><strong>HexSkin</strong></td><td>复杂曲面柔性电子皮肤</td><td>单集群最大覆盖面积 1.23 m²；单集群感知点位 34,300 个；厚度 1.75 mm；采样频率 60 Hz；单点法向量程 0–50 N；测量精度 &lt;1% FS；点位扫描速度 200 万点/秒；CAN FD；双向拉伸、适应双曲面</td><td>手臂、躯干等大面积曲面覆盖、压力分布、碰撞与交互感知；官网产品中心在列<sup><a href="#ref2">[2]</a></sup></td></tr>
+        <tr><td><strong>Magic Glove</strong></td><td>模块化多维触觉数据采集手套</td><td>15 个追踪单元；16 个独立触觉区域；1000+ 传感阵列；触觉模组厚度 2.1 mm；敏感度 10 mN；EMF 手部动作采集；同步记录手部动作、接触位置与多维受力；硬质基底抑制织物形变噪声；官方按压寿命 300 万次</td><td>具身智能训练、遥操作、示教采集；2026年10月前后正式发布；官网产品中心在列<sup><a href="#ref2">[2]</a></sup><sup><a href="#ref7">[7]</a></sup><sup><a href="#ref19">[19]</a></sup></td></tr>
+        <tr><td><strong>Quadrinity</strong></td><td>高交互人形机器人平台</td><td>集成 HexT/HexSkin 全身电子皮肤与 MultiDT/Tacta 指尖触觉；自研遥操作与多模态大模型算法；全向轮式底盘，续航约 8 小时；提供 6 自由度与 40 自由度两种整机方案</td><td>面向高校、科研机构的具身智能数据采集开发平台；2025年世界机器人大会、高交会展出；<span class="tag tag-warn">当前官网产品中心未列</span><sup><a href="#ref16">[16]</a></sup><sup><a href="#ref17">[17]</a></sup><sup><a href="#ref18">[18]</a></sup></td></tr>
+        <tr><td><strong>Tactract Duo</strong></td><td>超高密度多维触觉平行夹爪</td><td>支持夹持力闭环控制（公开参数有限）</td><td>2025年高交会展出；<span class="tag tag-warn">当前官网产品中心未列</span><sup><a href="#ref18">[18]</a></sup><sup><a href="#ref16">[16]</a></sup></td></tr>
+        <tr><td><strong>VTLA 教育开发者套件</strong></td><td>视觉—触觉—语言—动作开发套件</td><td>公开参数有限</td><td>面向教育与开发者；2025年高交会展出<sup><a href="#ref18">[18]</a></sup><sup><a href="#ref16">[16]</a></sup></td></tr>
+        <tr><td><strong>UTLS / E-Tac Expert</strong></td><td>触觉数据与模型软件</td><td>统一触觉表征空间；触觉专家模型；连接视觉、语言与动作模型</td><td>触觉数据基础设施的软件层<sup><a href="#ref12">[12]</a></sup><sup><a href="#ref19">[19]</a></sup></td></tr>
+      </table>
+      <p class="callout"><span class="callout-title">参数口径提示</span>界面新闻2026年10月的报道称 Tacta“当前公开产品厚度为3mm”，而公司官网当前标注为“&lt;2.1 mm”。两者可能对应不同版本或不同测量口径，本页以官网当前参数为准，并保留该差异提示。<sup><a href="#ref19">[19]</a></sup><sup><a href="#ref2">[2]</a></sup></p>
+
+      <h3 id="scenario">1.6 应用场景</h3>
+      <table class="wikitable">
+        <tr><th>场景</th><th>具体应用</th><th>客户 / 合作方</th><th>来源</th></tr>
+        <tr><td>工业精细装配</td><td>为头部客户灵巧手提供指尖触觉传感器，用于工业产线精细装配、抓取与插拔旋拧</td><td>智元机器人（万套批量订单）；多家国内外灵巧手、人形机器人客户（未具名）</td><td><sup><a href="#ref9">[9]</a></sup><sup><a href="#ref8">[8]</a></sup><sup><a href="#ref3">[3]</a></sup></td></tr>
+        <tr><td>人形机器人全身感知</td><td>HexSkin 覆盖手臂、躯干等复杂曲面，用于大面积压力分布、碰撞与交互感知</td><td>人形机器人本体厂商（未具名）</td><td><sup><a href="#ref2">[2]</a></sup><sup><a href="#ref5">[5]</a></sup></td></tr>
+        <tr><td>具身智能数据采集</td><td>Magic Glove 同步采集手部动作、接触位置与多维力，形成 Action + Tactile 数据，用于具身模型训练、遥操作与示教</td><td>海内外具身大模型团队、数据采集客户</td><td><sup><a href="#ref2">[2]</a></sup><sup><a href="#ref7">[7]</a></sup><sup><a href="#ref19">[19]</a></sup></td></tr>
+        <tr><td>科研与教育</td><td>Quadrinity 人形平台、VTLA 教育开发者套件用于触觉遥操作与具身智能开发教学</td><td>高校、科研机构</td><td><sup><a href="#ref16">[16]</a></sup><sup><a href="#ref17">[17]</a></sup><sup><a href="#ref18">[18]</a></sup></td></tr>
+        <tr><td>汽车视触融合（战略方向）</td><td>上富电技将机器人视觉与触觉融合感知作为新战略方向，探索智能驾驶汽车的视触融合</td><td>珠海上富电技</td><td><sup><a href="#ref8">[8]</a></sup></td></tr>
+        <tr><td>精密制造 / 医疗（潜在）</td><td>媒体提及精密工业装配、微创医疗机器人、自动化巡检等延伸场景，未见具体落地案例披露</td><td>—</td><td><span class="tag tag-warn">媒体推断，未经案例验证</span><sup><a href="#ref24">[24]</a></sup></td></tr>
+      </table>
+
+      <h3 id="commercial">1.7 商业化进展</h3>
+      <p><strong>订单与出货。</strong>公司披露，首款多维触觉标准产品推出后，已进入多家国内外头部灵巧手、机器人及数据采集客户的量产项目，<strong>2026年内传感器订单总规模达数十万颗</strong>。<sup><a href="#ref6">[6]</a></sup><sup><a href="#ref1">[1]</a></sup>其中，公司已获<strong>智元机器人万套触觉传感器批量订单</strong>，创始人亦确认客户包括智元机器人在内的多家机器人企业。<sup><a href="#ref9">[9]</a></sup><sup><a href="#ref8">[8]</a></sup>截至2026年11月，公司称已跨过“小批量送样验证”阶段，进入国内外多家灵巧手、人形机器人及数据采集客户的<strong>定点批量出货阶段</strong>。<sup><a href="#ref5">[5]</a></sup><sup><a href="#ref12">[12]</a></sup></p>
+      <p><strong>量产能力。</strong>2026年8月10日，猿声科技与珠海上富电技签署战略投资协议，合资成立<strong>珠海上猿传感科技有限公司</strong>（注册资本1000万元，上富电技持股51%、猿声科技持股49%），同日投产全球首条车规级多维压阻触觉传感器量产线。<sup><a href="#ref3">[3]</a></sup><sup><a href="#ref8">[8]</a></sup><sup><a href="#ref9">[9]</a></sup>产线首期规划年产<strong>500万颗</strong>，依托上富电技珠海高新区5万多平方米智能驾驶总部基地，未来可扩展至<strong>40条自动化产线、总产能1.2亿颗</strong>。<sup><a href="#ref9">[9]</a></sup><sup><a href="#ref8">[8]</a></sup>首批产品落地两大场景：灵巧手精细装配、触觉数据采集手套。<sup><a href="#ref8">[8]</a></sup></p>
+      <p><strong>产业合作。</strong>2026年9月，公司与拓普集团在宁波北仑签署战略合作协议，围绕具身智能“感知—执行”能力展开协作，打通灵巧手触觉感知技术，并面向全球头部客户在联合研发、市场拓展、生产智造与客户服务上深度配合。<sup><a href="#ref4">[4]</a></sup><sup><a href="#ref20">[20]</a></sup>此前8月，拓普集团已战略投资猿声科技。<sup><a href="#ref4">[4]</a></sup></p>
+      <p><strong>行业认可。</strong>2026年7月，公司获评“2026深圳市种子独角兽企业”。<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref23">[23]</a></sup></p>
+
+      <h3 id="financial">1.8 财务数据</h3>
+      <p>公司为非上市公司，未公开披露经审计的财务报表。截至本页更新日（2026-11-19），公开渠道<strong>没有营收、净利润、毛利率、现金流等财务数据</strong>；任何具体营收数字均属推测，本页不予收录。</p>
+      <table class="wikitable">
+        <tr><th>指标</th><th>数值</th><th>性质 / 来源</th></tr>
+        <tr><td>营业收入</td><td>未披露</td><td>无公开财报</td></tr>
+        <tr><td>净利润 / 毛利率</td><td>未披露</td><td>无公开财报</td></tr>
+        <tr><td>累计融资</td><td>数亿元</td><td>公司官网口径<sup><a href="#ref1">[1]</a></sup></td></tr>
+        <tr><td>2026年内传感器订单</td><td>数十万颗</td><td>公司披露<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref6">[6]</a></sup></td></tr>
+        <tr><td>注册资本</td><td>172.435998万元</td><td>工商登记<sup><a href="#ref13">[13]</a></sup></td></tr>
+        <tr><td>估值</td><td>未披露</td><td>多轮报道均无投后估值数字<sup><a href="#ref5">[5]</a></sup></td></tr>
+        <tr><td>产能</td><td>首期500万颗/年；远期规划1.2亿颗/年</td><td>合资公司产线规划<sup><a href="#ref9">[9]</a></sup></td></tr>
+      </table>
+
+      <h3 id="others">1.9 其他信息</h3>
+      <ul>
+        <li><strong>名称与品牌。</strong>“猿声”对应英文品牌 ENSURING，官网口号为“从触觉器件，到接触数据”；公司自我定位是“具身智能触觉感知与接触数据基础设施”，而非单纯的传感器元器件厂商。<sup><a href="#ref1">[1]</a></sup></li>
+        <li><strong>工商沿革。</strong>创始人侯宁喆、程逸钧曾于2023年11月设立上海猿声先达人工智能科技有限公司；2025年5月该公司股权变更为猿声先达科技（深圳）有限公司100%持有，成为全资子公司，后于2026年8月注销。该主体可作为名称消歧参考：当前经营主体为深圳公司。<sup><a href="#ref15">[15]</a></sup></li>
+        <li><strong>产品命名演进。</strong>早期资料中，触觉传感器名为 MultiDT（指尖多维触觉）与 HexT（大面积电子皮肤），软件工具链为 RealTSense；官网当前统一为 Tacta、HexSkin、Magic Glove，软件层表述为 UTLS 与 E-Tac Expert。<sup><a href="#ref16">[16]</a></sup><sup><a href="#ref2">[2]</a></sup><sup><a href="#ref12">[12]</a></sup></li>
+        <li><strong>年龄口径差异。</strong>多数报道（36氪、南方+、21财经等）称侯宁喆为“99后/1999年生”；亦有自媒体转写为“36岁牛津博士”。本页采用多方一致的1999年口径，并提示该差异。<sup><a href="#ref5">[5]</a></sup><sup><a href="#ref7">[7]</a></sup><sup><a href="#ref24">[24]</a></sup></li>
+        <li><strong>产能口径提示。</strong>“首期500万颗、远期1.2亿颗”来自合资签约时的规划表述，属规划产能而非实际产出；行业分析亦提示，按不同口径折算的整机配套数量差异极大，需与实际订单、良率区分看待。<sup><a href="#ref9">[9]</a></sup><sup><a href="#ref8">[8]</a></sup></li>
+        <li><strong>行业坐标。</strong>36氪将猿声与帕西尼并置讨论，称其是2026年下半年触觉赛道“资本聚集速度”最接近帕西尼的公司；但两者业务结构不同——帕西尼同时做人形本体，猿声聚焦触觉器件、数据终端与制造。<sup><a href="#ref5">[5]</a></sup></li>
+        <li><strong>国际化信号。</strong>2026年11月轮次中，欧洲头部具身智能独角兽企业核心管理层以个人身份跟投（媒体指认为思灵机器人CFO赵悦凯）；公司称本轮资金将用于国际市场拓展。<sup><a href="#ref14">[14]</a></sup><sup><a href="#ref21">[21]</a></sup></li>
+      </ul>
+
+      <h2 id="analysis">2 分析层</h2>
+      <p class="section-desc" style="color:#54595d;font-size:0.82rem;">以下为基于公开事实的分析判断，不构成投资建议；标注“判断”的内容为作者推论，非公司或第三方结论。</p>
+
+      <div class="analysis-block" id="a21">
+        <h4>2.1 团队背景与场景选择匹配度</h4>
+        <p>侯宁喆的学术路径（北大本科→帝国理工硕士→牛津机器人中心触觉方向博士）与公司所选赛道高度一致：触觉传感器是典型的“跨传感、材料、结构、算法、制造”学科交叉领域，博士阶段的触觉研究积累直接对应 Tacta 的空间编码与多维力解耦设计。<sup><a href="#ref24">[24]</a></sup><sup><a href="#ref2">[2]</a></sup>CTO 程逸钧的华为算法工程背景，则补上了“从论文指标到可交付信号处理”的工程化环节。<sup><a href="#ref24">[24]</a></sup></p>
+        <p>更关键的匹配点在于<strong>产业土壤</strong>：公司落地深圳南山“机器人谷”，周边聚集大量机器人产业链企业，样品验证、零部件配套可以“上午提出、下午交付”。创始人明确将供应链协同视为触觉传感器量产的前提。<sup><a href="#ref7">[7]</a></sup>叠加深圳科创学院的资金、方法论与供应链网络，团队在“实验室技术→原型→产线”的转化上获得了外部支撑。<sup><a href="#ref14">[14]</a></sup></p>
+        <p><strong>判断：</strong>团队的技术背景与触觉赛道匹配度高，但公司从成立到建车规产线仅约19个月，组织能力（质量体系、供应链管理、大客户交付）的成长速度是否跟得上产能扩张，是比技术背景更值得跟踪的变量。创始人也自述“从科学家转变为要真正交付技术的创业者”是最难的部分。<sup><a href="#ref14">[14]</a></sup></p>
+      </div>
+
+      <div class="analysis-block" id="a22">
+        <h4>2.2 技术路线与场景适配性</h4>
+        <p>触觉赛道存在压阻、电容、视触觉、磁电等多条路线。猿声选择<strong>多维压阻＋空间编码</strong>，其优势在于：器件薄、易集成、成本结构相对可控、可做高密度阵列，适合灵巧手指尖这种空间极度受限的场景；361 点/cm²、1000 Hz 的指标，指向的是“接触位置＋力的方向＋动态变化”的完整还原，而不只是“有没有碰到”。<sup><a href="#ref2">[2]</a></sup><sup><a href="#ref19">[19]</a></sup></p>
+        <p>压阻路线的固有挑战是迟滞、漂移、批次一致性与寿命。公司对此的回应不是参数，而是<strong>制造体系</strong>：把汽车行业的 IATF 16949、过程控制与全流程追溯引入触觉传感器产线，并将结构编码层做到40微米精度。<sup><a href="#ref3">[3]</a></sup><sup><a href="#ref14">[14]</a></sup>这是一个“用制造能力补材料/器件物理短板”的策略，逻辑成立，但效果需要客户端的长期可靠性数据验证。</p>
+        <p>产品组合的适配性也值得注意：Tacta 解决指尖，HexSkin 解决全身大面积（但采样率降至60 Hz，是面积/带宽权衡），Magic Glove 解决“训练数据没有触觉”的问题。三者共同构成“感知—采集—数据”的闭环，使公司不必只依赖人形机器人本体的出货节奏。<sup><a href="#ref2">[2]</a></sup><sup><a href="#ref19">[19]</a></sup></p>
+        <p><strong>判断：</strong>技术路线与“灵巧手精细操作”这一最刚性场景适配良好；真正的差异化不在单点参数，而在“器件＋数据＋车规制造”的组合。风险在于，压阻路线的性能上限与成本下降空间是否足以支撑其“百元级”终局假设，仍需产业链验证。</p>
+      </div>
+
+      <div class="analysis-block" id="a23">
+        <h4>2.3 股东/资本结构对战略的影响</h4>
+        <p>猿声的股东表本质上是<strong>一条压缩的供应链</strong>：纳芯微系（华业纳星，10.98%）提供芯片与磁传感视角，柯力传感（5.6293%）提供力学传感器与工业客户视角，速腾聚创（3.5283%）提供车规级百万台量产经验，拓普集团（1.76%）提供执行器/灵巧手总成与全球头部客户通道，上富电技（1.4026%）提供车规制造与合资产线。<sup><a href="#ref12">[12]</a></sup><sup><a href="#ref13">[13]</a></sup>财务端五源、线性、厚雪、曦晨则提供估值锚与后续融资能力。<sup><a href="#ref5">[5]</a></sup></p>
+        <p>这种结构的战略含义有三层。其一，<strong>客户前置</strong>：产业股东同时是潜在客户或渠道，缩短了定点周期；其二，<strong>制造前置</strong>：上富的产线与质量体系让公司跳过“小批量送样”陷阱；其三，<strong>标准前置</strong>：与拓普、上富的绑定，使公司有机会参与客户的产品规格定义。<sup><a href="#ref24">[24]</a></sup><sup><a href="#ref8">[8]</a></sup></p>
+        <p><strong>判断：</strong>“股东即客户”是加速器，也是约束。它可能带来订单，但也可能限制公司与其他本体厂商（尤其是拓普/上富的竞争对手）的合作深度；同时，创始团队持股比例未披露，多轮融资后控制权结构需持续观察。纯市场化、无国资的结构在当下是差异化优势，但也意味着公司缺少地方产能/补贴的兜底。</p>
+      </div>
+
+      <div class="analysis-block" id="a24">
+        <h4>2.4 试错过程与路径调整</h4>
+        <p>可观察到的路径调整至少有四次。第一，<strong>主体迁移</strong>：2023年11月先设上海主体，2025年1月设深圳主体，随后上海主体变为全资子公司并注销，反映团队把资源集中到深圳机器人供应链的决定。<sup><a href="#ref15">[15]</a></sup>第二，<strong>技术选型</strong>：团队把触觉各条路线摊开比较，选择学界存在二十余年但未商业化的压阻空间编码路线，属于“高上限、高工程风险”的选择。<sup><a href="#ref14">[14]</a></sup></p>
+        <p>第三，<strong>工艺自研</strong>：结构编码层需要40微米精度，市场上找不到可量产设备，团队改为自研、改装设备，历时约半年才突破。<sup><a href="#ref14">[14]</a></sup>第四，<strong>商业模式扩展</strong>：从早期卖 Tacta/HexSkin 器件，扩展到 Magic Glove 数据终端与 UTLS/E-Tac 数据模型，把客户从“本体厂”扩展到“大模型数据团队”，这是对“人形机器人放量慢”的现实回应。<sup><a href="#ref5">[5]</a></sup><sup><a href="#ref12">[12]</a></sup></p>
+        <p><strong>判断：</strong>公司的调整速度较快，且每次调整都指向“缩短商业化路径”而非“追求技术完美”。但试错成本也体现在产品命名与定位的反复（MultiDT/HexT→Tacta/HexSkin，Quadrinity 从展台主角到官网隐去），说明产品线仍在收敛过程中。</p>
+      </div>
+
+      <div class="analysis-block" id="a25">
+        <h4>2.5 竞争定位与取舍</h4>
+        <p>国内触觉赛道已十分拥挤：帕西尼（触觉＋人形本体）、他山科技（电容/触觉芯片）、戴盟机器人（视触觉）、千觉机器人（多维触觉）、途见科技（柔性触觉）等各有路线与资本支持。猿声的差异化可以概括为三点：<strong>车规级规模制造</strong>（不是实验室参数）、<strong>数据采集终端</strong>（不只卖零件）、<strong>全栈但不做整机</strong>（Quadrinity 仅作为开发平台）。<sup><a href="#ref5">[5]</a></sup><sup><a href="#ref19">[19]</a></sup></p>
+        <p>取舍的另一面是风险。不做整机意味着不与自己客户竞争，但也意味着价值量受制于本体厂商的出货与降本压力；行业分析提到触觉传感器单价正从万元级向百元级下探，若成本下降速度快于规模上量速度，器件厂商的毛利会被压缩。<sup><a href="#ref21">[21]</a></sup>此外，车规产线的折旧与产能利用率，在订单尚未达到百万颗级之前，会成为财务负担。</p>
+        <p><strong>判断：</strong>猿声选择的是一条“制造＋数据”双轮驱动的中间路线，避免了与帕西尼等“触觉＋本体”公司的正面竞争，但也放弃了本体带来的估值弹性。其竞争壁垒能否成立，取决于三点：车规产线的良率与成本、Magic Glove 能否成为数据采集的事实标准、以及头部客户是否愿意把触觉规格开放给多家供应商。</p>
+      </div>
+
+      <div class="analysis-block" id="a26">
+        <h4>2.6 其他重要观察</h4>
+        <p><strong>估值与订单的口径问题。</strong>公司累计融资“数亿元”、订单“数十万颗”、产能“500万颗/年”均为公司或媒体口径，缺少审计与客户公告交叉验证；36氪亦以“高估值”设问但未给出数字。<sup><a href="#ref1">[1]</a></sup><sup><a href="#ref5">[5]</a></sup>读者应将“订单”理解为框架/定点口径，而非已确认收入。</p>
+        <p><strong>“触觉元年”的叙事风险。</strong>2026年被业界称为具身智能“触觉元年”，但人形机器人年度出货仍处千台级，上游触觉公司融资总额已达数十亿元，供需存在阶段性错配。<sup><a href="#ref9">[9]</a></sup><sup><a href="#ref22">[22]</a></sup>猿声的“数十万颗订单”在行业里属于领先，但相对其1.2亿颗远期产能规划，仍有数量级差距。</p>
+        <p><strong>待验证清单（判断）：</strong>（1）智元万套订单的交付节奏与复购；（2）车规产线的实际良率、直通率与单位成本；（3）Magic Glove 采集的数据是否在客户模型上产生可量化的成功率提升；（4）前五大客户集中度；（5）专利与核心器件的自主可控程度（公开渠道未见专利数量披露）；（6）创始团队持股与公司治理结构。</p>
+      </div>
+
+      <h2 id="refs">3 参考资料</h2>
+      <div class="references">
+        <ol>
+          <li id="ref1">猿声科技官网《关于猿声》. <a href="https://www.ensuringtech.com/about/" target="_blank" rel="noopener">https://www.ensuringtech.com/about/</a>（2026-11-19 访问，HTTP 200）</li>
+          <li id="ref2">猿声科技官网《产品中心：Tacta / HexSkin / Magic Glove》. <a href="https://www.ensuringtech.com/product/" target="_blank" rel="noopener">https://www.ensuringtech.com/product/</a></li>
+          <li id="ref3">猿声科技官网《全球首条车规级多维触觉传感器量产线正式投产》，2026-08-10. <a href="https://www.ensuringtech.com/news/automotive-tactile-sensor-production-line/" target="_blank" rel="noopener">https://www.ensuringtech.com/news/automotive-tactile-sensor-production-line/</a></li>
+          <li id="ref4">猿声科技官网《资本与产业双向协同，猿声科技与拓普集团战略合作》，2026-10-11. <a href="https://www.ensuringtech.com/news/ensuring-tuopu-strategic-cooperation/" target="_blank" rel="noopener">https://www.ensuringtech.com/news/ensuring-tuopu-strategic-cooperation/</a></li>
+          <li id="ref5">36氪《会是下一个帕西尼吗？五源、线性与产业巨头入局，成立一年半的「猿声科技」靠什么消化高估值？》，2026-11-09. <a href="https://www.36kr.com/p/4062330345362311" target="_blank" rel="noopener">https://www.36kr.com/p/4062330345362311</a></li>
+          <li id="ref6">36氪快讯《“猿声科技”连续完成三轮融资，金额超亿元》，2026-08-17. <a href="https://eu.36kr.com/zh/newsflashes/3943073201831296" target="_blank" rel="noopener">https://eu.36kr.com/zh/newsflashes/3943073201831296</a></li>
+          <li id="ref7">南方+《99后牛津博士深圳南山创业，赋予机器人“手感”》，2026-10-28. <a href="https://static.nfnews.com/content/202610/28/c12943311.html" target="_blank" rel="noopener">https://static.nfnews.com/content/202610/28/c12943311.html</a></li>
+          <li id="ref8">21世纪经济报道《具身智能项目落地珠海，总产能将达1.2亿颗触觉传感器》，2026-08-13. <a href="https://m.21jingji.com/article/20260813/herald/facfa792d4141e8f06540ddd19f6f104.html" target="_blank" rel="noopener">https://m.21jingji.com/article/20260813/herald/facfa792d4141e8f06540ddd19f6f104.html</a></li>
+          <li id="ref9">珠海特区报《全球首条！珠海这条产线专攻机器人“触觉神经”》，2026-08-11. <a href="https://pub-zhtb.hizh.cn/a/202608/11/AP6a7b0258e4b02aa23974a1e3.html" target="_blank" rel="noopener">https://pub-zhtb.hizh.cn/a/202608/11/AP6a7b0258e4b02aa23974a1e3.html</a></li>
+          <li id="ref10">科创板日报《猿声科技完成超亿元Pre-A轮系列融资》，2026-08-17. <a href="https://www.chinastarmarket.cn/detail/2456420" target="_blank" rel="noopener">https://www.chinastarmarket.cn/detail/2456420</a></li>
+          <li id="ref11">21世纪经济报道《猿声科技新增9名股东，注册资本增长18.8%》，2026-11-09. <a href="https://m.21jingji.com/article/20261109/herald/be64dfbf0833e384a030aac9ae492ebe.html" target="_blank" rel="noopener">https://m.21jingji.com/article/20261109/herald/be64dfbf0833e384a030aac9ae492ebe.html</a></li>
+          <li id="ref12">电子发烧友/传感器专家网《深圳触觉传感器新锐“猿声科技”再融近亿元，股东里藏了4家国产传感器龙头》，2026-11-18. <a href="https://m.elecfans.com/article/8958100.html" target="_blank" rel="noopener">https://m.elecfans.com/article/8958100.html</a></li>
+          <li id="ref13">证券之星《拓普集团（601689.SH）新增一起对外投资，被投资公司为猿声先达科技（深圳）有限公司》，2026-11-11. <a href="https://wap.stockstar.com/detail/RB2026111100008146" target="_blank" rel="noopener">https://wap.stockstar.com/detail/RB2026111100008146</a></li>
+          <li id="ref14">福布斯中文网（搜狐转载）《与深圳科创学院同行：“阿尔戈号”上的年轻人》，2026-11-13. <a href="https://m.sohu.com/coo/zmtq/1101172135_100246910" target="_blank" rel="noopener">https://m.sohu.com/coo/zmtq/1101172135_100246910</a></li>
+          <li id="ref15">innoHere《猿声科技 公司详情·融资历史》. <a href="https://innohere.com/ir/159160/finance.html" target="_blank" rel="noopener">https://innohere.com/ir/159160/finance.html</a></li>
+          <li id="ref16">传感器专家网《Ensuring 猿声科技 品牌页》. <a href="https://www.sensorexpert.com.cn/brand/26169.html" target="_blank" rel="noopener">https://www.sensorexpert.com.cn/brand/26169.html</a></li>
+          <li id="ref17">自动化网/柯力传感《未来已来丨柯力集团亮相世界机器人大会，以创新传感技术赋能机器人产业新未来》，2025-08-12. <a href="https://www.zidonghua.com.cn/news/exhibition/75492.html" target="_blank" rel="noopener">https://www.zidonghua.com.cn/news/exhibition/75492.html</a></li>
+          <li id="ref18">智能制造网（搜狐号）《猿声科技Tacta超薄高密度感算一体多维触觉传感器亮相深圳第27届高交会》，2025-11-25. <a href="https://www.sohu.com/a/958282401_249199" target="_blank" rel="noopener">https://www.sohu.com/a/958282401_249199</a></li>
+          <li id="ref19">界面新闻《机器人触觉传感器厂商有哪些？猿声科技正在建立一套从感知到数据的产品体系》，2026-10-08. <a href="https://www.jiemian.com/article/15167257.html" target="_blank" rel="noopener">https://www.jiemian.com/article/15167257.html</a></li>
+          <li id="ref20">机器人大讲堂《拓普集团与猿声科技达成战略合作，打通灵巧手触觉感知》，2026-09-17. <a href="https://leaderobot.com/news/9698" target="_blank" rel="noopener">https://leaderobot.com/news/9698</a></li>
+          <li id="ref21">证券之星/财经报道网《五源、线性与多家车规巨头入局，深圳触觉初创「猿声科技」完成新一轮股东扩容》，2026-11-09. <a href="https://wap.stockstar.com/detail/IG2026110900017519" target="_blank" rel="noopener">https://wap.stockstar.com/detail/IG2026110900017519</a></li>
+          <li id="ref22">雷峰网《不拿地方国资、全靠市场化巨头抢筹：「猿声科技」凭什么让五源、线性与拓普同时掏钱？》，2026-11-09. <a href="https://www.leiphone.com/category/industrynews/B48XPbz6KLvCe9jk.html" target="_blank" rel="noopener">https://www.leiphone.com/category/industrynews/B48XPbz6KLvCe9jk.html</a></li>
+          <li id="ref23">猿声科技官网《新闻动态》（含“2026深圳市种子独角兽企业”，2026-07-16）. <a href="https://www.ensuringtech.com/news/" target="_blank" rel="noopener">https://www.ensuringtech.com/news/</a></li>
+          <li id="ref24">传感器专家网《牛津大学博士领衔创立，猿声先达科技完成逾亿元融资 产业资本与明星机构共同入局》，2026-11-11. <a href="https://m.sensorexpert.com.cn/article/508506.html" target="_blank" rel="noopener">https://m.sensorexpert.com.cn/article/508506.html</a></li>
+        </ol>
+      </div>
+
+      <div class="page-footer"><p>具身智能Wiki · 猿声科技 · 数据截止 2026-11-19 · 事实性内容均标注来源；分析层为作者判断</p></div>
+    </article>
+  </div>
+</div>
+<script>
+  (function(){
+    var links = document.querySelectorAll('.toc-nav a');
+    var map = {};
+    links.forEach(function(a){ map[a.getAttribute('href').slice(1)] = a; });
+    var obs = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if(e.isIntersecting){
+          links.forEach(function(a){ a.classList.remove('active'); });
+          var a = map[e.target.id]; if(a) a.classList.add('active');
+        }
+      });
+    }, {rootMargin: '-10% 0px -80% 0px'});
+    document.querySelectorAll('h2[id],h3[id]').forEach(function(h){ obs.observe(h); });
+  })();
+</script>
+</body>
+</html>

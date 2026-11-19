@@ -18,7 +18,7 @@
 1,海外#17,Cartwheel Robotics,Cartwheel,媒体报道,completed,,wiki/entities/Cartwheel-Robotics.html
 1,海外#18,Skild AI,Skild,Crunchbase/Bloomberg/NVIDIA官方案例,completed,,wiki/entities/Skild-AI.html
 1,国内#1,优必选,UBTech,年报/招股书,completed,,wiki/entities/优必选.html
-1,国内#2,智元机器人,AgiBot,公司披露/36氪,completed,,wiki/entities/智元机器人.html
+1,国内#2,智元机器人,AgiBot,公司披露/人民邮电报/澎湃/投资界/科创板日报/广州日报/钛媒体/中证网/智元官网,completed,,wiki/entities/智元机器人.html
 1,国内#3,新松机器人,SIASUN,上市公司公告,completed,,wiki/entities/新松机器人.html
 1,国内#4,埃斯顿,Estun,上市公司公告,completed,,wiki/entities/埃斯顿.html
 1,国内#5,越疆机器人,Dobot,港股招股书/36氪,completed,,wiki/entities/越疆机器人.html
@@ -225,8 +225,8 @@
 1,海外生态#4,Universal Robots/Teradyne,Teradyne Robotics,The Robot Report+NVIDIA GTC,completed,self,entities/Universal-Robots.html
 1,海外生态#5,ANYbotics,ANYbotics,Climate Investment官方+The AI Insider+ANYbotics官方,completed,self,entities/ANYbotics.html
 1,国内#176,松灵机器人,AgileX Robotics,36氪+Tracxn+松灵官网+微信公众号,completed,self,entities/松灵机器人.html
-1	国内生态#15	沃德尔	Wodeer Technology	公司官网+2026杭州人形机器人展+江西日报报道+灵犀智涌参访纪要	completed	self	entities/沃德尔.html
-1	国内生态#16	拉格朗日	Lagrange	天眼查+雷峰网独家报道+36氪快讯+百度风投入股公告	completed	self	entities/拉格朗日.html
+1	国内生态#20	沃德尔	Wodeer Technology	公司官网+2026杭州人形机器人展+江西日报报道+灵犀智涌参访纪要	completed	self	entities/沃德尔.html
+1	国内生态#21	拉格朗日	Lagrange	天眼查+雷峰网独家报道+36氪快讯+百度风投入股公告	completed	self	entities/拉格朗日.html
 1	国内生态#17	千里科技	Qianli (AFARI)	2025年报(上海证券报)+36氪+钛媒体+央广网+东方财富	completed	self	entities/千里科技.html
 1	国内#175	清科灵境	Qingke Lingjing (Synkrotron)	投资界+合肥在线+中国政府采购网+汽车测试网+36氪+将门创投	completed	self	entities/清科灵境.html
 1,国内#37,灵初智能,PSI Bot / Proto-Sentient Intelligence,36氪/投中网/钛媒体/北京日报/极客公园/量子位/公司官网,completed,self,entities/灵初智能.html
@@ -250,3 +250,4 @@
 2,investor#10,正海资本,Royalsea Capital,正海资本官网(royalsea-capital.com profile/team/case-ipo/case-venture/idea/speech 全量46个案例)+中基协AMAC公示(P1003518 35只基金)+寅家科技港交所上市申请(sehk26092700111 直营持股7.58%/交融5.09%/正海为两基金GP)+果纳半导体港交所上市申请(sehk26052903008)+上海证券报与证券之星(恒为科技南通正海恒浦1.75亿/国恒1.5亿公告)+人民网安徽(交融正海20亿首只备案子基金)+证券时报(寅家递表/估值27.8亿)+投资界(11起募资事件/索迩A+领投)+36氪PitchHub(同驭A+近2亿)+innoHere(华航唯实B轮)+客套企业名录(交融正海工商)+南方+(双湾产业协同联盟),completed,self,entities/investors/正海资本.html
 1,国内生态#19,梅卡曼德,Mech-Mind (09615.HK),"港交所招股章程(2026-08-24 425页 全文PDF:财务/股东/IPO/市占率/专利/客户)+2026中期报告(2026-09-24)+新京报贝壳财经2026-09-01+界面新闻2026-09-01+智通财经/证券之星2026-09-24(申购倍数/破发)+东方财富行情接口2026-10-27(市值111.7亿港元)+官网mech-mind.com(连通性验证200)",completed,self,entities/梅卡曼德.html
 1,海外#26,Tutor Intelligence,Tutor Intelligence,公司官网(tutorintelligence.com 首页/about/cassie/sonny/pricing/research/newsroom/careers)+公司博客5篇(2026-11-01 Next Age of Machines/2025-12-01 Series A Letter/2026-04-30 Data Factory 1/2026-09-16 第二代Cassie与Sonny/2026-11-09 TI-0.1与TRACE)+Business Wire官方新闻稿2026-11-02(B轮7500万美元)+a16z投资公告2026-11-02+Tech Funding News2026-11-03+Manufacturing Dive2026-05-07(DF1与BetterBody Foods)+Watertown News2026-04-27(Riverworks总部),completed,self,entities/Tutor-Intelligence.html
+1	国内生态#19	猿声科技	Ensuring Technology	公司官网(ensuringtech.com about/product/news 及产线、拓普合作两篇原文，连通性验证200)+36氪2026-11-09及快讯2026-08-17+南方+2026-10-28+21世纪经济报道2026-08-13/2026-11-09+珠海特区报2026-08-11+科创板日报2026-08-17+电子发烧友2026-11-18+传感器专家网2026-11-11+证券之星2026-11-11+界面新闻2026-10-08+机器人大讲堂2026-09-17+雷峰网2026-11-09+福布斯中文网+innoHere融资历史(估值未披露，累计融资数亿元)	completed	self	entities/猿声科技.html
